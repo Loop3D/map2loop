@@ -1,0 +1,14 @@
+numpy
+pandas
+geopandas
+shapely
+tqdm
+# descartes
+# matplotlib-base
+networkx
+owslib
+map2model
+# mplstereonet
+hjson
+loopprojectfile
+beartype

@@ -2,7 +2,7 @@
 
 Generate 3D geological model inputs from geographical maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:   
    
-<!-- <a href="http://geo.loop-gis.org/models/vtkleaflet_2021-03-19-11-40.html">3D Model from the Hamersley region, Western Australia</a> -->
+<a href="http://tectonique.net/models/brockman_syncline.html">3D Model from the Hamersley region, Western Australia</a>
 
 
 ## Install
@@ -95,10 +95,10 @@ bbox_3d = {
 Then, specify: the state, directory for the output, the bounding box and projection from above - and hit go! That's it.
 
 ```python
-proj = Project(use_australian_state_data="SA",
-               working_projection='EPSG:28354',
-               bbox=bbox_3d,
-               loop_project_filename="output.loop3d"
+proj = Project(use_australian_state_data = "SA",
+               working_projection = 'EPSG:28354',
+               bounding_box = bbox_3d,
+               loop_project_filename = "output.loop3d"
                )
 
 proj.run_all()

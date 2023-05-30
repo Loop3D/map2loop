@@ -913,7 +913,7 @@ class MapData:
 
     @beartype.beartype
     def save_raw_map_data(
-        self, output_dir: str, datatype: Datatype, extension: str = ".csv"
+        self, output_dir: str, datatype: Datatype, extension: str = ".shp.zip"
     ):
         """
         Save the map data from datatype to file
@@ -927,9 +927,11 @@ class MapData:
                 The extension to use for the data. Defaults to ".csv".
         """
         try:
-            filename = os.path.join(output_dir, datatype.name, extension)
+            filename = os.path.join(output_dir, datatype.name + extension)
             if extension == ".csv":
-                self.raw_data[datatype].write_csv(filename)
+                # TODO: Add geopandas to pandas converter and then write csv
+                # self.raw_data[datatype].write_csv(filename)
+                print("GeoDataFrame to CSV conversion not implimented")
             else:
                 self.raw_data[datatype].to_file(filename)
         except Exception:

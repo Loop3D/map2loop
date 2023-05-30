@@ -10,7 +10,10 @@ from .map2model_wrapper import Map2ModelWrapper
 import LoopProjectFile as LPF
 
 import numpy
+import pandas
+import geopandas
 import os
+from matplotlib.colors import to_rgba
 
 # TODO: When geopandas gets updated check that this FutureWarning supression
 #       is still needed for GeoDataFrame.clip methods
@@ -305,7 +308,7 @@ class Project(object):
         self.map_data.extract_all_contacts()
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        self.sampled_contacts = SamplerSpacing(50.0).sample(self.map_data.basal_contacts)
+        self.sampled_contacts = SamplerSpacing(500.0).sample(self.map_data.basal_contacts)
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.sampled_contacts)
 
     def calculate_stratigraphic_order(self):
@@ -502,3 +505,50 @@ class Project(object):
         observations["dip"] = self.structure_samples["DIP"]
         observations["dipPolarity"] = self.structure_samples["OVERTURNED"]
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations, verbose=True)
+
+    @beartype.beartype
+    def draw_geology_map(self, points:pandas.DataFrame = None, overlay:str = ""):
+        """
+        Plots the geology map with optional points or specific data
+
+        Args:
+            points (pandas.DataFrame, optional):
+                A dataframe to overlay on the geology map (must contains "X" and "Y" columns). Defaults to None.
+            overlay (str, optional):
+                Layer of points to overlay (options are "contacts", "basal_contacts", "orientations", "faults"). Defaults to "".
+        """
+        colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name","colour"]].set_index("name").to_dict()["colour"]
+        geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
+        geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
+        geol['colour_rgba'] = geol.apply(lambda row: to_rgba(row['colour'], 1.0), axis=1)
+        if points is None and overlay == "":
+            geol.plot(color=geol['colour_rgba'])
+        else:
+            base = geol.plot(color=geol['colour_rgba'])
+        if overlay != "":
+            if overlay == "contacts":
+                points = self.sampled_contacts
+            elif overlay == "orientations":
+                points = self.structure_samples
+            elif overlay == "faults":
+                points = self.fault_samples
+            else:
+                print(f"Invalid overlay option {overlay}")
+                return
+        gdf = geopandas.GeoDataFrame(points, geometry=geopandas.points_from_xy(points["X"], points["Y"], crs=geol.crs))
+        gdf.plot(ax=base, marker="o", color="red", markersize=5)
+
+    @beartype.beartype
+    def save_mapdata_to_files(self, save_path:str = ".", extension:str = ".shp.zip"):
+        """
+        Saves the map data frames to csv files
+
+        Args:
+            save_path (str, optional):
+                The path to save the file to. Defaults to ".".
+            extension (str, optional):
+                An alternate extension to save the GeoDataFrame in. Defaults to ".csv".
+        """
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+        self.map_data.save_all_map_data(save_path, extension)

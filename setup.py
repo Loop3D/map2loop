@@ -34,7 +34,6 @@ setuptools.setup(
     description="Generate 3D model data from 2D maps.",
     long_description=get_description(),
     long_description_content_type="text/markdown",
-    # install_requires=[],
     install_requires=[
         "numpy",
         "gdal",
@@ -42,14 +41,11 @@ setuptools.setup(
         "geopandas",
         "shapely",
         "tqdm",
-    #     "descartes",
-    #     "matplotlib",
         "networkx",
         "owslib",
-    #     "mplstereonet",
         "hjson",
         "loopprojectfile",
-        "map2model-loop3d"
+        "map2model"
     ],
     url="https://github.com/Loop3D/map2loop-3",
     packages=setuptools.find_packages(),

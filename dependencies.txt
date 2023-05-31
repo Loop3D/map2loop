@@ -1,14 +1,11 @@
 numpy
 pandas
-geopandas
+geopandas=0.12.2
 shapely
 tqdm
-# descartes
-# matplotlib-base
 networkx
 owslib
 map2model
-# mplstereonet
 hjson
 loopprojectfile
 beartype

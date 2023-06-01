@@ -51,7 +51,7 @@ class Project(object):
     def __init__(
         self,
         verbose_level: VerboseLevel = VerboseLevel.ALL,
-        tmp_path: str = ".\\m2l_data_tmp",
+        tmp_path: str = "m2l_data_tmp",
         working_projection=None,
         bounding_box=None,
         use_australian_state_data: str = "",

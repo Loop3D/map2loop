@@ -155,50 +155,58 @@ class Map2ModelWrapper():
             self.sorted_units = list(units_sorted[5])
 
         # Parse fault intersections
-        df = pandas.read_csv(
-            os.path.join(self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt"),
-            delimiter="{",
-            header=None,
-        )
-        df[1] = list(df[1].str.replace("}", "", regex=False))
-        df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # noqa: W605 Valid escape for regex
-        df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
-        df[0] = list(df[0].str.replace(", ", "", regex=False))
-        df[0] = "Fault_" + df[0]
-        for j in range(len(df)):
-            df[1][j] = [i.strip("()").replace(" ", "").split(",") for i in df[1][j]]
-
         out = []
-        for _, row in df.iterrows():
-            for i in numpy.arange(len(row[1])):
-                out += [[row[0], "Fault_"+row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+        fault_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data","fault-fault-intersection.txt")
+        if os.path.isfile(fault_fault_intersection_filename) and os.path.getsize(fault_fault_intersection_filename) > 0:
+            df = pandas.read_csv(
+                fault_fault_intersection_filename,
+                delimiter="{",
+                header=None,
+            )
+            df[1] = list(df[1].str.replace("}", "", regex=False))
+            df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # noqa: W605 Valid escape for regex
+            df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
+            df[0] = list(df[0].str.replace(", ", "", regex=False))
+            df[0] = "Fault_" + df[0]
+            for j in range(len(df)):
+                df[1][j] = [i.strip("()").replace(" ", "").split(",") for i in df[1][j]]
+
+            for _, row in df.iterrows():
+                for i in numpy.arange(len(row[1])):
+                    out += [[row[0], "Fault_"+row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
         self.fault_fault_relationships = df_out
 
         # Parse unit fault relationships
-        df = pandas.read_csv(os.path.join(self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt"), header=None, sep='{')
-        df[1] = list(df[1].str.replace("}", "", regex=False))
-        df[1] = df[1].astype(str).str.split(", ")
-        df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
-        df[0] = list(df[0].str.replace(", ", "", regex=False))
-
         out = []
-        for _, row in df.iterrows():
-            for i in numpy.arange(len(row[1])):
-                out += [[row[0], "Fault_"+row[1][i]]]
+        unit_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt")
+        if os.path.isfile(unit_fault_intersection_filename) and os.path.getsize(unit_fault_intersection_filename) > 0:
+            df = pandas.read_csv(unit_fault_intersection_filename, header=None, sep='{')
+            df[1] = list(df[1].str.replace("}", "", regex=False))
+            df[1] = df[1].astype(str).str.split(", ")
+            df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
+            df[0] = list(df[0].str.replace(", ", "", regex=False))
+
+            for _, row in df.iterrows():
+                for i in numpy.arange(len(row[1])):
+                    out += [[row[0], "Fault_"+row[1][i]]]
+
         df_out = pandas.DataFrame(columns=["Unit", "Fault"], data=out)
         self.unit_fault_relationships = df_out
 
         # Parse unit unit relationships
         units = []
         links = []
-        with open(os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")) as file:
-            contents = file.read()
-            segments = contents.split("\n\n")
-            for line in segments[0].split("\n"):
-                units += [line.split(" ")]
-            for line in segments[1].split("\n")[:-1]:
-                links += [line.split(" ")]
+        graph_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")
+        if os.path.isfile(graph_filename) and os.path.getsize(graph_filename) > 0:
+            with open(os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")) as file:
+                contents = file.read()
+                segments = contents.split("\n\n")
+                for line in segments[0].split("\n"):
+                    units += [line.split(" ")]
+                for line in segments[1].split("\n")[:-1]:
+                    links += [line.split(" ")]
 
         df = pandas.DataFrame(columns=["index", "unit"], data=units)
         df.set_index("index", inplace=True)

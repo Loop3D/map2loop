@@ -224,7 +224,7 @@ class MapData:
             return None
 
     @beartype.beartype
-    def set_config_filename(self, filename: str, legacy_format: bool = False):
+    def set_config_filename(self, filename: str, legacy_format: bool = False, lower:bool = False):
         """
         Set the config filename and update the config structure
 
@@ -235,7 +235,7 @@ class MapData:
                 Whether the file is in m2lv2 form. Defaults to False.
         """
         self.config_filename = filename
-        self.config.update_from_file(filename, legacy_format=legacy_format)
+        self.config.update_from_file(filename, legacy_format=legacy_format, lower=lower)
 
     def get_config_filename(self):
         """
@@ -307,7 +307,8 @@ class MapData:
             self.set_filename(Datatype.FAULT, AustraliaStateUrls.aus_fault_urls[state])
             self.set_filename(Datatype.FOLD, AustraliaStateUrls.aus_fold_urls[state])
             self.set_filename(Datatype.DTM, "au")
-            self.set_config_filename(AustraliaStateUrls.aus_config_urls[state], legacy_format=True)
+            lower = state == "SA"
+            self.set_config_filename(AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower)
             self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
         else:
             raise ValueError(f"Australian state {state} not in state url database")
@@ -818,8 +819,9 @@ class MapData:
         else:
             faults["ID"] = faults.index
 
-        faults["NAME"] = faults.apply(lambda fault: "Fault_" + str(fault["ID"]) if fault["NAME"] == "nan" else fault["NAME"], axis=1)
-        faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
+        if len(faults):
+            faults["NAME"] = faults.apply(lambda fault: "Fault_" + str(fault["ID"]) if fault["NAME"] == "nan" else fault["NAME"], axis=1)
+            faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
 
         self.data[Datatype.FAULT] = faults
         return (False, "")
@@ -1154,6 +1156,9 @@ class MapData:
         Returns:
             pandas.DataFrame: The modified dataframe
         """
+        if len(df) <= 0:
+            df['Z'] = []
+            return df
         data = self.get_map_data(datatype)
         if data is None:
             print("Cannot get value from data as data is not loaded")

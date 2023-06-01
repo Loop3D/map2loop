@@ -67,7 +67,7 @@ class Config:
             }
 
     @beartype.beartype
-    def update_from_dictionary(self, dictionary: dict):
+    def update_from_dictionary(self, dictionary: dict, lower:bool = False):
         """
         Update the config dictionary from a provided dict
 
@@ -102,7 +102,7 @@ class Config:
             print(f"Unused keys from config format {list(dictionary.keys())}")
 
     @beartype.beartype
-    def update_from_legacy_file(self, file_map: dict):
+    def update_from_legacy_file(self, file_map: dict, lower:bool=False):
         """
         Update the config dictionary from the provided old version dictionary
 
@@ -147,6 +147,8 @@ class Config:
         }
         for code in code_mapping:
             if code in file_map:
+                if lower is True:
+                    file_map[code] = str(file_map[code]).lower()
                 code_mapping[code][0][code_mapping[code][1]] = file_map[code]
                 file_map.pop(code)
 
@@ -160,7 +162,7 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: str, legacy_format: bool = False):
+    def update_from_file(self, filename: str, legacy_format: bool = False, lower:bool = False):
         """
         Update the config dictionary from the provided json filename or url
 
@@ -176,8 +178,8 @@ class Config:
         if filename.startswith("http") or filename.startswith("ftp"):
             with urllib.request.urlopen(filename) as url_data:
                 data = hjson.load(url_data)
-                func(data)
+                func(data, lower)
         else:
             with open(filename) as url_data:
                 data = hjson.load(url_data)
-                func(data)
+                func(data, lower)

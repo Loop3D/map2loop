@@ -183,6 +183,9 @@ class Project(object):
         largest_dimension = max(bounding_box["maxx"] - bounding_box["minx"], bounding_box["maxy"] - bounding_box["miny"])
         self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
 
+        if len(kwargs):
+            print(f"These keywords were not used in initialising the Loop project ({kwargs})")
+
     # Getters and Setters
     @beartype.beartype
     def set_ignore_codes(self, codes: list):
@@ -507,7 +510,7 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations, verbose=True)
 
     @beartype.beartype
-    def draw_geology_map(self, points:pandas.DataFrame = None, overlay:str = ""):
+    def draw_geology_map(self, points: pandas.DataFrame = None, overlay: str = ""):
         """
         Plots the geology map with optional points or specific data
 
@@ -517,7 +520,7 @@ class Project(object):
             overlay (str, optional):
                 Layer of points to overlay (options are "contacts", "basal_contacts", "orientations", "faults"). Defaults to "".
         """
-        colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name","colour"]].set_index("name").to_dict()["colour"]
+        colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name", "colour"]].set_index("name").to_dict()["colour"]
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
         geol['colour_rgba'] = geol.apply(lambda row: to_rgba(row['colour'], 1.0), axis=1)
@@ -539,7 +542,7 @@ class Project(object):
         gdf.plot(ax=base, marker="o", color="red", markersize=5)
 
     @beartype.beartype
-    def save_mapdata_to_files(self, save_path:str = ".", extension:str = ".shp.zip"):
+    def save_mapdata_to_files(self, save_path: str = ".", extension: str = ".shp.zip"):
         """
         Saves the map data frames to csv files
 

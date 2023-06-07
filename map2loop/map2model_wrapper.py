@@ -156,7 +156,7 @@ class Map2ModelWrapper():
 
         # Parse fault intersections
         out = []
-        fault_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data","fault-fault-intersection.txt")
+        fault_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt")
         if os.path.isfile(fault_fault_intersection_filename) and os.path.getsize(fault_fault_intersection_filename) > 0:
             df = pandas.read_csv(
                 fault_fault_intersection_filename,

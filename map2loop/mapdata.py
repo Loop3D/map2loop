@@ -224,7 +224,7 @@ class MapData:
             return None
 
     @beartype.beartype
-    def set_config_filename(self, filename: str, legacy_format: bool = False, lower:bool = False):
+    def set_config_filename(self, filename: str, legacy_format: bool = False, lower: bool = False):
         """
         Set the config filename and update the config structure
 

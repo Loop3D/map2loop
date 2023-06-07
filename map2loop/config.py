@@ -67,7 +67,7 @@ class Config:
             }
 
     @beartype.beartype
-    def update_from_dictionary(self, dictionary: dict, lower:bool = False):
+    def update_from_dictionary(self, dictionary: dict, lower: bool = False):
         """
         Update the config dictionary from a provided dict
 
@@ -102,7 +102,7 @@ class Config:
             print(f"Unused keys from config format {list(dictionary.keys())}")
 
     @beartype.beartype
-    def update_from_legacy_file(self, file_map: dict, lower:bool=False):
+    def update_from_legacy_file(self, file_map: dict, lower: bool = False):
         """
         Update the config dictionary from the provided old version dictionary
 
@@ -162,7 +162,7 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: str, legacy_format: bool = False, lower:bool = False):
+    def update_from_file(self, filename: str, legacy_format: bool = False, lower: bool = False):
         """
         Update the config dictionary from the provided json filename or url
 

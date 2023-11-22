@@ -2,7 +2,7 @@ import os
 import sys
 import setuptools
 # import subprocess
-from map2loop import __version__
+from map2loop.version import __version__
 
 head, tail = os.path.split(sys.argv[0])
 
@@ -36,14 +36,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "numpy",
-        "gdal",
+        # "gdal",
         "pandas",
         "geopandas",
         "shapely",
         "tqdm",
         "networkx",
         "owslib",
-        "hjson",
+        "hjson-py",
         "loopprojectfile",
         "map2model"
     ],

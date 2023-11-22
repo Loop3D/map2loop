@@ -6,6 +6,6 @@ tqdm
 networkx
 owslib
 map2model
-hjson
+hjson-py
 loopprojectfile
 beartype

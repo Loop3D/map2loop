@@ -100,7 +100,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 val = min(distance, thicknesses.at[idx, "thickness"])
             thicknesses.loc[idx, "thickness"] = val
 
-        # If no thickness calculations can be made with current stratigraphic column set all untis
+        # If no thickness calculations can be made with current stratigraphic column set all units
         # to a uniform thickness value
         if len(thicknesses[thicknesses["thickness"] > 0]) < 1:
             thicknesses["thickness"] = 100.0

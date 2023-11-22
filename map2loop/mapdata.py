@@ -731,6 +731,9 @@ class MapData:
         # Mask out ignored unit_names/codes (ie. for cover)
         for code in self.config.geology_config["ignore_codes"]:
             geology = geology[~geology["CODE"].astype(str).str.contains(code)]
+            geology = geology[~geology["UNITNAME"].astype(str).str.contains(code)]
+
+        geology = geology.dissolve(by="UNITNAME", as_index=False)
 
         # Note: alt_rocktype_column and volcanic_text columns not used
         self.data[Datatype.GEOLOGY] = geology
@@ -1102,7 +1105,6 @@ class MapData:
             print(f"Cannot get value from {datatype.name} data as data is not loaded")
             return None
         inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
-        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray())
 
         px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
         py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
@@ -1112,8 +1114,7 @@ class MapData:
         py = max(py, 0)
         py = min(py, data.RasterYSize-1)
         val = data.ReadAsArray(px, py, 1, 1)[0][0]
-        val2 = data_array[px][py]
-        return (val, val2)
+        return val
 
     @beartype.beartype
     def __value_from_raster(self, inv_geotransform, data, x: float, y: float):
@@ -1165,7 +1166,7 @@ class MapData:
             return None
 
         inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
-        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray())
+        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray().T)
 
         df['Z'] = df.apply(lambda row:
                            self.__value_from_raster(inv_geotransform,
@@ -1177,12 +1178,16 @@ class MapData:
         return df
 
     @beartype.beartype
-    def extract_all_contacts(self):
+    def extract_all_contacts(self, save_contacts=True):
         """
         Extract the contacts between units in the geology GeoDataFrame
         """
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
+        # Remove faults from contact geomety
+        faults = self.get_map_data(Datatype.FAULT).copy()
+        faults["geometry"] = faults.buffer(50)
+        geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
         units = geology["UNITNAME"].unique()
         column_names = ["UNITNAME_1", "UNITNAME_2", "geometry"]
         contacts = geopandas.GeoDataFrame(crs=geology.crs, columns=column_names, data=None)
@@ -1201,10 +1206,13 @@ class MapData:
                     if len(end):
                         contacts = pandas.concat([contacts, end], ignore_index=True)
         # contacts["TYPE"] = "UNKNOWN"
-        self.contacts = contacts
+        contacts['length'] = [row.length for row in contacts['geometry']]
+        if save_contacts:
+            self.contacts = contacts
+        return contacts
 
     @beartype.beartype
-    def extract_basal_contacts(self, stratigraphic_column: list):
+    def extract_basal_contacts(self, stratigraphic_column: list, save_contacts=True):
         """
         Identify the basal unit of the contacts based on the stratigraphic column
 
@@ -1226,7 +1234,10 @@ class MapData:
         basal_contacts["type"] = basal_contacts.apply(
             lambda row: "ABNORMAL" if abs(row["distance"]) > 1 else "BASAL", axis=1
         )
-        self.basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
+        basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
+        if save_contacts:
+            self.basal_contacts = basal_contacts
+        return basal_contacts
 
     @beartype.beartype
     def colour_units(self, stratigraphic_units: pandas.DataFrame, random: bool = False):

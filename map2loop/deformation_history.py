@@ -216,7 +216,7 @@ class DeformationHistory:
         self.faults["maxAge"] = -1
         self.faults["group"] = ""
         self.faults["supergroup"] = ""
-        self.faults["avgDisplacement"] = 1
+        self.faults["avgDisplacement"] = 100
         self.faults["avgDownthrowDir"] = 0
         self.faults["influenceDistance"] = 0
         self.faults["verticalRadius"] = 0
@@ -272,3 +272,24 @@ class DeformationHistory:
             pandas.DataFrame: The filtered fault summary
         """
         return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
+
+    @beartype.beartype
+    def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):
+        """
+        Ammend the fault relationships DataFrame with the fault eventIds
+
+        Args:
+            fault_fault_relationships (pandas.DataFrame): The fault_fault_relationships
+
+        Returns:
+            pandas.DataFrame: The fault_relationships with the correct eventIds
+        """
+        faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
+        rel = fault_fault_relationships.copy()
+        rel = rel.merge(faultIds, left_on="Fault1", right_on="name")
+        rel.rename(columns={"eventId": "eventId1"}, inplace=True)
+        rel.drop(columns=["name"], inplace=True)
+        rel = rel.merge(faultIds, left_on="Fault2", right_on="name")
+        rel.rename(columns={"eventId": "eventId2"}, inplace=True)
+        rel.drop(columns=["name"], inplace=True)
+        return rel

@@ -43,7 +43,7 @@ setuptools.setup(
         "tqdm",
         "networkx",
         "owslib",
-        "hjson-py",
+        "hjson",
         "loopprojectfile",
         "map2model"
     ],

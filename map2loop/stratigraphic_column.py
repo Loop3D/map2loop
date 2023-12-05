@@ -76,9 +76,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if type(id) == int:
+        if type(id) is int:
             return self.stratigraphicUnits[self.stratigraphicUnits["layerId"] == id]
-        elif type(id) == str:
+        elif type(id) is str:
             return self.stratigraphicUnits[self.stratigraphicUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find stratigraphic unit")
@@ -94,9 +94,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if type(id) == int:
+        if type(id) is int:
             return self.lithologyUnits[self.lithologyUnits["layerId"] == id]
-        elif type(id) == str:
+        elif type(id) is str:
             return self.lithologyUnits[self.lithologyUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find lithology unit")
@@ -109,7 +109,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if type(unit) == pandas.DataFrame or type(unit) == dict:
+        if type(unit) is pandas.DataFrame or type(unit) is dict:
             if "name" in unit.keys():
                 if unit["name"] in self.stratigraphicUnits.index:
                     print("Replacing stratigraphic unit", unit["name"])
@@ -127,7 +127,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if type(unit) == pandas.DataFrame or type(unit) == dict:
+        if type(unit) is pandas.DataFrame or type(unit) is dict:
             if "name" in unit.keys():
                 if unit["name"] in self.lithologyUnits.index:
                     print("Replacing lithology unit", unit["name"])

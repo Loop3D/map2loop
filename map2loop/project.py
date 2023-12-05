@@ -131,7 +131,7 @@ class Project(object):
             config_filename = kwargs["metadata_filename"]
 
         # Sanity check on working projection parameter
-        if type(working_projection) == str or type(working_projection) == int:
+        if type(working_projection) is str or type(working_projection) is int:
             self.map_data.set_working_projection(working_projection)
         elif type(working_projection) is None:
             if verbose_level != VerboseLevel.NONE:
@@ -140,7 +140,7 @@ class Project(object):
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
-        if type(bounding_box) == dict or type(bounding_box) == tuple:
+        if type(bounding_box) is dict or type(bounding_box) is tuple:
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
             else:

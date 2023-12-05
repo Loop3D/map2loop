@@ -112,13 +112,13 @@ class SamplerSpacing(Sampler):
         schema = {"ID": str, "X": float, "Y": float}
         df = pandas.DataFrame(columns=schema.keys()).astype(schema)
         for _, row in map_data.iterrows():
-            if type(row.geometry) == shapely.geometry.multipolygon.MultiPolygon:
+            if type(row.geometry) is shapely.geometry.multipolygon.MultiPolygon:
                 targets = row.geometry.boundary.geoms
-            elif type(row.geometry) == shapely.geometry.polygon.Polygon:
+            elif type(row.geometry) is shapely.geometry.polygon.Polygon:
                 targets = [row.geometry.boundary]
-            elif type(row.geometry) == shapely.geometry.multilinestring.MultiLineString:
+            elif type(row.geometry) is shapely.geometry.multilinestring.MultiLineString:
                 targets = row.geometry.geoms
-            elif type(row.geometry) == shapely.geometry.linestring.LineString:
+            elif type(row.geometry) is shapely.geometry.linestring.LineString:
                 targets = [row.geometry]
             else:
                 targets = []

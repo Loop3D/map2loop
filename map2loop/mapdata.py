@@ -93,10 +93,10 @@ class MapData:
             projection (int or str):
                 The projection to use for map reprojection
         """
-        if type(projection) == int:
+        if type(projection) is int:
             projection = "EPSG:" + str(projection)
             self.working_projection = projection
-        elif type(projection) == str:
+        elif type(projection) is str:
             self.working_projection = projection
         else:
             print(
@@ -123,7 +123,7 @@ class MapData:
                 The bounding box to use for maps
         """
         # Convert tuple bounding_box to dict else assign directly
-        if type(bounding_box) == tuple:
+        if type(bounding_box) is tuple:
             self.bounding_box = {'minx': bounding_box[0],
                                  'maxx': bounding_box[1],
                                  'miny': bounding_box[2],
@@ -131,7 +131,7 @@ class MapData:
             if len(bounding_box) == 6:
                 self.bounding_box['top'] = bounding_box[4]
                 self.bounding_box['base'] = bounding_box[5]
-        elif type(bounding_box) == dict:
+        elif type(bounding_box) is dict:
             self.bounding_box = bounding_box
         else:
             raise TypeError(f"Invalid type for bounding_box {type(bounding_box)}")
@@ -593,7 +593,7 @@ class MapData:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
         # Check type and size of loaded structure map
-        if self.raw_data[Datatype.STRUCTURE] is None or type(self.raw_data[Datatype.STRUCTURE]) != geopandas.GeoDataFrame:
+        if self.raw_data[Datatype.STRUCTURE] is None or type(self.raw_data[Datatype.STRUCTURE]) is not geopandas.GeoDataFrame:
             return (True, "Structure map is not loaded or valid")
 
         if len(self.raw_data[Datatype.STRUCTURE]) < 2:
@@ -648,7 +648,7 @@ class MapData:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
         # Check type of loaded geology map
-        if self.raw_data[Datatype.GEOLOGY] is None or type(self.raw_data[Datatype.GEOLOGY]) != geopandas.GeoDataFrame:
+        if self.raw_data[Datatype.GEOLOGY] is None or type(self.raw_data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame:
             return (True, "Geology map is not loaded or valid")
 
         # Create new geodataframe
@@ -748,7 +748,7 @@ class MapData:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
         # Check type of loaded fault map
-        if self.raw_data[Datatype.FAULT] is None or type(self.raw_data[Datatype.FAULT]) != geopandas.GeoDataFrame:
+        if self.raw_data[Datatype.FAULT] is None or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame:
             return (True, "Fault map is not loaded or valid")
 
         # Create new geodataframe
@@ -838,7 +838,7 @@ class MapData:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
         # Check type of loaded fold map
-        if self.raw_data[Datatype.FOLD] is None or type(self.raw_data[Datatype.FOLD]) != geopandas.GeoDataFrame:
+        if self.raw_data[Datatype.FOLD] is None or type(self.raw_data[Datatype.FOLD]) is not geopandas.GeoDataFrame:
             return (True, "Fold map is not loaded or valid")
 
         # Create new geodataframe
@@ -885,7 +885,7 @@ class MapData:
         """
         if self.working_projection is None:
             print("No working projection set leaving map data in original projection")
-        elif type(self.raw_data[datatype]) == geopandas.GeoDataFrame:
+        elif type(self.raw_data[datatype]) is geopandas.GeoDataFrame:
             if self.data_states[datatype] >= Datastate.LOADED:
                 if self.raw_data[datatype].crs is None:
                     print(f"No projection on original map data, assigning to working_projection {self.working_projection}")
@@ -1054,7 +1054,7 @@ class MapData:
 
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
-        if type(self.data[Datatype.GEOLOGY]) != geopandas.GeoDataFrame:
+        if type(self.data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame:
             print("Cannot export geology data as it is not a GeoDataFrame")
         elif self.data_states[Datatype.GEOLOGY] != Datastate.COMPLETE:
             print(f"Cannot export geology data as it only loaded to {self.data_states[Datatype.GEOLOGY].name} status")
@@ -1075,7 +1075,7 @@ class MapData:
 
         # Check faults data status and export to a WKT format file
         self.load_map_data(Datatype.FAULT)
-        if type(self.data[Datatype.FAULT]) != geopandas.GeoDataFrame:
+        if type(self.data[Datatype.FAULT]) is not geopandas.GeoDataFrame:
             print("Cannot export fault data as it is not a GeoDataFrame")
         elif self.data_states[Datatype.FAULT] != Datastate.COMPLETE:
             print(f"Cannot export fault data as it only loaded to {self.data_states[Datatype.FAULT].name} status")

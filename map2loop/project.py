@@ -252,6 +252,7 @@ class Project(object):
         self.samplers[Datatype.GEOLOGY] = SamplerSpacing(50.0)
         self.samplers[Datatype.FAULT] = SamplerSpacing(50.0)
         self.samplers[Datatype.FOLD] = SamplerSpacing(50.0)
+        self.samplers[Datatype.DTM] = SamplerSpacing(50.0)
 
     @beartype.beartype
     def set_sampler(self, datatype: Datatype, sampler: Sampler):
@@ -316,7 +317,7 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        self.sampled_contacts = SamplerSpacing(500.0).sample(self.map_data.basal_contacts)
+        self.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
@@ -500,6 +501,8 @@ class Project(object):
         faults_obs_data["dipPolarity"] = 0  # self.fault_samples["DIPPOLARITY"]
         # faults_obs_data["val"] = self.fault_samples["???"]
         faults_obs_data["displacement"] = 100  # self.fault_samples["DISPLACEMENT"]
+
+        # TODO: Find a better way to assign posOnly for fault observations
         from itertools import cycle, islice
         faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
         LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True)

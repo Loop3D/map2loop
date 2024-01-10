@@ -372,6 +372,9 @@ class MapData:
             print(
                 f"Datatype {datatype.name} is not set and so cannot be loaded\n"
             )
+            self.data[datatype] = self.get_empty_dataframe(datatype)
+            self.dirtyflags[datatype] = False
+            self.data_states[datatype] = Datastate.COMPLETE
         elif self.dirtyflags[datatype] is True:
             if self.data_states[datatype] == Datastate.UNLOADED:
                 # Load data from file
@@ -404,6 +407,31 @@ class MapData:
                 self.check_map(datatype)
                 self.data_states[datatype] = Datastate.COMPLETE
             self.dirtyflags[datatype] = False
+
+    @beartype.beartype
+    def get_empty_dataframe(self, datatype: Datatype):
+        """
+        Create a basic empty geodataframe for a specified datatype
+
+        Args:
+            datatype (Datatype):
+                The datatype of the empty dataset
+
+        Returns:
+            geopandas.GeoDataFrame or None: The created geodataframe
+        """
+        data = None
+        if datatype == Datatype.FAULT:
+            data = geopandas.GeoDataFrame(
+                columns=['geometry', 'ID', 'NAME', 'DIPDIR', 'DIP'],
+                crs=self.working_projection
+                )
+        elif datatype == Datatype.FOLD:
+            data = geopandas.GeoDataFrame(
+                columns=['geometry', 'ID', 'NAME', 'SYNCLINE'],
+                crs=self.working_projection
+                )
+        return data
 
     @beartype.beartype
     def open_http_query(url: str):
@@ -823,7 +851,8 @@ class MapData:
             faults["ID"] = faults.index
 
         if len(faults):
-            faults["NAME"] = faults.apply(lambda fault: "Fault_" + str(fault["ID"]) if fault["NAME"] == "nan" else fault["NAME"], axis=1)
+            faults["NAME"] = faults.apply(lambda fault: "Fault_" + str(fault["ID"]) if fault["NAME"].lower() == "nan" else fault["NAME"], axis=1)
+            faults["NAME"] = faults.apply(lambda fault: "Fault_" + str(fault["ID"]) if fault["NAME"].lower() == "none" else fault["NAME"], axis=1)
             faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
 
         self.data[Datatype.FAULT] = faults
@@ -1185,9 +1214,10 @@ class MapData:
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove faults from contact geomety
-        faults = self.get_map_data(Datatype.FAULT).copy()
-        faults["geometry"] = faults.buffer(50)
-        geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
+        if self.get_map_data(Datatype.FAULT) is not None:
+            faults = self.get_map_data(Datatype.FAULT).copy()
+            faults["geometry"] = faults.buffer(50)
+            geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
         units = geology["UNITNAME"].unique()
         column_names = ["UNITNAME_1", "UNITNAME_2", "geometry"]
         contacts = geopandas.GeoDataFrame(crs=geology.crs, columns=column_names, data=None)

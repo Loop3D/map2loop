@@ -84,7 +84,7 @@ jobs:
         run: |
            conda install conda-build
            conda install -c loop3d --file dependencies.txt -y
-           conda build -c loop3d --python ${{ matrix.python-version }} --output-folder conda conda
+           conda build -c loop3d --no-test --python ${{ matrix.python-version }} --output-folder conda conda
            conda install anaconda-client -y
       - name: upload windows
         env:

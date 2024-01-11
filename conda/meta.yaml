@@ -36,9 +36,9 @@ requirements:
     - loopprojectfile
     - beartype
 
-# test:
-#   imports:
-#     - map2loop
+test:
+  imports:
+    - map2loop
 
 about:
   home: "https://github.com/Loop3D/map2loop-3"

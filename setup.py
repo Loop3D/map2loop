@@ -1,21 +1,9 @@
 import os
 import sys
 import setuptools
-# import subprocess
 from map2loop.version import __version__
 
 head, tail = os.path.split(sys.argv[0])
-
-# try:
-#     cmd = 'bash .git.sh'
-#     subprocess.run(
-#         cmd.split())
-#     cmd = 'git tag -a {0} -m {0}'.format(
-#         __version__)
-#     subprocess.run(
-#         cmd.split())
-# except Exception as e:
-#     print(e)
 
 
 def get_description():

@@ -17,28 +17,31 @@ requirements:
   host:
     - pip
     - python
-    # - pybind11
     - setuptools
+    - numpy
+    - geopandas
+    - map2model
+    - hjson
+    - loopprojectfile
+    - beartype
   run:
     - python
     - numpy
     - pandas
     - geopandas
-    # - shapely
-    # - descartes
-    # - matplotlib-base
-    # - networkx
-    # - owslib
-    # - tqdm
     - map2model
-    # - mplstereonet
     - hjson
     - loopprojectfile
     - beartype
 
-# test:
-#   imports:
-#     - map2loop
+test:
+  imports:
+    - map2loop
+    - geopandas
+    - map2model
+    - hjson
+    - loopprojectfile
+    - beartype
 
 about:
   home: "https://github.com/Loop3D/map2loop-3"

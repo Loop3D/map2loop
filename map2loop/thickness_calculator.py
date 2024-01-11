@@ -3,6 +3,7 @@ import beartype
 import pandas
 import geopandas
 from statistics import mean
+from .mapdata import MapData
 
 
 class ThicknessCalculator(ABC):
@@ -29,24 +30,25 @@ class ThicknessCalculator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: geopandas.GeoDataFrame) -> pandas.DataFrame:
+    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: geopandas.GeoDataFrame, map_data: MapData) -> pandas.DataFrame:
         """
         Execute thickness calculator method (abstract method)
 
         Args:
-            units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
+            units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
-            pandas.DataFrame: sorted list of unit names
+            pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
         """
         pass
 
 
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
-    ThiknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
+    ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
     """
     def __init__(self):
         """
@@ -55,21 +57,22 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         self.thickness_calculator_label = "ThicknessCalculatorAlpha"
 
     @beartype.beartype
-    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame) -> pandas.DataFrame:
+    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts and stratigraphic order and attempts to estimate unit thickness.
         Note: Thicknesses of the top and bottom units are not possible with this data and so are assigned the average of all other calculated unit thicknesses.
 
         Args:
-            units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
+            units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
-            pandas.DataFrame: sorted list of unit names
+            pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
         """
-        # TODO: If we have orientation data near basal contact points we can estimate the actual distance between contacts
-        # rather than just using the horizontal distance
+        # TODO: If we have orientation data near basal contact points we can estimate
+        # the actual distance between contacts rather than just using the horizontal distance
         no_distance = -1
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
@@ -105,5 +108,8 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         if len(thicknesses[thicknesses["thickness"] > 0]) < 1:
             thicknesses["thickness"] = 100.0
         mean_thickness = mean(thicknesses[thicknesses["thickness"] > 0]["thickness"])
+
+        # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
+        # the mean thickness of the other units
         thicknesses["thickness"] = thicknesses.apply(lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1)
         return thicknesses

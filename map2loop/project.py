@@ -3,7 +3,8 @@ from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
-from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
+from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
+from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint, SorterMaximiseContacts, SorterObservationProjections
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
@@ -13,6 +14,7 @@ import numpy
 import pandas
 import geopandas
 import os
+import re
 from matplotlib.colors import to_rgba
 from osgeo import gdal
 
@@ -119,6 +121,7 @@ class Project(object):
         self.set_default_samplers()
         self.sorter = SorterUseHint()
         self.thickness_calculator = ThicknessCalculatorAlpha()
+        self.throw_calculator = ThrowCalculatorAlpha()
         self.loop_filename = loop_project_filename
 
         self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
@@ -244,6 +247,26 @@ class Project(object):
         """
         return self.thickness_calculator.thickness_calculator_label
 
+    @beartype.beartype
+    def set_throw_calculator(self, throw_calculator: ThrowCalculator):
+        """
+        Set the throw calculator that estimates fault throw values for all faults
+
+        Args:
+            throw_calculator (ThrowCalculator):
+                The calculator to use. Must be of base class ThrowCalculator
+        """
+        self.throw_calculator = throw_calculator
+
+    def get_throw_calculator(self):
+        """
+        Get the name of the throw calculator being used
+
+        Returns:
+            str: The name of the throw calculator used
+        """
+        return self.throw_calculator.throw_calculator_label
+
     def set_default_samplers(self):
         """
         Initialisation function to set or reset the point samplers
@@ -325,11 +348,12 @@ class Project(object):
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
         if take_best:
-            sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
+            sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX(), SorterMaximiseContacts(), SorterObservationProjections()]
             columns = [sorter.sort(self.stratigraphic_column.stratigraphicUnits,
                                    self.map2model.get_unit_unit_relationships(),
                                    self.map2model.get_sorted_units(),
-                                   self.map_data.contacts
+                                   self.map_data.contacts,
+                                   self.map_data,
                                    ) for sorter in sorters]
             basal_contacts = [self.map_data.extract_basal_contacts(column, save_contacts=False) for column in columns]
             basal_lengths = [sum(list(contacts[contacts["type"] == "BASAL"]["geometry"].length)) for contacts in basal_contacts]
@@ -348,7 +372,8 @@ class Project(object):
                 self.sorter.sort(self.stratigraphic_column.stratigraphicUnits,
                                  self.map2model.get_unit_unit_relationships(),
                                  self.map2model.get_sorted_units(),
-                                 self.map_data.contacts
+                                 self.map_data.contacts,
+                                 self.map_data
                                  )
 
     def calculate_unit_thicknesses(self):
@@ -358,7 +383,8 @@ class Project(object):
         self.stratigraphic_column.stratigraphicUnits = \
             self.thickness_calculator.compute(self.stratigraphic_column.stratigraphicUnits,
                                               self.stratigraphic_column.column,
-                                              self.map_data.basal_contacts)
+                                              self.map_data.basal_contacts,
+                                              self.map_data)
 
     def apply_colour_to_units(self):
         """
@@ -382,6 +408,11 @@ class Project(object):
         self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(numpy.nan, 0)
         self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
         self.deformation_history.summarise_data(self.fault_samples)
+        self.deformation_history.faults = \
+            self.throw_calculator.compute(self.deformation_history.faults,
+                                          self.stratigraphic_column.column,
+                                          self.map_data.basal_contacts,
+                                          self.map_data)
 
     def run_all(self, user_defined_stratigraphic_column=None, take_best=False):
         """
@@ -606,12 +637,17 @@ class Project(object):
         self.map_data.save_all_map_data(save_path, extension)
 
     @beartype.beartype
-    def save_geotiff_raster(self, filename: str = "test.tif", pixel_size: int = 25):
+    def save_geotiff_raster(self, filename: str = "test.tif", projection: str = "", pixel_size: int = 25):
         """
         Saves the geology map to a geotiff
 
         Args:
-            filename (str, optional): The filename of the geotiff file to save to. Defaults to "test.tif".
+            filename (str, optional):
+                The filename of the geotiff file to save to. Defaults to "test.tif".
+            projection (str, optional):
+                A string of the format "EPSG:3857" that is the projection to output. Defaults to the project working projection
+            pixel_size (int, optional):
+                The size of a pixel in metres for the geotiff. Defaults to 25
         """
         colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name", "colour"]].set_index("name").to_dict()["colour"]
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
@@ -628,7 +664,6 @@ class Project(object):
         y_res = int((y_max - y_min) / pixel_size)
         target_ds = gdal.GetDriverByName('GTiff').Create(filename, x_res, y_res, 4, gdal.GDT_Byte)
         target_ds.SetGeoTransform((x_min, pixel_size, 0, y_max, 0, -pixel_size))
-        target_ds.SetProjection(source_ds.GetProjection())
         band = target_ds.GetRasterBand(1)
         band.SetNoDataValue(0)
 
@@ -637,6 +672,12 @@ class Project(object):
         gdal.RasterizeLayer(target_ds, [2], source_layer, options=["ATTRIBUTE=colour_green"])
         gdal.RasterizeLayer(target_ds, [3], source_layer, options=["ATTRIBUTE=colour_blue"])
         gdal.RasterizeLayer(target_ds, [4], source_layer, burn_values=[255])
+        if re.search("^epsg:[0-9]+$", projection.lower()):
+            print("Projection is :", projection)
+            target_ds.SetProjection(projection)
+        else:
+            print("CRS is:", geol.crs.to_string())
+            target_ds.SetProjection(geol.crs.to_string())
         target_ds = None
         source_layer = None
         source_ds = None

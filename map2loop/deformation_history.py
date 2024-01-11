@@ -216,7 +216,7 @@ class DeformationHistory:
         self.faults["maxAge"] = -1
         self.faults["group"] = ""
         self.faults["supergroup"] = ""
-        self.faults["avgDisplacement"] = 100
+        self.faults["avgDisplacement"] = -1
         self.faults["avgDownthrowDir"] = 0
         self.faults["influenceDistance"] = 0
         self.faults["verticalRadius"] = 0

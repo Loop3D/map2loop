@@ -24,6 +24,7 @@ requirements:
     - hjson
     - loopprojectfile
     - beartype
+    - owslib
   run:
     - python
     - numpy
@@ -33,6 +34,7 @@ requirements:
     - hjson
     - loopprojectfile
     - beartype
+    - owslib
 
 test:
   imports:
@@ -42,6 +44,7 @@ test:
     - hjson
     - loopprojectfile
     - beartype
+    - owslib
 
 about:
   home: "https://github.com/Loop3D/map2loop-3"

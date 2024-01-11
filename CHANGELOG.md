@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.4](https://github.com/Loop3D/map2loop-3/compare/3.0.3...3.0.4) (2024-01-11)
+
+
+### Bug Fixes
+
+* Issue with conda build test env not working, skipping ([2fffb69](https://github.com/Loop3D/map2loop-3/commit/2fffb696556f48f0620dfbac356971301fb15e89))
+
 ## [3.0.3](https://github.com/Loop3D/map2loop-3/compare/3.0.2...3.0.3) (2024-01-11)
 
 

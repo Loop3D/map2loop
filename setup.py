@@ -33,9 +33,9 @@ setuptools.setup(
         "owslib",
         "hjson",
         "loopprojectfile",
-        "map2model"
+        "map2model",
     ],
-    url="https://github.com/Loop3D/map2loop-3",
+    url="https://github.com/Loop3D/map2loop",
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

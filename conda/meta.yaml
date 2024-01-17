@@ -7,7 +7,7 @@ package:
   version: "3.0.1"
 
 source:
-  git_url: https://github.com/Loop3D/map2loop-3
+  git_url: https://github.com/Loop3D/map2loop
 
 build:
   number: 0
@@ -47,7 +47,7 @@ test:
     - owslib
 
 about:
-  home: "https://github.com/Loop3D/map2loop-3"
+  home: "https://github.com/Loop3D/map2loop"
   license: MIT
   license_family: MIT
   license_file: ../LICENSE

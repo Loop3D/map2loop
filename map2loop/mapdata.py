@@ -781,7 +781,7 @@ class MapData:
                 config["rocktype_column"]
             ].astype(str)
         else:
-            geology["INSTRUSIVE"] = False
+            geology["INTRUSIVE"] = False
             geology["ROCKTYPE1"] = ""
 
         if config["alt_rocktype_column"] in self.raw_data[Datatype.GEOLOGY]:
@@ -1377,6 +1377,9 @@ class MapData:
         """
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
+        # Remove intrusions
+        geology = geology[geology["INTRUSIVE"]==False]
+        geology = geology[geology["SILL"]==False]
         # Remove faults from contact geomety
         if self.get_map_data(Datatype.FAULT) is not None:
             faults = self.get_map_data(Datatype.FAULT).copy()

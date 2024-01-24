@@ -214,3 +214,5 @@ docs/source/_autosummary/*
 docs/source/_autosummary 
 docs/source/_auto_examples/*
 docs/source/_auto_examples
+examples/*_tmp
+*.loop3d

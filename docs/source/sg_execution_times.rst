@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.000** total execution time for 0 files **from all galleries**:
+**00:11.787** total execution time for 1 file **from all galleries**:
 
 .. container::
 
@@ -32,6 +32,6 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - N/A
-     - N/A
-     - N/A
+   * - :ref:`sphx_glr__auto_examples_plot_hamersley.py` (``..\..\examples\plot_hamersley.py``)
+     - 00:11.787
+     - 0.0

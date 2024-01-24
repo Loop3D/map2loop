@@ -14,6 +14,7 @@ from .m2l_enums import Datatype, Datastate
 from .m2l_enums import VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
+from .random_colour import random_colours_hex
 
 
 class MapData:
@@ -1461,13 +1462,12 @@ class MapData:
             pandas.DataFrame: The modified units
         """
 
-        if self.colour_filename is None:
-            return stratigraphic_units
+        colour_lookup = pandas.DataFrame(columns=["UNITNAME", "colour"])
         try:
             colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
         except FileNotFoundError:
             print(f"Colour Lookup file {self.colour_filename} not found")
-            return stratigraphic_units
+
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
         if "UNITNAME" in colour_lookup.columns and "colour" in colour_lookup.columns:
             stratigraphic_units = stratigraphic_units.merge(
@@ -1476,7 +1476,10 @@ class MapData:
                 right_on="UNITNAME",
                 suffixes=("_old", ""),
                 how="left",
-            ).fillna("#000000")
+            )
+            stratigraphic_units.loc[
+                stratigraphic_units["colour"].isna(), ["colour"]
+            ] = random_colours_hex(stratigraphic_units["colour"].isna().sum())
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:
             print(

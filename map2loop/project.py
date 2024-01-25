@@ -348,7 +348,7 @@ class Project(object):
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
         if take_best:
-            sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX(), SorterMaximiseContacts(), SorterObservationProjections()]
+            sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
             columns = [sorter.sort(self.stratigraphic_column.stratigraphicUnits,
                                    self.map2model.get_unit_unit_relationships(),
                                    self.map2model.get_sorted_units(),

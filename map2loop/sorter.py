@@ -205,7 +205,7 @@ class SorterAlpha(Sorter):
         while graph.number_of_nodes() > 0:
             if cnode is None:
                 df = pandas.DataFrame(columns=["unit", "num_neighbours"])
-                df["unit"] = units
+                df["unit"] = list(graph.nodes)
                 df["num_neighbours"] = df.apply(lambda row: len(list(graph.neighbors(row["unit"]))), axis=1)
                 df.sort_values(by=["num_neighbours"], inplace=True)
                 df.reset_index(inplace=True, drop=True)
@@ -320,6 +320,8 @@ class SorterObservationProjections(Sorter):
             return stratigraphic_order_hint
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
+        geol = geol[geol["INTRUSIVE"]==False]
+        geol = geol[geol["SILL"]==False]
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
 
         verbose = False

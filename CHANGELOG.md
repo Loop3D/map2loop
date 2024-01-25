@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.6](https://github.com/Loop3D/map2loop/compare/3.0.5...3.0.6) (2024-01-25)
+
+
+### Bug Fixes
+
+* Remove deprecation ignore warnings and then deprecations ([79cd333](https://github.com/Loop3D/map2loop/commit/79cd33317625c96091690c9b97309be74cba2fdd))
+
 ## [3.0.5](https://github.com/Loop3D/map2loop/compare/3.0.4...3.0.5) (2024-01-25)
 
 

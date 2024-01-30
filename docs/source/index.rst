@@ -80,9 +80,8 @@ Links
 .. toctree::
    :hidden:
 
-   getting_started/index
-   _auto_examples/index
    user_guide/index
+   _auto_examples/index
 
 .. autosummary::
    :caption: API

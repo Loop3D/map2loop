@@ -35,7 +35,19 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install .
-
+  documentation-test:
+    runs-on: ubuntu-latest
+    #needs: continuous-integration
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cp CHANGELOG.md docs/source/getting_started/CHANGELOG.md
+          docker build . -t=docs -f docs/Dockerfile 
+          docker run -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: docs/build/html
   release-please:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'

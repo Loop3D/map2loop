@@ -2,8 +2,7 @@ FROM continuumio/miniconda3
 LABEL maintainer="lachlan.grose@monash.edu"
 #This docker image has been adapted from the lavavu dockerfile
 # install things
-COPY . /map2loop
-WORKDIR /map2loop
+
 
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
@@ -15,8 +14,11 @@ RUN apt-get update -qq && \
     libtinfo5\
     libtiff5\
     libgl1-mesa-glx
+COPY . /map2loop
+WORKDIR /map2loop
 COPY dependencies.txt dependencies.txt
 RUN conda install -c conda-forge -c loop3d --file dependencies.txt
+RUN conda install -c conda-forge -c loop3d LoopStructural
 RUN pip install -r docs/requirements.txt
 RUN pip install .
 
@@ -27,5 +29,6 @@ RUN pip install sphinxcontrib-bibtex
 ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
+# ENTRYPOINT ["/tini", "--"]
 
+WORKDIR /

@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          cp CHANGELOG.md docs/source/getting_started/CHANGELOG.md
+          cp CHANGELOG.md docs/source/CHANGELOG.md
           docker build . -t=docs -f docs/Dockerfile 
           docker run -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
       - name: upload artifacts

@@ -82,6 +82,7 @@ Links
 
    user_guide/index
    _auto_examples/index
+   CHANGLOG.md
 
 .. autosummary::
    :caption: API

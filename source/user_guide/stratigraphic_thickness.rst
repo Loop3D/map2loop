@@ -1,2 +1,0 @@
-Calculating stratigraphic thicknesses
--------------------------------------

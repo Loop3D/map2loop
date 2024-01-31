@@ -1,3 +1,0 @@
-Identifying stratigraphic order
-===============================
-

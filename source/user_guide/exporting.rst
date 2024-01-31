@@ -1,5 +1,0 @@
-Exporting 
-==========
-
-Geological map
---------------

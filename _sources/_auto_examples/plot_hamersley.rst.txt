@@ -145,7 +145,7 @@ Visualise the map2loop results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 11.342 seconds)
+   **Total running time of the script:** (0 minutes 19.460 seconds)
 
 
 .. _sphx_glr_download__auto_examples_plot_hamersley.py:

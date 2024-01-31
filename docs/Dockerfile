@@ -21,7 +21,7 @@ RUN conda install -c conda-forge -c loop3d --file dependencies.txt
 RUN conda install -c conda-forge -c loop3d LoopStructural
 RUN pip install -r docs/requirements.txt
 RUN pip install .
-
+RUN pip install git+https://github.com/Loop3D/LoopStructural.git
 RUN pip install lavavu-osmesa==1.8.45 
 ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.10/site-packages/lavavu_osmesa.libs
 RUN conda install -c conda-forge pydata-sphinx-theme 

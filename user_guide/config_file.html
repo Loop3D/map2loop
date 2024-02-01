@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="./" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>API &#8212; map2loop 3.0.6 documentation</title>
+    <title>Mapping attributes to variables using an HJSON file &#8212; map2loop 3.0.6 documentation</title>
   
   
   
@@ -18,33 +18,35 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
 
-    <script src="_static/documentation_options.js?v=c3365b21"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'API';</script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <script src="../_static/documentation_options.js?v=c3365b21"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/config_file';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Setting up your Jupyter Notebook" href="setup_jupyter.html" />
+    <link rel="prev" title="Creating a 3D geological model" href="geomodelling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -81,7 +83,7 @@
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -113,7 +115,7 @@
 
   
 
-<a class="navbar-brand logo" href="index.html">
+<a class="navbar-brand logo" href="../index.html">
   
   
   
@@ -134,22 +136,22 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_auto_examples/index.html">
+                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_autosummary/map2loop.html">
+                      <a class="nav-link nav-internal" href="../_autosummary/map2loop.html">
                         map2loop
                       </a>
                     </li>
@@ -259,9 +261,7 @@ document.write(`
       
       
       
-        
-      
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -274,22 +274,22 @@ document.write(`
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_auto_examples/index.html">
+                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_autosummary/map2loop.html">
+                      <a class="nav-link nav-internal" href="../_autosummary/map2loop.html">
                         map2loop
                       </a>
                     </li>
@@ -354,6 +354,28 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing map2loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geomodelling.html">Creating a 3D geological model</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Mapping attributes to variables using an HJSON file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_jupyter.html">Setting up your Jupyter Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changing_colours.html">Changing Colours</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stratigraphic_thickness.html">Calculating stratigraphic thicknesses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stratigraphic_order.html">Identifying stratigraphic order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fault_offset.html">Fault offset calculation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -382,11 +404,14 @@ document.write(`
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="index.html" class="nav-link" aria-label="Home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">API</li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Mapping...</li>
   </ul>
 </nav>
 </div>
@@ -403,15 +428,33 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="api">
-<h1>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h1>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/map2loop.html#module-map2loop" title="map2loop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+  <section id="mapping-attributes-to-variables-using-an-hjson-file">
+<h1>Mapping attributes to variables using an HJSON file<a class="headerlink" href="#mapping-attributes-to-variables-using-an-hjson-file" title="Link to this heading">#</a></h1>
+<p>Once you’ve completed your map in QGIS, you’ll need to map the attributes (with whatever names you’ve given them) to the variable names used in map2loop. You can map the attributes to the variable names used in version 2 or 3 of map2loop, as specified in the tables in the Setting up your Shapefiles section.
+An example hjson file is shown below, using map2loop-2 variable names (also known as Legacy code. If you decide to use map2loop-2 variable names, you will have to set the legacy flag to true in the map2loop calling code later on. If you use map2loop-3 variable names you’ll need to set the legacy flag to false.</p>
+<p>Feel free to copy the attached template and fill in the required variables with the attribute names specific to your project.</p>
+<section id="config-file-template">
+<h2>Config File Template<a class="headerlink" href="#config-file-template" title="Link to this heading">#</a></h2>
+<p>The templates below demonstrate how to setup a config file for map2loop.
+Explanations of the HJSON file elements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The left most ‘term’ is the map2loop variable name</p></li>
+<li><p>The information after the hash on the right is a description of the required field. You can delete this from your own file if you’d like.</p></li>
+<li><p>You’ll need to change the attribute name in the second quotation to match your shapefile attribute names (e.g. change “INSERT_DIP” to your attribute name). Ensure that the attribute name is between ‘’ or “”.</p></li>
+<li><p>Any lines with a <a href="#id1"><span class="problematic" id="id2">*</span></a>opt in the description string, means that they are optional. If you don’t want to include them, just leave the attribute field blank (e.g. “g”: ‘’, )</p></li>
+</ul>
+</div></blockquote>
+<p>For more information on the variables and map2loop requirements please see the documentation.</p>
+<section id="legacy-variable-names-map2loop-2-template">
+<h3>Legacy Variable Names (map2loop-2) Template<a class="headerlink" href="#legacy-variable-names-map2loop-2-template" title="Link to this heading">#</a></h3>
+<p>Note, there is an inbuilt converter within map2loop so you can use either of the config files with the most recent version of map2loop.</p>
+</section>
+<section id="map2loop-3-variable-names-hjson-file-template">
+<h3>map2loop-3 variable names HJSON File Template<a class="headerlink" href="#map2loop-3-variable-names-hjson-file-template" title="Link to this heading">#</a></h3>
+<p>This is a template with the most up-to date variable names.</p>
+</section>
+</section>
 </section>
 
 
@@ -424,6 +467,24 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="geomodelling.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Creating a 3D geological model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="setup_jupyter.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Setting up your Jupyter Notebook</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -435,9 +496,25 @@ document.write(`
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#config-file-template">Config File Template</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-variable-names-map2loop-2-template">Legacy Variable Names (map2loop-2) Template</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop-3-variable-names-hjson-file-template">map2loop-3 variable names HJSON File Template</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="_sources/API.rst.txt">
+    <a href="../_sources/user_guide/config_file.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
@@ -456,8 +533,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
 
 <script type="text/javascript">
   $(document).ready(function () {

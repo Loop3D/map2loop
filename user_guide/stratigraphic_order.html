@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Identifying stratigraphic order &#8212; map2loop 3.0.4 documentation</title>
+    <title>Identifying stratigraphic order &#8212; map2loop 3.0.6 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
 
-    <script src="../_static/documentation_options.js?v=50b65552"></script>
+    <script src="../_static/documentation_options.js?v=c3365b21"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/stratigraphic_order';</script>
@@ -122,7 +122,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.0.4 documentation</p>
+    <p class="title logo__title">map2loop 3.0.6 documentation</p>
   
 </a></div>
     
@@ -361,9 +361,12 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installing map2loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geomodelling.html">Creating a 3D geological model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Mapping attributes to variables using an HJSON file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_jupyter.html">Setting up your Jupyter Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changing_colours.html">Changing Colours</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stratigraphic_thickness.html">Calculating stratigraphic thicknesses</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Identifying stratigraphic order</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fault_offset.html">Fault offset calculation</a></li>
@@ -427,6 +430,119 @@ document.write(`
                   
   <section id="identifying-stratigraphic-order">
 <h1>Identifying stratigraphic order<a class="headerlink" href="#identifying-stratigraphic-order" title="Link to this heading">#</a></h1>
+<p>Calculating stratigraphic order in map2loop can be difficult depending on the
+stratigraphy of your region of interest and how much data has been collected in
+the field.  Because of this map2loop has been written so that a python-capable user
+can create their own stratigraphic column sorter and use it within the map2loop process.</p>
+<p>Below is the structure of a stratigraphic column sorter and an example of how to implement
+your own and use it within map2loop.</p>
+<p>In order to make a plugin sorter map2loop has a template that is extendable.  The whole
+template is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Sorter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base Class of Sorter used to force structure of Sorter</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ABC (ABC): Derived from Abstract Base Class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialiser of for Sorter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorter_label</span> <span class="o">=</span> <span class="s2">&quot;SorterBaseClass&quot;</span>
+
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for subclass type label</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorter_label</span>
+
+    <span class="nd">@beartype</span><span class="o">.</span><span class="n">beartype</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">unit_relationships</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">stratigraphic_order_hint</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">contacts</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">map_data</span><span class="p">:</span> <span class="n">MapData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute sorter method (abstract method)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            units (pandas.DataFrame): the data frame to sort (columns must contain [&quot;layerId&quot;, &quot;name&quot;, &quot;minAge&quot;, &quot;maxAge&quot;, &quot;group&quot;])</span>
+<span class="sd">            units_relationships (pandas.DataFrame): the relationships between units (columns must contain [&quot;Index1&quot;, &quot;Unitname1&quot;, &quot;Index2&quot;, &quot;Unitname2&quot;])</span>
+<span class="sd">            stratigraphic_order_hint (list): a list of unit names to be used as a hint to sorting the units</span>
+<span class="sd">            contacts (geopandas.GeoDataFrame): unit contacts with length of the contacts in metres</span>
+<span class="sd">            map_data (map2loop.MapData): a catchall so that access to all map data is available</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: sorted list of unit names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Using this abstract base class a new class can be created by taking that base class and
+replacing the __init__ and sort functions, the simplest example is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">mySorter</span><span class="p">(</span><span class="n">Sorter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorter_label</span> <span class="o">=</span> <span class="s2">&quot;mySorter&quot;</span>
+
+    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">units</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">unit_relationships</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">stratigraphic_order_hint</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">contacts</span><span class="p">:</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="p">:</span> <span class="n">MapData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">unitnames</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">unitnames</span>
+</pre></div>
+</div>
+<p>This example will sort the units into alphabetical order based on name and return the
+stratigraphic column order in a list of unit names.</p>
+<p>To use this new sorter in the map2loop project one final line needs to
+be added after the Project has been initialised:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">proj</span> <span class="o">=</span> <span class="n">map2loop</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+
+<span class="n">proj</span><span class="o">.</span><span class="n">set_sorter</span><span class="p">(</span><span class="n">mySorter</span><span class="p">())</span>
+</pre></div>
+</div>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<p>You need to set the sorter as an instance of mySorter (with the ()s) rather than the definition.</p>
+<p>The sorter takes the existing units dataframe and must return a list containing all the
+unitnames present in that dataframe.  If some are added or missing map2loop with raise an
+exception.  Also while you have control of this dataframe you have the power to add or
+remove units, and change features of any unit but if you do this there is no longer any
+guarantee that map2loop will still process your maps or even finish.</p>
+<p>As the base class Sorter contains abstract methods and is parsed through beartype the
+structure of the sort function must remain the same.  If there is reason to access more
+map2loop data that isn’t in the map_data structure raise an issue with in the map2loop
+github repo and we can address that.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<p>As seen in the template and the sort abstract method you have access to other data
+from within the map2loop process. Below is a brief description of each and a potential
+use for them in your thickness calculator:</p>
+<p>units - this is the data frame that contains the units and fields such as group, supergroup and
+min/max ages.  If the age data is present it can be useful in sorting the units. Also
+group and supergroup information could be used to ensure that all units within the
+same group/supergroup are contiguous.</p>
+<p>unit_relationships - this data frame contains a list of adjacent units within the shapefile.
+The format is [‘Index1’, ‘Unitname1’, ‘Index2’, ‘Unitname2’] and each row is a single
+adjacency that was found.  Note that some of these contacts might have been across a fault
+so take that into account when using this data.</p>
+<p>stratigraphic_order_hint - this is a first pass attempt at the stratigraphic column
+calculated by map2model which looks at unit adjacency in the shapefile.</p>
+<p>contacts - this geometric data frame contains linear data of where adjacent
+units are and the length of that contact. Using this data you might prioritise
+longer contacts as more likely to be adjacent in the stratigraphic column.</p>
+<p>map_data - this catch-all gives you complete access to the shapefiles used in map2loop.
+If you need access to the structural orientation data you can use
+map_data.get_map_data(Datatype.STRUCTURE) or if you want the geology map
+map_data.get_map_data(Datatype.GEOLOGY) and you have access to those shapefiles.  Note
+that changing information or using setter function from map_data is likely to cause
+problems within the map2loop workflow.</p>
+</section>
 </section>
 
 
@@ -466,6 +582,19 @@ document.write(`
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

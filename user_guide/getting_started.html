@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Getting started &#8212; map2loop 3.0.4 documentation</title>
+    <title>Getting Started &#8212; map2loop 3.0.6 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
 
-    <script src="../_static/documentation_options.js?v=50b65552"></script>
+    <script src="../_static/documentation_options.js?v=c3365b21"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/getting_started';</script>
@@ -122,7 +122,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.0.4 documentation</p>
+    <p class="title logo__title">map2loop 3.0.6 documentation</p>
   
 </a></div>
     
@@ -361,9 +361,12 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting started</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installing map2loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geomodelling.html">Creating a 3D geological model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Mapping attributes to variables using an HJSON file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_jupyter.html">Setting up your Jupyter Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changing_colours.html">Changing Colours</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stratigraphic_thickness.html">Calculating stratigraphic thicknesses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stratigraphic_order.html">Identifying stratigraphic order</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fault_offset.html">Fault offset calculation</a></li>
@@ -408,7 +411,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Getting started</li>
+    <li class="breadcrumb-item active" aria-current="page">Getting Started</li>
   </ul>
 </nav>
 </div>
@@ -426,7 +429,24 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<p>map2loop is a python library that improves the ease and accessibility of 3D modelling with Loop. It enables you to create 3D geological models from digital maps produced in programs such as GIS. map2loop’s role within the Loop3D ecosystem is to automatically convert digital map data into a useable format. The generated ‘.loop3d’ output file can then be transformed into a 3D geological model using the LoopStructural library.</p>
+<section id="map2loop-requirements">
+<h2>map2loop Requirements<a class="headerlink" href="#map2loop-requirements" title="Link to this heading">#</a></h2>
+<p>In order to run map2loop you will need the following input files:</p>
+<ol class="arabic simple">
+<li><p>Polygon shapefile containing your lithologies</p></li>
+<li><p>LineString shapefile containing your linear features (e.g. faults)</p></li>
+<li><p>Point data shapefile containing orientation data</p></li>
+<li><p>hjson config file, used to map the attribute names used in your shapefiles to map2loop’s variables</p></li>
+</ol>
+<p>Additional useful inputs:</p>
+<ul class="simple">
+<li><p>DEM or DTM file for your map region</p></li>
+<li><p>Optional CSV file specifying unit colours</p></li>
+</ul>
+<p>If you need help setting up these files please refer to the relevant map2loop user pages or to the examples which provide a step-by-step guide.</p>
+</section>
 </section>
 
 
@@ -466,6 +486,18 @@ document.write(`
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop-requirements">map2loop Requirements</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

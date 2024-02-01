@@ -10,7 +10,7 @@ In order to ‘run’ map2loop, you need to pass the program several pieces of i
  *	DEM / DTM path 
  *	hjson config file that maps the attributes from your QGIS project onto the map2loop variables. 
 
-An example code template for processing your QGIS map data using map2loop is provided under the **Map2loop code Template** user guide page. The output from this code is a .loop3d file which can then be passed to LoopStructural to create your 3d model. 
+An example code template for processing your QGIS map data using map2loop is provided under the Examples section on the map2loop website. The output from this code is a .loop3d file which can then be passed to LoopStructural to create your 3d model. 
 
 Depending on the sorter algorithm you choose to use with map2loop (as described in the template), you’ll receive different outputs. If you use the take best sorter algorithm, you can expect an output similar to: 
 

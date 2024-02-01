@@ -13,6 +13,7 @@ class ThicknessCalculator(ABC):
     Args:
         ABC (ABC): Derived from Abstract Base Class
     """
+
     def __init__(self):
         """
         Initialiser of for ThicknessCalculator
@@ -30,7 +31,13 @@ class ThicknessCalculator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: geopandas.GeoDataFrame, map_data: MapData) -> pandas.DataFrame:
+    def compute(
+        self,
+        units: pandas.DataFrame,
+        stratigraphic_order: list,
+        basal_contacts: geopandas.GeoDataFrame,
+        map_data: MapData,
+    ) -> pandas.DataFrame:
         """
         Execute thickness calculator method (abstract method)
 
@@ -50,6 +57,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
     """
+
     def __init__(self):
         """
         Initialiser for alpha version of the thickness calculator
@@ -57,7 +65,13 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         self.thickness_calculator_label = "ThicknessCalculatorAlpha"
 
     @beartype.beartype
-    def compute(self, units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData) -> pandas.DataFrame:
+    def compute(
+        self,
+        units: pandas.DataFrame,
+        stratigraphic_order: list,
+        basal_contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts and stratigraphic order and attempts to estimate unit thickness.
         Note: Thicknesses of the top and bottom units are not possible with this data and so are assigned the average of all other calculated unit thicknesses.
@@ -80,24 +94,43 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         thicknesses["thickness"] = no_distance
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         if len(stratigraphic_order) < 3:
-            print(f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units")
+            print(
+                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
+            )
             return thicknesses
-        for i in range(1, len(stratigraphic_order)-1):
+        for i in range(1, len(stratigraphic_order) - 1):
             # Compare basal contacts of adjacent units
-            if stratigraphic_order[i] in basal_unit_list and stratigraphic_order[i+1] in basal_unit_list:
-                contact1 = basal_contacts[basal_contacts["basal_unit"] == stratigraphic_order[i]]["geometry"].to_list()[0]
-                contact2 = basal_contacts[basal_contacts["basal_unit"] == stratigraphic_order[i+1]]["geometry"].to_list()[0]
+            if (
+                stratigraphic_order[i] in basal_unit_list
+                and stratigraphic_order[i + 1] in basal_unit_list
+            ):
+                contact1 = basal_contacts[
+                    basal_contacts["basal_unit"] == stratigraphic_order[i]
+                ]["geometry"].to_list()[0]
+                contact2 = basal_contacts[
+                    basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
+                ]["geometry"].to_list()[0]
                 if contact1 is not None and contact2 is not None:
                     distance = contact1.distance(contact2)
                 else:
+                    print(
+                        f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i+1]}"
+                    )
                     distance = no_distance
             else:
+                print(
+                    f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i+1]}"
+                )
+
                 distance = no_distance
 
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
-            idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
-            if thicknesses.loc[idx, "thickness"] <= -1.0:
+            idx = thicknesses.index[
+                thicknesses["name"] == stratigraphic_order[i]
+            ].tolist()[0]
+            if thicknesses.loc[idx, "thickness"] == -1:
+
                 val = distance
             else:
                 val = min(distance, thicknesses.at[idx, "thickness"])
@@ -111,5 +144,8 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
 
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
-        thicknesses["thickness"] = thicknesses.apply(lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1)
+        thicknesses["thickness"] = thicknesses.apply(
+            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"],
+            axis=1,
+        )
         return thicknesses

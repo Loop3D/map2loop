@@ -212,4 +212,8 @@ docs/source/_autosummary/*
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,c++,cmake
 #ignore automatically generated doc files
 docs/source/_autosummary 
- 
+docs/source/_auto_examples/*
+docs/source/_auto_examples
+examples/*_tmp
+*.loop3d
+m2l_data_tmp/*

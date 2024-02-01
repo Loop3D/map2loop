@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  map2loop:
+    build:
+      dockerfile: docs/Dockerfile
+      context: ../
+    volumes:
+      - ../:/map2loop
+      - ../../LoopStructural:/LoopStructural
+    tty: true
+    command: sh map2loop/docs/build_docs.sh

@@ -1,9 +1,8 @@
 # Map2Loop 3.0
 
-Generate 3D geological model inputs from geographical maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:   
-   
-<a href="http://tectonique.net/models/brockman_syncline.html">3D Model from the Hamersley region, Western Australia</a>
+Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 
+<a href="http://tectonique.net/models/brockman_syncline.html">3D Model from the Hamersley region, Western Australia</a>
 
 ## Install
 
@@ -16,26 +15,27 @@ To just use map2loop, issue the following
 ```bash
 conda install -c conda-forge -c loop3d map2loop -y
 ```
+
 ### Documentation
 
-If you can call it that, is available  <a href="http://13.211.217.129/m2ldocs/">here</a>
+If you can call it that, is available <a href="http://13.211.217.129/m2ldocs/">here</a>
 
 ### Development
 
 If you want to tinker yourself/contribute, clone the source code with
 
 ```bash
-git clone https://github.com/Loop3D/map2loop-3.git
+git clone https://github.com/Loop3D/map2loop.git
 ```
 
 Or get the source + example notebooks with
 
 ```bash
-git clone https://github.com/Loop3D/map2loop-3.git
+git clone https://github.com/Loop3D/map2loop.git
 git clone --single-branch --branch yohan https://github.com/Loop3D/map2loop-3-notebooks
 ```
 
-Navigate into map2loop-3, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
+Navigate into map2loop, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
 
 ```bash
 conda install -c loop3d --file dependencies.txt
@@ -46,7 +46,7 @@ pip install .
 
 Fair warning, we recommend conda to almost everyone. With great software development power comes great environment setup inconvenience. You'll need to download and install the [docker containerisation software](https://docs.docker.com/get-docker/), and the docker and docker-compose CLI.
 
-### Development 
+### Development
 
 1. Clone this repo and navigate inside as per above
 2. Run the following and click on the Jupyter server forwarded link to access and edit the notebooks
@@ -65,9 +65,9 @@ Fair warning, we recommend conda to almost everyone. With great software develop
 
    ```bash
    docker exec -it <container_NAMEorID> bash
-   # Probably -> docker exec -it  map2loop-3_dev_1 bash
+   # Probably -> docker exec -it  map2loop_dev_1 bash
    ```
- 
+
 ## Usage
 
 Our notebooks cover use cases in more detail, but here is an example of processing Loop's South Australia remote geospatial data in just 20 lines of Python.
@@ -78,7 +78,7 @@ First, lets import map2loop and define a bounding box. You can use GIS software 
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
 
-# Note that this region is defined in the EPSG 28354 projection and 
+# Note that this region is defined in the EPSG 28354 projection and
 # x and y represent easting and northing respectively
 bbox_3d = {
     'minx': 250805.1529856466,

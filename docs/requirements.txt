@@ -1,0 +1,4 @@
+sphinx
+sphinx-gallery
+pydata-sphinx-theme
+myst-parser

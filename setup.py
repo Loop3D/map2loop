@@ -1,7 +1,13 @@
 import os
 import sys
 import setuptools
-from map2loop.version import __version__
+
+version = {}
+package_root = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(package_root, "map2loop/version.py")) as fp:
+    exec(fp.read(), version)
+version = version["__version__"]
 
 head, tail = os.path.split(sys.argv[0])
 
@@ -16,7 +22,7 @@ def get_description():
 
 setuptools.setup(
     name="map2loop",
-    version=__version__,
+    version=version,
     author="The Loop Organisation",
     author_email="roy.thomson@monash.edu",
     description="Generate 3D model data from 2D maps.",
@@ -33,9 +39,10 @@ setuptools.setup(
         "owslib",
         "hjson",
         "loopprojectfile",
-        "map2model"
+        "map2model",
+        "beartype",
     ],
-    url="https://github.com/Loop3D/map2loop-3",
+    url="https://github.com/Loop3D/map2loop",
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

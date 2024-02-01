@@ -1,5 +1,5 @@
 Calculating stratigraphic thicknesses
--------------------------------------
+=====================================
 
 Calculating unit thicknesses in map2loop is both an important and a difficult 
 task.  There is no 'best' way to determine thicknesses because it depends on the
@@ -14,6 +14,7 @@ In order to make a plugin thickness calculator map2loop has a template that is
 extendable.  The whole template is shown below:
 
 .. code-block::
+
     class ThicknessCalculator(ABC):
     """
     Base Class of Thickness Calculator used to force structure of ThicknessCalculator
@@ -62,7 +63,9 @@ extendable.  The whole template is shown below:
 
 Using this abstract base class a new class can be created by taking that base class and
 replacing the __init__ and compute functions, the simplest example is shown below:
-'' code-block::
+
+.. code-block::
+
     class myThicknessCalculator(ThicknessCalculator):
         def __init__(self):
             self.thickness_calculator_label = "myThicknessCalculator"
@@ -82,12 +85,15 @@ This example will set all unit thicknesses to 100m.
 
 To use this new thickness calculator in the map2loop project one final line needs to
 be added after the Project has been initialised:
-'' code-block::
+
+.. code-block::
+
     proj = map2loop.Project( ... )
 
     proj.set_thickness_calculator(myThicknessCalculator())
 
-''Notes''
+Notes
+-----
 You need to set the thickness calculator as an instance of myThicknessCalculator
 (with the ()s) rather than the definition.
 
@@ -97,7 +103,8 @@ this dataframe you have the power to add or remove units, and change features
 of any unit but if you do this there is no longer any guarantee that map2loop will still
 process your maps or even finish.
 
-''Parameters''
+Parameters
+----------
 As seen in the template and the compute abstract method you have access to other data
 from within the map2loop process.  Below is a brief description of each and a potential
 use for them in your thickness calculator:

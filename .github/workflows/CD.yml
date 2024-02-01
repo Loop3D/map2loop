@@ -118,18 +118,18 @@ jobs:
         shell: bash -l {0}
         run: |
           anaconda upload --label main conda/osx-64/*.tar.bz2
-documentation-deploy:
-  runs-on: ubuntu-latest
-  needs: documentation-test #release-please
-  # if: ${{ needs.release-please.outputs.release_created }}
-  steps:
-    - uses: actions/checkout@v2
-    - run: |
-        cp CHANGELOG.md docs/source/getting_started/CHANGELOG.md
-        docker build . -t=lsdocs -f docs/Dockerfile 
-        docker run -v $(pwd):/LoopStructural lsdocs bash LoopStructural/docs/build_docs.sh
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@4.1.3
-      with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: docs/build/html # The folder the action should deploy.
+  documentation-deploy:
+    runs-on: ubuntu-latest
+    needs: documentation-test #release-please
+    # if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cp CHANGELOG.md docs/source/getting_started/CHANGELOG.md
+          docker build . -t=lsdocs -f docs/Dockerfile 
+          docker run -v $(pwd):/LoopStructural lsdocs bash LoopStructural/docs/build_docs.sh
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs/build/html # The folder the action should deploy.

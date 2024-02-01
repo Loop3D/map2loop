@@ -61,4 +61,4 @@ Note, there is an inbuilt converter within map2loop so you can use either of the
                                                                       
 map2loop-3 variable names HJSON File Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is a template with the most up-to date variable names. 
+`This <../_static/HJSON_TEMPLATE.hjson>`_ This is a template with the most up-to date variable names. 

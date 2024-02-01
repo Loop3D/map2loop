@@ -51,6 +51,7 @@ jobs:
           path: docs/build/html
   release-please:
     runs-on: ubuntu-latest
+    needs: continuous-integration
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v3
@@ -121,8 +122,8 @@ jobs:
           anaconda upload --label main conda/osx-64/*.tar.bz2
   documentation-deploy:
     runs-on: ubuntu-latest
-    needs: documentation-test #release-please
-    # if: ${{ needs.release-please.outputs.release_created }}
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v3

@@ -4,6 +4,8 @@ Using a CSV file
 ----------------
 The easiest way to set the colour of different units in your model is to create a csv file that contains the lithological unit names in one column and the hex colour code in another, as shown below: 
 
+.. image:: images/csv.png
+  :width: 200
 
 Changing colours via your Jupyter notebook
 ------------------------------------------

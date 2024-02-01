@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.0.6](https://github.com/Loop3D/map2loop/compare/3.0.5...3.0.6) (2024-01-25)
+
+
+### Bug Fixes
+
+* Remove deprecation ignore warnings and then deprecations ([79cd333](https://github.com/Loop3D/map2loop/commit/79cd33317625c96091690c9b97309be74cba2fdd))
+
+## [3.0.5](https://github.com/Loop3D/map2loop/compare/3.0.4...3.0.5) (2024-01-25)
+
+
+### Bug Fixes
+
+* Typo in intrusion flag, ignoring intrusions for contact calculations, remove errant sorter from take_best option ([527de6c](https://github.com/Loop3D/map2loop/commit/527de6c339e56ead036ab5ed5d94d06d77673ae6))
+
 ## [3.0.4](https://github.com/Loop3D/map2loop-3/compare/3.0.3...3.0.4) (2024-01-11)
 
 

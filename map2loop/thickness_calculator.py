@@ -87,7 +87,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         """
         # TODO: If we have orientation data near basal contact points we can estimate
         # the actual distance between contacts rather than just using the horizontal distance
-        no_distance = -1
+        no_distance = -1.0
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
         # Set default value
@@ -130,6 +130,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 thicknesses["name"] == stratigraphic_order[i]
             ].tolist()[0]
             if thicknesses.loc[idx, "thickness"] == -1:
+
                 val = distance
             else:
                 val = min(distance, thicknesses.at[idx, "thickness"])

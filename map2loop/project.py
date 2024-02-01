@@ -18,11 +18,6 @@ import re
 from matplotlib.colors import to_rgba
 from osgeo import gdal
 
-# TODO: When geopandas gets updated check that this FutureWarning supression
-#       is still needed for GeoDataFrame.clip methods
-import warnings
-warnings.simplefilter(action="ignore", category=FutureWarning)
-
 
 class Project(object):
     """

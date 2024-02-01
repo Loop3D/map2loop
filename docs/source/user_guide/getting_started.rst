@@ -1,4 +1,4 @@
-Getting started
+Getting Started
 ===============
 map2loop is a python library that improves the ease and accessibility of 3D modelling with Loop. It enables you to create 3D geological models from digital maps produced in programs such as GIS. map2loop's role within the Loop3D ecosystem is to automatically convert digital map data into a useable format. The generated ‘.loop3d’ output file can then be transformed into a 3D geological model using the LoopStructural library.
 

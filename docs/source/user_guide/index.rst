@@ -7,6 +7,9 @@ User Guide
    getting_started
    installation
    geomodelling
+   config_file
+   setup_jupyter
+   changing_colours
    stratigraphic_thickness
    stratigraphic_order
    fault_offset

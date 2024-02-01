@@ -77,22 +77,149 @@ This file contains point data that is used to represent orientation data (e.g. b
      - String 
      - Optional 
      - Text field indicating if bedding measurements are overturned (eg. ‘overturned’)
-   * - 
-     - 
-     - 
-     - 
-     - 
-     - 
-   * - 
-     - 
-     - 
-     - 
-     - 
-     - 
+   * - geopnt_id
+     - "objectid_column"
+     - ‘gi’
+     - Integer / String
+     - Optional 
+     - Field to specify a unique id of structural measurement 
+
+An example of the QGIS attribute table for simple orientation data is shown in the image below: 
+
+.. image:: images/ori_attributes_table.png
+   :width: 400
+
+LineString Shapefile 
+......................
+This shapefile contains lineStrings that represent fault traces at the surface. Axial traces can also be included in this shape file, however map2loop doesn’t yet have the capability to include fold axes in the 3D model. If you’d like to include fold axes, you will have to do so using LoopStructural.
+
+.. list-table:: **Linear_Features.shp**
+   :widths: 20 25 20 20 20 50
+   :header-rows: 1
+
+   * - Example Attribute name in QGIS
+     - Variable name in map2loop-3
+     - Variable name in map2loop-2 (ie Legacy code)
+     - Data Type 
+     - Required/ optional
+     - Description 
+   * - Feature
+     - "structtype_column"
+     - "f"
+     - String
+     - Required   
+     - Field that contains information about the type of structure (eg. ‘fault’)
+   * - Plunge
+     - "dip_column"
+     - "fdip"
+     - Integer 
+     - Optional 
+     - Fault dip value. Note if a fault dip isn’t provided the default value defined by ‘fdipnull’ will be used
+   * - Dip Direct
+     - "dipdir_column"
+     - “fdipdir”
+     - Integer 
+     - Required 
+     - Fault dip direction – calculate this as the strike using the RHR ±90 degrees
+   * - Name
+     - "name_column"
+     - “n”
+     - String 
+     - Optional
+     - Name of the feature 
+
+An example of the QGIS attribute table for a single fault is shown in the image below: 
+
+.. image:: images/fault_attributes_table.png
+   :width: 400
 
 
+Polygon Shapefile 
+...................
+This contains polygons representing different lithologies and the contacts between them.
 
+.. list-table:: **Lithologies.shp**
+   :widths: 20 25 20 20 20 50
+   :header-rows: 1
 
+   * - Example Attribute name in QGIS
+     - Variable name in map2loop-3
+     - Variable name in map2loop-2 (ie Legacy code)
+     - Data Type 
+     - Required/ optional
+     - Description 
+   * - supersuite
+     - "group_column"
+     - “g”
+     - String
+     - Optional
+     - Most coarse stratigraphic unit classification (e.g. supergroup)
+   * - group
+     - "supergroup_column"
+     - "g2"
+     - String
+     - Optional 
+     - Coarser stratigraphic group classification (e.g. group)
+   * - Lithology
+     - "unitname_column"
+     - "c"
+     - String
+     - Required
+     - Most specific stratigraphic unit names (eg. member, formation etc)
+   * - Descript
+     - "description_column"
+     - "ds"
+     - String
+     - Optional 
+     - General description field 
+   * - Alt_unit
+     - "alt_unitname_column"
+     - "u"
+     - String
+     - Required
+     - Field containing alternate stratigraphic unit names
+   * - r1
+     - "rocktype_column"
+     - "r1"
+     - String
+     - Optional
+     - Contains rocktype information (e.g. intrusion)
+   * - r2
+     - "alt_rocktype_column"
+     - "r2"
+     - String
+     - Optional 
+     - Secondary rock type field
+   * - min_age
+     - "minage_column"
+     - "min"
+     - Integer
+     - Optional 
+     - Minimum unit age
+   * - max_age
+     - "maxage_column"
+     - "max"
+     - Integer
+     - Optional 
+     - Maximum unit age
 
+A simple example of the QGIS attribute table for lithology data is shown in the image below: 
 
+.. image:: images/litho_attributes_table.png
+   :width: 400
 
+Tips and Trouble Shooting for QGIS map 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* 	Ensure that there are no gaps between your polygons. You may find it helpful to use the ‘snapping tool’ in QGIS. 
+*  Map2loop sometimes glitches with white spaces. You may need to replace spaces in names with underscores (for example: Emu Egg Fault becomes Emu_Egg_Fault)
+*	If you want to force a stratigraphic sequence but don’t want to but in absolute unit ages, you can number the units with relative ‘age’ values in order (eg, 1, 2, 3, 4). To do this set the min and max ages to the relevant sequence number. This is demonstrated in the image above.
+
+Adding Data 
+===========
+Once you’ve set up the aforementioned shapefiles, you can start to add your data into the corresponding QGIS layers. 
+
+Tip
+~~~
+
+* If you are working in a complex system, or an area with fine geological detail, you may need to upscale your data. It is usually easier to start modelling the large scale structures and then you can try to add in relevant detail once you have a decent model. 

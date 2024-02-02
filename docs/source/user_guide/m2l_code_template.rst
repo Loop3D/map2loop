@@ -20,11 +20,11 @@ program’s functionality.
 Before You Begin
 ----------------
 
-In order to run map2loop you will need the following files: 1. Polygon
-shapefile containing your lithologies 2. LineString shapefile containing
-your linear features (e.g. faults) 3. Point data shapefile containing
-orientation data 4. hjson file defining the attribute names used in your
-shapefiles
+In order to run map2loop you will need the following files: 
+#. Polygon shapefile containing your lithologies 
+#. LineString shapefile containing your linear features (e.g. faults) 
+#. Point data shapefile containing orientation data 
+#. hjson file defining the attribute names used in your shapefiles
 
 .. raw:: html
 
@@ -57,8 +57,10 @@ This format specifies that the output file will be saved in a new folder
 within the current directory (where ever you have saved your notebook).
 The new folder will be named whatever you specify in line 6 (
 “insert_output_folder_name_here”). The generated loop3d file will be
-called “local_source.loop3d”. #### CHANGE: (line 6):
-“insert_output_folder_name_here” to a project relevant name
+called “local_source.loop3d”. 
+CHANGE: 
+.......
+* (line 6): “insert_output_folder_name_here” to a project relevant name
 
 .. code:: ipython3
 
@@ -78,9 +80,10 @@ You’ll need to specify the extent of the area you want to model. This is
 defined as minimum and maximum x and y coordinates, where x is the
 latitude and y is the longitude. You also need to state the bounds of
 the model along the z axis. This is given as the number of meters above
-and below the surface that will be modeled. #### CHANGE: The numeric
-values assigned to variables accross lines 2 to 7, to match your region
-of interest.
+and below the surface that will be modeled. 
+CHANGE: 
+.......
+* The numeric values assigned to variables accross lines 2 to 7, to match your region of interest.
 
 .. code:: ipython3
 
@@ -97,46 +100,29 @@ Creating a Project Instance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is where all of the required files (e.g. shape files) are passed to
-map2loop. #### NOTE When passing local files to map2loop you need to
+map2loop. 
+NOTE
+....
+When passing local files to map2loop you need to
 specify the full file path. If you get an error concerning the path, you
 may need to use double backslashes in the path specification (e.g
 geology_filename = “C:\\Users\\Bob\\Documents\\lithology.shp”, )
 alternatively you can use a raw string command and continue to use
-single backslashes (e.g geology_filename =
-r”C::raw-latex:`\Users`:raw-latex:`\Bob`:raw-latex:`\Documents`:raw-latex:`\lithology`.shp”,)
-#### CHANGE: Fill in the appropriate paths described in each string from
-lines 2 to 7.
+single backslashes (e.g geology_filename = r”C\Users\Bob\Documents\lithology.shp”,)
 
-.. raw:: html
-
-   <p>
-
-(line 8): clut_filename is an optional variable. If you would like to
+CHANGE:
+.......
+* Fill in the appropriate paths described in each string from lines 2 to 7.
+* **(line 8):** clut_filename is an optional variable. If you would like to
 assign colours to each unit using a csv file you’ll need to specify the
-full path here, otherwise leave an empty string (i.e clut_filename = ’’,
-)
-
-.. raw:: html
-
-   <p>
-
-(line 9): clut_file_legacy =True, if using legacy variable names in your
+full path here, otherwise leave an empty string (i.e clut_filename = ’’,)
+* **(line 9):** clut_file_legacy =True, if using legacy variable names in your
 hjson file (map2loop-2 and prior), clut_file_legacy = False, if you are
 using the current map2loop variable names in your hjson file (map2loop-3
 onwards)
-
-.. raw:: html
-
-   <p>
-
-(line 11 and 14): This is the folder name you specified in the “Naming
+* **(line 11 and 14):** This is the folder name you specified in the “Naming
 your .loop3d output file” section above
-
-.. raw:: html
-
-   <p>
-
-(line 12): Specify the projection (CRS) that your shapefiles use
+* **(line 12):** Specify the projection (CRS) that your shapefiles use
 (e.g. working_projection = “EPSG:28354”,)
 
 .. code:: ipython3
@@ -161,28 +147,15 @@ Setting Sampling Distances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You’ll need to provide samping distances and minimums so that map2loop
-knows what resolution you’d like to model in. #### CHANGE: The numeric
-values for each of the following lines need to be altered to suit your
+knows what resolution you’d like to model in. 
+CHANGE: 
+.......
+* The numeric values for each of the following lines need to be altered to suit your
 case study.
-
-.. raw:: html
-
-   <p>
-
-(line 1): sets the minimum fault length in meters. Map2Loop will ignore
+* **(line 1):** sets the minimum fault length in meters. Map2Loop will ignore
 any faults below this numeric value
-
-.. raw:: html
-
-   <p>
-
-(line 2): sets the sample spacing for geological contacts in meters
-
-.. raw:: html
-
-   <p>
-
-(line 3): sets the sample decimator for structural measurements to
+* **(line 2):** sets the sample spacing for geological contacts in meters
+* **(line 3):** sets the sample decimator for structural measurements to
 sample every nth measurement
 
 .. code:: ipython3
@@ -205,8 +178,14 @@ more information).
 
    <p>
 
-The commands for the different sorters you can choose from are listed
-below. Note if you want map2loop to select the best one, skip this step:
+**The commands for the different sorters you can choose from are listed
+below. Note if you want map2loop to select the best one, skip this step:**
+
+.. code:: ipython3
+
+   proj.set_sorter(SorterUseNetworkX()) 
+
+This sorts units based on their relationships, using a topological graph sorting algorithm.
 
 .. raw:: html
 
@@ -216,8 +195,11 @@ below. Note if you want map2loop to select the best one, skip this step:
 
    <p>
 
-proj.set_sorter(SorterUseNetworkX()) This sorts units based on their
-relationships, using a topological graph sorting algorithm.
+.. code:: ipython3
+
+   proj.set_sorter(SorterAgeBased()) 
+
+This sorts units based on their minimum and maximum ages (if specified in the attributes table of the lithology shape file).
 
 .. raw:: html
 
@@ -227,9 +209,11 @@ relationships, using a topological graph sorting algorithm.
 
    <p>
 
-proj.set_sorter(SorterAgeBased()) This sorts units based on their
-minimum and maximum ages (if specified in the attributes table of the
-lithology shape file).
+.. code:: ipython3
+
+   proj.set_sorter(SorterAlpha()) 
+
+This sorts units based on their adjacency (the algorithm uses the number of neighbouring units to do this).
 
 .. raw:: html
 
@@ -239,19 +223,11 @@ lithology shape file).
 
    <p>
 
-proj.set_sorter(SorterAlpha()) This sorts units based on their adjacency
-(the algorithm uses the number of neighbouring units to do this).
+.. code:: ipython3
 
-.. raw:: html
+   proj.set_sorter(SorterBeta()) 
 
-   </p>
-
-.. raw:: html
-
-   <p>
-
-proj.set_sorter(SorterBeta()) –NOTE THIS MAY NOT BE WORKING YET This
-sorts units based on their adjacency (the algorithm uses egde length to
+NOTE THIS MAY NOT BE WORKING YET.  This sorts units based on their adjacency (the algorithm uses egde length to
 calculate the order of units).
 
 Running your map2loop program
@@ -265,16 +241,17 @@ have used one of the above sorters.
 
    <p>
 
-(Option 1): proj.run_all(take_best=True) This itterates through the
+* (Option 1): proj.run_all(take_best=True) This itterates through the
 different sorters and selects the best based on the maximum basal
 contact length. Use this option if you want map2loop to calculate the
-‘best’ sorter.
+‘best’ sorter. 
+ 
 
 .. raw:: html
 
    <p>
 
-(Option 2): proj.run_all(take_best=False) Use this option if you
+* (Option 2): proj.run_all(take_best=False) Use this option if you
 implemented any of the above sorters. The False flag ensures that the
 specified sorting algorithm is used rather than the calculated ‘best’
 option.

@@ -2,6 +2,8 @@
 Template for Map2Loop
 =====================
 
+`CLICK HERE TO DOWLOAD NOTEBOOK <../_static/m2l_code_template.ipynb>`_
+
 This is a basic template for the calling code that can be used to run
 Map2Loop. The output of the program will be a ‘.loop3d’ file, which can
 be passed directly to LoopStructural to produce your 3D model.

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>&lt;no title&gt; &#8212; map2loop 3.0.6 documentation</title>
+    <title>Template for Map2Loop &#8212; map2loop 3.0.6 documentation</title>
   
   
   
@@ -45,6 +45,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/m2l_code_template';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Exporting" href="exporting.html" />
+    <link rel="prev" title="Fault offset calculation" href="fault_offset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -134,7 +136,7 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
@@ -259,9 +261,7 @@ document.write(`
       
       
       
-        
-      
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -274,7 +274,7 @@ document.write(`
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
@@ -354,6 +354,29 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing map2loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geomodelling.html">Creating a 3D geological model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Mapping attributes to variables using an HJSON file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_jupyter.html">Setting up your Jupyter Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changing_colours.html">Changing Colours</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stratigraphic_thickness.html">Calculating stratigraphic thicknesses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stratigraphic_order.html">Identifying stratigraphic order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fault_offset.html">Fault offset calculation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Template for Map2Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -386,7 +409,10 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">&lt;no title&gt;</li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Template...</li>
   </ul>
 </nav>
 </div>
@@ -403,7 +429,219 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  
+  <section id="template-for-map2loop">
+<h1>Template for Map2Loop<a class="headerlink" href="#template-for-map2loop" title="Link to this heading">#</a></h1>
+<p>This is a basic template for the calling code that can be used to run
+Map2Loop. The output of the program will be a ‘.loop3d’ file, which can
+be passed directly to LoopStructural to produce your 3D model.</p>
+<p><p>An attempt has been made to explain the code as much as possible. In
+your own notebook, you may want to get rid of the explanatory comments
+(any lines starting with a ‘#’, and text cells). This won’t affect the
+program’s functionality.</p>
+<section id="before-you-begin">
+<h2>Before You Begin<a class="headerlink" href="#before-you-begin" title="Link to this heading">#</a></h2>
+<p>In order to run map2loop you will need the following files: 1. Polygon
+shapefile containing your lithologies 2. LineString shapefile containing
+your linear features (e.g. faults) 3. Point data shapefile containing
+orientation data 4. hjson file defining the attribute names used in your
+shapefiles</p>
+<p><p>If you need help setting up these files please refer to the map2loop
+examples which provide a step-by-step guide.</p>
+</section>
+<section id="setting-up-your-notebook">
+<h2>Setting up your notebook<a class="headerlink" href="#setting-up-your-notebook" title="Link to this heading">#</a></h2>
+<p>In order for your map2loop code to funtion correctly, you need to import
+all of the neccessary python libraries. In simple terms, imports allow
+different code modules to speak to eachother.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">map2loop.project</span> <span class="kn">import</span> <span class="n">Project</span>
+<span class="kn">from</span> <span class="nn">map2loop.m2l_enums</span> <span class="kn">import</span> <span class="n">VerboseLevel</span>
+<span class="kn">from</span> <span class="nn">map2loop.m2l_enums</span> <span class="kn">import</span> <span class="n">Datatype</span>
+<span class="kn">from</span> <span class="nn">map2loop.sampler</span> <span class="kn">import</span> <span class="n">SamplerSpacing</span><span class="p">,</span> <span class="n">SamplerDecimator</span>
+<span class="kn">from</span> <span class="nn">map2loop.sorter</span> <span class="kn">import</span> <span class="n">SorterUseHint</span><span class="p">,</span> <span class="n">SorterUseNetworkX</span><span class="p">,</span> <span class="n">SorterAgeBased</span><span class="p">,</span> <span class="n">SorterAlpha</span>
+<span class="kn">import</span> <span class="nn">time</span>
+</pre></div>
+</div>
+<section id="naming-your-loop3d-output-file">
+<h3>Naming your .loop3d output file<a class="headerlink" href="#naming-your-loop3d-output-file" title="Link to this heading">#</a></h3>
+<p>This format specifies that the output file will be saved in a new folder
+within the current directory (where ever you have saved your notebook).
+The new folder will be named whatever you specify in line 6 (
+“insert_output_folder_name_here”). The generated loop3d file will be
+called “local_source.loop3d”. #### CHANGE: (line 6):
+“insert_output_folder_name_here” to a project relevant name</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="n">nowtime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s1">&#39;minutes&#39;</span><span class="p">)</span>
+<span class="n">model_name</span><span class="o">=</span><span class="n">nowtime</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span><span class="s2">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+<span class="c1">#The next line specifies the name of the output file and the folder containing all the data</span>
+<span class="n">loop_project_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;insert_output_folder_name_here&quot;</span><span class="p">,</span> <span class="s2">&quot;local_source.loop3d&quot;</span><span class="p">)</span>
+
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="defining-the-model-extents">
+<h3>Defining the Model Extents<a class="headerlink" href="#defining-the-model-extents" title="Link to this heading">#</a></h3>
+<p>You’ll need to specify the extent of the area you want to model. This is
+defined as minimum and maximum x and y coordinates, where x is the
+latitude and y is the longitude. You also need to state the bounds of
+the model along the z axis. This is given as the number of meters above
+and below the surface that will be modeled. #### CHANGE: The numeric
+values assigned to variables accross lines 2 to 7, to match your region
+of interest.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bounding_box</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;minx&quot;</span><span class="p">:</span> <span class="mi">602635</span><span class="p">,</span>        <span class="c1">#minimum latitude</span>
+    <span class="s2">&quot;miny&quot;</span><span class="p">:</span> <span class="mi">5852551</span><span class="p">,</span>       <span class="c1">#minimum longitude</span>
+    <span class="s2">&quot;maxx&quot;</span><span class="p">:</span> <span class="mi">642618</span><span class="p">,</span>        <span class="c1">#maximum latitude</span>
+    <span class="s2">&quot;maxy&quot;</span><span class="p">:</span> <span class="mi">5908499</span><span class="p">,</span>       <span class="c1">#maximum longitude</span>
+    <span class="s2">&quot;base&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2000</span><span class="p">,</span>         <span class="c1">#meters modeled below the surface</span>
+    <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>           <span class="c1">#meters modeled above the surface</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-a-project-instance">
+<h3>Creating a Project Instance<a class="headerlink" href="#creating-a-project-instance" title="Link to this heading">#</a></h3>
+<p>This is where all of the required files (e.g. shape files) are passed to
+map2loop. #### NOTE When passing local files to map2loop you need to
+specify the full file path. If you get an error concerning the path, you
+may need to use double backslashes in the path specification (e.g
+geology_filename = “C:\Users\Bob\Documents\lithology.shp”, )
+alternatively you can use a raw string command and continue to use
+single backslashes (e.g geology_filename =
+r”C:<a href="#id1"><span class="problematic" id="id2">:raw-latex:`\Users`</span></a><a href="#id3"><span class="problematic" id="id4">:raw-latex:`\Bob`</span></a><a href="#id5"><span class="problematic" id="id6">:raw-latex:`\Documents`</span></a><a href="#id7"><span class="problematic" id="id8">:raw-latex:`\lithology`</span></a>.shp”,)
+#### CHANGE: Fill in the appropriate paths described in each string from
+lines 2 to 7.</p>
+<p><p>(line 8): clut_filename is an optional variable. If you would like to
+assign colours to each unit using a csv file you’ll need to specify the
+full path here, otherwise leave an empty string (i.e clut_filename = ’’,
+)</p>
+<p><p>(line 9): clut_file_legacy =True, if using legacy variable names in your
+hjson file (map2loop-2 and prior), clut_file_legacy = False, if you are
+using the current map2loop variable names in your hjson file (map2loop-3
+onwards)</p>
+<p><p>(line 11 and 14): This is the folder name you specified in the “Naming
+your .loop3d output file” section above</p>
+<p><p>(line 12): Specify the projection (CRS) that your shapefiles use
+(e.g. working_projection = “EPSG:28354”,)</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj</span> <span class="o">=</span> <span class="n">Project</span><span class="p">(</span>
+    <span class="n">geology_filename</span> <span class="o">=</span> <span class="s1">&#39;enter the full path of your lithology polygon shape file here&#39;</span><span class="p">,</span>
+    <span class="n">fault_filename</span> <span class="o">=</span> <span class="s1">&#39;enter the full path of your linear features shape file here&#39;</span><span class="p">,</span>
+    <span class="n">fold_filename</span> <span class="o">=</span> <span class="s1">&#39;enter the full path of your linear features shape file here&#39;</span><span class="p">,</span>
+    <span class="n">structure_filename</span> <span class="o">=</span> <span class="s1">&#39;enter the full path of your orientation point data shape file here&#39;</span><span class="p">,</span>
+    <span class="n">dtm_filename</span> <span class="o">=</span> <span class="s1">&#39;au&#39;</span><span class="p">,</span> <span class="c1">#if the area is in Australia you can leave this as &#39;au&#39;, otherwise specify full path to DTM</span>
+    <span class="n">config_filename</span> <span class="o">=</span> <span class="s1">&#39;enter the full path of your hjson config file here&#39;</span><span class="p">,</span>
+    <span class="n">clut_filename</span> <span class="o">=</span> <span class="s1">&#39;OPTIONAL, enter the full path of the csv file specifying unit colours&#39;</span><span class="p">,</span>
+    <span class="n">clut_file_legacy</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose_level</span> <span class="o">=</span> <span class="n">VerboseLevel</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="c1">#can set this to VerboseLevel.NONE if you don&#39;t wan&#39;t any feedback from the program</span>
+    <span class="n">tmp_path</span> <span class="o">=</span> <span class="s2">&quot;insert_output_folder_name_here&quot;</span><span class="p">,</span>
+    <span class="n">working_projection</span> <span class="o">=</span> <span class="s2">&quot;EPSG:code&quot;</span><span class="p">,</span>
+    <span class="n">bounding_box</span> <span class="o">=</span> <span class="n">bounding_box</span><span class="p">,</span>
+    <span class="n">loop_project_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;insert_output_folder_name_here&quot;</span><span class="p">,</span> <span class="s2">&quot;local_source.loop3d&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="setting-sampling-distances">
+<h3>Setting Sampling Distances<a class="headerlink" href="#setting-sampling-distances" title="Link to this heading">#</a></h3>
+<p>You’ll need to provide samping distances and minimums so that map2loop
+knows what resolution you’d like to model in. #### CHANGE: The numeric
+values for each of the following lines need to be altered to suit your
+case study.</p>
+<p><p>(line 1): sets the minimum fault length in meters. Map2Loop will ignore
+any faults below this numeric value</p>
+<p><p>(line 2): sets the sample spacing for geological contacts in meters</p>
+<p><p>(line 3): sets the sample decimator for structural measurements to
+sample every nth measurement</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj</span><span class="o">.</span><span class="n">set_minimum_fault_length</span><span class="p">(</span><span class="mf">2000.0</span><span class="p">)</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="n">Datatype</span><span class="o">.</span><span class="n">GEOLOGY</span><span class="p">,</span> <span class="n">SamplerSpacing</span><span class="p">(</span><span class="mf">100.0</span><span class="p">))</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="n">Datatype</span><span class="o">.</span><span class="n">STRUCTURE</span><span class="p">,</span> <span class="n">SamplerDecimator</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="selecting-a-stratigraphic-column-sorter">
+<h3>Selecting a Stratigraphic Column Sorter<a class="headerlink" href="#selecting-a-stratigraphic-column-sorter" title="Link to this heading">#</a></h3>
+<p>There are several different sorting algorithms that map2loop can use to
+calculate the stratigraphic column. Choosing the ‘best’ of these sorters
+may take some trial and error. There is also the option to allow
+map2loop to choose the best sorter, or to specify the correct
+stratigraphic sequence (see below or refer to the map2loop examples for
+more information).</p>
+<p><p>The commands for the different sorters you can choose from are listed
+below. Note if you want map2loop to select the best one, skip this step:</p>
+</p><p><p>proj.set_sorter(SorterUseNetworkX()) This sorts units based on their
+relationships, using a topological graph sorting algorithm.</p>
+</p><p><p>proj.set_sorter(SorterAgeBased()) This sorts units based on their
+minimum and maximum ages (if specified in the attributes table of the
+lithology shape file).</p>
+</p><p><p>proj.set_sorter(SorterAlpha()) This sorts units based on their adjacency
+(the algorithm uses the number of neighbouring units to do this).</p>
+</p><p><p>proj.set_sorter(SorterBeta()) –NOTE THIS MAY NOT BE WORKING YET This
+sorts units based on their adjacency (the algorithm uses egde length to
+calculate the order of units).</p>
+</section>
+<section id="running-your-map2loop-program">
+<h3>Running your map2loop program<a class="headerlink" href="#running-your-map2loop-program" title="Link to this heading">#</a></h3>
+<p>Once you’ve selected a sorter (optional), you will need to run the
+program. There are 2 options to do this, depending on whether or not you
+have used one of the above sorters.</p>
+<p><p>(Option 1): proj.run_all(take_best=True) This itterates through the
+different sorters and selects the best based on the maximum basal
+contact length. Use this option if you want map2loop to calculate the
+‘best’ sorter.</p>
+<p><p>(Option 2): proj.run_all(take_best=False) Use this option if you
+implemented any of the above sorters. The False flag ensures that the
+specified sorting algorithm is used rather than the calculated ‘best’
+option.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj</span><span class="o">.</span><span class="n">set_sorter</span><span class="p">(</span><span class="n">SorterAlpha</span><span class="p">())</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">run_all</span><span class="p">(</span><span class="n">take_best</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="alternative-using-a-user-defined-stratigraphic-column">
+<h2>Alternative: Using a User Defined Stratigraphic Column<a class="headerlink" href="#alternative-using-a-user-defined-stratigraphic-column" title="Link to this heading">#</a></h2>
+<p><p>Alternatively, you can run the program with a user defined stratigraphic
+column. If you decide to do this, you’ll need to define the
+stratigraphic column with the youngest unit at the top and the oldest at
+the bottom as shown in the code below.</p>
+<p><p>To run the program use the command in line 9 below.</p>
+<p>Skip the ‘Selecting a Stratigraphic Column Sorter’ and ‘Running your
+map2loop program’ sections above.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span> <span class="n">column</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># youngest</span>
+    <span class="s1">&#39;youngest_unit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;middle_unit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;oldest_unit&#39;</span><span class="p">,</span>
+    <span class="c1"># oldest</span>
+ <span class="p">]</span>
+
+<span class="n">proj</span><span class="o">.</span><span class="n">run_all</span><span class="p">(</span><span class="n">user_defined_stratigraphic_column</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
+
+<span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>The expected output from map2loop is a ‘.loop3d’ file. You can then pass
+this file to Loop Structural to produce your 3D model.</p>
+<p><p>If you’d like to inspect your loop3d output file via terminal
+(e.g. Anaconda Prompt) you can do this with the command ncdump
+loop3d_file_name.loop3d (e.g. ncdump local_source.loop3d). Ensure that
+you’re in the correct working directory (i.e wherever you saved the
+loop3d file). You can change directories using the ‘cd’ command. To use
+the ncdump tool, you’ll need to ensure that you have netcdf4 installed
+in your environment. You can check this by using the command ‘conda
+list’ in your Anaconda environment and then scroll through the
+applications to see if it is installed.</p>
+<p><p>Note that the output of ncdump will appear as text within the terminal.</p>
+</section>
+</section>
+
 
                 </article>
               
@@ -414,6 +652,24 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="fault_offset.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Fault offset calculation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="exporting.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Exporting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -431,9 +687,20 @@ document.write(`
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="simple visible nav section-nav flex-column">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#before-you-begin">Before You Begin</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-your-notebook">Setting up your notebook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naming-your-loop3d-output-file">Naming your .loop3d output file</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-model-extents">Defining the Model Extents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-project-instance">Creating a Project Instance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-sampling-distances">Setting Sampling Distances</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-a-stratigraphic-column-sorter">Selecting a Stratigraphic Column Sorter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-your-map2loop-program">Running your map2loop program</a></li>
 </ul>
-
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-using-a-user-defined-stratigraphic-column">Alternative: Using a User Defined Stratigraphic Column</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
+</ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">

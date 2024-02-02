@@ -13,4 +13,5 @@ User Guide
    stratigraphic_thickness
    stratigraphic_order
    fault_offset
+   m2l_code_template
    exporting

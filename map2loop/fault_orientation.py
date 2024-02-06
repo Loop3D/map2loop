@@ -73,7 +73,7 @@ class FaultOrientationNearest(FaultOrientation):
         Assigns the nearest fault orientation to a fault
 
         Args:
-            faults (pandas.DataFrame): the data frame of the faults to add throw values to
+            fault_trace (geopandas.GeoDataFrame): the data frame of the fault traces 
             fault_orientation (pandas.DataFrame): data frame with fault orientations to assign to faults
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 

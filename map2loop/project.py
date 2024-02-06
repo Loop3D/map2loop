@@ -466,15 +466,15 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
-        self.fault_samples = self.fault_samples.merge(
-            self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]],
-            on="ID",
-            how="left",
-        )
-        self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(
-            numpy.nan, 0
-        )
-        self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
+        # self.fault_samples = self.fault_samples.merge(
+        #     self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]],
+        #     on="ID",
+        #     how="left",
+        # )
+        # self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(
+        #     numpy.nan, 0
+        # )
+        # self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
@@ -639,23 +639,27 @@ class Project(object):
         contacts_data["altitude"] = self.sampled_contacts["Z"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data, verbose=True)
 
-        # Save fault information
+        # Save fault trace information
         faults_obs_data = numpy.zeros(len(self.fault_samples), LPF.faultObservationType)
+
         faults_obs_data["eventId"] = self.fault_samples["ID"]
         faults_obs_data["easting"] = self.fault_samples["X"]
         faults_obs_data["northing"] = self.fault_samples["Y"]
         faults_obs_data["altitude"] = self.fault_samples["Z"]
         faults_obs_data["type"] = 0
-        faults_obs_data["dipDir"] = self.fault_samples["DIPDIR"]
-        faults_obs_data["dip"] = self.fault_samples["DIP"]
-        faults_obs_data["dipPolarity"] = 0  # self.fault_samples["DIPPOLARITY"]
+        faults_obs_data["dipDir"] = numpy.nan
+        faults_obs_data["dip"] = numpy.nan
+        faults_obs_data["posOnly"] = 1
+        # faults_obs_data["dipDir"] = self.fault_samples["DIPDIR"]
+        # faults_obs_data["dip"] = self.fault_samples["DIP"]
+        # faults_obs_data["dipPolarity"] = 0  # self.fault_samples["DIPPOLARITY"]
         # faults_obs_data["val"] = self.fault_samples["???"]
         faults_obs_data["displacement"] = 100  # self.fault_samples["DISPLACEMENT"]
 
         # TODO: Find a better way to assign posOnly for fault observations
-        from itertools import cycle, islice
+        # from itertools import cycle, islice
 
-        faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
+        # faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
         LPF.Set(
             self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True
         )

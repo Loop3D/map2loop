@@ -139,7 +139,12 @@ class Project(object):
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
-        self.fault_orientations = None  # TODO set default values for all samplers
+        self.fault_orientations = pandas.DataFrame(
+            columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"]
+        )
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]

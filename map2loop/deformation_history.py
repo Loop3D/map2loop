@@ -25,6 +25,7 @@ class DeformationHistory:
         The fold summary
 
     """
+
     def __init__(self):
         """
         The initialiser for the deformation history. All attributes are defaulted
@@ -217,26 +218,28 @@ class DeformationHistory:
         self.faults["group"] = ""
         self.faults["supergroup"] = ""
         self.faults["avgDisplacement"] = -1.0
-        self.faults["avgDownthrowDir"] = 0.0
-        self.faults["influenceDistance"] = 0.0
-        self.faults["verticalRadius"] = 0.0
-        self.faults["horizontalRadius"] = 0.0
+        self.faults["avgDownthrowDir"] = numpy.nan
+        self.faults["influenceDistance"] = numpy.nan
+        self.faults["verticalRadius"] = numpy.nan
+        self.faults["horizontalRadius"] = numpy.nan
         self.faults["colour"] = "#000000"
-        self.faults["centreX"] = 0.0
-        self.faults["centreY"] = 0.0
-        self.faults["centreZ"] = 0.0
-        self.faults["avgSlipDirX"] = 0.0
-        self.faults["avgSlipDirY"] = 0.0
-        self.faults["avgSlipDirZ"] = 0.0
-        self.faults["avgNormalX"] = 0.0
-        self.faults["avgNormalY"] = 0.0
-        self.faults["avgNormalZ"] = 0.0
+        self.faults["centreX"] = numpy.nan
+        self.faults["centreY"] = numpy.nan
+        self.faults["centreZ"] = numpy.nan
+        self.faults["avgSlipDirX"] = numpy.nan
+        self.faults["avgSlipDirY"] = numpy.nan
+        self.faults["avgSlipDirZ"] = numpy.nan
+        self.faults["avgNormalX"] = numpy.nan
+        self.faults["avgNormalY"] = numpy.nan
+        self.faults["avgNormalZ"] = numpy.nan
         self.faults["length"] = faults_data.geometry.length
         for index, fault in self.faults.iterrows():
-            bounds = faults_map_data[faults_map_data["ID"] == fault["eventId"]].geometry.bounds
+            bounds = faults_map_data[
+                faults_map_data["ID"] == fault["eventId"]
+            ].geometry.bounds
             xdist = float(bounds.maxx.iloc[0] - bounds.minx.iloc[0])
             ydist = float(bounds.maxy.iloc[0] - bounds.miny.iloc[0])
-            length = math.sqrt(xdist*xdist + ydist*ydist)
+            length = math.sqrt(xdist * xdist + ydist * ydist)
             self.faults.at[index, "verticalRadius"] = length
             self.faults.at[index, "horizontalRadius"] = length / 2.0
             self.faults.at[index, "influenceDistance"] = length / 4.0
@@ -258,7 +261,9 @@ class DeformationHistory:
 
         # id_list = self.faults["eventId"].unique()
         for index, fault in self.faults.iterrows():
-            observations = fault_observations[fault_observations["ID"] == fault["eventId"]]
+            observations = fault_observations[
+                fault_observations["ID"] == fault["eventId"]
+            ]
             # calculate centre point
             self.faults.at[index, "centreX"] = numpy.mean(observations["X"])
             self.faults.at[index, "centreY"] = numpy.mean(observations["Y"])
@@ -271,10 +276,14 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
-        return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
+        return self.faults[
+            self.faults["length"] >= self.minimum_fault_length_to_export
+        ].copy()
 
     @beartype.beartype
-    def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):
+    def get_fault_relationships_with_ids(
+        self, fault_fault_relationships: pandas.DataFrame
+    ):
         """
         Ammend the fault relationships DataFrame with the fault eventIds
 

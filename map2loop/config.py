@@ -1,7 +1,7 @@
 import beartype
 import hjson
 import urllib
-
+import time
 
 class Config:
     """
@@ -177,9 +177,21 @@ class Config:
 
         try:
             if filename.startswith("http") or filename.startswith("ftp"):
-                with urllib.request.urlopen(filename) as url_data:
-                    data = hjson.load(url_data)
-                    func(data, lower)
+                try_count = 10
+                success = False
+                while try_count >= 0 and not success:
+                    try:
+                        with urllib.request.urlopen(filename) as url_data:
+                            data = hjson.load(url_data)
+                            func(data, lower)
+                        success = True
+                    except Exception as e:
+                        # Catch a failed online access or file load, re-attempt
+                        # a few times before throwing further
+                        time.sleep(0.25)
+                        try_count = try_count - 1
+                        if try_count < 0:
+                            raise e
             else:
                 with open(filename) as url_data:
                     data = hjson.load(url_data)

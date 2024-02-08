@@ -1,0 +1,12 @@
+[tool.black]
+line-length = 100
+skip-string-normalization = true
+target-version = ['py39']
+exclude='\.eggs|\.git|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|node_modules'
+skip-magic-trailing-comma = true
+
+# Add an option to remove the trailing comma of separated lists
+# but it doesn't exist because python devs don't like beautiful code.
+# black specifically adds trailing commas due to git diff lengths
+# which is an insufficient reason to destroy beautiful code making
+# it look like an unfinished thought or an incomplete

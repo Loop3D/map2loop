@@ -7,6 +7,7 @@ class Datatype(IntEnum):
     FAULT = 2
     FOLD = 3
     DTM = 4
+    FAULT_ORIENTATION = 5
 
 
 class Datastate(IntEnum):

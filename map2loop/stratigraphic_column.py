@@ -23,6 +23,7 @@ class StratigraphicColumn:
         The lithology units
 
     """
+
     def __init__(self):
         """
         The initialiser for the stratigraphic units. All attributes are defaulted
@@ -76,9 +77,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if type(id) is int:
+        if isinstance(type(id), int):
             return self.stratigraphicUnits[self.stratigraphicUnits["layerId"] == id]
-        elif type(id) is str:
+        elif isinstance(type(id), str):
             return self.stratigraphicUnits[self.stratigraphicUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find stratigraphic unit")
@@ -94,9 +95,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if type(id) is int:
+        if isinstance(type(id), int):
             return self.lithologyUnits[self.lithologyUnits["layerId"] == id]
-        elif type(id) is str:
+        elif isinstance(type(id), str):
             return self.lithologyUnits[self.lithologyUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find lithology unit")
@@ -109,7 +110,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if type(unit) is pandas.DataFrame or type(unit) is dict:
+        if isinstance(type(unit), pandas.DataFrame) or isinstance(type(unit), dict):
             if "name" in unit.keys():
                 if unit["name"] in self.stratigraphicUnits.index:
                     print("Replacing stratigraphic unit", unit["name"])
@@ -127,7 +128,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if type(unit) is pandas.DataFrame or type(unit) is dict:
+        if isinstance(type(unit), pandas.DataFrame) or isinstance(type(unit), dict):
             if "name" in unit.keys():
                 if unit["name"] in self.lithologyUnits.index:
                     print("Replacing lithology unit", unit["name"])
@@ -167,9 +168,7 @@ class StratigraphicColumn:
 
         self.groups = list(self.stratigraphicUnits['group'].unique())
 
-    def set_stratigraphic_unit_parameter_by_name(
-        self, name: str, parameter: str, value
-    ):
+    def set_stratigraphic_unit_parameter_by_name(self, name: str, parameter: str, value):
         """
         Set a specific parameter on a specific stratigraphic unit
 
@@ -178,9 +177,7 @@ class StratigraphicColumn:
             parameter (str): The colmn name of the parameters
             value (str or int or float): The value to set
         """
-        self.stratigraphicUnits.iloc[self.stratigraphicUnits["name"] == name][
-            parameter
-        ] = value
+        self.stratigraphicUnits.iloc[self.stratigraphicUnits["name"] == name][parameter] = value
 
     def sort_from_relationship_list(self, relationshipList: list):
         """

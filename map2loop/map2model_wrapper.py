@@ -164,7 +164,7 @@ class Map2ModelWrapper():
                 header=None,
             )
             df[1] = list(df[1].str.replace("}", "", regex=False))
-            df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # noqa: W605 Valid escape for regex
+            df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
             df[0] = "Fault_" + df[0]

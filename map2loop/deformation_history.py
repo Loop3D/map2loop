@@ -25,6 +25,7 @@ class DeformationHistory:
         The fold summary
 
     """
+
     def __init__(self):
         """
         The initialiser for the deformation history. All attributes are defaulted
@@ -111,9 +112,9 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested fault
         """
-        if type(id) is int:
+        if isinstance(type(id), int):
             return self.faults[self.faults["eventId"] == id]
-        elif type(id) is str:
+        elif isinstance(type(id), str):
             return self.faults[self.faults["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find fault")
@@ -129,9 +130,9 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested fold
         """
-        if type(id) is int:
+        if isinstance(type(id), int):
             return self.folds[self.folds["foldId"] == id]
-        elif type(id) is str:
+        elif isinstance(type(id), str):
             return self.folds[self.folds["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find fold")
@@ -144,7 +145,7 @@ class DeformationHistory:
             fault (pandas.DataFrame or dict):
                 The fault information to add
         """
-        if type(fault) is pandas.DataFrame or type(fault) is dict:
+        if isinstance(type(fault), pandas.DataFrame) or isinstance(type(fault), dict):
             if "name" in fault.keys():
                 if fault["name"] in self.faults.index:
                     print("Replacing fault", fault["name"])
@@ -182,7 +183,7 @@ class DeformationHistory:
             fold (pandas.DataFrame or dict):
                 The fold information to add
         """
-        if type(fold) is pandas.DataFrame or type(fold) is dict:
+        if isinstance(type(fold), pandas.DataFrame) or isinstance(type(fold), dict):
             if "name" in fold.keys():
                 if fold["name"] in self.folds.index:
                     print("Replacing fold", fold["name"])
@@ -236,7 +237,7 @@ class DeformationHistory:
             bounds = faults_map_data[faults_map_data["ID"] == fault["eventId"]].geometry.bounds
             xdist = float(bounds.maxx.iloc[0] - bounds.minx.iloc[0])
             ydist = float(bounds.maxy.iloc[0] - bounds.miny.iloc[0])
-            length = math.sqrt(xdist*xdist + ydist*ydist)
+            length = math.sqrt(xdist * xdist + ydist * ydist)
             self.faults.at[index, "verticalRadius"] = length
             self.faults.at[index, "horizontalRadius"] = length / 2.0
             self.faults.at[index, "influenceDistance"] = length / 4.0

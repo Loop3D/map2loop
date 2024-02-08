@@ -5,7 +5,7 @@ def random_colours_hex(n):
     """
     Generate n random colours in hex format.
     """
-    rgb = np.random.rand(n, 3)
+    rgb = np.random.Generator.rand(n, 3)
     return rgb_to_hex(rgb)
 
 

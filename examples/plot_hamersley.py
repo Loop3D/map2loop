@@ -3,11 +3,10 @@
 Hamersley, Western Australia
 ============================
 """
+
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel, Datatype
-from map2loop.sorter import (
-    SorterAlpha,
-)
+from map2loop.sorter import SorterAlpha
 from map2loop.sampler import SamplerSpacing
 
 ####################################################################

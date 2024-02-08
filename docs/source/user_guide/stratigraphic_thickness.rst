@@ -65,10 +65,15 @@ Using this abstract base class a new class can be created by taking that base cl
 replacing the __init__ and compute functions, the simplest example is shown below:
 
 .. code-block::
+from map2loop.thickness_calculator import ThicknessCalculator
+from map2loop.mapdata import MapData
+import pandas
+import geopandas
 
     class myThicknessCalculator(ThicknessCalculator):
-        def __init__(self):
+        def __init__(self, thickness=100):
             self.thickness_calculator_label = "myThicknessCalculator"
+            self.default_thickness = thickness
         
         def compute(
             self,
@@ -78,7 +83,7 @@ replacing the __init__ and compute functions, the simplest example is shown belo
             map_data: MapData,
         ) -> pandas.DataFrame:
             output_units = units.copy()
-            output_units['thickness'] = 100
+            output_units['thickness'] = default_thickness
             return output_units
 
 This example will set all unit thicknesses to 100m.
@@ -90,12 +95,14 @@ be added after the Project has been initialised:
 
     proj = map2loop.Project( ... )
 
-    proj.set_thickness_calculator(myThicknessCalculator())
+    proj.set_thickness_calculator(myThicknessCalculator(50))
 
 Notes
 -----
 You need to set the thickness calculator as an instance of myThicknessCalculator
-(with the ()s) rather than the definition.
+(with the ()s) rather than the definition.  If you want to set the default thickness using
+this class you can create the class with the thickness parameter as above
+(myThicknessCalculator(50)).
 
 The thickness calculator takes the existing units dataframe, changes the values in the
 thickness column and then returns the modified dataframe.  While you have control of

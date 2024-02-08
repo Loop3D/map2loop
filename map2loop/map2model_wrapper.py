@@ -6,7 +6,7 @@ from .m2l_enums import VerboseLevel
 import re
 
 
-class Map2ModelWrapper():
+class Map2ModelWrapper:
     """
     A wrapper around map2model functionality
 
@@ -25,6 +25,7 @@ class Map2ModelWrapper():
     verbose_level: m2l_enum.VerboseLevel
         A selection that defines how much console logging is output
     """
+
     def __init__(self, map_data, verbose_level: VerboseLevel = VerboseLevel.NONE):
         """
         The initialiser for the map2model wrapper
@@ -139,7 +140,7 @@ class Map2ModelWrapper():
             self.map_data.get_bounding_box(),
             map2model_code_map,
             verbose_level == VerboseLevel.NONE,
-            "None"
+            "None",
         )
         if verbose_level == VerboseLevel.ALL:
             print("map2model log:")
@@ -148,7 +149,11 @@ class Map2ModelWrapper():
             print("map2model complete")
 
         # Parse units sorted
-        units_sorted = pandas.read_csv(os.path.join(self.map_data.tmp_path, "map2model_data", "units_sorted.txt"), header=None, sep=' ')
+        units_sorted = pandas.read_csv(
+            os.path.join(self.map_data.tmp_path, "map2model_data", "units_sorted.txt"),
+            header=None,
+            sep=' ',
+        )
         if units_sorted.shape == 0:
             self.sorted_units = []
         else:
@@ -156,13 +161,14 @@ class Map2ModelWrapper():
 
         # Parse fault intersections
         out = []
-        fault_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt")
-        if os.path.isfile(fault_fault_intersection_filename) and os.path.getsize(fault_fault_intersection_filename) > 0:
-            df = pandas.read_csv(
-                fault_fault_intersection_filename,
-                delimiter="{",
-                header=None,
-            )
+        fault_fault_intersection_filename = os.path.join(
+            self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt"
+        )
+        if (
+            os.path.isfile(fault_fault_intersection_filename)
+            and os.path.getsize(fault_fault_intersection_filename) > 0
+        ):
+            df = pandas.read_csv(fault_fault_intersection_filename, delimiter="{", header=None)
             df[1] = list(df[1].str.replace("}", "", regex=False))
             df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
@@ -173,15 +179,20 @@ class Map2ModelWrapper():
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
-                    out += [[row[0], "Fault_"+row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+                    out += [[row[0], "Fault_" + row[1][i][0], row[1][i][1], float(row[1][i][2])]]
 
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
         self.fault_fault_relationships = df_out
 
         # Parse unit fault relationships
         out = []
-        unit_fault_intersection_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt")
-        if os.path.isfile(unit_fault_intersection_filename) and os.path.getsize(unit_fault_intersection_filename) > 0:
+        unit_fault_intersection_filename = os.path.join(
+            self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt"
+        )
+        if (
+            os.path.isfile(unit_fault_intersection_filename)
+            and os.path.getsize(unit_fault_intersection_filename) > 0
+        ):
             df = pandas.read_csv(unit_fault_intersection_filename, header=None, sep='{')
             df[1] = list(df[1].str.replace("}", "", regex=False))
             df[1] = df[1].astype(str).str.split(", ")
@@ -190,7 +201,7 @@ class Map2ModelWrapper():
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
-                    out += [[row[0], "Fault_"+row[1][i]]]
+                    out += [[row[0], "Fault_" + row[1][i]]]
 
         df_out = pandas.DataFrame(columns=["Unit", "Fault"], data=out)
         self.unit_fault_relationships = df_out
@@ -198,9 +209,13 @@ class Map2ModelWrapper():
         # Parse unit unit relationships
         units = []
         links = []
-        graph_filename = os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")
+        graph_filename = os.path.join(
+            self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt"
+        )
         if os.path.isfile(graph_filename) and os.path.getsize(graph_filename) > 0:
-            with open(os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")) as file:
+            with open(
+                os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")
+            ) as file:
                 contents = file.read()
                 segments = contents.split("\n\n")
                 for line in segments[0].split("\n"):

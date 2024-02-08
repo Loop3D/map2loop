@@ -60,11 +60,7 @@ extensions = [
     "myst_parser",
 ]
 
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".txt": "markdown",
-    ".md": "markdown",
-}
+source_suffix = {".rst": "restructuredtext", ".txt": "markdown", ".md": "markdown"}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -84,18 +80,12 @@ html_theme_options = {
             "url": "https://github.com/loop3d/map2loop",
             "icon": "fab fa-github-square",
         },
-        {
-            "name": "Twitter",
-            "url": "https://twitter.com/loop3d",
-            "icon": "fab fa-twitter-square",
-        },
+        {"name": "Twitter", "url": "https://twitter.com/loop3d", "icon": "fab fa-twitter-square"},
     ],
     #     "navbar_start": ["navbar-logo", "navbar-version"],
     #     "use_edit_page_button": True,
     "collapse_navigation": True,
-    "external_links": [
-        {"name": "Loop3d", "url": "https://www.loop3d.org"},
-    ],
+    "external_links": [{"name": "Loop3d", "url": "https://www.loop3d.org"}],
 }
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -109,18 +99,14 @@ html_theme = "pydata_sphinx_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-autosummary_mock_imports = [
-    "LoopStructural.interpolators._cython",
-]
+autosummary_mock_imports = ["LoopStructural.interpolators._cython"]
 # Sphinx gallery examples
 from LoopStructural.visualisation.sphinx_scraper import Scraper as LoopScraper
 from sphinx_gallery.sorting import ExampleTitleSortKey
 
 sphinx_gallery_conf = {
     "examples_dirs": ["../../examples/"],
-    "gallery_dirs": [
-        "_auto_examples/"
-    ],  # path to where to save gallery generated output
+    "gallery_dirs": ["_auto_examples/"],  # path to where to save gallery generated output
     "image_scrapers": ("matplotlib", LoopScraper()),
     "within_subsection_order": ExampleTitleSortKey,
     "reference_url": {"LoopStructural": None},

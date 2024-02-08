@@ -18,53 +18,54 @@ class Config:
     fold_config: dict
         column names and keywords for fold mappings
     """
+
     def __init__(self):
         self.structure_config = {
-                "orientation_type":    "dip direction",
-                "dipdir_column":       "DIPDIR",
-                "dip_column":          "DIP",
-                "description_column":  "DESCRIPTION",
-                "bedding_text":        "bedding",
-                "overturned_column":   "DESCRIPTION",
-                "overturned_text":     "overturned",
-                "objectid_column":     "ID"
-            }
+            "orientation_type": "dip direction",
+            "dipdir_column": "DIPDIR",
+            "dip_column": "DIP",
+            "description_column": "DESCRIPTION",
+            "bedding_text": "bedding",
+            "overturned_column": "DESCRIPTION",
+            "overturned_text": "overturned",
+            "objectid_column": "ID",
+        }
         self.geology_config = {
-                "unitname_column":     "UNITNAME",
-                "alt_unitname_column": "CODE",
-                "group_column":        "GROUP",
-                "supergroup_column":   "SUPERGROUP",
-                "description_column":  "DESCRIPTION",
-                "minage_column":       "MIN_AGE",
-                "maxage_column":       "MAX_AGE",
-                "rocktype_column":     "ROCKTYPE1",
-                "alt_rocktype_column": "ROCKTYPE2",
-                "sill_text":           "sill",
-                "intrusive_text":      "intrusive",
-                "volcanic_text":       "volcanic",
-                "objectid_column":     "ID",
-                "ignore_codes":        ["cover"]
-            }
+            "unitname_column": "UNITNAME",
+            "alt_unitname_column": "CODE",
+            "group_column": "GROUP",
+            "supergroup_column": "SUPERGROUP",
+            "description_column": "DESCRIPTION",
+            "minage_column": "MIN_AGE",
+            "maxage_column": "MAX_AGE",
+            "rocktype_column": "ROCKTYPE1",
+            "alt_rocktype_column": "ROCKTYPE2",
+            "sill_text": "sill",
+            "intrusive_text": "intrusive",
+            "volcanic_text": "volcanic",
+            "objectid_column": "ID",
+            "ignore_codes": ["cover"],
+        }
         self.fault_config = {
-                "structtype_column":   "FEATURE",
-                "fault_text":          "fault",
-                "dip_null_value":      "-999",
-                "dipdir_flag":         "num",
-                "dipdir_column":       "DIPDIR",
-                "dip_column":          "DIP",
-                "dipestimate_column":  "DIP_ESTIMATE",
-                "dipestimate_text":    "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
-                "name_column":         "NAME",
-                "objectid_column":     "ID"
-            }
+            "structtype_column": "FEATURE",
+            "fault_text": "fault",
+            "dip_null_value": "-999",
+            "dipdir_flag": "num",
+            "dipdir_column": "DIPDIR",
+            "dip_column": "DIP",
+            "dipestimate_column": "DIP_ESTIMATE",
+            "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
+            "name_column": "NAME",
+            "objectid_column": "ID",
+        }
         self.fold_config = {
-                "structtype_column":   "FEATURE",
-                "fold_text":           "fold",
-                "description_column":  "DESCRIPTION",
-                "synform_text":        "syncline",
-                "foldname_column":     "NAME",
-                "objectid_column":     "ID"
-            }
+            "structtype_column": "FEATURE",
+            "fold_text": "fold",
+            "description_column": "DESCRIPTION",
+            "synform_text": "syncline",
+            "foldname_column": "NAME",
+            "objectid_column": "ID",
+        }
 
     @beartype.beartype
     def update_from_dictionary(self, dictionary: dict, lower: bool = False):

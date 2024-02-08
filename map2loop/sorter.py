@@ -12,6 +12,7 @@ class Sorter(ABC):
     Args:
         ABC (ABC): Derived from Abstract Base Class
     """
+
     def __init__(self):
         """
         Initialiser of for Sorter
@@ -29,7 +30,14 @@ class Sorter(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method (abstract method)
 
@@ -50,6 +58,7 @@ class SorterUseHint(Sorter):
     """
     Sorter class which only returns the hint (no algorithm for sorting is done in this class)
     """
+
     def __init__(self):
         """
         Initialiser for use hint sorter
@@ -57,7 +66,14 @@ class SorterUseHint(Sorter):
         self.sorter_label = "SorterUseHint"
 
     @beartype.beartype
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
         In this case it purely returns the hint list
@@ -79,6 +95,7 @@ class SorterUseNetworkX(Sorter):
     """
     Sorter class which returns a sorted list of units based on the unit relationships using a topological graph sorting algorithm
     """
+
     def __init__(self):
         """
         Initialiser for networkx graph sorter
@@ -86,7 +103,14 @@ class SorterUseNetworkX(Sorter):
         self.sorter_label = "SorterUseNetworkX"
 
     @beartype.beartype
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
 
@@ -116,9 +140,13 @@ class SorterUseNetworkX(Sorter):
         for i in range(0, len(cycles)):
             if graph.has_edge(cycles[i][0], cycles[i][1]):
                 graph.remove_edge(cycles[i][0], cycles[i][1])
-                print(" SorterUseNetworkX Warning: Cycle found and contact edge removed:", units["name"][cycles[i][0]], units["name"][cycles[i][1]])
+                print(
+                    " SorterUseNetworkX Warning: Cycle found and contact edge removed:",
+                    units["name"][cycles[i][0]],
+                    units["name"][cycles[i][1]],
+                )
 
-        indexes = (list(nx.topological_sort(graph)))
+        indexes = list(nx.topological_sort(graph))
         order = [units["name"][i] for i in list(indexes)]
         return order
 
@@ -127,13 +155,21 @@ class SorterAgeBased(Sorter):
     """
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
+
     def __init__(self):
         """
         Initialiser for age based sorter
         """
         self.sorter_label = "SorterAgeBased"
 
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
 
@@ -149,7 +185,9 @@ class SorterAgeBased(Sorter):
         """
         sorted_units = units.copy()
         if "minAge" in units.columns and "maxAge" in units.columns:
-            sorted_units["meanAge"] = sorted_units.apply(lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1)
+            sorted_units["meanAge"] = sorted_units.apply(
+                lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
+            )
         else:
             sorted_units["meanAge"] = 0
         if "group" in units.columns:
@@ -165,13 +203,21 @@ class SorterAlpha(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     prioritising the units with lower number of contacting units
     """
+
     def __init__(self):
         """
         Initialiser for adjacency based sorter
         """
         self.sorter_label = "SorterAlpha"
 
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
 
@@ -191,14 +237,18 @@ class SorterAlpha(Sorter):
             print("Cannot import networkx module, defaulting to SorterUseHint")
             return stratigraphic_order_hint
 
-        contacts = contacts.sort_values(by="length", ascending=False)[["UNITNAME_1", "UNITNAME_2", "length"]]
+        contacts = contacts.sort_values(by="length", ascending=False)[
+            ["UNITNAME_1", "UNITNAME_2", "length"]
+        ]
         units = list(units["name"].unique())
         graph = nx.Graph()
         for unit in units:
             graph.add_node(unit, name=unit)
         max_weight = max(list(contacts["length"])) + 1
         for _, row in contacts.iterrows():
-            graph.add_edge(row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"]))
+            graph.add_edge(
+                row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"])
+            )
 
         cnode = None
         new_graph = nx.DiGraph()
@@ -206,7 +256,9 @@ class SorterAlpha(Sorter):
             if cnode is None:
                 df = pandas.DataFrame(columns=["unit", "num_neighbours"])
                 df["unit"] = list(graph.nodes)
-                df["num_neighbours"] = df.apply(lambda row: len(list(graph.neighbors(row["unit"]))), axis=1)
+                df["num_neighbours"] = df.apply(
+                    lambda row: len(list(graph.neighbors(row["unit"]))), axis=1
+                )
                 df.sort_values(by=["num_neighbours"], inplace=True)
                 df.reset_index(inplace=True, drop=True)
                 cnode = df["unit"][0]
@@ -228,7 +280,7 @@ class SorterAlpha(Sorter):
                     new_graph.add_edge(cnode, node_with_min_edges)
                     graph.remove_node(cnode)
                     cnode = node_with_min_edges
-        order = (list(nx.topological_sort(new_graph)))
+        order = list(nx.topological_sort(new_graph))
         return order
 
 
@@ -237,13 +289,21 @@ class SorterMaximiseContacts(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     prioritising the maximum length of each contact
     """
+
     def __init__(self):
         """
         Initialiser for adjacency based sorter
         """
         self.sorter_label = "SorterMaximiseContacts"
 
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
 
@@ -272,7 +332,9 @@ class SorterMaximiseContacts(Sorter):
 
         max_weight = max(list(sorted_contacts["length"])) + 1
         for _, row in sorted_contacts.iterrows():
-            graph.add_edge(row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"]))
+            graph.add_edge(
+                row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"])
+            )
 
         route = nx_app.traveling_salesman_problem(graph)
         edge_list = list(nx.utils.pairwise(route))
@@ -290,13 +352,21 @@ class SorterObservationProjections(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     using the direction of observations to predict which unit is adjacent to the current one
     """
+
     def __init__(self):
         """
         Initialiser for adjacency based sorter
         """
         self.sorter_label = "SorterObservationProjections"
 
-    def sort(self, units: pandas.DataFrame, unit_relationships: pandas.DataFrame, stratigraphic_order_hint: list, contacts: pandas.DataFrame, map_data: MapData) -> list:
+    def sort(
+        self,
+        units: pandas.DataFrame,
+        unit_relationships: pandas.DataFrame,
+        stratigraphic_order_hint: list,
+        contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
 
@@ -320,8 +390,8 @@ class SorterObservationProjections(Sorter):
             return stratigraphic_order_hint
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol = geol[geol["INTRUSIVE"]==False]
-        geol = geol[geol["SILL"]==False]
+        geol = geol[geol["INTRUSIVE"] is False]
+        geol = geol[geol["SILL"] is False]
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
 
         verbose = False
@@ -349,8 +419,10 @@ class SorterObservationProjections(Sorter):
                 dipDirRadians = row.DIPDIR * math.pi / 180.0
                 dipRadians = row.DIP * math.pi / 180.0
                 start = row.geometry
-                end = Point(start.x + math.cos(dipDirRadians) * length,
-                            start.y + math.sin(dipDirRadians) * length)
+                end = Point(
+                    start.x + math.cos(dipDirRadians) * length,
+                    start.y + math.sin(dipDirRadians) * length,
+                )
                 line = LineString([start, end])
 
                 inter = geol[line.intersects(geol.geometry)]
@@ -377,14 +449,16 @@ class SorterObservationProjections(Sorter):
                         continue
 
                     # Get heights for intersection point and start of ray
-                    height = map_data.get_value_from_raster(Datatype.DTM, intersect_point.x, intersect_point.y)
+                    height = map_data.get_value_from_raster(
+                        Datatype.DTM, intersect_point.x, intersect_point.y
+                    )
                     intersect_point = Point(intersect_point.x, intersect_point.y, height)
                     height = map_data.get_value_from_raster(Datatype.DTM, start.x, start.y)
                     start = Point(start.x, start.y, height)
 
                     # Check vertical difference between points and compare to projected dip angle
                     horizontal_dist = (intersect_point.x - intersect_point.x, end.y - start.y)
-                    horizontal_dist = math.sqrt(horizontal_dist[0]**2 + horizontal_dist[1]**2)
+                    horizontal_dist = math.sqrt(horizontal_dist[0] ** 2 + horizontal_dist[1] ** 2)
                     projected_height = start.z + horizontal_dist * math.cos(dipRadians)
 
                     if intersect_point.z < projected_height:
@@ -395,7 +469,7 @@ class SorterObservationProjections(Sorter):
         # Create a matrix of older versus younger frequency from observations
         unit_names = geol.UNITNAME.unique()
         df = pandas.DataFrame(0, index=unit_names, columns=unit_names)
-        for (younger, older) in ordered_unit_observations:
+        for younger, older in ordered_unit_observations:
             df.loc[younger, older] += 1
         max_value = max(df.max())
 
@@ -410,9 +484,9 @@ class SorterObservationProjections(Sorter):
                 if unit1 != unit2:
                     weight = df.loc[unit1, unit2] - df.loc[unit2, unit1]
                     if weight < 0:
-                        g.add_edge(unit1, unit2, weight=max_value+weight)
+                        g.add_edge(unit1, unit2, weight=max_value + weight)
                     elif weight > 0:
-                        g.add_edge(unit2, unit1, weight=max_value-weight)
+                        g.add_edge(unit2, unit1, weight=max_value - weight)
 
         # Link in unlinked units from contacts with max weight
         g_undirected = g.to_undirected()

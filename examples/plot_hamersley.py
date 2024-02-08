@@ -3,20 +3,12 @@
 Hamersley, Western Australia
 ============================
 """
-import time
-import os
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel, Datatype
 from map2loop.sorter import (
     SorterAlpha,
-    SorterAgeBased,
-    SorterUseHint,
-    SorterUseNetworkX,
-    SorterMaximiseContacts,
-    SorterObservationProjections,
 )
 from map2loop.sampler import SamplerSpacing
-from datetime import datetime
 
 ####################################################################
 # Set the region of interest for the project

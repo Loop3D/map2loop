@@ -37,12 +37,12 @@ quiet-level = 3
 
 [tool.ruff]
 exclude = ['.git', 'pycache__', 'build', 'dist', 'doc/examples', 'doc/_build']
-external = ["E131", "D102", "D105"]
 line-length = 100
 indent-width = 4
 target-version = 'py39'
 
 [tool.ruff.lint]
+external = ["E131", "D102", "D105"]
 ignore = [
     # whitespace before ':'
     "E203",
@@ -74,3 +74,5 @@ extend-select = ["B007", "B010", "C4", "F", "NPY", "PGH004", "RSE", "RUF100"]
 
 [tool.ruff.lint.flake8-comprehensions]
 allow-dict-calls-with-keyword-arguments = true
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]

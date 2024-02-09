@@ -390,8 +390,8 @@ class SorterObservationProjections(Sorter):
             return stratigraphic_order_hint
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol = geol[geol["INTRUSIVE"] is False]
-        geol = geol[geol["SILL"] is False]
+        geol = geol[~geol["INTRUSIVE"]]
+        geol = geol[~geol["SILL"]]
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
 
         verbose = False

@@ -129,7 +129,7 @@ class Project(object):
             config_filename = kwargs["metadata_filename"]
 
         # Sanity check on working projection parameter
-        if isinstance(type(working_projection), str) or isinstance(type(working_projection), int):
+        if issubclass(type(working_projection), str) or issubclass(type(working_projection), int):
             self.map_data.set_working_projection(working_projection)
         elif type(working_projection) is None:
             if verbose_level != VerboseLevel.NONE:
@@ -140,7 +140,8 @@ class Project(object):
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
-        if isinstance(type(bounding_box), dict) or isinstance(type(bounding_box), tuple):
+
+        if issubclass(type(bounding_box), dict) or issubclass(type(bounding_box), tuple):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
             else:
@@ -454,7 +455,7 @@ class Project(object):
         self.map_data.extract_all_contacts()
 
         # Calculate the stratigraphic column
-        if isinstance(type(user_defined_stratigraphic_column), list):
+        if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
         else:
             if user_defined_stratigraphic_column is not None:

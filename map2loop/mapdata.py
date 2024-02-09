@@ -94,10 +94,10 @@ class MapData:
             projection (int or str):
                 The projection to use for map reprojection
         """
-        if isinstance(type(projection), int):
+        if issubclass(type(projection), int):
             projection = "EPSG:" + str(projection)
             self.working_projection = projection
-        elif isinstance(type(projection), str):
+        elif issubclass(type(projection), str):
             self.working_projection = projection
         else:
             print(
@@ -124,7 +124,7 @@ class MapData:
                 The bounding box to use for maps
         """
         # Convert tuple bounding_box to dict else assign directly
-        if isinstance(type(bounding_box), tuple):
+        if issubclass(type(bounding_box), tuple):
             self.bounding_box = {
                 "minx": bounding_box[0],
                 "maxx": bounding_box[1],
@@ -134,7 +134,7 @@ class MapData:
             if len(bounding_box) == 6:
                 self.bounding_box["top"] = bounding_box[4]
                 self.bounding_box["base"] = bounding_box[5]
-        elif isinstance(type(bounding_box), dict):
+        elif issubclass(type(bounding_box), dict):
             self.bounding_box = bounding_box
         else:
             raise TypeError(f"Invalid type for bounding_box {type(bounding_box)}")
@@ -1296,8 +1296,8 @@ class MapData:
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove intrusions
-        geology = geology[geology["INTRUSIVE"] is False]
-        geology = geology[geology["SILL"] is False]
+        geology = geology[~geology["INTRUSIVE"]]
+        geology = geology[~geology["SILL"]]
         # Remove faults from contact geomety
         if self.get_map_data(Datatype.FAULT) is not None:
             faults = self.get_map_data(Datatype.FAULT).copy()

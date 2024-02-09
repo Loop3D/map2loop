@@ -77,9 +77,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if isinstance(type(id), int):
+        if issubclass(type(id), int):
             return self.stratigraphicUnits[self.stratigraphicUnits["layerId"] == id]
-        elif isinstance(type(id), str):
+        elif issubclass(type(id), str):
             return self.stratigraphicUnits[self.stratigraphicUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find stratigraphic unit")
@@ -95,9 +95,9 @@ class StratigraphicColumn:
         Returns:
             pandas.DataFrame: The sliced data frame containing the requested unit
         """
-        if isinstance(type(id), int):
+        if issubclass(type(id), int):
             return self.lithologyUnits[self.lithologyUnits["layerId"] == id]
-        elif isinstance(type(id), str):
+        elif issubclass(type(id), str):
             return self.lithologyUnits[self.lithologyUnits["name"] == id]
         else:
             print("ERROR: Unknown identifier type used to find lithology unit")
@@ -110,7 +110,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if isinstance(type(unit), pandas.DataFrame) or isinstance(type(unit), dict):
+        if issubclass(type(unit), pandas.DataFrame) or issubclass(type(unit), dict):
             if "name" in unit.keys():
                 if unit["name"] in self.stratigraphicUnits.index:
                     print("Replacing stratigraphic unit", unit["name"])
@@ -128,7 +128,7 @@ class StratigraphicColumn:
             fault (pandas.DataFrame or dict):
                 The unit information to add
         """
-        if isinstance(type(unit), pandas.DataFrame) or isinstance(type(unit), dict):
+        if issubclass(type(unit), pandas.DataFrame) or issubclass(type(unit), dict):
             if "name" in unit.keys():
                 if unit["name"] in self.lithologyUnits.index:
                     print("Replacing lithology unit", unit["name"])

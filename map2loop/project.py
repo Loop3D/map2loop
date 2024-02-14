@@ -484,7 +484,7 @@ class Project(object):
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
-            self.fault_orientations = self.fault_orientation.compute(
+            self.fault_orientations = self.fault_orientation.calculate(
                 self.map_data.get_map_data(Datatype.FAULT),
                 self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
                 self.map_data,
@@ -514,15 +514,6 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
-        # self.fault_samples = self.fault_samples.merge(
-        #     self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]],
-        #     on="ID",
-        #     how="left",
-        # )
-        # self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(
-        #     numpy.nan, 0
-        # )
-        # self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
@@ -710,10 +701,6 @@ class Project(object):
         faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
-        # faults_obs_data["dipDir"] = self.fault_samples["DIPDIR"]
-        # faults_obs_data["dip"] = self.fault_samples["DIP"]
-        # faults_obs_data["dipPolarity"] = 0  # self.fault_samples["DIPPOLARITY"]
-        # faults_obs_data["val"] = self.fault_samples["???"]
         faults_obs_data["displacement"] = (
             100  # self.fault_samples["DISPLACEMENT"] #TODO remove note needed
         )
@@ -738,11 +725,6 @@ class Project(object):
             "DIP"
         ]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0
-
-        # TODO: Find a better way to assign posOnly for fault observations
-        # from itertools import cycle, islice
-
-        # faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
         LPF.Set(
             self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True
         )

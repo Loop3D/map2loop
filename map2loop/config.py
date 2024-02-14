@@ -1,7 +1,7 @@
 import beartype
 import hjson
 import urllib
-
+import time
 
 class Config:
     """
@@ -175,11 +175,32 @@ class Config:
         else:
             func = self.update_from_dictionary
 
-        if filename.startswith("http") or filename.startswith("ftp"):
-            with urllib.request.urlopen(filename) as url_data:
-                data = hjson.load(url_data)
-                func(data, lower)
-        else:
-            with open(filename) as url_data:
-                data = hjson.load(url_data)
-                func(data, lower)
+        try:
+            if filename.startswith("http") or filename.startswith("ftp"):
+                try_count = 10
+                success = False
+                while try_count >= 0 and not success:
+                    try:
+                        with urllib.request.urlopen(filename) as url_data:
+                            data = hjson.load(url_data)
+                            func(data, lower)
+                        success = True
+                    except Exception as e:
+                        # Catch a failed online access or file load, re-attempt
+                        # a few times before throwing further
+                        time.sleep(0.25)
+                        try_count = try_count - 1
+                        if try_count < 0:
+                            raise e
+            else:
+                with open(filename) as url_data:
+                    data = hjson.load(url_data)
+                    func(data, lower)
+        except Exception:
+            err_string = f"There is a problem parsing the config file ({filename}).\n"
+            if filename.startswith("http"):
+                err_string += "Please check the file is accessible online and then\n"
+            if legacy_format == False:
+                err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
+            err_string += "Check the contents for mismatched quotes or brackets!"
+            raise Exception(err_string)

@@ -31,7 +31,7 @@ class FaultOrientation(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def compute(
+    def calculate(
         self,
         fault_trace: geopandas.GeoDataFrame,
         fault_orientations: pandas.DataFrame,
@@ -63,7 +63,7 @@ class FaultOrientationNearest(FaultOrientation):
         self.label = "FaultOrientationNearest"
 
     @beartype.beartype
-    def compute(
+    def calculate(self, fault_trace, fault_orientations, map_data)(
         self,
         fault_trace: geopandas.GeoDataFrame,
         fault_orientations: pandas.DataFrame,

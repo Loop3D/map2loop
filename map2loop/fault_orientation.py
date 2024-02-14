@@ -63,7 +63,7 @@ class FaultOrientationNearest(FaultOrientation):
         self.label = "FaultOrientationNearest"
 
     @beartype.beartype
-    def calculate(self, fault_trace, fault_orientations, map_data)(
+    def calculate(
         self,
         fault_trace: geopandas.GeoDataFrame,
         fault_orientations: pandas.DataFrame,
@@ -73,7 +73,7 @@ class FaultOrientationNearest(FaultOrientation):
         Assigns the nearest fault orientation to a fault
 
         Args:
-            fault_trace (geopandas.GeoDataFrame): the data frame of the fault traces 
+            fault_trace (geopandas.GeoDataFrame): the data frame of the fault traces
             fault_orientation (pandas.DataFrame): data frame with fault orientations to assign to faults
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 

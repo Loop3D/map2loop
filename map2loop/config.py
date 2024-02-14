@@ -3,6 +3,7 @@ import hjson
 import urllib
 import time
 
+
 class Config:
     """
     A data structure containing column name mappings for files and keywords
@@ -18,53 +19,54 @@ class Config:
     fold_config: dict
         column names and keywords for fold mappings
     """
+
     def __init__(self):
         self.structure_config = {
-                "orientation_type":    "dip direction",
-                "dipdir_column":       "DIPDIR",
-                "dip_column":          "DIP",
-                "description_column":  "DESCRIPTION",
-                "bedding_text":        "bedding",
-                "overturned_column":   "DESCRIPTION",
-                "overturned_text":     "overturned",
-                "objectid_column":     "ID"
-            }
+            "orientation_type": "dip direction",
+            "dipdir_column": "DIPDIR",
+            "dip_column": "DIP",
+            "description_column": "DESCRIPTION",
+            "bedding_text": "bedding",
+            "overturned_column": "DESCRIPTION",
+            "overturned_text": "overturned",
+            "objectid_column": "ID",
+        }
         self.geology_config = {
-                "unitname_column":     "UNITNAME",
-                "alt_unitname_column": "CODE",
-                "group_column":        "GROUP",
-                "supergroup_column":   "SUPERGROUP",
-                "description_column":  "DESCRIPTION",
-                "minage_column":       "MIN_AGE",
-                "maxage_column":       "MAX_AGE",
-                "rocktype_column":     "ROCKTYPE1",
-                "alt_rocktype_column": "ROCKTYPE2",
-                "sill_text":           "sill",
-                "intrusive_text":      "intrusive",
-                "volcanic_text":       "volcanic",
-                "objectid_column":     "ID",
-                "ignore_codes":        ["cover"]
-            }
+            "unitname_column": "UNITNAME",
+            "alt_unitname_column": "CODE",
+            "group_column": "GROUP",
+            "supergroup_column": "SUPERGROUP",
+            "description_column": "DESCRIPTION",
+            "minage_column": "MIN_AGE",
+            "maxage_column": "MAX_AGE",
+            "rocktype_column": "ROCKTYPE1",
+            "alt_rocktype_column": "ROCKTYPE2",
+            "sill_text": "sill",
+            "intrusive_text": "intrusive",
+            "volcanic_text": "volcanic",
+            "objectid_column": "ID",
+            "ignore_codes": ["cover"],
+        }
         self.fault_config = {
-                "structtype_column":   "FEATURE",
-                "fault_text":          "fault",
-                "dip_null_value":      "-999",
-                "dipdir_flag":         "num",
-                "dipdir_column":       "DIPDIR",
-                "dip_column":          "DIP",
-                "dipestimate_column":  "DIP_ESTIMATE",
-                "dipestimate_text":    "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
-                "name_column":         "NAME",
-                "objectid_column":     "ID"
-            }
+            "structtype_column": "FEATURE",
+            "fault_text": "fault",
+            "dip_null_value": "-999",
+            "dipdir_flag": "num",
+            "dipdir_column": "DIPDIR",
+            "dip_column": "DIP",
+            "dipestimate_column": "DIP_ESTIMATE",
+            "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
+            "name_column": "NAME",
+            "objectid_column": "ID",
+        }
         self.fold_config = {
-                "structtype_column":   "FEATURE",
-                "fold_text":           "fold",
-                "description_column":  "DESCRIPTION",
-                "synform_text":        "syncline",
-                "foldname_column":     "NAME",
-                "objectid_column":     "ID"
-            }
+            "structtype_column": "FEATURE",
+            "fold_text": "fold",
+            "description_column": "DESCRIPTION",
+            "synform_text": "syncline",
+            "foldname_column": "NAME",
+            "objectid_column": "ID",
+        }
 
     @beartype.beartype
     def update_from_dictionary(self, dictionary: dict, lower: bool = False):
@@ -78,25 +80,33 @@ class Config:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
                 if key not in self.structure_config:
-                    print(f"Config dictionary structure segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary structure segment contained {key} which is not used"
+                    )
             dictionary.pop("structure")
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
                 if key not in self.geology_config:
-                    print(f"Config dictionary geology segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary geology segment contained {key} which is not used"
+                    )
             dictionary.pop("geology")
         if "fault" in dictionary:
             self.fault_config.update(dictionary["fault"])
             for key in dictionary["fault"].keys():
                 if key not in self.fault_config:
-                    print(f"Config dictionary fault segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary fault segment contained {key} which is not used"
+                    )
             dictionary.pop("fault")
         if "fold" in dictionary:
             self.fold_config.update(dictionary["fold"])
             for key in dictionary["fold"].keys():
                 if key not in self.fold_config:
-                    print(f"Config dictionary fold segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary fold segment contained {key} which is not used"
+                    )
             dictionary.pop("fold")
         if len(dictionary):
             print(f"Unused keys from config format {list(dictionary.keys())}")
@@ -162,7 +172,9 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: str, legacy_format: bool = False, lower: bool = False):
+    def update_from_file(
+        self, filename: str, legacy_format: bool = False, lower: bool = False
+    ):
         """
         Update the config dictionary from the provided json filename or url
 
@@ -200,7 +212,7 @@ class Config:
             err_string = f"There is a problem parsing the config file ({filename}).\n"
             if filename.startswith("http"):
                 err_string += "Please check the file is accessible online and then\n"
-            if legacy_format == False:
+            if not legacy_format:
                 err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)

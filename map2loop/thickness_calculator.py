@@ -104,9 +104,9 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 stratigraphic_order[i] in basal_unit_list
                 and stratigraphic_order[i + 1] in basal_unit_list
             ):
-                contact1 = basal_contacts[
-                    basal_contacts["basal_unit"] == stratigraphic_order[i]
-                ]["geometry"].to_list()[0]
+                contact1 = basal_contacts[basal_contacts["basal_unit"] == stratigraphic_order[i]][
+                    "geometry"
+                ].to_list()[0]
                 contact2 = basal_contacts[
                     basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
                 ]["geometry"].to_list()[0]
@@ -126,9 +126,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
 
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
-            idx = thicknesses.index[
-                thicknesses["name"] == stratigraphic_order[i]
-            ].tolist()[0]
+            idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
             if thicknesses.loc[idx, "thickness"] == -1:
 
                 val = distance
@@ -145,7 +143,6 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
         thicknesses["thickness"] = thicknesses.apply(
-            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"],
-            axis=1,
+            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1
         )
         return thicknesses

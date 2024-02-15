@@ -1,0 +1,78 @@
+[tool.black]
+line-length = 100
+skip-string-normalization = true
+target-version = ['py39']
+exclude = '\.eggs|\.git|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|node_modules'
+skip-magic-trailing-comma = true
+
+# Add an option to remove the trailing comma of separated lists
+# but it doesn't exist because python devs don't like beautiful code.
+# black specifically adds trailing commas due to git diff lengths
+# which is an insufficient reason to destroy beautiful code making
+# it look like an unfinished thought or an incomplete
+[tool.blackdoc]
+# From https://numpydoc.readthedocs.io/en/latest/format.html
+# Extended discussion: https://github.com/pyvista/pyvista/pull/4129
+# The length of docstring lines should be kept to 75 characters to facilitate
+# reading the docstrings in text terminals.
+line-length = 75
+
+[tool.build_sphinx]
+source-dir = 'doc'
+build-dir = './doc/build'
+all_files = 1
+
+[tool.upload_sphinx]
+upload-dir = 'doc/build/html'
+
+[tool.pydocstyle]
+match = '(?!coverage).*.py'
+convention = "numpy"
+add-ignore = ["D404"]
+
+[tool.codespell]
+skip = '*.pyc,*.txt,*.gif,*.png,*.jpg,*.ply,*.vtk,*.vti,*.vtu,*.js,*.html,*.doctree,*.ttf,*.woff,*.woff2,*.eot,*.mp4,*.inv,*.pickle,*.ipynb,flycheck*,./.git/*,./.hypothesis/*,*.yml,doc/_build/*,./doc/images/*,./dist/*,*~,.hypothesis*,./doc/examples/*,*.mypy_cache/*,*cover,./tests/tinypages/_build/*,*/_autosummary/*'
+quiet-level = 3
+
+
+[tool.ruff]
+exclude = ['.git', 'pycache__', 'build', 'dist', 'doc/examples', 'doc/_build']
+line-length = 100
+indent-width = 4
+target-version = 'py39'
+
+[tool.ruff.lint]
+external = ["E131", "D102", "D105"]
+ignore = [
+    # whitespace before ':'
+    "E203",
+    # line break before binary operator
+    # "W503",
+    # line length too long
+    "E501",
+    # do not assign a lambda expression, use a def
+    "E731",
+    # too many leading '#' for block comment
+    "E266",
+    # ambiguous variable name
+    "E741",
+    # module level import not at top of file
+    "E402",
+    # Quotes (temporary)
+    "Q0",
+    # bare excepts (temporary)
+    # "B001", "E722",
+    "E722",
+    # we already check black
+    # "BLK100",
+    # 'from module import *' used; unable to detect undefined names
+    "F403",
+]
+fixable = ["ALL"]
+unfixable = []
+extend-select = ["B007", "B010", "C4", "F", "NPY", "PGH004", "RSE", "RUF100"]
+
+[tool.ruff.lint.flake8-comprehensions]
+allow-dict-calls-with-keyword-arguments = true
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]

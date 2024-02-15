@@ -1,11 +1,11 @@
-import numpy as np
+from .random import rng
 
 
 def random_colours_hex(n):
     """
     Generate n random colours in hex format.
     """
-    rgb = np.random.rand(n, 3)
+    rgb = rng.random((n, 3))
     return rgb_to_hex(rgb)
 
 

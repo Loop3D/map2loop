@@ -12,6 +12,7 @@ class ThrowCalculator(ABC):
     Args:
         ABC (ABC): Derived from Abstract Base Class
     """
+
     def __init__(self):
         """
         Initialiser of for Sorter
@@ -29,7 +30,13 @@ class ThrowCalculator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def compute(self, faults: pandas.DataFrame, stratigraphic_order: list, basal_contacts: geopandas.GeoDataFrame, map_data: MapData) -> pandas.DataFrame:
+    def compute(
+        self,
+        faults: pandas.DataFrame,
+        stratigraphic_order: list,
+        basal_contacts: geopandas.GeoDataFrame,
+        map_data: MapData,
+    ) -> pandas.DataFrame:
         """
         Execute throw calculator method (abstract method)
 
@@ -49,6 +56,7 @@ class ThrowCalculatorAlpha(ThrowCalculator):
     """
     ThrowCalculator class which estimates fault throw values based on units, basal_contacts and stratigraphic order
     """
+
     def __init__(self):
         """
         Initialiser for alpha version of the throw calculator
@@ -56,7 +64,13 @@ class ThrowCalculatorAlpha(ThrowCalculator):
         self.throw_calculator_label = "ThrowCalculatorAlpha"
 
     @beartype.beartype
-    def compute(self, faults: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData) -> pandas.DataFrame:
+    def compute(
+        self,
+        faults: pandas.DataFrame,
+        stratigraphic_order: list,
+        basal_contacts: pandas.DataFrame,
+        map_data: MapData,
+    ) -> pandas.DataFrame:
         """
         Execute throw calculator method takes fault data, basal_contacts and stratigraphic order and attempts to estimate fault throw.
 
@@ -79,5 +93,7 @@ class ThrowCalculatorAlpha(ThrowCalculator):
         # unit (if we exclude map height changes and fault angle)
 
         # Set any remaining displacement values to default value
-        faults["avgDisplacement"] = faults.apply(lambda row: 100 if row["avgDisplacement"] == -1 else row["avgDisplacement"], axis=1)
+        faults["avgDisplacement"] = faults.apply(
+            lambda row: 100 if row["avgDisplacement"] == -1 else row["avgDisplacement"], axis=1
+        )
         return faults

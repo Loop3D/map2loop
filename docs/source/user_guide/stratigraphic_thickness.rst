@@ -65,10 +65,10 @@ Using this abstract base class a new class can be created by taking that base cl
 replacing the __init__ and compute functions, the simplest example is shown below:
 
 .. code-block::
-from map2loop.thickness_calculator import ThicknessCalculator
-from map2loop.mapdata import MapData
-import pandas
-import geopandas
+    from map2loop.thickness_calculator import ThicknessCalculator
+    from map2loop.mapdata import MapData
+    import pandas
+    import geopandas
 
     class myThicknessCalculator(ThicknessCalculator):
         def __init__(self, thickness=100):

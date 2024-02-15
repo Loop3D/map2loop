@@ -58,10 +58,10 @@ Using this abstract base class a new class can be created by taking that base cl
 replacing the __init__ and sort functions, the simplest example is shown below:
 
 .. code-block::
-from map2loop.sorter import Sorter
-from map2loop.mapdata import MapData
-import pandas
-import geopandas
+    from map2loop.sorter import Sorter
+    from map2loop.mapdata import MapData
+    import pandas
+    import geopandas
 
     class mySorter(Sorter):
         def __init__(self):

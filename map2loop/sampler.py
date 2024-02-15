@@ -13,6 +13,7 @@ class Sampler(ABC):
     Args:
         ABC (ABC): Derived from Abstract Base Class
     """
+
     def __init__(self):
         """
         Initialiser of for Sampler
@@ -49,6 +50,7 @@ class SamplerDecimator(Sampler):
     ie. decimation = 10 means take every tenth point
     Note: This only works on data frames with lists of points with columns "X" and "Y"
     """
+
     @beartype.beartype
     def __init__(self, decimation: int = 1):
         """
@@ -76,7 +78,7 @@ class SamplerDecimator(Sampler):
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
         data.reset_index(drop=True, inplace=True)
-        return pandas.DataFrame(data[::self.decimation].drop(columns="geometry"))
+        return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
 
 
 class SamplerSpacing(Sampler):
@@ -86,6 +88,7 @@ class SamplerSpacing(Sampler):
     ie. spacing = 500 means take a sample every 500 metres
     Note: This only works on data frames that contain MultiPolgon, Polygon, MultiLineString and LineString geometry
     """
+
     @beartype.beartype
     def __init__(self, spacing: float = 50.0):
         """

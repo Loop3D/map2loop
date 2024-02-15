@@ -4,7 +4,7 @@ from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
-from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint, SorterMaximiseContacts, SorterObservationProjections
+from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
@@ -64,7 +64,7 @@ class Project(object):
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
-        **kwargs
+        **kwargs,
     ):
         """
         The initialiser for the map2loop project
@@ -129,20 +129,25 @@ class Project(object):
             config_filename = kwargs["metadata_filename"]
 
         # Sanity check on working projection parameter
-        if type(working_projection) is str or type(working_projection) is int:
+        if issubclass(type(working_projection), str) or issubclass(type(working_projection), int):
             self.map_data.set_working_projection(working_projection)
         elif type(working_projection) is None:
             if verbose_level != VerboseLevel.NONE:
-                print("No working projection set, will attempt to use the projection of the geology map")
+                print(
+                    "No working projection set, will attempt to use the projection of the geology map"
+                )
         else:
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
-        if type(bounding_box) is dict or type(bounding_box) is tuple:
+
+        if issubclass(type(bounding_box), dict) or issubclass(type(bounding_box), tuple):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
             else:
-                raise ValueError(f"Length of bounding_box {len(bounding_box)} is neither 4 (map boundary) nor 6 (volumetric boundary)")
+                raise ValueError(
+                    f"Length of bounding_box {len(bounding_box)} is neither 4 (map boundary) nor 6 (volumetric boundary)"
+                )
         else:
             raise TypeError(f"Invalid type for bounding_box {type(bounding_box)}")
 
@@ -152,7 +157,9 @@ class Project(object):
             if use_australian_state_data in ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
-                raise ValueError(f"Australian state {use_australian_state_data} not in state url database")
+                raise ValueError(
+                    f"Australian state {use_australian_state_data} not in state url database"
+                )
         if geology_filename != "":
             self.map_data.set_filename(Datatype.GEOLOGY, geology_filename)
         if structure_filename != "":
@@ -183,7 +190,9 @@ class Project(object):
 
         # Set default minimum fault length to 5% of the longest bounding box dimension
         bounding_box = self.map_data.get_bounding_box()
-        largest_dimension = max(bounding_box["maxx"] - bounding_box["minx"], bounding_box["maxy"] - bounding_box["miny"])
+        largest_dimension = max(
+            bounding_box["maxx"] - bounding_box["minx"], bounding_box["maxy"] - bounding_box["miny"]
+        )
         self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
 
         if len(kwargs):
@@ -324,10 +333,18 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(self.map_data.get_map_data(Datatype.GEOLOGY))
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE))
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
+        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
+            self.map_data.get_map_data(Datatype.GEOLOGY)
+        )
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
+            self.map_data.get_map_data(Datatype.STRUCTURE)
+        )
+        self.fault_samples = self.samplers[Datatype.FAULT].sample(
+            self.map_data.get_map_data(Datatype.FAULT)
+        )
+        self.fold_samples = self.samplers[Datatype.FOLD].sample(
+            self.map_data.get_map_data(Datatype.FOLD)
+        )
 
     def extract_geology_contacts(self):
         """
@@ -344,14 +361,24 @@ class Project(object):
         """
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
-            columns = [sorter.sort(self.stratigraphic_column.stratigraphicUnits,
-                                   self.map2model.get_unit_unit_relationships(),
-                                   self.map2model.get_sorted_units(),
-                                   self.map_data.contacts,
-                                   self.map_data,
-                                   ) for sorter in sorters]
-            basal_contacts = [self.map_data.extract_basal_contacts(column, save_contacts=False) for column in columns]
-            basal_lengths = [sum(list(contacts[contacts["type"] == "BASAL"]["geometry"].length)) for contacts in basal_contacts]
+            columns = [
+                sorter.sort(
+                    self.stratigraphic_column.stratigraphicUnits,
+                    self.map2model.get_unit_unit_relationships(),
+                    self.map2model.get_sorted_units(),
+                    self.map_data.contacts,
+                    self.map_data,
+                )
+                for sorter in sorters
+            ]
+            basal_contacts = [
+                self.map_data.extract_basal_contacts(column, save_contacts=False)
+                for column in columns
+            ]
+            basal_lengths = [
+                sum(list(contacts[contacts["type"] == "BASAL"]["geometry"].length))
+                for contacts in basal_contacts
+            ]
             max_length = -1
             column = columns[0]
             best_sorter = sorters[0]
@@ -360,33 +387,37 @@ class Project(object):
                     max_length = basal_lengths[i]
                     column = columns[i]
                     best_sorter = sorters[i]
-            print(f"Best sorter {best_sorter.sorter_label} calculated contact length of {max_length}")
+            print(
+                f"Best sorter {best_sorter.sorter_label} calculated contact length of {max_length}"
+            )
             self.stratigraphic_column.column = column
         else:
-            self.stratigraphic_column.column = \
-                self.sorter.sort(self.stratigraphic_column.stratigraphicUnits,
-                                 self.map2model.get_unit_unit_relationships(),
-                                 self.map2model.get_sorted_units(),
-                                 self.map_data.contacts,
-                                 self.map_data
-                                 )
+            self.stratigraphic_column.column = self.sorter.sort(
+                self.stratigraphic_column.stratigraphicUnits,
+                self.map2model.get_unit_unit_relationships(),
+                self.map2model.get_sorted_units(),
+                self.map_data.contacts,
+                self.map_data,
+            )
 
     def calculate_unit_thicknesses(self):
         """
         Use the stratigraphic column, and fault and contact data to estimate unit thicknesses
         """
-        self.stratigraphic_column.stratigraphicUnits = \
-            self.thickness_calculator.compute(self.stratigraphic_column.stratigraphicUnits,
-                                              self.stratigraphic_column.column,
-                                              self.map_data.basal_contacts,
-                                              self.map_data)
+        self.stratigraphic_column.stratigraphicUnits = self.thickness_calculator.compute(
+            self.stratigraphic_column.stratigraphicUnits,
+            self.stratigraphic_column.column,
+            self.map_data.basal_contacts,
+            self.map_data,
+        )
 
     def apply_colour_to_units(self):
         """
         Apply the clut file to the units in the stratigraphic column
         """
-        self.stratigraphic_column.stratigraphicUnits = \
-            self.map_data.colour_units(self.stratigraphic_column.stratigraphicUnits)
+        self.stratigraphic_column.stratigraphicUnits = self.map_data.colour_units(
+            self.stratigraphic_column.stratigraphicUnits
+        )
 
     def sort_stratigraphic_column(self):
         """
@@ -399,15 +430,18 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
-        self.fault_samples = self.fault_samples.merge(self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]], on="ID", how="left")
+        self.fault_samples = self.fault_samples.merge(
+            self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]], on="ID", how="left"
+        )
         self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(numpy.nan, 0)
         self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
         self.deformation_history.summarise_data(self.fault_samples)
-        self.deformation_history.faults = \
-            self.throw_calculator.compute(self.deformation_history.faults,
-                                          self.stratigraphic_column.column,
-                                          self.map_data.basal_contacts,
-                                          self.map_data)
+        self.deformation_history.faults = self.throw_calculator.compute(
+            self.deformation_history.faults,
+            self.stratigraphic_column.column,
+            self.map_data.basal_contacts,
+            self.map_data,
+        )
 
     def run_all(self, user_defined_stratigraphic_column=None, take_best=False):
         """
@@ -421,11 +455,13 @@ class Project(object):
         self.map_data.extract_all_contacts()
 
         # Calculate the stratigraphic column
-        if type(user_defined_stratigraphic_column) is list:
+        if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
         else:
             if user_defined_stratigraphic_column is not None:
-                print("user_defined_stratigraphic_column is not of type list. Attempting to calculate column")
+                print(
+                    "user_defined_stratigraphic_column is not of type list. Attempting to calculate column"
+                )
             self.calculate_stratigraphic_order(take_best)
         self.sort_stratigraphic_column()
 
@@ -443,7 +479,9 @@ class Project(object):
         """
         # Open project file
         if self.loop_filename is None or self.loop_filename == "":
-            self.loop_filename = os.path.join(self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d")
+            self.loop_filename = os.path.join(
+                self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
+            )
 
         # Check overwrite of mismatch version
         file_exists = os.path.isfile(self.loop_filename)
@@ -453,12 +491,16 @@ class Project(object):
             file_version = LPF.Get(self.loop_filename, "version", verbose=False)
             if file_version["errorFlag"] is True:
                 print(f"Error: {file_version['errorString']}")
-                print(f"       Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file")
+                print(
+                    f"       Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file"
+                )
                 return
             else:
                 version_mismatch = file_version["value"] != LPF.LoopVersion()
                 if version_mismatch:
-                    print(f"Mismatched loop project file versions {LPF.LoopVersion()} and {file_version}, old version will be replaced")
+                    print(
+                        f"Mismatched loop project file versions {LPF.LoopVersion()} and {file_version}, old version will be replaced"
+                    )
             resp = LPF.Get(self.loop_filename, "extents")
             if not resp["errorFlag"]:
                 existing_extents = resp["value"]
@@ -468,28 +510,31 @@ class Project(object):
 
         # Save extents
         if existing_extents is None:
-            LPF.Set(self.loop_filename, "extents", geodesic=[-180, -179, 0, 1],
-                    utm=[1,
-                         1,
-                         self.map_data.bounding_box["minx"],
-                         self.map_data.bounding_box["maxx"],
-                         self.map_data.bounding_box["miny"],
-                         self.map_data.bounding_box["maxy"]
-                         ],
-                    depth=[
-                         self.map_data.bounding_box["top"],
-                         self.map_data.bounding_box["base"]
-                         ],
-                    spacing=[1000, 1000, 500],
-                    preference="utm"
-                    )
+            LPF.Set(
+                self.loop_filename,
+                "extents",
+                geodesic=[-180, -179, 0, 1],
+                utm=[
+                    1,
+                    1,
+                    self.map_data.bounding_box["minx"],
+                    self.map_data.bounding_box["maxx"],
+                    self.map_data.bounding_box["miny"],
+                    self.map_data.bounding_box["maxy"],
+                ],
+                depth=[self.map_data.bounding_box["top"], self.map_data.bounding_box["base"]],
+                spacing=[1000, 1000, 500],
+                preference="utm",
+            )
         else:
             # TODO: Check loopfile extents match project extents before continuing
             # if mismatch on extents warn the user and create new file
             LPF.Set(self.loop_filename, "extents", **existing_extents)
 
         # Save unit information
-        stratigraphic_data = numpy.zeros(len(self.stratigraphic_column.stratigraphicUnits), LPF.stratigraphicLayerType)
+        stratigraphic_data = numpy.zeros(
+            len(self.stratigraphic_column.stratigraphicUnits), LPF.stratigraphicLayerType
+        )
         stratigraphic_data["layerId"] = self.stratigraphic_column.stratigraphicUnits["layerId"]
         stratigraphic_data["minAge"] = self.stratigraphic_column.stratigraphicUnits["minAge"]
         stratigraphic_data["maxAge"] = self.stratigraphic_column.stratigraphicUnits["maxAge"]
@@ -499,12 +544,22 @@ class Project(object):
         stratigraphic_data["rank"] = 0
         stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits["thickness"]
 
-        stratigraphic_data["colour1Red"] = [int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]]
-        stratigraphic_data["colour1Green"] = [int(a[3:5], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]]
-        stratigraphic_data["colour1Blue"] = [int(a[5:7], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]]
+        stratigraphic_data["colour1Red"] = [
+            int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
+        ]
+        stratigraphic_data["colour1Green"] = [
+            int(a[3:5], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
+        ]
+        stratigraphic_data["colour1Blue"] = [
+            int(a[5:7], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
+        ]
         stratigraphic_data["colour2Red"] = [int(a * 0.95) for a in stratigraphic_data["colour1Red"]]
-        stratigraphic_data["colour2Green"] = [int(a * 0.95) for a in stratigraphic_data["colour1Green"]]
-        stratigraphic_data["colour2Blue"] = [int(a * 0.95) for a in stratigraphic_data["colour1Blue"]]
+        stratigraphic_data["colour2Green"] = [
+            int(a * 0.95) for a in stratigraphic_data["colour1Green"]
+        ]
+        stratigraphic_data["colour2Blue"] = [
+            int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
+        ]
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data, verbose=True)
 
         # Save contacts
@@ -530,6 +585,7 @@ class Project(object):
 
         # TODO: Find a better way to assign posOnly for fault observations
         from itertools import cycle, islice
+
         faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
         LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True)
 
@@ -571,7 +627,9 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations, verbose=True)
 
         if self.map2model.fault_fault_relationships is not None:
-            ff_relationships = self.deformation_history.get_fault_relationships_with_ids(self.map2model.fault_fault_relationships)
+            ff_relationships = self.deformation_history.get_fault_relationships_with_ids(
+                self.map2model.fault_fault_relationships
+            )
             relationships = numpy.zeros(len(ff_relationships), LPF.eventRelationshipType)
             relationships["eventId1"] = ff_relationships["eventId1"]
             relationships["eventId2"] = ff_relationships["eventId2"]
@@ -591,7 +649,11 @@ class Project(object):
             overlay (str, optional):
                 Layer of points to overlay (options are "contacts", "basal_contacts", "orientations", "faults"). Defaults to "".
         """
-        colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name", "colour"]].set_index("name").to_dict()["colour"]
+        colour_lookup = (
+            self.stratigraphic_column.stratigraphicUnits[["name", "colour"]]
+            .set_index("name")
+            .to_dict()["colour"]
+        )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
         geol['colour_rgba'] = geol.apply(lambda row: to_rgba(row['colour'], 1.0), axis=1)
@@ -602,7 +664,9 @@ class Project(object):
             base = geol.plot(color=geol['colour_rgba'])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(ax=base)
+                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
+                    ax=base
+                )
                 return
             elif overlay == "contacts":
                 points = self.sampled_contacts
@@ -613,7 +677,9 @@ class Project(object):
             else:
                 print(f"Invalid overlay option {overlay}")
                 return
-        gdf = geopandas.GeoDataFrame(points, geometry=geopandas.points_from_xy(points["X"], points["Y"], crs=geol.crs))
+        gdf = geopandas.GeoDataFrame(
+            points, geometry=geopandas.points_from_xy(points["X"], points["Y"], crs=geol.crs)
+        )
         gdf.plot(ax=base, marker="o", color="red", markersize=5)
 
     @beartype.beartype
@@ -632,7 +698,9 @@ class Project(object):
         self.map_data.save_all_map_data(save_path, extension)
 
     @beartype.beartype
-    def save_geotiff_raster(self, filename: str = "test.tif", projection: str = "", pixel_size: int = 25):
+    def save_geotiff_raster(
+        self, filename: str = "test.tif", projection: str = "", pixel_size: int = 25
+    ):
         """
         Saves the geology map to a geotiff
 
@@ -644,7 +712,11 @@ class Project(object):
             pixel_size (int, optional):
                 The size of a pixel in metres for the geotiff. Defaults to 25
         """
-        colour_lookup = self.stratigraphic_column.stratigraphicUnits[["name", "colour"]].set_index("name").to_dict()["colour"]
+        colour_lookup = (
+            self.stratigraphic_column.stratigraphicUnits[["name", "colour"]]
+            .set_index("name")
+            .to_dict()["colour"]
+        )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
         geol["colour_red"] = geol.apply(lambda row: int(row['colour'][1:3], 16), axis=1)

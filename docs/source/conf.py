@@ -107,7 +107,7 @@ try:
     from sphinx_gallery.sorting import ExampleTitleSortKey
 
     sphinx_gallery_conf = {
-        "examples_dirs": ["../../examples/"],
+        "examples_dirs": ["../examples/"],
         "gallery_dirs": ["_auto_examples/"],  # path to where to save gallery generated output
         "image_scrapers": ("matplotlib", LoopScraper()),
         "within_subsection_order": ExampleTitleSortKey,

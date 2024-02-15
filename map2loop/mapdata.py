@@ -57,9 +57,7 @@ class MapData:
         A link to the config structure which is defined in config.py
     """
 
-    def __init__(
-        self, tmp_path: str = "", verbose_level: VerboseLevel = VerboseLevel.ALL
-    ):
+    def __init__(self, tmp_path: str = "", verbose_level: VerboseLevel = VerboseLevel.ALL):
         """
         The initialiser for the map data
 
@@ -96,10 +94,10 @@ class MapData:
             projection (int or str):
                 The projection to use for map reprojection
         """
-        if type(projection) is int:
+        if issubclass(type(projection), int):
             projection = "EPSG:" + str(projection)
             self.working_projection = projection
-        elif type(projection) is str:
+        elif issubclass(type(projection), str):
             self.working_projection = projection
         else:
             print(
@@ -126,7 +124,7 @@ class MapData:
                 The bounding box to use for maps
         """
         # Convert tuple bounding_box to dict else assign directly
-        if type(bounding_box) is tuple:
+        if issubclass(type(bounding_box), tuple):
             self.bounding_box = {
                 "minx": bounding_box[0],
                 "maxx": bounding_box[1],
@@ -136,7 +134,7 @@ class MapData:
             if len(bounding_box) == 6:
                 self.bounding_box["top"] = bounding_box[4]
                 self.bounding_box["base"] = bounding_box[5]
-        elif type(bounding_box) is dict:
+        elif issubclass(type(bounding_box), dict):
             self.bounding_box = bounding_box
         else:
             raise TypeError(f"Invalid type for bounding_box {type(bounding_box)}")
@@ -229,9 +227,7 @@ class MapData:
             return None
 
     @beartype.beartype
-    def set_config_filename(
-        self, filename: str, legacy_format: bool = False, lower: bool = False
-    ):
+    def set_config_filename(self, filename: str, legacy_format: bool = False, lower: bool = False):
         """
         Set the config filename and update the config structure
 
@@ -309,20 +305,14 @@ class MapData:
             ValueError: state string not in state list ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']
         """
         if state in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
-            self.set_filename(
-                Datatype.GEOLOGY, AustraliaStateUrls.aus_geology_urls[state]
-            )
-            self.set_filename(
-                Datatype.STRUCTURE, AustraliaStateUrls.aus_structure_urls[state]
-            )
+            self.set_filename(Datatype.GEOLOGY, AustraliaStateUrls.aus_geology_urls[state])
+            self.set_filename(Datatype.STRUCTURE, AustraliaStateUrls.aus_structure_urls[state])
             self.set_filename(Datatype.FAULT, AustraliaStateUrls.aus_fault_urls[state])
             self.set_filename(Datatype.FOLD, AustraliaStateUrls.aus_fold_urls[state])
             self.set_filename(Datatype.DTM, "au")
             lower = state == "SA"
             self.set_config_filename(
-                AustraliaStateUrls.aus_config_urls[state],
-                legacy_format=True,
-                lower=lower,
+                AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
             )
             self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
         else:
@@ -369,6 +359,7 @@ class MapData:
             Datatype.FOLD,
             Datatype.FAULT_ORIENTATION,
         ]:
+
             self.load_map_data(i)
         self.load_raster_map_data(Datatype.DTM)
 
@@ -381,10 +372,7 @@ class MapData:
             datatype (Datatype):
                 The datatype to load
         """
-        if (
-            self.filenames[datatype] is None
-            or self.data_states[datatype] == Datastate.UNNAMED
-        ):
+        if self.filenames[datatype] is None or self.data_states[datatype] == Datastate.UNNAMED:
             print(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
             self.data[datatype] = self.get_empty_dataframe(datatype)
             self.dirtyflags[datatype] = False
@@ -435,13 +423,11 @@ class MapData:
         data = None
         if datatype == Datatype.FAULT:
             data = geopandas.GeoDataFrame(
-                columns=["geometry", "ID", "NAME", "DIPDIR", "DIP"],
-                crs=self.working_projection,
+                columns=["geometry", "ID", "NAME", "DIPDIR", "DIP"], crs=self.working_projection
             )
         elif datatype == Datatype.FOLD:
             data = geopandas.GeoDataFrame(
-                columns=["geometry", "ID", "NAME", "SYNCLINE"],
-                crs=self.working_projection,
+                columns=["geometry", "ID", "NAME", "SYNCLINE"], crs=self.working_projection
             )
         return data
 
@@ -491,20 +477,13 @@ class MapData:
         self.__check_and_create_tmp_path()
         # For gdal debugging use exceptions
         gdal.UseExceptions()
-        bb_ll = tuple(
-            self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds
-        )
+        bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
         # try:
         if filename.lower() == "aus" or filename.lower() == "au":
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
             coverage = wcs.getCoverage(
-                identifier="1",
-                bbox=bb_ll,
-                format="GeoTIFF",
-                crs=4326,
-                width=2048,
-                height=2048,
+                identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
             )
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
@@ -516,7 +495,9 @@ class MapData:
         elif filename == "hawaii":
             import netCDF4
 
-            bbox_str = f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
+            bbox_str = (
+                f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
+            )
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
             f = urllib.request.urlopen(filename)
             ds = netCDF4.Dataset("in-mem-file", mode="r", memory=f.read())
@@ -563,10 +544,7 @@ class MapData:
             datatype (Datatype):
                 The raster datatype to load
         """
-        if (
-            self.filenames[datatype] is None
-            or self.data_states[datatype] == Datastate.UNNAMED
-        ):
+        if self.filenames[datatype] is None or self.data_states[datatype] == Datastate.UNNAMED:
             print(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
         elif self.dirtyflags[datatype] is True:
             if self.data_states[datatype] == Datastate.UNLOADED:
@@ -713,9 +691,7 @@ class MapData:
             )
 
         # Create new geodataframe
-        structure = geopandas.GeoDataFrame(
-            self.raw_data[Datatype.STRUCTURE]["geometry"]
-        )
+        structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])
         config = self.config.structure_config
 
         # Parse dip direction and dip columns
@@ -725,13 +701,9 @@ class MapData:
                     lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
                 )
             else:
-                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][
-                    config["dipdir_column"]
-                ]
+                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
         else:
-            print(
-                f"Structure map does not contain dipdir_column '{config['dipdir_column']}'"
-            )
+            print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
 
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
@@ -759,9 +731,7 @@ class MapData:
 
         # Add object id
         if config["objectid_column"] in self.raw_data[Datatype.STRUCTURE]:
-            structure["ID"] = self.raw_data[Datatype.STRUCTURE][
-                config["objectid_column"]
-            ]
+            structure["ID"] = self.raw_data[Datatype.STRUCTURE][config["objectid_column"]]
         else:
             structure["ID"] = numpy.arange(len(structure))
 
@@ -789,27 +759,27 @@ class MapData:
 
         # Parse unit names and codes
         if config["unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][
-                config["unitname_column"]
-            ].astype(str)
+            geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(
+                str
+            )
         else:
             msg = f"Geology map does not contain unitname_column {config['unitname_column']}"
             print(msg)
             return (True, msg)
         if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["CODE"] = self.raw_data[Datatype.GEOLOGY][
-                config["alt_unitname_column"]
-            ].astype(str)
+            geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
+                str
+            )
         else:
-            msg = f"Geology map does not contain alt_unitname_column {config['alt_unitname_column']}"
+            msg = (
+                f"Geology map does not contain alt_unitname_column {config['alt_unitname_column']}"
+            )
             print(msg)
             return (True, msg)
 
         # Parse group and supergroup columns
         if config["group_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["GROUP"] = self.raw_data[Datatype.GEOLOGY][
-                config["group_column"]
-            ].astype(str)
+            geology["GROUP"] = self.raw_data[Datatype.GEOLOGY][config["group_column"]].astype(str)
         else:
             geology["GROUP"] = ""
         if config["supergroup_column"] in self.raw_data[Datatype.GEOLOGY]:
@@ -857,15 +827,15 @@ class MapData:
 
         # Parse age columns
         if config["minage_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY][
-                config["minage_column"]
-            ].astype(numpy.float64)
+            geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY][config["minage_column"]].astype(
+                numpy.float64
+            )
         else:
             geology["MIN_AGE"] = 0.0
         if config["maxage_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY][
-                config["maxage_column"]
-            ].astype(numpy.float64)
+            geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY][config["maxage_column"]].astype(
+                numpy.float64
+            )
         else:
             geology["MAX_AGE"] = 100000.0
 
@@ -884,9 +854,7 @@ class MapData:
         geology["UNITNAME"] = geology["UNITNAME"].str.replace("[ -/?]", "_", regex=True)
         geology["CODE"] = geology["CODE"].str.replace("[ -/?]", "_", regex=True)
         geology["GROUP"] = geology["GROUP"].str.replace("[ -/?]", "_", regex=True)
-        geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace(
-            "[ -/?]", "_", regex=True
-        )
+        geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace("[ -/?]", "_", regex=True)
 
         # Mask out ignored unit_names/codes (ie. for cover)
         for code in self.config.geology_config["ignore_codes"]:
@@ -919,24 +887,15 @@ class MapData:
         config = self.config.fault_config
 
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
-            faults["FEATURE"] = self.raw_data[Datatype.FAULT][
-                config["structtype_column"]
-            ]
-            faults = faults[
-                faults["FEATURE"].astype(str).str.contains(config["fault_text"])
-            ]
+            faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
+            faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
             if self.verbose_level > VerboseLevel.NONE:
-                if (
-                    len(faults) < len(self.raw_data[Datatype.GEOLOGY])
-                    and len(faults) == 0
-                ):
+                if len(faults) < len(self.raw_data[Datatype.GEOLOGY]) and len(faults) == 0:
                     msg = f"Fault map reduced to 0 faults as structtype_column ({config['structtype_column']}) does not contains as row with fault_text \"{config['fault_text']}\""
                     print(msg)
 
         if config["name_column"] in self.raw_data[Datatype.FAULT]:
-            faults["NAME"] = self.raw_data[Datatype.FAULT][
-                config["name_column"]
-            ].astype(str)
+            faults["NAME"] = self.raw_data[Datatype.FAULT][config["name_column"]].astype(str)
         else:
             faults["NAME"] = "Fault_" + faults.index.astype(str)
 
@@ -953,9 +912,9 @@ class MapData:
         # Parse the dip direction for the fault
         if config["dipdir_flag"] != "alpha":
             if config["dipdir_column"] in self.raw_data[Datatype.FAULT]:
-                faults["DIPDIR"] = self.raw_data[Datatype.FAULT][
-                    config["dipdir_column"]
-                ].astype(numpy.float64)
+                faults["DIPDIR"] = self.raw_data[Datatype.FAULT][config["dipdir_column"]].astype(
+                    numpy.float64
+                )
             else:
                 faults["DIPDIR"] = numpy.nan
         else:
@@ -985,9 +944,7 @@ class MapData:
                     "west": 270.0,
                 }
                 for direction in direction_map:
-                    dipdir_text_estimates = dipdir_text_estimates.astype(
-                        str
-                    ).str.replace(
+                    dipdir_text_estimates = dipdir_text_estimates.astype(str).str.replace(
                         f".*{direction}.*", direction_map[direction], regex=True
                     )
                 # Catch all for any field that still contains anything that isn't a number
@@ -998,9 +955,7 @@ class MapData:
 
         # Add object id
         if config["objectid_column"] in self.raw_data[Datatype.FAULT]:
-            faults["ID"] = self.raw_data[Datatype.FAULT][
-                config["objectid_column"]
-            ].astype(int)
+            faults["ID"] = self.raw_data[Datatype.FAULT][config["objectid_column"]].astype(int)
         else:
             faults["ID"] = faults.index
 
@@ -1010,6 +965,7 @@ class MapData:
                     "Fault_" + str(fault["ID"])
                     if fault["NAME"].lower() == "nan"
                     else fault["NAME"]
+
                 ),
                 axis=1,
             )
@@ -1050,22 +1006,15 @@ class MapData:
                 config["structtype_column"]
             ]
             folds = folds[
-                folds[config["structtype_column"]]
-                .astype(str)
-                .str.contains(config["fold_text"])
+                folds[config["structtype_column"]].astype(str).str.contains(config["fold_text"])
             ]
             if self.verbose_level > VerboseLevel.NONE:
-                if (
-                    len(folds) < len(self.raw_data[Datatype.GEOLOGY])
-                    and len(folds) == 0
-                ):
+                if len(folds) < len(self.raw_data[Datatype.GEOLOGY]) and len(folds) == 0:
                     msg = f"Fold map reduced to 0 folds as structtype_column ({config['structtype_column']}) does not contains any row with fold_text \"{config['fold_text']}\""
                     print(msg)
 
         if config["foldname_column"] in self.raw_data[Datatype.FOLD]:
-            folds["NAME"] = self.raw_data[Datatype.FOLD][
-                config["foldname_column"]
-            ].astype(str)
+            folds["NAME"] = self.raw_data[Datatype.FOLD][config["foldname_column"]].astype(str)
         else:
             folds["NAME"] = numpy.arange(len(folds))
             folds["NAME"] = "Fold_" + folds["NAME"].astype(str)
@@ -1108,9 +1057,7 @@ class MapData:
                     )
                     self.raw_data[datatype].crs = self.working_projection
                 else:
-                    self.raw_data[datatype].to_crs(
-                        crs=self.working_projection, inplace=True
-                    )
+                    self.raw_data[datatype].to_crs(crs=self.working_projection, inplace=True)
         else:
             print(
                 f"Type of {datatype.name} map not a GeoDataFrame so cannot change map crs projection"
@@ -1127,18 +1074,11 @@ class MapData:
             extension (str, optional):
                 The extension to use for the data. Defaults to ".csv".
         """
-        for i in [
-            Datatype.GEOLOGY,
-            Datatype.STRUCTURE,
-            Datatype.FAULT,
-            Datatype.FOLD,
-        ]:
+        for i in [Datatype.GEOLOGY, Datatype.STRUCTURE, Datatype.FAULT, Datatype.FOLD]:
             self.save_raw_map_data(output_dir, i, extension)
 
     @beartype.beartype
-    def save_raw_map_data(
-        self, output_dir: str, datatype: Datatype, extension: str = ".shp.zip"
-    ):
+    def save_raw_map_data(self, output_dir: str, datatype: Datatype, extension: str = ".shp.zip"):
         """
         Save the map data from datatype to file
 
@@ -1173,10 +1113,7 @@ class MapData:
         Returns:
             geopandas.GeoDataFrame: The raw data
         """
-        if (
-            self.data_states[datatype] != Datastate.COMPLETE
-            or self.dirtyflags[datatype] is True
-        ):
+        if self.data_states[datatype] != Datastate.COMPLETE or self.dirtyflags[datatype] is True:
             self.load_map_data(datatype)
         return self.raw_data[datatype]
 
@@ -1192,10 +1129,7 @@ class MapData:
         Returns:
             geopandas.GeoDataFrame: The dataframe
         """
-        if (
-            self.data_states[datatype] != Datastate.COMPLETE
-            or self.dirtyflags[datatype] is True
-        ):
+        if self.data_states[datatype] != Datastate.COMPLETE or self.dirtyflags[datatype] is True:
             self.load_map_data(datatype)
         return self.data[datatype]
 
@@ -1305,8 +1239,7 @@ class MapData:
             geology = self.get_map_data(Datatype.GEOLOGY)[columns].copy()
             geology.reset_index(inplace=True, drop=True)
             geology.rename(
-                columns={"geometry": "WKT", "CODE": "UNITNAME", "UNITNAME": "CODE"},
-                inplace=True,
+                columns={"geometry": "WKT", "CODE": "UNITNAME", "UNITNAME": "CODE"}, inplace=True
             )
             geology["MIN_AGE"] = geology["MIN_AGE"].replace("None", 0)
             geology["MAX_AGE"] = geology["MAX_AGE"].replace("None", 4500000000)
@@ -1358,12 +1291,8 @@ class MapData:
             return None
         inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
 
-        px = int(
-            inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y
-        )
-        py = int(
-            inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y
-        )
+        px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
+        py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
         # Clamp values to the edges of raster if past boundary, similiar to GL_CLIP
         px = max(px, 0)
         px = min(px, data.RasterXSize - 1)
@@ -1390,12 +1319,8 @@ class MapData:
         Returns:
             float or int: The value at the point specified
         """
-        px = int(
-            inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y
-        )
-        py = int(
-            inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y
-        )
+        px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
+        py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
         # Clamp values to the edges of raster if past boundary, similiar to GL_CLIP
         px = max(px, 0)
         px = min(px, data.shape[0] - 1)
@@ -1429,9 +1354,7 @@ class MapData:
         data_array = numpy.array(data.GetRasterBand(1).ReadAsArray().T)
 
         df["Z"] = df.apply(
-            lambda row: self.__value_from_raster(
-                inv_geotransform, data_array, row["X"], row["Y"]
-            ),
+            lambda row: self.__value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),
             axis=1,
         )
         return df
@@ -1444,20 +1367,16 @@ class MapData:
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove intrusions
-        geology = geology[geology["INTRUSIVE"] == False]
-        geology = geology[geology["SILL"] == False]
+        geology = geology[~geology["INTRUSIVE"]]
+        geology = geology[~geology["SILL"]]
         # Remove faults from contact geomety
         if self.get_map_data(Datatype.FAULT) is not None:
             faults = self.get_map_data(Datatype.FAULT).copy()
             faults["geometry"] = faults.buffer(50)
-            geology = geopandas.overlay(
-                geology, faults, how="difference", keep_geom_type=False
-            )
+            geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
         units = geology["UNITNAME"].unique()
         column_names = ["UNITNAME_1", "UNITNAME_2", "geometry"]
-        contacts = geopandas.GeoDataFrame(
-            crs=geology.crs, columns=column_names, data=None
-        )
+        contacts = geopandas.GeoDataFrame(crs=geology.crs, columns=column_names, data=None)
         while len(units) > 1:
             unit1 = units[0]
             units = units[1:]
@@ -1469,9 +1388,7 @@ class MapData:
                         keep_geom_type=False,
                     )[column_names]
                     join["geometry"] = join.buffer(1)
-                    buffered = geology[geology["UNITNAME"] == unit2][
-                        ["geometry"]
-                    ].copy()
+                    buffered = geology[geology["UNITNAME"] == unit2][["geometry"]].copy()
                     buffered["geometry"] = buffered.boundary
                     end = geopandas.overlay(buffered, join, keep_geom_type=False)
                     if len(end):
@@ -1494,19 +1411,11 @@ class MapData:
         units = stratigraphic_column
         basal_contacts = self.contacts.copy()
         basal_contacts["ID"] = basal_contacts.apply(
-            lambda row: min(
-                units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])
-            ),
-            axis=1,
+            lambda row: min(units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])), axis=1
         )
-        basal_contacts["basal_unit"] = basal_contacts.apply(
-            lambda row: units[row["ID"]], axis=1
-        )
+        basal_contacts["basal_unit"] = basal_contacts.apply(lambda row: units[row["ID"]], axis=1)
         basal_contacts["distance"] = basal_contacts.apply(
-            lambda row: abs(
-                units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])
-            ),
-            axis=1,
+            lambda row: abs(units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])), axis=1
         )
         basal_contacts["type"] = basal_contacts.apply(
             lambda row: "ABNORMAL" if abs(row["distance"]) > 1 else "BASAL", axis=1
@@ -1546,9 +1455,9 @@ class MapData:
                 suffixes=("_old", ""),
                 how="left",
             )
-            stratigraphic_units.loc[
-                stratigraphic_units["colour"].isna(), ["colour"]
-            ] = random_colours_hex(stratigraphic_units["colour"].isna().sum())
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
+                random_colours_hex(stratigraphic_units["colour"].isna().sum())
+            )
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:
             print(

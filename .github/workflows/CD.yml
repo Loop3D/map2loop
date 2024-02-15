@@ -1,7 +1,24 @@
-on:
-  push:
+on: [push, pull_request]
 name: release-please
 jobs:
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black ruff
+      - name: Autoformat with black
+        run: |
+          black .
+      - name: Lint with ruff
+        run: |
+          ruff check . --fix
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style: style fixes by ruff and autoformatting by black"
   continuous-integration:
     name: Continuous integration ${{ matrix.os }} python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
@@ -23,14 +40,6 @@ jobs:
         run: |
           conda install -c loop3d --file dependencies.txt -y
 
-      - name: Checking formatting of code
-        shell: bash -l {0}
-        run: |
-          pip install flake8
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 map2loop --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 map2loop --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Building and install
         shell: bash -l {0}
         run: |

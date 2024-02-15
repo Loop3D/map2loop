@@ -16,6 +16,7 @@ from .sorter import (
     SorterMaximiseContacts,
     SorterObservationProjections,
 )
+
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
@@ -150,7 +151,7 @@ class Project(object):
             config_filename = kwargs["metadata_filename"]
 
         # Sanity check on working projection parameter
-        if type(working_projection) is str or type(working_projection) is int:
+        if issubclass(type(working_projection), str) or issubclass(type(working_projection), int):
             self.map_data.set_working_projection(working_projection)
         elif type(working_projection) is None:
             if verbose_level != VerboseLevel.NONE:
@@ -163,7 +164,8 @@ class Project(object):
             )
 
         # Sanity check bounding box
-        if type(bounding_box) is dict or type(bounding_box) is tuple:
+
+        if issubclass(type(bounding_box), dict) or issubclass(type(bounding_box), tuple):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
             else:
@@ -232,6 +234,7 @@ class Project(object):
         largest_dimension = max(
             bounding_box["maxx"] - bounding_box["minx"],
             bounding_box["maxy"] - bounding_box["miny"],
+
         )
         self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
 
@@ -430,6 +433,7 @@ class Project(object):
                 SorterAlpha(),
                 SorterUseNetworkX(),
             ]
+
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
@@ -493,6 +497,7 @@ class Project(object):
                 Datatype.DTM, self.fault_orientations
             )
 
+
     def apply_colour_to_units(self):
         """
         Apply the clut file to the units in the stratigraphic column
@@ -514,6 +519,7 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
+
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
@@ -534,7 +540,7 @@ class Project(object):
         self.map_data.extract_all_contacts()
 
         # Calculate the stratigraphic column
-        if type(user_defined_stratigraphic_column) is list:
+        if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
         else:
             if user_defined_stratigraphic_column is not None:
@@ -562,6 +568,7 @@ class Project(object):
             self.loop_filename = os.path.join(
                 self.map_data.tmp_path,
                 os.path.basename(self.map_data.tmp_path) + ".loop3d",
+
             )
 
         # Check overwrite of mismatch version
@@ -607,6 +614,7 @@ class Project(object):
                     self.map_data.bounding_box["top"],
                     self.map_data.bounding_box["base"],
                 ],
+
                 spacing=[1000, 1000, 500],
                 preference="utm",
             )
@@ -656,6 +664,7 @@ class Project(object):
         stratigraphic_data["colour2Red"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Red"]
         ]
+
         stratigraphic_data["colour2Green"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Green"]
         ]
@@ -668,6 +677,7 @@ class Project(object):
             data=stratigraphic_data,
             verbose=True,
         )
+
 
         # Save contacts
         contacts_data = numpy.zeros(
@@ -729,6 +739,7 @@ class Project(object):
             self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True
         )
 
+
         faults = self.deformation_history.get_faults_for_export()
         faults_data = numpy.zeros(len(faults), LPF.faultEventType)
         faults_data["eventId"] = faults["eventId"]
@@ -782,6 +793,7 @@ class Project(object):
             relationships = numpy.zeros(
                 len(ff_relationships), LPF.eventRelationshipType
             )
+
             relationships["eventId1"] = ff_relationships["eventId1"]
             relationships["eventId2"] = ff_relationships["eventId2"]
             relationships["bidirectional"] = True
@@ -825,6 +837,7 @@ class Project(object):
                 self.map_data.basal_contacts[
                     self.map_data.basal_contacts["type"] == "BASAL"
                 ].plot(ax=base)
+
                 return
             elif overlay == "contacts":
                 points = self.sampled_contacts
@@ -838,6 +851,7 @@ class Project(object):
         gdf = geopandas.GeoDataFrame(
             points,
             geometry=geopandas.points_from_xy(points["X"], points["Y"], crs=geol.crs),
+
         )
         gdf.plot(ax=base, marker="o", color="red", markersize=5)
 

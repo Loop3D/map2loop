@@ -234,9 +234,7 @@ class DeformationHistory:
         self.faults["avgNormalZ"] = numpy.nan
         self.faults["length"] = faults_data.geometry.length
         for index, fault in self.faults.iterrows():
-            bounds = faults_map_data[
-                faults_map_data["ID"] == fault["eventId"]
-            ].geometry.bounds
+            bounds = faults_map_data[faults_map_data["ID"] == fault["eventId"]].geometry.bounds
             xdist = float(bounds.maxx.iloc[0] - bounds.minx.iloc[0])
             ydist = float(bounds.maxy.iloc[0] - bounds.miny.iloc[0])
             length = math.sqrt(xdist * xdist + ydist * ydist)
@@ -261,9 +259,7 @@ class DeformationHistory:
 
         # id_list = self.faults["eventId"].unique()
         for index, fault in self.faults.iterrows():
-            observations = fault_observations[
-                fault_observations["ID"] == fault["eventId"]
-            ]
+            observations = fault_observations[fault_observations["ID"] == fault["eventId"]]
             # calculate centre point
             self.faults.at[index, "centreX"] = numpy.mean(observations["X"])
             self.faults.at[index, "centreY"] = numpy.mean(observations["Y"])
@@ -276,14 +272,10 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
-        return self.faults[
-            self.faults["length"] >= self.minimum_fault_length_to_export
-        ].copy()
+        return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
 
     @beartype.beartype
-    def get_fault_relationships_with_ids(
-        self, fault_fault_relationships: pandas.DataFrame
-    ):
+    def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):
         """
         Ammend the fault relationships DataFrame with the fault eventIds
 

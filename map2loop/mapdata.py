@@ -621,8 +621,7 @@ class MapData:
         # Check type and size of loaded structure map
         if (
             self.raw_data[Datatype.FAULT_ORIENTATION] is None
-            or type(self.raw_data[Datatype.FAULT_ORIENTATION])
-            is not geopandas.GeoDataFrame
+            or type(self.raw_data[Datatype.FAULT_ORIENTATION]) is not geopandas.GeoDataFrame
         ):
             return (True, "Fault orientation shapefile is not loaded or valid")
 
@@ -639,9 +638,9 @@ class MapData:
                     lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
                 )
             else:
-                fault_orientations["DIPDIR"] = self.raw_data[
-                    Datatype.FAULT_ORIENTATION
-                ][config["dipdir_column"]]
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                    config["dipdir_column"]
+                ]
         else:
             print(
                 f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
@@ -962,10 +961,7 @@ class MapData:
         if len(faults):
             faults["NAME"] = faults.apply(
                 lambda fault: (
-                    "Fault_" + str(fault["ID"])
-                    if fault["NAME"].lower() == "nan"
-                    else fault["NAME"]
-
+                    "Fault_" + str(fault["ID"]) if fault["NAME"].lower() == "nan" else fault["NAME"]
                 ),
                 axis=1,
             )

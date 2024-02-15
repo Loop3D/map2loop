@@ -86,8 +86,7 @@ class FaultOrientationNearest(FaultOrientation):
         for i in orientations.index:
             p = orientations.loc[i, :].geometry
             orientations.loc[i, "ID"] = fault_trace.loc[
-                fault_trace.index[np.argmin(fault_trace.distance(p))],
-                "ID",
+                fault_trace.index[np.argmin(fault_trace.distance(p))], "ID"
             ]
             orientations.loc[i, "X"] = p.x
             orientations.loc[i, "Y"] = p.y

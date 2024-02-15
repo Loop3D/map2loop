@@ -1,6 +1,7 @@
 import beartype
 import hjson
 import urllib
+import time
 
 
 class Config:
@@ -79,25 +80,33 @@ class Config:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
                 if key not in self.structure_config:
-                    print(f"Config dictionary structure segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary structure segment contained {key} which is not used"
+                    )
             dictionary.pop("structure")
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
                 if key not in self.geology_config:
-                    print(f"Config dictionary geology segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary geology segment contained {key} which is not used"
+                    )
             dictionary.pop("geology")
         if "fault" in dictionary:
             self.fault_config.update(dictionary["fault"])
             for key in dictionary["fault"].keys():
                 if key not in self.fault_config:
-                    print(f"Config dictionary fault segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary fault segment contained {key} which is not used"
+                    )
             dictionary.pop("fault")
         if "fold" in dictionary:
             self.fold_config.update(dictionary["fold"])
             for key in dictionary["fold"].keys():
                 if key not in self.fold_config:
-                    print(f"Config dictionary fold segment contained {key} which is not used")
+                    print(
+                        f"Config dictionary fold segment contained {key} which is not used"
+                    )
             dictionary.pop("fold")
         if len(dictionary):
             print(f"Unused keys from config format {list(dictionary.keys())}")
@@ -163,7 +172,9 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: str, legacy_format: bool = False, lower: bool = False):
+    def update_from_file(
+        self, filename: str, legacy_format: bool = False, lower: bool = False
+    ):
         """
         Update the config dictionary from the provided json filename or url
 
@@ -176,11 +187,32 @@ class Config:
         else:
             func = self.update_from_dictionary
 
-        if filename.startswith("http") or filename.startswith("ftp"):
-            with urllib.request.urlopen(filename) as url_data:
-                data = hjson.load(url_data)
-                func(data, lower)
-        else:
-            with open(filename) as url_data:
-                data = hjson.load(url_data)
-                func(data, lower)
+        try:
+            if filename.startswith("http") or filename.startswith("ftp"):
+                try_count = 10
+                success = False
+                while try_count >= 0 and not success:
+                    try:
+                        with urllib.request.urlopen(filename) as url_data:
+                            data = hjson.load(url_data)
+                            func(data, lower)
+                        success = True
+                    except Exception as e:
+                        # Catch a failed online access or file load, re-attempt
+                        # a few times before throwing further
+                        time.sleep(0.25)
+                        try_count = try_count - 1
+                        if try_count < 0:
+                            raise e
+            else:
+                with open(filename) as url_data:
+                    data = hjson.load(url_data)
+                    func(data, lower)
+        except Exception:
+            err_string = f"There is a problem parsing the config file ({filename}).\n"
+            if filename.startswith("http"):
+                err_string += "Please check the file is accessible online and then\n"
+            if not legacy_format:
+                err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
+            err_string += "Check the contents for mismatched quotes or brackets!"
+            raise Exception(err_string)

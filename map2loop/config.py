@@ -202,7 +202,7 @@ class Config:
             err_string = f"There is a problem parsing the config file ({filename}).\n"
             if filename.startswith("http"):
                 err_string += "Please check the file is accessible online and then\n"
-            if legacy_format == False:
+            if not legacy_format:
                 err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)

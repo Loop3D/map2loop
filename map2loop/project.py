@@ -334,16 +334,16 @@ class Project(object):
         Use the samplers to extract points along polylines or unit boundaries
         """
         self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY)
+            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
         )
         self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE)
+            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
         )
         self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT)
+            self.map_data.get_map_data(Datatype.FAULT), self.map_data
         )
         self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD)
+            self.map_data.get_map_data(Datatype.FOLD), self.map_data
         )
 
     def extract_geology_contacts(self):

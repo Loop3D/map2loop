@@ -4,7 +4,9 @@ import geopandas
 import pandas
 import shapely
 import numpy
-
+from .m2l_enums import Datatype
+from .mapdata import MapData
+from typing import Optional
 
 class Sampler(ABC):
     """
@@ -31,12 +33,12 @@ class Sampler(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def sample(self, map_data: geopandas.GeoDataFrame) -> pandas.DataFrame:
+    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
 
         Args:
-            map_data (geopandas.GeoDataFrame): data frame to sample
+            spatial_data (geopandas.GeoDataFrame): data frame to sample
 
         Returns:
             pandas.DataFrame: data frame containing samples
@@ -64,19 +66,20 @@ class SamplerDecimator(Sampler):
         self.decimation = decimation
 
     @beartype.beartype
-    def sample(self, map_data: geopandas.GeoDataFrame) -> pandas.DataFrame:
+    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the decimated points
 
         Args:
-            map_data (geopandas.GeoDataFrame): the data frame to sample
+            spatial_data (geopandas.GeoDataFrame): the data frame to sample
 
         Returns:
             pandas.DataFrame: the sampled data points
         """
-        data = map_data.copy()
+        data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
+        data["ID"] = geopandas.sjoin(map_data.get_map_data(Datatype.STRUCTURE),map_data.get_map_data(Datatype.GEOLOGY), how = 'left')['ID_right'].values
         data.reset_index(drop=True, inplace=True)
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
 
@@ -102,19 +105,19 @@ class SamplerSpacing(Sampler):
         self.spacing = spacing
 
     @beartype.beartype
-    def sample(self, map_data: geopandas.GeoDataFrame) -> pandas.DataFrame:
+    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points
 
         Args:
-            map_data (geopandas.GeoDataFrame): the data frame to sample (must contain column ["ID"])
+            spatial_data (geopandas.GeoDataFrame): the data frame to sample (must contain column ["ID"])
 
         Returns:
             pandas.DataFrame: the sampled data points
         """
         schema = {"ID": str, "X": float, "Y": float}
         df = pandas.DataFrame(columns=schema.keys()).astype(schema)
-        for _, row in map_data.iterrows():
+        for _, row in spatial_data.iterrows():
             if type(row.geometry) is shapely.geometry.multipolygon.MultiPolygon:
                 targets = row.geometry.boundary.geoms
             elif type(row.geometry) is shapely.geometry.polygon.Polygon:
@@ -133,7 +136,7 @@ class SamplerSpacing(Sampler):
                 points = [target.interpolate(distance) for distance in distances]
                 df2["X"] = [point.x for point in points]
                 df2["Y"] = [point.y for point in points]
-                if "ID" in map_data.columns:
+                if "ID" in spatial_data.columns:
                     df2["ID"] = row["ID"]
                 else:
                     df2["ID"] = 0

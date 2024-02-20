@@ -8,6 +8,7 @@ from .m2l_enums import Datatype
 from .mapdata import MapData
 from typing import Optional
 
+
 class Sampler(ABC):
     """
     Base Class of Sampler used to force structure of Sampler
@@ -33,7 +34,9 @@ class Sampler(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
+    def sample(
+        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+    ) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
 
@@ -66,7 +69,9 @@ class SamplerDecimator(Sampler):
         self.decimation = decimation
 
     @beartype.beartype
-    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
+    def sample(
+        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+    ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the decimated points
 
@@ -79,7 +84,11 @@ class SamplerDecimator(Sampler):
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
-        data["ID"] = geopandas.sjoin(map_data.get_map_data(Datatype.STRUCTURE),map_data.get_map_data(Datatype.GEOLOGY), how = 'left')['ID_right'].values
+        data["ID"] = geopandas.sjoin(
+            map_data.get_map_data(Datatype.STRUCTURE),
+            map_data.get_map_data(Datatype.GEOLOGY),
+            how='left',
+        )['ID_right'].values
         data.reset_index(drop=True, inplace=True)
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
 
@@ -105,7 +114,9 @@ class SamplerSpacing(Sampler):
         self.spacing = spacing
 
     @beartype.beartype
-    def sample(self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None) -> pandas.DataFrame:
+    def sample(
+        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+    ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points
 

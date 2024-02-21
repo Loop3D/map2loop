@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 import beartype
 import numpy
@@ -180,12 +181,12 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
             pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
         """
 
-        # def calc_thickness(tmp_path, output_path, buffer, max_thickness_allowed, c_l):
+        # def calc_thickness(temporary_path, output_path, buffer, max_thickness_allowed, c_l):
         """
         This function calculates the thickness of geological units based on various data inputs.
 
         Parameters:
-        tmp_path (str): The temporary path where the data files are located.
+        temporary_path (str): The temporary path where the data files are located.
         output_path (str): The path where the output file will be saved.
         buffer (float): The buffer distance for identifying close points.
         max_thickness_allowed (float): The maximum allowed thickness for a geological unit.
@@ -194,17 +195,16 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         Returns:
         None: The function writes the results to an output file and does not return anything.
         """
-
+        temporary_path = map_data.tmp_path
         # Load the contact points and interpolated data from the temporary path
-        contact_points_file = os.path.join(tmp_path, "raw_contacts.csv")
-        interpolated_combo_file = os.path.join(tmp_path, "combo_full.csv")
+        contact_points_file = os.path.join(temporary_path, "raw_contacts.csv")
+        interpolated_combo_file = os.path.join(temporary_path, "combo_full.csv")
 
         # Load the basal contacts as a geopandas dataframe
-
-        contact_lines = geopandas.read_file(os.path.join(tmp_path, "/basal_contacts.shp.zip"))
+        basal_contacts = geopandas.read_file(os.path.join(temporary_path, "/basal_contacts.shp.zip"))
 
         # Load the sorted data
-        all_sorts = pandas.read_csv(os.path.join(tmp_path, "all_sorts.csv"))
+        all_sorts = pandas.read_csv(os.path.join(temporary_path, "all_sorts.csv"))
 
         # Load the contacts and orientations data
         contacts = pandas.read_csv(contact_points_file)
@@ -288,9 +288,9 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                     if ctextcode[k] == apair["code"]:
                         # Subset contacts to just those with 'a' code
                         is_contacta = (
-                                contact_lines["UNIT_NAME"] == all_sorts.iloc[g - 1]["code"]
+                                basal_contacts["UNIT_NAME"] == all_sorts.iloc[g - 1]["code"]
                         )
-                        acontacts = contact_lines[is_contacta]
+                        acontacts = basal_contacts[is_contacta]
                         i = 0
 
                         # Loop through distinct linestrings for upper contact
@@ -366,17 +366,17 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
 
 @beartype.beartype
 def calc_thickness_with_grid(config: Config, map_data: MapData):
-    contact_points_file = os.path.join(config.tmp_path, "raw_contacts.csv")
+    contact_points_file = os.path.join(config.temporary_path, "raw_contacts.csv")
     dtm = map_data.get_map_data(Datatype.DTM).open()
     # load basal contacts as geopandas dataframe
     contact_lines = gpd.read_file(
-        os.path.join(config.tmp_path, "basal_contacts.shp.zip")
+        os.path.join(config.temporary_path, "basal_contacts.shp.zip")
     )
-    all_sorts = pd.read_csv(os.path.join(config.tmp_path, "all_sorts.csv"))
+    all_sorts = pd.read_csv(os.path.join(config.temporary_path, "all_sorts.csv"))
     all_sorts["index2"] = all_sorts.index
     # all_sorts.set_index('code',inplace=True)
     geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
-    # geol=gpd.read_file(os.path.join(config.tmp_path, 'geol_clip.shp'))
+    # geol=gpd.read_file(os.path.join(config.temporary_path, 'geol_clip.shp'))
     geol.drop_duplicates(subset="UNIT_NAME", inplace=True)
     # geol.set_index('UNIT_NAME',inplace=True)
     drops = geol[
@@ -403,7 +403,7 @@ def calc_thickness_with_grid(config: Config, map_data: MapData):
         "X,Y,formation,appar_th,thickness,cl,cm,p1x,p1y,p2x,p2y,dip,type,slope_dip,slope_length,delz,zbase,zcross\n"
     )
 
-    # np.savetxt(os.path.join(config.tmp_path,'dist.csv'),dist,delimiter = ',')
+    # np.savetxt(os.path.join(config.temporary_path,'dist.csv'),dist,delimiter = ',')
     # display("ppp",cx.shape,cy.shape,ox.shape,oy.shape,dip.shape,azimuth.shape,dist.shape)
     n_est = 0
     for k in range(0, clength):  # loop through all contact segments
@@ -558,12 +558,12 @@ def calc_thickness_with_grid(config: Config, map_data: MapData):
 @beartype.beartype
 def calc_min_thickness_with_grid(config: Config, map_data: MapData):
     dtm = map_data.get_map_data(Datatype.DTM).open()
-    contact_points_file = os.path.join(config.tmp_path, "raw_contacts.csv")
+    contact_points_file = os.path.join(config.temporary_path, "raw_contacts.csv")
     # load basal contacts as geopandas dataframe
     contact_lines = gpd.read_file(
-        os.path.join(config.tmp_path, "basal_contacts.shp.zip")
+        os.path.join(config.temporary_path, "basal_contacts.shp.zip")
     )
-    all_sorts = pd.read_csv(os.path.join(config.tmp_path, "all_sorts.csv"))
+    all_sorts = pd.read_csv(os.path.join(config.temporary_path, "all_sorts.csv"))
     contacts = pd.read_csv(contact_points_file)
 
     sum_thick = pd.read_csv(
@@ -582,7 +582,7 @@ def calc_min_thickness_with_grid(config: Config, map_data: MapData):
     fth = open(os.path.join(config.output_path, "formation_thicknesses.csv"), "a+")
     # fth.write('X,Y,formation,appar_th,thickness,cl,cm,p1x,p1y,p2x,p2y,dip\n')
 
-    # np.savetxt(os.path.join(config.tmp_path,'dist.csv'),dist,delimiter = ',')
+    # np.savetxt(os.path.join(config.temporary_path,'dist.csv'),dist,delimiter = ',')
     # display("ppp",cx.shape,cy.shape,ox.shape,oy.shape,dip.shape,azimuth.shape,dist.shape)
     n_est = 0
     for k in range(0, clength):  # loop through all contact segments

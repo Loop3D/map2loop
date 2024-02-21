@@ -617,7 +617,7 @@ class Project(object):
         # Save structural information
         observations = numpy.zeros(len(self.structure_samples), LPF.stratigraphicObservationType)
         observations["layer"] = "s0"
-        observations["layerId"] = self.structure_samples["ID"]
+        observations["layerId"] = self.structure_samples["layerID"]
         observations["easting"] = self.structure_samples["X"]
         observations["northing"] = self.structure_samples["Y"]
         # observations["altitude"] = self.structure_samples["Z"]

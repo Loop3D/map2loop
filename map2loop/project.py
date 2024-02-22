@@ -1,10 +1,20 @@
 import beartype
+
+from map2loop.fault_orientation import FaultOrientationNearest
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
-from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
+from .fault_orientation import FaultOrientation
+from .sorter import (
+    Sorter,
+    SorterAgeBased,
+    SorterAlpha,
+    SorterUseNetworkX,
+    SorterUseHint,
+)
+
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
@@ -56,6 +66,7 @@ class Project(object):
         geology_filename: str = "",
         structure_filename: str = "",
         fault_filename: str = "",
+        fault_orientation_filename: str = "",
         fold_filename: str = "",
         dtm_filename: str = "",
         config_filename: str = "",
@@ -86,6 +97,8 @@ class Project(object):
                 The filename of the structure shapefile. Defaults to "".
             fault_filename (str, optional):
                 The filename of the fault shapefile. Defaults to "".
+            fault_orientation_filename (str, optional):
+                The filename of the fault orientation shapefile. Defaults to "".
             fold_filename (str, optional):
                 The filename fo the fold shapefile. Defaults to "".
             dtm_filename (str, optional):
@@ -117,6 +130,7 @@ class Project(object):
         self.sorter = SorterUseHint()
         self.thickness_calculator = ThicknessCalculatorAlpha()
         self.throw_calculator = ThrowCalculatorAlpha()
+        self.fault_orientation = FaultOrientationNearest()
         self.loop_filename = loop_project_filename
 
         self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
@@ -124,6 +138,10 @@ class Project(object):
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
+        self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"])
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -154,7 +172,7 @@ class Project(object):
         # Assign filenames
         if use_australian_state_data != "":
             # Sanity check on state string
-            if use_australian_state_data in ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']:
+            if use_australian_state_data in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
                 raise ValueError(
@@ -170,6 +188,8 @@ class Project(object):
             self.map_data.set_filename(Datatype.FOLD, fold_filename)
         if dtm_filename != "":
             self.map_data.set_filename(Datatype.DTM, dtm_filename)
+        if fault_orientation_filename != "":
+            self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
         if config_filename != "":
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
         if config_dictionary != {}:
@@ -250,6 +270,26 @@ class Project(object):
             str: The name of the thickness calculator used
         """
         return self.thickness_calculator.thickness_calculator_label
+
+    @beartype.beartype
+    def set_fault_orientation(self, fault_orientation: FaultOrientation):
+        """
+        Set the fault orientation calculator that estimates fault orientation values for all faults
+
+        Args:
+            fault_orientation (FaultOrientation):
+                The calculator to use. Must be of base class FaultOrientation
+        """
+        self.fault_orientation = fault_orientation
+
+    def get_fault_orientation(self):
+        """
+        Get the name of the fault orientation calculator being used
+
+        Returns:
+            str: The name of the fault orientation calculator used
+        """
+        return self.fault_orientation.label
 
     @beartype.beartype
     def set_throw_calculator(self, throw_calculator: ThrowCalculator):
@@ -361,6 +401,7 @@ class Project(object):
         """
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
+
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
@@ -411,6 +452,15 @@ class Project(object):
             self.map_data,
         )
 
+    def calculate_fault_orientations(self):
+        if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
+            self.fault_orientations = self.fault_orientation.calculate(
+                self.map_data.get_map_data(Datatype.FAULT),
+                self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
+                self.map_data,
+            )
+            self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
+
     def apply_colour_to_units(self):
         """
         Apply the clut file to the units in the stratigraphic column
@@ -430,11 +480,7 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
-        self.fault_samples = self.fault_samples.merge(
-            self.map_data.get_map_data(Datatype.FAULT)[["ID", "DIPDIR", "DIP"]], on="ID", how="left"
-        )
-        self.fault_samples["DIPDIR"] = self.fault_samples["DIPDIR"].replace(numpy.nan, 0)
-        self.fault_samples["DIP"] = self.fault_samples["DIP"].replace(numpy.nan, 90)
+
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
@@ -469,6 +515,7 @@ class Project(object):
         self.extract_geology_contacts()
         self.calculate_unit_thicknesses()
         self.sample_map_data()
+        self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()
         self.save_into_projectfile()
@@ -554,6 +601,7 @@ class Project(object):
             int(a[5:7], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
         ]
         stratigraphic_data["colour2Red"] = [int(a * 0.95) for a in stratigraphic_data["colour1Red"]]
+
         stratigraphic_data["colour2Green"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Green"]
         ]
@@ -570,23 +618,31 @@ class Project(object):
         contacts_data["altitude"] = self.sampled_contacts["Z"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data, verbose=True)
 
-        # Save fault information
-        faults_obs_data = numpy.zeros(len(self.fault_samples), LPF.faultObservationType)
-        faults_obs_data["eventId"] = self.fault_samples["ID"]
-        faults_obs_data["easting"] = self.fault_samples["X"]
-        faults_obs_data["northing"] = self.fault_samples["Y"]
-        faults_obs_data["altitude"] = self.fault_samples["Z"]
-        faults_obs_data["type"] = 0
-        faults_obs_data["dipDir"] = self.fault_samples["DIPDIR"]
-        faults_obs_data["dip"] = self.fault_samples["DIP"]
-        faults_obs_data["dipPolarity"] = 0  # self.fault_samples["DIPPOLARITY"]
-        # faults_obs_data["val"] = self.fault_samples["???"]
-        faults_obs_data["displacement"] = 100  # self.fault_samples["DISPLACEMENT"]
+        # Save fault trace information
+        faults_obs_data = numpy.zeros(
+            len(self.fault_samples) + len(self.fault_orientations), LPF.faultObservationType
+        )
+        faults_obs_data["val"] = numpy.nan
+        faults_obs_data["eventId"][0 : len(self.fault_samples)] = self.fault_samples["ID"]
+        faults_obs_data["easting"][0 : len(self.fault_samples)] = self.fault_samples["X"]
+        faults_obs_data["northing"][0 : len(self.fault_samples)] = self.fault_samples["Y"]
+        faults_obs_data["altitude"][0 : len(self.fault_samples)] = self.fault_samples["Z"]
+        faults_obs_data["type"][0 : len(self.fault_samples)] = 0
+        faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
+        faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
+        faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
+        faults_obs_data["displacement"] = (
+            100  # self.fault_samples["DISPLACEMENT"] #TODO remove note needed
+        )
 
-        # TODO: Find a better way to assign posOnly for fault observations
-        from itertools import cycle, islice
-
-        faults_obs_data["posOnly"] = list(islice(cycle([0, 1]), len(faults_obs_data)))
+        faults_obs_data["eventId"][len(self.fault_samples) :] = self.fault_orientations["ID"]
+        faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
+        faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
+        faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
+        faults_obs_data["type"][len(self.fault_samples) :] = 0
+        faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
+        faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
+        faults_obs_data["posOnly"][len(self.fault_samples) :] = 0
         LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True)
 
         faults = self.deformation_history.get_faults_for_export()
@@ -631,6 +687,7 @@ class Project(object):
                 self.map2model.fault_fault_relationships
             )
             relationships = numpy.zeros(len(ff_relationships), LPF.eventRelationshipType)
+
             relationships["eventId1"] = ff_relationships["eventId1"]
             relationships["eventId2"] = ff_relationships["eventId2"]
             relationships["bidirectional"] = True
@@ -655,18 +712,19 @@ class Project(object):
             .to_dict()["colour"]
         )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
-        geol['colour_rgba'] = geol.apply(lambda row: to_rgba(row['colour'], 1.0), axis=1)
+        geol["colour"] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
+        geol["colour_rgba"] = geol.apply(lambda row: to_rgba(row["colour"], 1.0), axis=1)
         if points is None and overlay == "":
-            geol.plot(color=geol['colour_rgba'])
+            geol.plot(color=geol["colour_rgba"])
             return
         else:
-            base = geol.plot(color=geol['colour_rgba'])
+            base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
                 self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
                     ax=base
                 )
+
                 return
             elif overlay == "contacts":
                 points = self.sampled_contacts
@@ -718,10 +776,10 @@ class Project(object):
             .to_dict()["colour"]
         )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol['colour'] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
-        geol["colour_red"] = geol.apply(lambda row: int(row['colour'][1:3], 16), axis=1)
-        geol["colour_green"] = geol.apply(lambda row: int(row['colour'][3:5], 16), axis=1)
-        geol["colour_blue"] = geol.apply(lambda row: int(row['colour'][5:7], 16), axis=1)
+        geol["colour"] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
+        geol["colour_red"] = geol.apply(lambda row: int(row["colour"][1:3], 16), axis=1)
+        geol["colour_green"] = geol.apply(lambda row: int(row["colour"][3:5], 16), axis=1)
+        geol["colour_blue"] = geol.apply(lambda row: int(row["colour"][5:7], 16), axis=1)
         source_ds = gdal.OpenEx(geol.to_json())
         source_layer = source_ds.GetLayer()
         x_min, x_max, y_min, y_max = source_layer.GetExtent()
@@ -729,7 +787,7 @@ class Project(object):
         # Create the destination data source
         x_res = int((x_max - x_min) / pixel_size)
         y_res = int((y_max - y_min) / pixel_size)
-        target_ds = gdal.GetDriverByName('GTiff').Create(filename, x_res, y_res, 4, gdal.GDT_Byte)
+        target_ds = gdal.GetDriverByName("GTiff").Create(filename, x_res, y_res, 4, gdal.GDT_Byte)
         target_ds.SetGeoTransform((x_min, pixel_size, 0, y_max, 0, -pixel_size))
         band = target_ds.GetRasterBand(1)
         band.SetNoDataValue(0)

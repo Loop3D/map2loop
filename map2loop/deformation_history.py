@@ -218,20 +218,20 @@ class DeformationHistory:
         self.faults["group"] = ""
         self.faults["supergroup"] = ""
         self.faults["avgDisplacement"] = -1.0
-        self.faults["avgDownthrowDir"] = 0.0
-        self.faults["influenceDistance"] = 0.0
-        self.faults["verticalRadius"] = 0.0
-        self.faults["horizontalRadius"] = 0.0
+        self.faults["avgDownthrowDir"] = numpy.nan
+        self.faults["influenceDistance"] = numpy.nan
+        self.faults["verticalRadius"] = numpy.nan
+        self.faults["horizontalRadius"] = numpy.nan
         self.faults["colour"] = "#000000"
-        self.faults["centreX"] = 0.0
-        self.faults["centreY"] = 0.0
-        self.faults["centreZ"] = 0.0
-        self.faults["avgSlipDirX"] = 0.0
-        self.faults["avgSlipDirY"] = 0.0
-        self.faults["avgSlipDirZ"] = 0.0
-        self.faults["avgNormalX"] = 0.0
-        self.faults["avgNormalY"] = 0.0
-        self.faults["avgNormalZ"] = 0.0
+        self.faults["centreX"] = numpy.nan
+        self.faults["centreY"] = numpy.nan
+        self.faults["centreZ"] = numpy.nan
+        self.faults["avgSlipDirX"] = numpy.nan
+        self.faults["avgSlipDirY"] = numpy.nan
+        self.faults["avgSlipDirZ"] = numpy.nan
+        self.faults["avgNormalX"] = numpy.nan
+        self.faults["avgNormalY"] = numpy.nan
+        self.faults["avgNormalZ"] = numpy.nan
         self.faults["length"] = faults_data.geometry.length
         for index, fault in self.faults.iterrows():
             bounds = faults_map_data[faults_map_data["ID"] == fault["eventId"]].geometry.bounds

@@ -54,6 +54,7 @@ class Config:
             "dipdir_flag": "num",
             "dipdir_column": "DIPDIR",
             "dip_column": "DIP",
+            "orientation_type": "dip direction",
             "dipestimate_column": "DIP_ESTIMATE",
             "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
             "name_column": "NAME",

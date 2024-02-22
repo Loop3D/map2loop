@@ -352,7 +352,14 @@ class MapData:
         """
         Load all the map data for each datatype.  Cycles through each type and loads it
         """
-        for i in [Datatype.GEOLOGY, Datatype.STRUCTURE, Datatype.FAULT, Datatype.FOLD]:
+        for i in [
+            Datatype.GEOLOGY,
+            Datatype.STRUCTURE,
+            Datatype.FAULT,
+            Datatype.FOLD,
+            Datatype.FAULT_ORIENTATION,
+        ]:
+
             self.load_map_data(i)
         self.load_raster_map_data(Datatype.DTM)
 
@@ -596,11 +603,71 @@ class MapData:
             func = self.parse_fault_map
         elif datatype == Datatype.FOLD:
             func = self.parse_fold_map
-
+        elif datatype == Datatype.FAULT_ORIENTATION:
+            func = self.parse_fault_orientations
         if func:
             error, message = func()
             if error:
                 print(message)
+
+    @beartype.beartype
+    def parse_fault_orientations(self) -> tuple:
+        """
+        Parse the fault orientations shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
+        """
+        # Check type and size of loaded structure map
+        if (
+            self.raw_data[Datatype.FAULT_ORIENTATION] is None
+            or type(self.raw_data[Datatype.FAULT_ORIENTATION]) is not geopandas.GeoDataFrame
+        ):
+            return (True, "Fault orientation shapefile is not loaded or valid")
+
+        # Create new geodataframe
+        fault_orientations = geopandas.GeoDataFrame(
+            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
+        )
+        config = self.config.fault_config
+
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            if config["orientation_type"] == "strike":
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                    config["dipdir_column"]
+                ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
+            )
+
+        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["dip_column"]
+            ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
+            )
+
+        # TODO LG would it be worthwhile adding a description column for faults?
+        # it would be possible to parse out the fault displacement, type, slip direction
+        # if this was stored in the descriptions?
+
+        # Add object id
+        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["objectid_column"]
+            ]
+        else:
+            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
+        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        return (False, "")
 
     @beartype.beartype
     def parse_structure_map(self) -> tuple:

@@ -85,9 +85,7 @@ class SamplerDecimator(Sampler):
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
         data["layerID"] = geopandas.sjoin(
-            data,
-            map_data.get_map_data(Datatype.GEOLOGY),
-            how='left',
+            data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
         )['index_right']
         data.reset_index(drop=True, inplace=True)
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))

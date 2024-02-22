@@ -5,7 +5,7 @@ jobs:
     name: Linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -16,7 +16,7 @@ jobs:
       - name: Lint with ruff
         run: |
           ruff check . --fix
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
   continuous-integration:
@@ -28,17 +28,17 @@ jobs:
         os: ${{ fromJSON(vars.BUILD_OS)}}
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          use-mamba: true
+          # miniforge-variant: Mambaforge
+          # miniforge-version: latest
+          # use-mamba: true
       - name: Installing dependencies
         shell: bash -l {0}
         run: |
-          conda install -c loop3d --file dependencies.txt -y
+          conda install -c loop3d -c conda-forge --file dependencies.txt -y
 
       - name: Building and install
         shell: bash -l {0}
@@ -48,13 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     #needs: continuous-integration
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: |
           cp CHANGELOG.md docs/source/CHANGELOG.md
           docker build . -t=docs -f docs/Dockerfile 
           docker run -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
       - name: upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/build/html
@@ -63,7 +63,7 @@ jobs:
     needs: continuous-integration
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v3
+      - uses: GoogleCloudPlatform/release-please-action@v4
         id: release
         with:
           release-type: python
@@ -92,7 +92,7 @@ jobs:
           miniforge-version: latest
           use-mamba: true
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: update submodules
         run: |
           git submodule update --init --recursive
@@ -134,8 +134,8 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: docs
           path: docs
@@ -143,7 +143,7 @@ jobs:
         run: |
           ls -l docs
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.3
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.

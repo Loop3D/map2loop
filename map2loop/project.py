@@ -7,13 +7,7 @@ from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
-from .sorter import (
-    Sorter,
-    SorterAgeBased,
-    SorterAlpha,
-    SorterUseNetworkX,
-    SorterUseHint,
-)
+from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
 
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory

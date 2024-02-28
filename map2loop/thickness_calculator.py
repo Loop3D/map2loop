@@ -7,7 +7,8 @@ import geopandas
 from statistics import mean
 from .mapdata import MapData
 from map2loop.sampler import SamplerSpacing
-
+from interpolator import NormalVectorInterpolator, DipInterpolator
+from utils import normal_vector_to_dipdirection_dip
 
 class ThicknessCalculator(ABC):
     """
@@ -391,11 +392,27 @@ class ThicknessCalculatorTheta(ThicknessCalculator):
             Returns:
                 pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
             """
+            # 1. calculate $spacing using bounding box
             bounding_box = map_data.bounding_box
             side_length = bounding_box['maxx'] - bounding_box['minx']
             # define the spacing of the sampler automatically to 4% of the side length of the bounding box
             spacing = side_length * 0.04
-            # sample the contacts
+            # # 2. Sample $basal_contacts using $spacing
             sampler = SamplerSpacing(spacing)
             sampled_contacts = sampler.sample(basal_contacts)
-            
+            # 4. interpolate orientation data using bounding box
+            interpolator = NormalVectorInterpolator()
+            normal_vectors = interpolator.interpolate(map_data)
+            # convert normal vectors to dip and dip direction
+            dip, dip_direction = normal_vector_to_dipdirection_dip(normal_vectors[:, 0],
+                                                                   normal_vectors[:, 1],
+                                                                   normal_vectors[:, 2])
+
+            # 5. For each unit, assign name of unit to $basal_contact
+            # 6. calculate the nearest neighbours between base and top of unit in the stratigraphic order
+            # 7. select the nearest neighbour of each basal point and their distance to the top point
+            # 8. calculate the nearest neighbour between orientation data and basal points and top points
+            # 9. calculate angle ρ = cos–1 {[(x1 – x2) / L] sinθb sinδb + [(y1 – y2) / L] cosθb sinδb + [(z2 – z1) / L] cosδb} / L : is the distance between basal and top points
+            # 10. Calculate true thickness t = L . cos ρ
+
+

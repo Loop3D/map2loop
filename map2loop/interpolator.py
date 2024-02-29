@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Any
-
+from map2loop.m2l_enums import Datatype
 import beartype
 import pandas
 import geopandas
@@ -43,8 +43,6 @@ class Interpolator(ABC):
         abstract method to setup interpolation (abstract method)
 
         Args:
-            contact_orientations (pandas.DataFrame): structural data with columns: 'X', 'Y', 'Z', 'dipDir/dipdir',
-            'dip', 'layer', 'name'
             map_data (map2loop.MapData): a catchall so that access to all map data is available
         """
         pass
@@ -102,14 +100,17 @@ class NormalVectorInterpolator(Interpolator):
     Normal vector interpolation class
 
     Args:
-        Interpolator(ABC): Derived from Abstract Base Class
+        NormalVectorInterpolator(Interpolator): Derived from Abstract Base Class
     """
 
     def __init__(self):
         """
-        Initialiser of for IDWInterpolator
+        Initialiser of for NormalVectorInterpolator class
         """
-        self.interpolator_label = "IDWInterpolator"
+        self.dataframe = None
+        self.xi = None
+        self.yi = None
+        self.interpolator_label = "NormalVectorInterpolator"
 
     def type(self):
         """
@@ -122,7 +123,7 @@ class NormalVectorInterpolator(Interpolator):
 
     @beartype.beartype
     @abstractmethod
-    def setup_interpolation(self, map_data: MapData) -> pandas.DataFrame:
+    def setup_interpolation(self, map_data: MapData):
         """
         Setup the interpolation method (abstract method)
 
@@ -132,7 +133,7 @@ class NormalVectorInterpolator(Interpolator):
             map_data (map2loop.MapData): a catchall so that access to all map data is available
         """
         # the following code is from LoopStructural
-        contact_orientations = map_data.raw_data[1].copy()
+        contact_orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
         if (
                 "nx" not in contact_orientations.columns
                 or "ny" not in contact_orientations.columns
@@ -218,10 +219,10 @@ class NormalVectorInterpolator(Interpolator):
                         "Contact orientation data must contain either X, Y, Z or easting, northing, altitude"
                     )
 
-        return contact_orientations
+        self.dataframe = contact_orientations
 
     @beartype.beartype
-    def setup_grid(self, map_data: MapData) -> numpy.ndarray:
+    def setup_grid(self, map_data: MapData):
         """
         Setup the grid for interpolation
 
@@ -241,11 +242,14 @@ class NormalVectorInterpolator(Interpolator):
         yi = numpy.linspace(
             map_data.bounding_box["miny"], map_data.bounding_box["maxy"], grid_resolution
         )
-        return xi, yi
+
+        self.xi = xi
+        self.yi = yi
 
     @beartype.beartype
     def interpolator(self, x: float, y: float, ni: float, xi: float, yi: float) -> numpy.ndarray:
-
+        # TODO: 1. add argument for type of interpolator. 2. add code to process different types of
+        #  interpolators from Scipy and use the chosen one
         """
         Inverse Distance Weighting interpolation method
 
@@ -267,11 +271,9 @@ class NormalVectorInterpolator(Interpolator):
     @beartype.beartype
     def interpolate(self, map_data: MapData) -> numpy.ndarray:
         """
-        Execute interpolation method (abstract method)
+        Execute interpolation method
 
         Args:
-            contact_orientations (pandas.DataFrame): structural data with columns: 'X', 'Y', 'Z', 'dipDir/dipdir',
-            'dip', 'layer', 'name'
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
@@ -295,7 +297,7 @@ class NormalVectorInterpolator(Interpolator):
         return vecs
 
 
-class DipInterpolator(Interpolator):
+class DipDipDirectionInterpolator(Interpolator):
     """
 
 
@@ -307,7 +309,7 @@ class DipInterpolator(Interpolator):
         """
         Initialiser of for IDWInterpolator
         """
-        self.interpolator_label = "IDWInterpolator"
+        self.interpolator_label = "DipDipDirectionInterpolator"
 
     def type(self):
         """
@@ -381,8 +383,6 @@ class DipInterpolator(Interpolator):
         Execute interpolation method (abstract method)
 
         Args:
-            contact_orientations (pandas.DataFrame): structural data with columns: 'X', 'Y', 'Z', 'dipDir/dipdir',
-            'dip', 'layer', 'name'
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:

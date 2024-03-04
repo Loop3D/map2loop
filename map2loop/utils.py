@@ -1,5 +1,6 @@
 import numpy
 from math import radians, degrees, atan2, asin
+from shapely.geometry import Point
 
 
 def strike_dip_vector(strike, dip):
@@ -66,3 +67,11 @@ def normal_vector_to_dipdirection_dip(nx, ny, nz):
     dipdir = dipdir % 360
 
     return dip, dipdir
+
+
+def create_points(xy):
+    points = []
+    for x, y in xy:
+        point = Point(x, y)
+        points.append(point)
+    return points

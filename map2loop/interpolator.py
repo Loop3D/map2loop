@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Any
+
+from Cython.Includes.numpy import ndarray
 from map2loop.m2l_enums import Datatype
 import beartype
 import pandas
 import geopandas
 import numpy
 import math
+
+from numpy import ndarray
 from scipy.interpolate import Rbf
 from pandas import DataFrame
 
@@ -309,6 +313,12 @@ class DipDipDirectionInterpolator(Interpolator):
         """
         Initialiser of for IDWInterpolator
         """
+        self.x = None
+        self.y = None
+        self.xi = None
+        self.yi = None
+        self.dip = None
+        self.dipdir = None
         self.interpolator_label = "DipDipDirectionInterpolator"
 
     def type(self):
@@ -322,20 +332,19 @@ class DipDipDirectionInterpolator(Interpolator):
 
     @beartype.beartype
     @abstractmethod
-    def setup_interpolation(self, map_data: MapData) -> Tuple[pandas.DataFrame, list, numpy.ndarray]:
+    def setup_interpolation(self, map_data: MapData):
         """
         Setup the interpolation method
         """
-        contact_orientations = map_data.raw_data[1].copy()
+        contact_orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
         contact_orientations['x'] = contact_orientations['geometry'].apply(lambda geom: geom.x)
         contact_orientations['y'] = contact_orientations['geometry'].apply(lambda geom: geom.y)
-        x, y = contact_orientations[['x', 'y']].to_list()
-        dip = contact_orientations["dip"].to_list()
-
-        return x, y, dip
+        self.x, self.y = contact_orientations[['x', 'y']].to_list()
+        self.dip = contact_orientations["dip"].to_list()
+        self.dipdir = contact_orientations["dipdir"].to_list()
 
     @beartype.beartype
-    def setup_grid(self, map_data: MapData) -> tuple[tuple[Any, Any] | Any, tuple[Any, Any] | Any]:
+    def setup_grid(self, map_data: MapData):
         """
         Setup the grid for interpolation
 
@@ -349,36 +358,32 @@ class DipDipDirectionInterpolator(Interpolator):
         grid_resolution = round((map_data.bounding_box["maxx"] - map_data.bounding_box["minx"]) / cell_size)
 
         # Generate the grid
-        xi = numpy.linspace(
+        self.xi = numpy.linspace(
             map_data.bounding_box["minx"], map_data.bounding_box["maxx"], grid_resolution
         )
-        yi = numpy.linspace(
+        self.yi = numpy.linspace(
             map_data.bounding_box["miny"], map_data.bounding_box["maxy"], grid_resolution
         )
-        return xi, yi
 
     @beartype.beartype
-    def interpolator(self, x: Any, y: Any, ni: Any, xi: Any, yi: Any) -> numpy.ndarray:
+    def interpolator(self, ni: Any) -> numpy.ndarray:
         """
         Inverse Distance Weighting interpolation method
 
         Args:
-            x (Any): x-coordinate of the point
-            y (Any): y-coordinate of the point
             ni (Any): list or numpy.ndarray of values to interpolate
-            xi (Any): x-coordinate of the point where interpolation of ni is performed (grid point)
-            yi (Any): y-coordinate of the point where interpolation of ni is performed (grid point)
+
 
         Returns:
             Rbf: radial basis function object
         """
 
-        rbf = Rbf(x, y, ni, function="linear")
+        rbf = Rbf(self.x, self.y, ni, function="linear")
 
-        return rbf(xi, yi)
+        return rbf(self.xi, self.yi)
 
     @beartype.beartype
-    def interpolate(self, map_data: MapData) -> numpy.ndarray:
+    def interpolate(self, map_data: MapData) -> tuple[ndarray | ndarray, ndarray | ndarray]:
         """
         Execute interpolation method (abstract method)
 
@@ -390,10 +395,12 @@ class DipDipDirectionInterpolator(Interpolator):
 
         """
 
-        x, y, dip = self.setup_interpolation(map_data)
-        xi, yi = self.setup_grid(map_data)
+        self.setup_interpolation(map_data)
+        self.setup_grid(map_data)
 
         # interpolate each component of the normal vector nx, ny, nz
-        interpolated_dip = self.interpolator(x, y, dip, xi, yi)
+        interpolated_dip = self.interpolator(self.dip)
+        interpolated_dipdir = self.interpolator(self.dipdir)
+        interpolated = numpy.array([interpolated_dip, interpolated_dipdir]).T
 
-        return interpolated_dip
+        return interpolated

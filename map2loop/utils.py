@@ -53,15 +53,15 @@ def normal_vector_to_dipdirection_dip(nx, ny, nz):
     """
 
     # Calculate the dip direction in degrees, ranging from 0 to 360
-    dipdir = degrees(atan2(nx, ny)) % 360
+    dipdir = numpy.degrees(numpy.arctan2(nx, ny)) % 360
 
     # Calculate the dip angle in degrees, ranging from 0 to 90
-    dip = 90 - degrees(asin(nz))
+    dip = 90 - numpy.degrees(numpy.arcsin(nz))
 
     # If the dip angle is greater than 90 degrees, adjust the dip and dip direction
-    if dip > 90:
-        dip = 180 - dip
-        dipdir = dipdir + 180
+    mask = dip > 90
+    dip[mask] = 180 - dip[mask]
+    dipdir[mask] = (dipdir[mask] + 180) % 360
 
     # Ensure the dip direction is within the range of 0 to 360 degrees
     dipdir = dipdir % 360

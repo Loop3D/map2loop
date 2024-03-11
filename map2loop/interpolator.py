@@ -249,7 +249,7 @@ class NormalVectorInterpolator(Interpolator):
 
         Args:
             map_data (map2loop.MapData): a catchall so that access to all map data is available
-        """
+hw        """
         # Define the desired cell size
         cell_size = 0.01 * (map_data.bounding_box["maxx"] - map_data.bounding_box["minx"])
 

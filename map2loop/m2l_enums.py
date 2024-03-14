@@ -1,13 +1,6 @@
 from enum import IntEnum
 
 
-class Sampletype(IntEnum):
-    GEOLOGY = 0
-    STRUCTURE = 1
-    FAULT = 2
-    FOLD = 3
-    DTM = 4
-
 class Datatype(IntEnum):
     GEOLOGY = 0
     STRUCTURE = 1

@@ -174,8 +174,10 @@ class Map2ModelWrapper:
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
             df[0] = "Fault_" + df[0]
-            for j in range(len(df)):
-                df[1][j] = [i.strip("()").replace(" ", "").split(",") for i in df[1][j]]
+            relations = df[1]
+            for j in range(len(relations)):
+                relations[j] = [i.strip("()").replace(" ", "").split(",") for i in relations[j]]
+            df[1] = relations
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):

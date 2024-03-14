@@ -149,6 +149,9 @@ class SamplerSpacing(Sampler):
                     df2["ID"] = row["ID"]
                 else:
                     df2["ID"] = 0
-                df = pandas.concat([df, df2])
+                if len(df) == 0:
+                    df = df2
+                else:
+                    df = pandas.concat([df, df2])
         df.reset_index(drop=True, inplace=True)
         return df

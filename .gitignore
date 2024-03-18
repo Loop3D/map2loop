@@ -217,3 +217,4 @@ docs/source/_auto_examples
 examples/*_tmp
 *.loop3d
 m2l_data_tmp/*
+packages.txt

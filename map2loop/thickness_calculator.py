@@ -196,7 +196,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         DTM data to estimate unit thickness.
 
         The method works by iterating over the stratigraphic order of units. For each unit, it finds the basal contact
-        points and the top contact points. It then calculates the shortest line between these points. For each basal
+        points and the top contact line. It then calculates the shortest line between these points. For each basal
         contact point, it finds the interpolated points that are within 10% of the length of the shortest line. It then
         calculates the true thickness of the unit at these points using the formula t = L . sin dip, where L is the
         length of the line orthogonal to both contacts and dip is the dip of the interpolated points.

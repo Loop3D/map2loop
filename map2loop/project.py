@@ -2,7 +2,7 @@ import beartype
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
+from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorBeta, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint, SorterMaximiseContacts, SorterObservationProjections
 from .stratigraphic_column import StratigraphicColumn
@@ -19,6 +19,7 @@ from matplotlib.colors import to_rgba
 from osgeo import gdal
 
 
+# TODO: update the Z value to be the correct value from the DTM for all geometries
 class Project(object):
     """
     The main entry point into using map2loop
@@ -115,11 +116,12 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.sorter = SorterUseHint()
-        self.thickness_calculator = ThicknessCalculatorAlpha()
+        self.thickness_calculator = ThicknessCalculatorBeta()
         self.throw_calculator = ThrowCalculatorAlpha()
         self.loop_filename = loop_project_filename
 
         self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
+        self.sampled_data = []
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
@@ -379,6 +381,7 @@ class Project(object):
             self.thickness_calculator.compute(self.stratigraphic_column.stratigraphicUnits,
                                               self.stratigraphic_column.column,
                                               self.map_data.basal_contacts,
+                                              self.structure_samples,
                                               self.map_data)
 
     def apply_colour_to_units(self):
@@ -431,8 +434,8 @@ class Project(object):
 
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
-        self.calculate_unit_thicknesses()
         self.sample_map_data()
+        self.calculate_unit_thicknesses()
         self.summarise_fault_data()
         self.apply_colour_to_units()
         self.save_into_projectfile()

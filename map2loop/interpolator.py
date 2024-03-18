@@ -1,20 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Any
-
-# from Cython.Includes.numpy import ndarray
-from map2loop.m2l_enums import Datatype
+from typing import Any, Union
 import beartype
-import pandas
-import geopandas
 import numpy
-import math
-
 from numpy import ndarray
-from scipy.interpolate import Rbf
-from pandas import DataFrame
-
-from .mapdata import MapData
-from utils import strike_dip_vector
+from scipy.interpolate import Rbf, LinearNDInterpolator
+from .utils import strike_dip_vector, setup_grid
+import pandas
 
 
 class Interpolator(ABC):
@@ -42,38 +33,36 @@ class Interpolator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def setup_interpolation(self, map_data: MapData) -> Tuple[pandas.DataFrame, list, numpy.ndarray]:
+    def setup_interpolation(self, structure_data: pandas.DataFrame):
         """
         abstract method to setup interpolation (abstract method)
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            structure_data (pandas.DataFrame): sampled structural data
         """
         pass
 
     @beartype.beartype
     @abstractmethod
-    def setup_grid(self, map_data: MapData) -> Tuple[numpy.ndarray, list]:
+    def setup_grid(self, bounding_box: dict):
         """
         abstract method to setup an XY grid (abstract method)
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            bounding_box (dict): a dictionary containing the bounding box of the map data
         """
         pass
 
     @beartype.beartype
     @abstractmethod
-    def interpolator(self, x: float, y: float, ni: float, xi: float, yi: float) -> Tuple[numpy.ndarray, list]:
+    def interpolator(self, ni: Union[list, numpy.ndarray]):
         """
         Interpolator method
 
         Args:
-            x (float): x-coordinate of the point
-            y (float): y-coordinate of the point
+
             ni (int): number of points
-            xi (float): x-coordinate of the point
-            yi (float): z-coordinate of the point
+
 
         Returns:
             float: interpolated value
@@ -83,14 +72,19 @@ class Interpolator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def interpolate(self, map_data: MapData) -> list:
+    def interpolate(
+        self,
+        bounding_box: dict,
+        structure_data: pandas.DataFrame,
+        interpolator: Any = None,
+    ) -> Any:
         """
         Execute interpolate method (abstract method)
 
         Args:
-            contact_orientations (pandas.DataFrame): structural data with columns: 'X', 'Y', 'Z', 'dipDir/dipdir',
-            'dip', 'layer', 'name'
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            bounding_box (dict): a dictionary containing the bounding box of the map data
+            structure_data (pandas.DataFrame): sampled structural data
+            interpolator: type of interpolator to use by default SciPy Rbf interpolator
 
         Returns:
             list: sorted list of unit names
@@ -102,7 +96,7 @@ class Interpolator(ABC):
 class NormalVectorInterpolator(Interpolator):
     """
     This class is a subclass of the Interpolator abstract base class. It implements the normal vector interpolation
-    method for a given set of data points. The class is initialised without any arguments.
+    method for a given set of data points.
 
     Attributes:
         dataframe (pandas.DataFrame): A DataFrame that stores the processed data points for interpolation.
@@ -115,10 +109,10 @@ class NormalVectorInterpolator(Interpolator):
 
     Methods:
         type(): Returns the label of the interpolator.
-        setup_interpolation(map_data: MapData): Sets up the interpolation by preparing the data points for interpolation.
-        setup_grid(map_data: MapData): Sets up the grid for interpolation.
+        setup_interpolation(structure_data: pandas.DataFrame): Sets up the interpolation by preparing the data points for interpolation.
+        setup_grid(bounding_box: dict): Sets up the grid for interpolation.
         interpolator(ni: Any) -> numpy.ndarray: Performs the interpolation for a given set of values.
-        interpolate(map_data: MapData) -> numpy.ndarray: Executes the interpolation method.
+        interpolate(bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any) -> numpy.ndarray: Executes the interpolation method.
     """
 
     def __init__(self):
@@ -142,172 +136,176 @@ class NormalVectorInterpolator(Interpolator):
         return self.interpolator_label
 
     @beartype.beartype
-    def setup_interpolation(self, map_data: MapData):
+    def setup_interpolation(self, structure_data: pandas.DataFrame):
         """
         Setup the interpolation method (abstract method)
 
         Args:
-            contact_orientations (pandas.DataFrame): structural data with columns: 'X', 'Y', 'Z', 'dipDir/dipdir',
-            'dip', 'layer', 'name'
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            structure_data (pandas.DataFrame): sampled structural data
         """
-        # the following code is from LoopStructural
-        contact_orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
+        # the following code is a slightly modified version from LoopStructural's InputDataProcessor
         if (
-                "nx" not in contact_orientations.columns
-                or "ny" not in contact_orientations.columns
-                or "nz" not in contact_orientations.columns
+            "nx" not in structure_data.columns
+            or "ny" not in structure_data.columns
+            or "nz" not in structure_data.columns
         ):
             if (
-                    "strike" not in contact_orientations.columns
-                    and "azimuth" in contact_orientations.columns
+                "strike" not in structure_data.columns
+                and "azimuth" in structure_data.columns
             ):
-                contact_orientations["strike"] = contact_orientations["azimuth"] - 90
+                structure_data["strike"] = structure_data["azimuth"] - 90
             if (
-                    "strike" not in contact_orientations.columns
-                    and "dipdir" in contact_orientations.columns
+                "strike" not in structure_data.columns
+                and "dipdir" in structure_data.columns
             ):
-                contact_orientations["strike"] = contact_orientations["dipdir"] - 90
+                structure_data["strike"] = structure_data["dipdir"] - 90
+
             if (
-                    "strike" not in contact_orientations.columns
-                    and "dipDir" in contact_orientations.columns
+                "strike" not in structure_data.columns
+                and "dipDir" in structure_data.columns
             ):
-                contact_orientations["strike"] = contact_orientations["dipDir"] - 90
+                structure_data["strike"] = structure_data["dipDir"] - 90
             if (
-                    "strike" in contact_orientations.columns
-                    and "dip" in contact_orientations.columns
+                "strike" not in structure_data.columns
+                and "DIPDIR" in structure_data.columns
             ):
-                contact_orientations["nx"] = numpy.nan
-                contact_orientations["ny"] = numpy.nan
-                contact_orientations["nz"] = numpy.nan
-                contact_orientations[["nx", "ny", "nz"]] = strike_dip_vector(
-                    contact_orientations["strike"], contact_orientations["dip"]
+                structure_data["strike"] = structure_data["DIPDIR"] - 90
+
+            if "strike" in structure_data.columns and "dip" in structure_data.columns:
+                structure_data["nx"] = numpy.nan
+                structure_data["ny"] = numpy.nan
+                structure_data["nz"] = numpy.nan
+                structure_data[["nx", "ny", "nz"]] = strike_dip_vector(
+                    structure_data["strike"], structure_data["dip"]
                 )
+            if "strike" in structure_data.columns and "DIP" in structure_data.columns:
+                structure_data["nx"] = numpy.nan
+                structure_data["ny"] = numpy.nan
+                structure_data["nz"] = numpy.nan
+                structure_data[["nx", "ny", "nz"]] = strike_dip_vector(
+                    structure_data["strike"], structure_data["DIP"]
+                )
+
             if (
-                    "nx" not in contact_orientations.columns
-                    or "ny" not in contact_orientations.columns
-                    or "nz" not in contact_orientations.columns
+                "nx" not in structure_data.columns
+                or "ny" not in structure_data.columns
+                or "nz" not in structure_data.columns
             ):
                 raise ValueError(
                     "Contact orientation data must contain either strike/dipdir, dip, or nx, ny, nz"
                 )
 
             if (
-                    "X" not in contact_orientations.columns
-                    or "Y" not in contact_orientations.columns
-                    or "Z" not in contact_orientations.columns
+                "X" not in structure_data.columns
+                or "Y" not in structure_data.columns
+                or "Z" not in structure_data.columns
             ):
                 if (
-                        "X" not in contact_orientations.columns
-                        and "easting" in contact_orientations.columns
+                    "X" not in structure_data.columns
+                    and "easting" in structure_data.columns
                 ):
-                    contact_orientations["X"] = contact_orientations["easting"]
+                    structure_data["X"] = structure_data["easting"]
                 if (
-                        "X" not in contact_orientations.columns
-                        and "easting" not in contact_orientations.columns
+                    "X" not in structure_data.columns
+                    and "easting" not in structure_data.columns
                 ):
-                    contact_orientations["X"] = contact_orientations['geometry'].apply(lambda geom: geom.x)
+                    structure_data["X"] = structure_data["geometry"].apply(
+                        lambda geom: geom.x
+                    )
 
                 if (
-                        "Y" not in contact_orientations.columns
-                        and "northing" in contact_orientations.columns
+                    "Y" not in structure_data.columns
+                    and "northing" in structure_data.columns
                 ):
-                    contact_orientations["Y"] = contact_orientations["northing"]
+                    structure_data["Y"] = structure_data["northing"]
                 if (
-                        "Y" not in contact_orientations.columns
-                        and "northing" not in contact_orientations.columns
+                    "Y" not in structure_data.columns
+                    and "northing" not in structure_data.columns
                 ):
-                    contact_orientations["Y"] = contact_orientations['geometry'].apply(lambda geom: geom.y)
+                    structure_data["Y"] = structure_data["geometry"].apply(
+                        lambda geom: geom.y
+                    )
                 if (
-                        "Z" not in contact_orientations.columns
-                        and "altitude" in contact_orientations.columns
+                    "Z" not in structure_data.columns
+                    and "altitude" in structure_data.columns
                 ):
-                    contact_orientations["Z"] = contact_orientations["altitude"]
+                    structure_data["Z"] = structure_data["altitude"]
                 if (
-                        "Z" not in contact_orientations.columns
-                        and "altitude" not in contact_orientations.columns
+                    "Z" not in structure_data.columns
+                    and "altitude" not in structure_data.columns
                 ):
-                    contact_orientations["Z"] = 0
+                    structure_data["Z"] = 0
 
                 if (
-                        "X" not in contact_orientations.columns
-                        or "Y" not in contact_orientations.columns
-                        or "Z" not in contact_orientations.columns
+                    "X" not in structure_data.columns
+                    or "Y" not in structure_data.columns
+                    or "Z" not in structure_data.columns
                 ):
                     raise ValueError(
                         "Contact orientation data must contain either X, Y, Z or easting, northing, altitude"
                     )
 
-        self.dataframe = contact_orientations
-        self.x = self.dataframe['geometry'].apply(lambda geom: geom.x).to_numpy()
-        self.y = self.dataframe['geometry'].apply(lambda geom: geom.y).to_numpy()
+        self.dataframe = structure_data
+        self.x = structure_data["X"].to_numpy()
+        self.y = structure_data["Y"].to_numpy()
 
     @beartype.beartype
-    def setup_grid(self, map_data: MapData):
+    def setup_grid(self, bounding_box: dict):
         """
         Setup the grid for interpolation
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
-hw        """
-        # Define the desired cell size
-        cell_size = 0.01 * (map_data.bounding_box["maxx"] - map_data.bounding_box["minx"])
-
-        # Calculate the grid resolution
-        grid_resolution = round((map_data.bounding_box["maxx"] - map_data.bounding_box["minx"]) / cell_size)
-
-        # Generate the grid
-        x = numpy.linspace(
-            map_data.bounding_box["minx"], map_data.bounding_box["maxx"], grid_resolution
-        )
-        y = numpy.linspace(
-            map_data.bounding_box["miny"], map_data.bounding_box["maxy"], grid_resolution
-        )
-        xi, yi = numpy.meshgrid(x, y)
-        xi = xi.flatten()
-        yi = yi.flatten()
-
-        self.xi = xi
-        self.yi = yi
+            bounding_box
+        """
+        self.xi, self.yi = setup_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(self, ni: Any) -> numpy.ndarray:
-        # TODO: 1. add argument for type of interpolator. 2. add code to process different types of
-        #  interpolators from Scipy and use the chosen one
+    def interpolator(
+        self,
+        ni: Union[ndarray, list],
+        interpolator: Any = Rbf,
+    ) -> numpy.ndarray:
+        # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
 
         Args:
-            x (float): x-coordinate of the point
-            y (float): y-coordinate of the point
             ni (int): value to interpolate
-            xi (float): x-coordinate of the point where interpolation of ni is performed (grid point)
-            yi (float): y-coordinate of the point where interpolation of ni is performed (grid point)
+            interpolator: type of interpolator to use by default SciPy Rbf interpolator
 
         Returns:
             Rbf: radial basis function object
         """
+        if interpolator is Rbf:
+            rbf = Rbf(self.x, self.y, ni, function="linear")
+            return rbf(self.xi, self.yi)
 
-        rbf = Rbf(self.x, self.y, ni, function="linear")
-
-        return rbf(self.xi, self.yi)
+        if interpolator is LinearNDInterpolator:
+            lnd_interpolator = LinearNDInterpolator(list(zip(self.x, self.y)), ni)
+            return lnd_interpolator(self.xi, self.yi)
 
     @beartype.beartype
-    def interpolate(self, map_data: MapData) -> numpy.ndarray:
+    def interpolate(
+        self,
+        bounding_box: dict,
+        structure_data: pandas.DataFrame,
+        interpolator: Any = Rbf,
+    ) -> numpy.ndarray:
         """
         Execute interpolation method
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            bounding_box (dict): a dictionary containing the bounding box of the map data
+            structure_data (pandas.DataFrame): sampled structural data
+            interpolator: type of interpolator to use by default SciPy Rbf interpolator
 
         Returns:
             list: sorted list of unit names
 
         """
-        self.setup_interpolation(map_data)
-        self.setup_grid(map_data)
-
-        # nx, ny, nz = self.dataframe[["nx", "ny", "nz"]].to_numpy()
+        self.setup_interpolation(structure_data)
+        self.setup_grid(bounding_box)
+        # get normal vector components
         nx = self.dataframe["nx"].to_numpy()
         ny = self.dataframe["ny"].to_numpy()
         nz = self.dataframe["nz"].to_numpy()
@@ -318,6 +316,7 @@ hw        """
         nz_interp = self.interpolator(nz)
 
         vecs = numpy.array([nx_interp, ny_interp, nz_interp]).T
+        # normalize the vectors
         vecs /= numpy.linalg.norm(vecs, axis=1)[:, None]
 
         return vecs
@@ -331,10 +330,14 @@ class DipDipDirectionInterpolator(Interpolator):
         Interpolator(ABC): Derived from Abstract Base Class
     """
 
-    def __init__(self):
+    def __init__(self, data_type=None):
         """
         Initialiser of for IDWInterpolator
         """
+        if data_type is None:
+            self.data_type = ["dip", "dipdir"]
+        else:
+            self.data_type = data_type
         self.x = None
         self.y = None
         self.xi = None
@@ -353,82 +356,88 @@ class DipDipDirectionInterpolator(Interpolator):
         return self.interpolator_label
 
     @beartype.beartype
-    @abstractmethod
-    def setup_interpolation(self, map_data: MapData):
+    def setup_interpolation(self, structure_data: pandas.DataFrame):
         """
         Setup the interpolation method
+
+        Args:
+            structure_data (pandas.DataFrame): sampled structural data
         """
-        contact_orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
-        contact_orientations['x'] = contact_orientations['geometry'].apply(lambda geom: geom.x)
-        contact_orientations['y'] = contact_orientations['geometry'].apply(lambda geom: geom.y)
-        self.x, self.y = contact_orientations[['x', 'y']].to_list()
-        self.dip = contact_orientations["dip"].to_list()
-        self.dipdir = contact_orientations["dipdir"].to_list()
+
+        self.x = structure_data["X"].to_numpy()
+        self.y = structure_data["Y"].to_numpy()
+        if "dip" in self.data_type:
+            self.dip = structure_data["DIP"].to_numpy()
+        if "dipdir" in self.data_type:
+            self.dipdir = structure_data["DIPDIR"].to_numpy()
 
     @beartype.beartype
-    def setup_grid(self, map_data: MapData):
+    def setup_grid(self, bounding_box: dict):
         """
         Setup the grid for interpolation
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            bounding_box (dict): a dictionary containing the bounding box of the map data
         """
-        # Define the desired cell size
-        cell_size = 0.05 * (map_data.bounding_box["maxx"] - map_data.bounding_box["minx"])
-
-        # Calculate the grid resolution
-        grid_resolution = round((map_data.bounding_box["maxx"] - map_data.bounding_box["minx"]) / cell_size)
-
-        # Generate the grid
-        x = numpy.linspace(
-            map_data.bounding_box["minx"], map_data.bounding_box["maxx"], grid_resolution
-        )
-        y = numpy.linspace(
-            map_data.bounding_box["miny"], map_data.bounding_box["maxy"], grid_resolution
-        )
-        # generate the grid
-        xi, yi = numpy.meshgrid(x, y)
-        xi = xi.flatten()
-        yi = yi.flatten()
-        self.xi = xi
-        self.yi = yi
+        self.xi, self.yi = setup_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(self, ni: Any) -> numpy.ndarray:
+    def interpolator(
+        self,
+        ni: Union[ndarray, list],
+        interpolator: Any = Rbf,
+    ) -> numpy.ndarray:
+        # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
 
         Args:
-            ni (Any): list or numpy.ndarray of values to interpolate
-
+            ni (int): value to interpolate
+            interpolator: type of interpolator to use by default SciPy Rbf interpolator
 
         Returns:
             Rbf: radial basis function object
         """
+        if interpolator is Rbf:
+            rbf = Rbf(self.x, self.y, ni, function="linear")
+            return rbf(self.xi, self.yi)
 
-        rbf = Rbf(self.x, self.y, ni, function="linear")
-
-        return rbf(self.xi, self.yi)
+        if interpolator is LinearNDInterpolator:
+            lnd_interpolator = LinearNDInterpolator(list(zip(self.x, self.y)), ni)
+            return lnd_interpolator(self.xi, self.yi)
 
     @beartype.beartype
-    def interpolate(self, map_data: MapData) -> numpy.ndarray:
+    def interpolate(
+        self,
+        bounding_box: dict,
+        structure_data: pandas.DataFrame,
+        interpolator: Any = Rbf,
+    ):
         """
         Execute interpolation method (abstract method)
 
         Args:
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            bounding_box (dict): a dictionary containing the bounding box of the map data
+            structure_data (pandas.DataFrame): sampled structural data
+            interpolator (Union[Rbf, LinearNDInterpolator]): type of interpolator to use by default SciPy Rbf interpolator
 
         Returns:
-            list: sorted list of unit names
+            numpy.ndarray: interpolated dip and dip direction values
 
         """
 
-        self.setup_interpolation(map_data)
-        self.setup_grid(map_data)
+        self.setup_interpolation(structure_data)
+        self.setup_grid(bounding_box)
 
-        # interpolate each component of the normal vector nx, ny, nz
-        interpolated_dip = self.interpolator(self.dip)
-        interpolated_dipdir = self.interpolator(self.dipdir)
-        interpolated = numpy.array([interpolated_dip, interpolated_dipdir]).T
+        # interpolate dip and dip direction
+        if self.dip is not None and self.dipdir is not None:
+            interpolated_dip = self.interpolator(self.dip, interpolator)
+            interpolated_dipdir = self.interpolator(self.dipdir, interpolator)
+            interpolated = numpy.array([interpolated_dip, interpolated_dipdir]).T
+            return interpolated
 
-        return interpolated
+        if self.dip is not None and self.dipdir is None:
+            return self.interpolator(self.dip, interpolator)
+
+        if self.dipdir is not None and self.dip is None:
+            return self.interpolator(self.dipdir, interpolator)

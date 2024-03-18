@@ -1,6 +1,41 @@
 import numpy
-from math import radians, degrees, atan2, asin
 from shapely.geometry import Point
+import beartype
+
+
+@beartype.beartype
+def setup_grid(bounding_box: dict):
+    """
+    Setup the grid for interpolation
+
+    Args:
+        bounding_box
+
+    Returns:
+        xi, yi (numpy.ndarray, numpy.ndarray): The x and y coordinates of the grid points.
+    """
+    # Define the desired cell size
+    cell_size = 0.01 * (bounding_box["maxx"] - bounding_box["minx"])
+
+    # Calculate the grid resolution
+    grid_resolution = round((bounding_box["maxx"] - bounding_box["minx"]) / cell_size)
+
+    # Generate the grid
+    x = numpy.linspace(
+        bounding_box["minx"],
+        bounding_box["maxx"],
+        grid_resolution,
+    )
+    y = numpy.linspace(
+        bounding_box["miny"],
+        bounding_box["maxy"],
+        grid_resolution,
+    )
+    xi, yi = numpy.meshgrid(x, y)
+    xi = xi.flatten()
+    yi = yi.flatten()
+
+    return xi, yi
 
 
 def strike_dip_vector(strike, dip):
@@ -42,9 +77,9 @@ def normal_vector_to_dipdirection_dip(nx, ny, nz):
     This function calculates the dip and dip direction from a normal vector.
 
     Parameters:
-    nx (float): The x-component of the normal vector.
-    ny (float): The y-component of the normal vector.
-    nz (float): The z-component of the normal vector.
+    nx: The x-component of the normal vector.
+    ny: The y-component of the normal vector.
+    nz: The z-component of the normal vector.
 
     Returns:
     dip (float): The dip angle in degrees, ranging from 0 to 90.

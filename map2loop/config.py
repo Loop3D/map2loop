@@ -117,7 +117,7 @@ class Config:
             "otype": (self.structure_config, "orientation_type"),
             "dd": (self.structure_config, "dipdir_column"),
             "d": (self.structure_config, "dip_column"),
-            "sf": (self.structure_config, "desciption_column"),
+            "sf": (self.structure_config, "description_column"),
             "bedding": (self.structure_config, "bedding_text"),
             "bo": (self.structure_config, "overturned_column"),
             "btype": (self.structure_config, "overturned_text"),

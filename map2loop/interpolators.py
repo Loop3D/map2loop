@@ -73,10 +73,7 @@ class Interpolator(ABC):
     @beartype.beartype
     @abstractmethod
     def interpolate(
-        self,
-        bounding_box: dict,
-        structure_data: pandas.DataFrame,
-        interpolator: Any = None,
+        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = None
     ) -> Any:
         """
         Execute interpolate method (abstract method)
@@ -149,26 +146,14 @@ class NormalVectorInterpolator(Interpolator):
             or "ny" not in structure_data.columns
             or "nz" not in structure_data.columns
         ):
-            if (
-                "strike" not in structure_data.columns
-                and "azimuth" in structure_data.columns
-            ):
+            if "strike" not in structure_data.columns and "azimuth" in structure_data.columns:
                 structure_data["strike"] = structure_data["azimuth"] - 90
-            if (
-                "strike" not in structure_data.columns
-                and "dipdir" in structure_data.columns
-            ):
+            if "strike" not in structure_data.columns and "dipdir" in structure_data.columns:
                 structure_data["strike"] = structure_data["dipdir"] - 90
 
-            if (
-                "strike" not in structure_data.columns
-                and "dipDir" in structure_data.columns
-            ):
+            if "strike" not in structure_data.columns and "dipDir" in structure_data.columns:
                 structure_data["strike"] = structure_data["dipDir"] - 90
-            if (
-                "strike" not in structure_data.columns
-                and "DIPDIR" in structure_data.columns
-            ):
+            if "strike" not in structure_data.columns and "DIPDIR" in structure_data.columns:
                 structure_data["strike"] = structure_data["DIPDIR"] - 90
 
             if "strike" in structure_data.columns and "dip" in structure_data.columns:
@@ -200,40 +185,18 @@ class NormalVectorInterpolator(Interpolator):
                 or "Y" not in structure_data.columns
                 or "Z" not in structure_data.columns
             ):
-                if (
-                    "X" not in structure_data.columns
-                    and "easting" in structure_data.columns
-                ):
+                if "X" not in structure_data.columns and "easting" in structure_data.columns:
                     structure_data["X"] = structure_data["easting"]
-                if (
-                    "X" not in structure_data.columns
-                    and "easting" not in structure_data.columns
-                ):
-                    structure_data["X"] = structure_data["geometry"].apply(
-                        lambda geom: geom.x
-                    )
+                if "X" not in structure_data.columns and "easting" not in structure_data.columns:
+                    structure_data["X"] = structure_data["geometry"].apply(lambda geom: geom.x)
 
-                if (
-                    "Y" not in structure_data.columns
-                    and "northing" in structure_data.columns
-                ):
+                if "Y" not in structure_data.columns and "northing" in structure_data.columns:
                     structure_data["Y"] = structure_data["northing"]
-                if (
-                    "Y" not in structure_data.columns
-                    and "northing" not in structure_data.columns
-                ):
-                    structure_data["Y"] = structure_data["geometry"].apply(
-                        lambda geom: geom.y
-                    )
-                if (
-                    "Z" not in structure_data.columns
-                    and "altitude" in structure_data.columns
-                ):
+                if "Y" not in structure_data.columns and "northing" not in structure_data.columns:
+                    structure_data["Y"] = structure_data["geometry"].apply(lambda geom: geom.y)
+                if "Z" not in structure_data.columns and "altitude" in structure_data.columns:
                     structure_data["Z"] = structure_data["altitude"]
-                if (
-                    "Z" not in structure_data.columns
-                    and "altitude" not in structure_data.columns
-                ):
+                if "Z" not in structure_data.columns and "altitude" not in structure_data.columns:
                     structure_data["Z"] = 0
 
                 if (
@@ -260,11 +223,7 @@ class NormalVectorInterpolator(Interpolator):
         self.xi, self.yi = setup_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(
-        self,
-        ni: Union[ndarray, list],
-        interpolator: Any = Rbf,
-    ) -> numpy.ndarray:
+    def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
         # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
@@ -286,10 +245,7 @@ class NormalVectorInterpolator(Interpolator):
 
     @beartype.beartype
     def interpolate(
-        self,
-        bounding_box: dict,
-        structure_data: pandas.DataFrame,
-        interpolator: Any = Rbf,
+        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = Rbf
     ) -> numpy.ndarray:
         """
         Execute interpolation method
@@ -382,11 +338,7 @@ class DipDipDirectionInterpolator(Interpolator):
         self.xi, self.yi = setup_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(
-        self,
-        ni: Union[ndarray, list],
-        interpolator: Any = Rbf,
-    ) -> numpy.ndarray:
+    def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
         # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
@@ -408,10 +360,7 @@ class DipDipDirectionInterpolator(Interpolator):
 
     @beartype.beartype
     def interpolate(
-        self,
-        bounding_box: dict,
-        structure_data: pandas.DataFrame,
-        interpolator: Any = Rbf,
+        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = Rbf
     ):
         """
         Execute interpolation method (abstract method)

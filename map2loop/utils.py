@@ -21,16 +21,8 @@ def setup_grid(bounding_box: dict):
     grid_resolution = round((bounding_box["maxx"] - bounding_box["minx"]) / cell_size)
 
     # Generate the grid
-    x = numpy.linspace(
-        bounding_box["minx"],
-        bounding_box["maxx"],
-        grid_resolution,
-    )
-    y = numpy.linspace(
-        bounding_box["miny"],
-        bounding_box["maxy"],
-        grid_resolution,
-    )
+    x = numpy.linspace(bounding_box["minx"], bounding_box["maxx"], grid_resolution)
+    y = numpy.linspace(bounding_box["miny"], bounding_box["maxy"], grid_resolution)
     xi, yi = numpy.meshgrid(x, y)
     xi = xi.flatten()
     yi = yi.flatten()

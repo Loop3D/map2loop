@@ -8,8 +8,7 @@ Map2loop 3.0.6
 
 Generate 3D geological model inputs from geolocial maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 
-.. raw:: html
-   :file: http://tectonique.net/models/brockman_syncline.html
+`Brockman Syncline model, WA <http://tectonique.net/models/brockman_syncline.html>`_
 
 
 

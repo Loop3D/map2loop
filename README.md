@@ -6,7 +6,20 @@ Generate 3D geological model inputs from geological maps — a high-level implem
 
 ## Install
 
-You will need some flavour of conda (a Python package manager, [see here](https://docs.anaconda.com/anaconda/install/index.html)), as well as Python ≥ 3.8
+You will need some flavour of conda (a Python package manager, [see here](https://docs.anaconda.com/anaconda/install/index.html)), as well as Python ≥ 3.8. 
+
+### Adding  ```conda-forge``` to Anaconda channels
+map2loop installation may run smoother if ```conda-forge``` is added to the channels. 
+To check for that, run 
+
+```bash
+conda config --show channels
+```
+if conda-forge is not in the output, the channel can be added with:
+
+```bash
+conda config --add channels conda-forge
+```
 
 ### Run
 
@@ -38,8 +51,8 @@ git clone https://github.com/Loop3D/map2loop-3-notebooks
 Navigate into map2loop, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
 
 ```bash
-conda install -c loop3d --file dependencies.txt
-pip install .
+conda install -conda-forge -c loop3d --file dependencies.txt
+pip install -e .
 ```
 
 ## Building with Docker

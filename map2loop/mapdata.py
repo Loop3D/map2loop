@@ -71,6 +71,7 @@ class MapData:
         self.data = [None] * len(Datatype)
         self.contacts = None
         self.basal_contacts = None
+        self.sampled_contacts = None
         self.filenames = [None] * len(Datatype)
         # self.output_filenames = [None] * len(Datatype)
         self.dirtyflags = [True] * len(Datatype)

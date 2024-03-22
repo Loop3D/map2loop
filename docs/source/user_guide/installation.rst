@@ -53,7 +53,7 @@ Navigate into the map2loop folder, and issue the following to install map2loop a
 
 .. code-block::
    
-   conda install -conda-forge -c loop3d --file dependencies.txt
+   conda install -c conda-forge -c loop3d --file dependencies.txt
 
 To install map2loop in an editable environment run the following command:
 

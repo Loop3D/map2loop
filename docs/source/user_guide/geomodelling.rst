@@ -29,7 +29,7 @@ In order to use map2loop, you will first need to create a digital QGIS map conta
      - Represents orientation data (eg. bedding measurements, foliations etc) as points on your QGIS map
      - Point 
 Notes:
-~~~~~
+~~~~~~
 * If your map doesn’t have any faults in it, you will need to create a blank lineString shapefile to pass map2loop as an input. 
 * Axial trace data is not yet used by map2loop, so irrespective of whether you include it in the line shape file, you will have to manually add axial traces using LoopStructural. 
 * Faults are currently modelled using a single orientation measurement (dip and dip direction). This makes it difficult to model faults with changing dip using map2loop. This issue is currently being worked on, but in the meantime if you would like to model complex fault systems it may be best to use LoopStructural to generate these. 

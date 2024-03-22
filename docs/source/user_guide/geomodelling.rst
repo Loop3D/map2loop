@@ -28,6 +28,7 @@ In order to use map2loop, you will first need to create a digital QGIS map conta
    * - Orientation_data.shp
      - Represents orientation data (eg. bedding measurements, foliations etc) as points on your QGIS map
      - Point 
+     
 Notes:
 ~~~~~~
 * If your map doesn’t have any faults in it, you will need to create a blank lineString shapefile to pass map2loop as an input. 

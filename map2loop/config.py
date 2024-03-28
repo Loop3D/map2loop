@@ -69,6 +69,20 @@ class Config:
             "objectid_column": "ID",
         }
 
+    def to_dict(self):
+        """
+        Convert the config dictionary to a dictionary
+
+        Returns:
+            dict: The dictionary representation of the config
+        """
+        return {
+            "structure": self.structure_config,
+            "geology": self.geology_config,
+            "fault": self.fault_config,
+            "fold": self.fold_config,
+        }
+
     @beartype.beartype
     def update_from_dictionary(self, dictionary: dict, lower: bool = False):
         """

@@ -60,9 +60,9 @@ class AustraliaStateUrls:
         "NT": "",
     }
     aus_clut_urls = {
-        "WA": "https://gist.githubusercontent.com/yohanderose/8f7e2d57db9086fbe1a7c651b9e25996/raw/9144994d162662ec015321699c3658a8dbf57def/WA_clut.csv",
-        "QLD": "",
-        "SA": "https://gist.githubusercontent.com/yohanderose/c7927fa6f9a2b9e983eeec6941ad9f56/raw/253b33afee74fcb1d487ef1c12093134f31093f4/SA_clut.csv",
+        "WA": "https://loop3d.org/map2loop/clut_presets/WA_clut.csv",
+        "QLD": "https://loop3d.org/map2loop/clut_presets/QLD_clut.csv",
+        "SA": "https://loop3d.org/map2loop/clut_presets/SA_clut.csv",
         "VIC": "",
         "NSW": "",
         "ACT": "",

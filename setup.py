@@ -44,10 +44,7 @@ setuptools.setup(
     ],
     url="https://github.com/Loop3D/map2loop",
     packages=setuptools.find_packages(),
-    package_data={
-        "config_files": ["map2loop/_datasets/config_files/*.json"],
-        "clut_files": ["map2loop/_datasets/clut_files/*.csv"],
-    },
+    include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",

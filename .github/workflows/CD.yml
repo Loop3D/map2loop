@@ -52,7 +52,7 @@ jobs:
       - run: |
           cp CHANGELOG.md docs/source/CHANGELOG.md
           docker build . -t=docs -f docs/Dockerfile 
-          docker run -e DOCUMENTATION-TEST='True' -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
+          docker run -e DOCUMENTATION_TEST='True' -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:

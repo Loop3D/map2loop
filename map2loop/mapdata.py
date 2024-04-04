@@ -313,7 +313,7 @@ class MapData:
             lower = state == "SA"
 
             # Check if this is running a documentation test and use local datasets if so
-            if os.environ.get("DOCUMENTATION-TEST", False):
+            if os.environ.get("DOCUMENTATION_TEST", False):
                 import map2loop
 
                 dataset_path = os.path.join(os.path.dirname(map2loop.__file__), "_datasets")

@@ -47,6 +47,8 @@ jobs:
   documentation-test:
     runs-on: ubuntu-latest
     #needs: continuous-integration
+    env:
+      DOCUMENTATION-TEST: true
     steps:
       - uses: actions/checkout@v4
       - run: |

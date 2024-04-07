@@ -51,7 +51,7 @@ git clone https://github.com/Loop3D/map2loop-3-notebooks
 Navigate into map2loop, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
 
 ```bash
-conda install -conda-forge -c loop3d --file dependencies.txt
+conda install -c -conda-forge loop3d --file dependencies.txt
 pip install -e .
 ```
 

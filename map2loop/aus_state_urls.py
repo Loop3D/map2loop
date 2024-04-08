@@ -1,12 +1,15 @@
 # import pkg_resources
 
+
 def load_clut(state):
     stream = './map2loop/_datasets/clut_files/{}_clut.csv'.format(state)
     return stream
 
+
 def load_config(state):
     stream = './map2loop/_datasets/config_files/{}_config.json'.format(state)
     return stream
+
 
 class AustraliaStateUrls:
     aus_geology_urls = {
@@ -64,7 +67,7 @@ class AustraliaStateUrls:
         "QLD": load_config('QLD'),
         "SA": load_config('SA'),
         "VIC": load_config('VIC'),
-        "NSW":  load_config('NSW'),
+        "NSW": load_config('NSW'),
         "ACT": "",
         "TAS": load_config('TAS'),
         "NT": "",

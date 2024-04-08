@@ -1,6 +1,7 @@
 import numpy
-from shapely.geometry import Point
+import shapely
 import beartype
+from typing import Union
 
 
 @beartype.beartype
@@ -9,7 +10,14 @@ def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
     Setup the grid for interpolation
 
     Args:
-        bounding_box
+        bounding_box (dict): a dictionary containing the bounding box of the map data.
+            The bounding box dictionary should comply with the following format: {
+                "minx": value,
+                "maxx": value,
+                "miny": value,
+                "maxy": value,
+            }
+        grid_resolution (int, optional): The number of grid points in the x and y directions. Defaults to None.
 
     Returns:
         xi, yi (numpy.ndarray, numpy.ndarray): The x and y coordinates of the grid points.
@@ -33,20 +41,21 @@ def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
     return xi, yi
 
 
-def strike_dip_vector(strike, dip):
+def strike_dip_vector(strike: Union[float, list, numpy.ndarray],
+                      dip: Union[float, list, numpy.ndarray]) -> numpy.ndarray:
     """
-    This function calculates the strike-dip vector from the given strike and dip angles.
+    Calculates the strike-dip vector from the given strike and dip angles.
 
-    Parameters:
-    strike (float or array-like): The strike angle(s) in degrees. Can be a single value or an array of values.
-    dip (float or array-like): The dip angle(s) in degrees. Can be a single value or an array of values.
+    Args:
+        strike (Union[float, list, numpy.ndarray]): The strike angle(s) in degrees. Can be a single value or an array of values.
+        dip (Union[float, list, numpy.ndarray]): The dip angle(s) in degrees. Can be a single value or an array of values.
 
     Returns:
-    vec (numpy.ndarray): The calculated strike-dip vector(s). Each row corresponds to a vector,
-    and the columns correspond to the x, y, and z components of the vector.
+        numpy.ndarray: The calculated strike-dip vector(s). Each row corresponds to a vector,
+        and the columns correspond to the x, y, and z components of the vector.
 
     Note:
-    This code is adapted from LoopStructural.
+        This code is adapted from LoopStructural.
     """
 
     # Initialize a zero vector with the same length as the input strike and dip angles
@@ -67,26 +76,28 @@ def strike_dip_vector(strike, dip):
     return vec
 
 
-def normal_vector_to_dipdirection_dip(nx, ny, nz):
+@beartype.beartype
+def normal_vector_to_dipdirection_dip(normal_vector: numpy.ndarray) -> numpy.ndarray:
     """
-    This function calculates the dip and dip direction from a normal vector.
+    Calculates the dip and dip direction from a normal vector.
 
-    Parameters:
-    nx: The x-component of the normal vector.
-    ny: The y-component of the normal vector.
-    nz: The z-component of the normal vector.
+    Args:
+        normal_vector (numpy.ndarray): The normal vector(s) for which to calculate the dip and dip direction.
+            Each row corresponds to a vector, and the columns correspond to the x, y, and z components of the vector.
 
     Returns:
-    dip (float): The dip angle in degrees, ranging from 0 to 90.
-    dipdir (float): The dip direction in degrees, ranging from 0 to 360.
+        numpy.ndarray: The calculated dip and dip direction(s). Each row corresponds to a set of dip and dip direction,
+        and the columns correspond to the dip and dip direction, respectively.
 
+    Note:
+        This code is adapted from LoopStructural.
     """
 
     # Calculate the dip direction in degrees, ranging from 0 to 360
-    dipdir = numpy.degrees(numpy.arctan2(nx, ny)) % 360
+    dipdir = numpy.degrees(numpy.arctan2(normal_vector[:, 0], normal_vector[:, 1])) % 360
 
     # Calculate the dip angle in degrees, ranging from 0 to 90
-    dip = 90 - numpy.degrees(numpy.arcsin(nz))
+    dip = 90 - numpy.degrees(numpy.arcsin(normal_vector[:, 2]))
 
     # If the dip angle is greater than 90 degrees, adjust the dip and dip direction
     mask = dip > 90
@@ -95,13 +106,22 @@ def normal_vector_to_dipdirection_dip(nx, ny, nz):
 
     # Ensure the dip direction is within the range of 0 to 360 degrees
     dipdir = dipdir % 360
+    dip_dipdir = numpy.array([dip, dipdir]).T
 
-    return dip, dipdir
+    return dip_dipdir
 
 
-def create_points(xy):
-    points = []
-    for x, y in xy:
-        point = Point(x, y)
-        points.append(point)
+@beartype.beartype
+def create_points(xy: Union[list, tuple, numpy.ndarray]) -> shapely.points:
+    """
+    Creates a list of shapely Point objects from a list, tuple, or numpy array of coordinates.
+
+    Args:
+        xy (Union[list, tuple, numpy.ndarray]): A list, tuple, or numpy array of coordinates,
+        where each coordinate contains two elements representing the x and y coordinates of a point.
+
+    Returns:
+        shapely.points: A list of Point objects created from the input list of coordinates.
+    """
+    points = shapely.points(xy)
     return points

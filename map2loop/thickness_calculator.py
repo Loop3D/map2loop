@@ -12,6 +12,7 @@ from .utils import create_points
 from .m2l_enums import Datatype
 from shapely.geometry import Point, shape
 from shapely import dwithin, shortest_line
+import shapely
 
 
 class ThicknessCalculator(ABC):
@@ -216,7 +217,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
             "betaThickness" is the median thickness of the unit,
             "betaStdDev" is the standard deviation of the thickness of the unit
         """
-        
+
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"].copy()
         thicknesses = units.copy()
         # Set default value
@@ -296,7 +297,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                     basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
                     ].copy()
                 top_contact_geometry = [
-                    shape(geom.__geo_interface__) for geom in top_contact.geometry
+                    shapely.geometry.shape(geom.__geo_interface__) for geom in top_contact.geometry
                 ]
                 if basal_contact is not None and top_contact is not None:
                     interp_points = interpolated_orientations.loc[
@@ -310,7 +311,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                     _thickness = []
                     for j, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
-                        short_line = shortest_line(row.geometry, top_contact_geometry)
+                        short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         self.lines.append(short_line)
                         # extract the end points of the shortest line
                         p1 = numpy.asarray(short_line[0].coords[0])
@@ -325,7 +326,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                         # calculate the length of the shortest line
                         line_length = euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
-                        indices = dwithin(short_line, interp_points, line_length * 0.1)
+                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.1)
                         # get the dip of the points that are within
                         # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])

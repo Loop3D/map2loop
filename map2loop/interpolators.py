@@ -49,7 +49,13 @@ class Interpolator(ABC):
         abstract method to setup an XY grid (abstract method)
 
         Args:
-            bounding_box (dict): a dictionary containing the bounding box of the map data
+            bounding_box (dict): a dictionary containing the bounding box of the map data.
+            The bounding box dictionary should comply with the following format: {
+                "minx": value,
+                "maxx": value,
+                "miny": value,
+                "maxy": value,
+            }
         """
         pass
 
@@ -218,7 +224,13 @@ class NormalVectorInterpolator(Interpolator):
         Setup the grid for interpolation
 
         Args:
-            bounding_box
+            bounding_box (dict): a dictionary containing the bounding box of the map data.
+            The bounding box dictionary should comply with the following format: {
+                "minx": value,
+                "maxx": value,
+                "miny": value,
+                "maxy": value,
+            }
         """
         self.xi, self.yi = setup_grid(bounding_box)
 
@@ -333,7 +345,13 @@ class DipDipDirectionInterpolator(Interpolator):
         Setup the grid for interpolation
 
         Args:
-            bounding_box (dict): a dictionary containing the bounding box of the map data
+            bounding_box (dict): a dictionary containing the bounding box of the map data.
+            The bounding box dictionary should comply with the following format: {
+                "minx": value,
+                "maxx": value,
+                "miny": value,
+                "maxy": value,
+            }
         """
         self.xi, self.yi = setup_grid(bounding_box)
 

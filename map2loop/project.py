@@ -602,7 +602,7 @@ class Project(object):
         stratigraphic_data["colour2Blue"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
-        LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data, verbose=True)
+        LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
 
         # Save contacts
         contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
@@ -610,7 +610,7 @@ class Project(object):
         contacts_data["easting"] = self.sampled_contacts["X"]
         contacts_data["northing"] = self.sampled_contacts["Y"]
         contacts_data["altitude"] = self.sampled_contacts["Z"]
-        LPF.Set(self.loop_filename, "contacts", data=contacts_data, verbose=True)
+        LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
         faults_obs_data = numpy.zeros(
@@ -637,7 +637,7 @@ class Project(object):
         faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
         faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0
-        LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data, verbose=True)
+        LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data)
 
         faults = self.deformation_history.get_faults_for_export()
         faults_data = numpy.zeros(len(faults), LPF.faultEventType)
@@ -662,7 +662,7 @@ class Project(object):
         faults_data["avgNormalEasting"] = faults["avgNormalX"]
         faults_data["avgNormalNorthing"] = faults["avgNormalY"]
         faults_data["avgNormalAltitude"] = faults["avgNormalZ"]
-        LPF.Set(self.loop_filename, "faultLog", data=faults_data, verbose=True)
+        LPF.Set(self.loop_filename, "faultLog", data=faults_data)
 
         # Save structural information
         observations = numpy.zeros(len(self.structure_samples), LPF.stratigraphicObservationType)
@@ -674,7 +674,7 @@ class Project(object):
         observations["dipDir"] = self.structure_samples["DIPDIR"]
         observations["dip"] = self.structure_samples["DIP"]
         observations["dipPolarity"] = self.structure_samples["OVERTURNED"]
-        LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations, verbose=True)
+        LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations)
 
         if self.map2model.fault_fault_relationships is not None:
             ff_relationships = self.deformation_history.get_fault_relationships_with_ids(
@@ -687,7 +687,7 @@ class Project(object):
             relationships["bidirectional"] = True
             relationships["angle"] = ff_relationships["Angle"]
             relationships["type"] = LPF.EventRelationshipType.FAULT_FAULT_ABUT
-            LPF.Set(self.loop_filename, "eventRelationships", data=relationships, verbose=True)
+            LPF.Set(self.loop_filename, "eventRelationships", data=relationships)
 
     @beartype.beartype
     def draw_geology_map(self, points: pandas.DataFrame = None, overlay: str = ""):

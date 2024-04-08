@@ -79,7 +79,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         self,
         units: pandas.DataFrame,
         stratigraphic_order: list,
-        basal_contacts: pandas.DataFrame,
+        basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -189,7 +189,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         self,
         units: pandas.DataFrame,
         stratigraphic_order: list,
-        basal_contacts: pandas.DataFrame,
+        basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -207,7 +207,8 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         Args:
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
-            basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
+            the contacts (columns must contain ["ID","basal_unit","type","geometry"])
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 

@@ -4,7 +4,7 @@ import beartype
 
 
 @beartype.beartype
-def setup_grid(bounding_box: dict):
+def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
     """
     Setup the grid for interpolation
 
@@ -13,12 +13,15 @@ def setup_grid(bounding_box: dict):
 
     Returns:
         xi, yi (numpy.ndarray, numpy.ndarray): The x and y coordinates of the grid points.
+        grid_resolution (int): The number of grid points in the x and y directions.
     """
+
     # Define the desired cell size
     cell_size = 0.01 * (bounding_box["maxx"] - bounding_box["minx"])
 
-    # Calculate the grid resolution
-    grid_resolution = round((bounding_box["maxx"] - bounding_box["minx"]) / cell_size)
+    if grid_resolution is None:
+        # Calculate the grid resolution
+        grid_resolution = round((bounding_box["maxx"] - bounding_box["minx"]) / cell_size)
 
     # Generate the grid
     x = numpy.linspace(bounding_box["minx"], bounding_box["maxx"], grid_resolution)

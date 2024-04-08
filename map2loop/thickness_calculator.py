@@ -40,12 +40,12 @@ class ThicknessCalculator(ABC):
     @beartype.beartype
     @abstractmethod
     def compute(
-        self,
-        units: pandas.DataFrame,
-        stratigraphic_order: list,
-        basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
-        map_data: MapData,
+            self,
+            units: pandas.DataFrame,
+            stratigraphic_order: list,
+            basal_contacts: geopandas.GeoDataFrame,
+            structure_data: pandas.DataFrame,
+            map_data: MapData,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method (abstract method)
@@ -76,12 +76,12 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
 
     @beartype.beartype
     def compute(
-        self,
-        units: pandas.DataFrame,
-        stratigraphic_order: list,
-        basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
-        map_data: MapData,
+            self,
+            units: pandas.DataFrame,
+            stratigraphic_order: list,
+            basal_contacts: geopandas.GeoDataFrame,
+            structure_data: pandas.DataFrame,
+            map_data: MapData,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts and stratigraphic order and attempts to estimate unit thickness.
@@ -113,15 +113,15 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         for i in range(1, len(stratigraphic_order) - 1):
             # Compare basal contacts of adjacent units
             if (
-                stratigraphic_order[i] in basal_unit_list
-                and stratigraphic_order[i + 1] in basal_unit_list
+                    stratigraphic_order[i] in basal_unit_list
+                    and stratigraphic_order[i + 1] in basal_unit_list
             ):
                 contact1 = basal_contacts[
                     basal_contacts["basal_unit"] == stratigraphic_order[i]
-                ]["geometry"].to_list()[0]
+                    ]["geometry"].to_list()[0]
                 contact2 = basal_contacts[
                     basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
-                ]["geometry"].to_list()[0]
+                    ]["geometry"].to_list()[0]
                 if contact1 is not None and contact2 is not None:
                     distance = contact1.distance(contact2)
                 else:
@@ -140,7 +140,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
             idx = thicknesses.index[
                 thicknesses["name"] == stratigraphic_order[i]
-            ].tolist()[0]
+                ].tolist()[0]
             if thicknesses.loc[idx, "thickness"] == -1:
                 val = distance
             else:
@@ -183,15 +183,14 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         self.thickness_calculator_label = "ThicknessCalculatorBeta"
         self.lines = []
 
-
     @beartype.beartype
     def compute(
-        self,
-        units: pandas.DataFrame,
-        stratigraphic_order: list,
-        basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
-        map_data: MapData,
+            self,
+            units: pandas.DataFrame,
+            stratigraphic_order: list,
+            basal_contacts: geopandas.GeoDataFrame,
+            structure_data: pandas.DataFrame,
+            map_data: MapData,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts, stratigraphic order, orientation data and
@@ -213,12 +212,17 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
-            pandas.DataFrame: units dataframe with added thickness column
+            pandas.DataFrame: units dataframe with added thickness columns:
+            "betaThickness" is the median thickness of the unit,
+            "betaStdDev" is the standard deviation of the thickness of the unit
         """
+        
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"].copy()
         thicknesses = units.copy()
         # Set default value
+        # thicknesses["betaThickness"] is the median thickness of the unit
         thicknesses["betaThickness"] = -1.0
+        # thicknesses["betaStdDev"] is the standard deviation of the thickness of the unit
         thicknesses["betaStdDev"] = 0
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
@@ -282,15 +286,15 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
 
         for i in range(0, len(stratigraphic_order) - 1):
             if (
-                stratigraphic_order[i] in basal_unit_list
-                and stratigraphic_order[i + 1] in basal_unit_list
+                    stratigraphic_order[i] in basal_unit_list
+                    and stratigraphic_order[i + 1] in basal_unit_list
             ):
                 basal_contact = contacts.loc[
                     contacts["basal_unit"] == stratigraphic_order[i]
-                ].copy()
+                    ].copy()
                 top_contact = basal_contacts.loc[
                     basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
-                ].copy()
+                    ].copy()
                 top_contact_geometry = [
                     shape(geom.__geo_interface__) for geom in top_contact.geometry
                 ]
@@ -310,7 +314,10 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                         self.lines.append(short_line)
                         # extract the end points of the shortest line
                         p1 = numpy.asarray(short_line[0].coords[0])
-                        p2 = numpy.asarray(short_line[0].coords[-1])
+                        # create array to store xyz coordinates of the end point p2
+                        p2 = numpy.zeros(3)
+                        p2[0] = numpy.asarray(short_line[0].coords[-1][0])
+                        p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(
                             Datatype.DTM, p2[0], p2[1]
@@ -335,7 +342,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
 
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]
-                    ].tolist()[0]
+                        ].tolist()[0]
                     thicknesses.loc[idx, "betaThickness"] = median
                     thicknesses.loc[idx, "betaStdDev"] = std_dev
             else:

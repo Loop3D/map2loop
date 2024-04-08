@@ -4,7 +4,7 @@ import beartype
 import numpy
 from numpy import ndarray
 from scipy.interpolate import Rbf, LinearNDInterpolator
-from .utils import strike_dip_vector, setup_grid
+from .utils import strike_dip_vector, generate_grid
 import pandas
 
 
@@ -232,7 +232,7 @@ class NormalVectorInterpolator(Interpolator):
                 "maxy": value,
             }
         """
-        self.xi, self.yi = setup_grid(bounding_box)
+        self.xi, self.yi = generate_grid(bounding_box)
 
     @beartype.beartype
     def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
@@ -353,7 +353,7 @@ class DipDipDirectionInterpolator(Interpolator):
                 "maxy": value,
             }
         """
-        self.xi, self.yi = setup_grid(bounding_box)
+        self.xi, self.yi = generate_grid(bounding_box)
 
     @beartype.beartype
     def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:

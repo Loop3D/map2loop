@@ -2,9 +2,11 @@
 import site
 import os
 
+
 def load_clut(state):
     stream = './map2loop/_datasets/clut_files/{}_clut.csv'.format(state)
     return stream
+
 
 def get_install_path():
     site_packages = site.getsitepackages()
@@ -12,12 +14,15 @@ def get_install_path():
         package_path = os.path.join(site_package, 'map2loop')
     return package_path
 
+
 def load_config(state):
-    stream = os.path.join(get_install_path(), 'map2loop\\_datasets\\config_files\\{}_config.json'.format(state))
+    stream = os.path.join(
+        get_install_path(), 'map2loop\\_datasets\\config_files\\{}_config.json'.format(state)
+    )
     return stream
+
+
 ######## this works if map2loop is NOT installed in editable mode
-
-
 
 
 class AustraliaStateUrls:

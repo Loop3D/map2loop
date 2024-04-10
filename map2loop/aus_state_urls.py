@@ -13,7 +13,7 @@ def load_clut(state):
 
 def load_config(state):
     stream = os.path.join(
-        module_path, pathlib.Path('_datasets\\config_files\\{}_config.json'.format(state))
+        module_path, pathlib.Path('_datasets\\config_files\\{}.json'.format(state))
     )
     return stream
 

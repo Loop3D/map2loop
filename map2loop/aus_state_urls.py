@@ -3,12 +3,18 @@ import pathlib
 
 module_path = os.path.dirname(__file__)
 
+
 def load_clut(state):
-    stream = os.path.join(module_path, pathlib.Path('_datasets\\clut_files\\{}_clut.csv'.format(state)))
+    stream = os.path.join(
+        module_path, pathlib.Path('_datasets\\clut_files\\{}_clut.csv'.format(state))
+    )
     return stream
 
+
 def load_config(state):
-    stream = os.path.join(module_path, pathlib.Path('_datasets\\config_files\\{}_config.json'.format(state)))
+    stream = os.path.join(
+        module_path, pathlib.Path('_datasets\\config_files\\{}_config.json'.format(state))
+    )
     return stream
 
 

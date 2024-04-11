@@ -154,8 +154,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
         thicknesses["thickness"] = thicknesses.apply(
-            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"],
-            axis=1,
+            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1
         )
         return thicknesses
 
@@ -294,12 +293,10 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                 ]
                 if basal_contact is not None and top_contact is not None:
                     interp_points = interpolated_orientations.loc[
-                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i],
-                        "geometry",
+                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "geometry"
                     ].copy()
                     dip = interpolated_orientations.loc[
-                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i],
-                        "dip",
+                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
                     _thickness = []
                     for _, row in basal_contact.iterrows():

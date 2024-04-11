@@ -113,7 +113,7 @@ def normal_vector_to_dipdirection_dip(normal_vector: numpy.ndarray) -> numpy.nda
 
 
 @beartype.beartype
-def create_points(xy: Union[list, tuple, numpy.ndarray]) -> shapely.points:
+def create_points(xy: Union[list, tuple, numpy.ndarray]):
     """
     Creates a list of shapely Point objects from a list, tuple, or numpy array of coordinates.
 

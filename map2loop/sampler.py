@@ -139,12 +139,14 @@ class SamplerSpacing(Sampler):
                 targets = []
 
             # For the main cases Polygon and LineString the list 'targets' has one element
-            for target in targets:
+            for i, target in enumerate(targets):
                 df2 = pandas.DataFrame(columns=schema.keys()).astype(schema)
                 distances = numpy.arange(0, target.length, self.spacing)[:-1]
                 points = [target.interpolate(distance) for distance in distances]
                 df2["X"] = [point.x for point in points]
                 df2["Y"] = [point.y for point in points]
+                df2['segNum'] = i
+
                 if "ID" in spatial_data.columns:
                     df2["ID"] = row["ID"]
                 else:
@@ -152,6 +154,7 @@ class SamplerSpacing(Sampler):
                 if len(df) == 0:
                     df = df2
                 else:
-                    df = pandas.concat([df, df2])
+                    df = pandas.concat([df, df2])                
+
         df.reset_index(drop=True, inplace=True)
         return df

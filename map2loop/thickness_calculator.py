@@ -302,7 +302,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                         "dip",
                     ].to_numpy()
                     _thickness = []
-                    for j, row in basal_contact.iterrows():
+                    for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         self.lines.append(short_line)

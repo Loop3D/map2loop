@@ -312,10 +312,24 @@ class MapData:
             self.set_filename(Datatype.FOLD, AustraliaStateUrls.aus_fold_urls[state])
             self.set_filename(Datatype.DTM, "au")
             lower = state == "SA"
-            self.set_config_filename(
-                AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
-            )
-            self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
+
+            # Check if this is running a documentation test and use local datasets if so
+            if os.environ.get("DOCUMENTATION_TEST", False):
+                import map2loop
+
+                dataset_path = os.path.join(os.path.dirname(map2loop.__file__), "_datasets")
+                self.set_config_filename(
+                    os.path.join(dataset_path, "config_files", state + ".json")
+                )
+                self.set_colour_filename(
+                    os.path.join(dataset_path, "clut_files", state + "_clut.csv")
+                )
+            else:
+                self.set_config_filename(
+                    AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
+                )
+                self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
+            print(self.config_filename)
         else:
             raise ValueError(f"Australian state {state} not in state url database")
 

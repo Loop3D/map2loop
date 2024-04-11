@@ -608,11 +608,11 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.sampled_contacts["ID"]
-        contacts_data["easting"] = self.sampled_contacts["X"]
-        contacts_data["northing"] = self.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.sampled_contacts["Z"]
+        contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
+        contacts_data["layerId"] = self.map_data.sampled_contacts["ID"]
+        contacts_data["easting"] = self.map_data.sampled_contacts["X"]
+        contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
+        contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information

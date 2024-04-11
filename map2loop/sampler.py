@@ -154,7 +154,7 @@ class SamplerSpacing(Sampler):
                 if len(df) == 0:
                     df = df2
                 else:
-                    df = pandas.concat([df, df2])                
+                    df = pandas.concat([df, df2])
 
         df.reset_index(drop=True, inplace=True)
         return df

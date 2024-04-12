@@ -102,6 +102,7 @@ html_static_path = ["_static"]
 autosummary_mock_imports = ["LoopStructural.interpolators._cython"]
 # Sphinx gallery examples
 
+
 try:
     from LoopStructural.visualisation.sphinx_scraper import Scraper as LoopScraper
     from sphinx_gallery.sorting import ExampleTitleSortKey

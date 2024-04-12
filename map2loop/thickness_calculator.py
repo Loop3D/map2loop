@@ -1,17 +1,19 @@
 from abc import ABC, abstractmethod
+from .m2l_enums import Datatype, SampleType
+from .sample_storage import SampleSupervisor
+from .interpolators import DipDipDirectionInterpolator
+from .mapdata import MapData
+from .utils import create_points
 import beartype
 import numpy
 from scipy.spatial.distance import euclidean
 import pandas
 import geopandas
 from statistics import mean
-from .mapdata import MapData
 from scipy.interpolate import Rbf
-from .interpolators import DipDipDirectionInterpolator
-from .utils import create_points
-from .m2l_enums import Datatype
 from shapely.geometry import Point
 import shapely
+
 
 
 class ThicknessCalculator(ABC):
@@ -44,7 +46,7 @@ class ThicknessCalculator(ABC):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -54,7 +56,7 @@ class ThicknessCalculator(ABC):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            structure_data (pandas.DataFrame): sampled structural data
+            samples (SampleSupervisor): a catchall to access all sample data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
@@ -80,7 +82,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -91,7 +93,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            structure_data (pandas.DataFrame): sampled structural data
+            samples (SampleSupervisor): a catchall to access all sample data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
@@ -187,7 +189,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -206,7 +208,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
             the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            structure_data (pandas.DataFrame): sampled structural data
+            samples (SampleSupervisor): a catchall to access all sample data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
@@ -225,8 +227,8 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
-        # get the sampled contacts
-        contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
+        # get the sampled contacts using the sample supervisor
+        contacts = geopandas.GeoDataFrame(samples(SampleType.CONTACT))
         # build points from x and y coordinates
         contacts["geometry"] = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
         # set the crs of the contacts to the crs of the units
@@ -243,7 +245,8 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         bounding_box = map_data.get_bounding_box()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator.interpolate(bounding_box, structure_data, interpolator=Rbf)
+        structural_data = samples(SampleType.STRUCTURE)
+        dip = interpolator.interpolate(bounding_box, structural_data, interpolator=Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame

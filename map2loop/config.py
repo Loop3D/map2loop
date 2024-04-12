@@ -131,7 +131,7 @@ class Config:
             "otype": (self.structure_config, "orientation_type"),
             "dd": (self.structure_config, "dipdir_column"),
             "d": (self.structure_config, "dip_column"),
-            "sf": (self.structure_config, "description_column"),
+            "sf": (self.structure_config, "desciption_column"),
             "bedding": (self.structure_config, "bedding_text"),
             "bo": (self.structure_config, "overturned_column"),
             "btype": (self.structure_config, "overturned_text"),
@@ -217,6 +217,8 @@ class Config:
             err_string = f"There is a problem parsing the config file ({filename}).\n"
             if filename.startswith("http"):
                 err_string += "Please check the file is accessible online and then\n"
+            else:
+                err_string += "Please check the file exists and is accessible then\n"
             if not legacy_format:
                 err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
             err_string += "Check the contents for mismatched quotes or brackets!"

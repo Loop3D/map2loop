@@ -7,9 +7,7 @@ from map2loop.sampler import SamplerSpacing
 test_geology_shapefile = pandas.read_csv("geology_test.csv")
 test_geology_shapefile['geometry'] = test_geology_shapefile['geometry'].apply(shapely.wkt.loads)
 
-test_geology_shapefile = geopandas.GeoDataFrame(
-    test_geology_shapefile, crs = 'epsg:7854',
-)
+test_geology_shapefile = geopandas.GeoDataFrame(test_geology_shapefile, crs='epsg:7854')
 
 sampler = SamplerSpacing(spacing=50.0)
 

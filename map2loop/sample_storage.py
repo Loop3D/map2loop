@@ -3,7 +3,10 @@ from .m2l_enums import Datatype, SampleType, StateType
 from .sampler import SamplerDecimator, SamplerSpacing, Sampler
 import beartype
 from .mapdata import MapData
-from .project import Project
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .project import Project
 
 
 class AccessStorage(ABC):
@@ -59,8 +62,7 @@ class SampleSupervisor(AccessStorage):
            map_data (MapData): The map data associated with the project.
     """
 
-    @beartype.beartype
-    def __init__(self, project: Project):
+    def __init__(self, project: 'Project'):
 
         """
              The constructor for the SampleSupervisor class.
@@ -69,7 +71,7 @@ class SampleSupervisor(AccessStorage):
                  project (Project): The Project class associated with the SampleSupervisor.
         """
 
-        self.storage_label = "SampleAdministrator"
+        self.storage_label = "SampleSupervisor"
         self.samples = [None] * len(SampleType)
         self.samplers = [None] * len(SampleType)
         self.sampler_dirtyflags = [True] * len(SampleType)
@@ -86,6 +88,7 @@ class SampleSupervisor(AccessStorage):
         Initialisation function to set or reset the point samplers
         """
         self.samplers[SampleType.STRUCTURE] = SamplerDecimator(1)
+        self.samplers[SampleType.FAULT_ORIENTATION] = SamplerDecimator(1)
         self.samplers[SampleType.GEOLOGY] = SamplerSpacing(50.0)
         self.samplers[SampleType.FAULT] = SamplerSpacing(50.0)
         self.samplers[SampleType.FOLD] = SamplerSpacing(50.0)
@@ -135,6 +138,7 @@ class SampleSupervisor(AccessStorage):
 
         # store the sample data
         self.samples[sampletype] = data
+        self.sampler_dirtyflags[sampletype] = False
 
     @beartype.beartype
     def check_state(self, sampletype: SampleType):
@@ -156,15 +160,16 @@ class SampleSupervisor(AccessStorage):
          Args:
              sampletype (SampleType): The type of the sample.
          """
+        datatype = Datatype(sampletype)
 
-        if sampletype == SampleType.DTM:
+        if datatype == Datatype.DTM:
 
-            self.map_data.load_raster_map_data(SampleType.DTM)
+            self.map_data.load_raster_map_data(datatype)
 
         else:
 
             # load map data
-            self.map_data.load_map_data(sampletype)
+            self.map_data.load_map_data(datatype)
 
     @beartype.beartype
     def process(self, sampletype: SampleType):
@@ -179,14 +184,13 @@ class SampleSupervisor(AccessStorage):
         if sampletype == SampleType.CONTACT:
 
             self.store(SampleType.CONTACT, self.samplers[SampleType.CONTACT].sample(
-                self.map_data.get_map_data(Datatype.GEOLOGY),
-                self.map_data.basal_contacts
-            ))
+                self.map_data.basal_contacts, self.map_data)
+                       )
 
         else:
-
+            datatype = Datatype(sampletype)
             self.store(sampletype, self.samplers[sampletype].sample(
-                self.map_data.get_map_data(sampletype), self.map_data
+                self.map_data.get_map_data(datatype), self.map_data
             ))
 
     @beartype.beartype
@@ -199,7 +203,6 @@ class SampleSupervisor(AccessStorage):
             sampletype (SampleType): The type of the sample.
         """
 
-        # TODO: implement reprocessing of data in Project()
         if sampletype == SampleType.GEOLOGY or sampletype == SampleType.CONTACT:
 
             self.map_data.extract_all_contacts()
@@ -213,6 +216,7 @@ class SampleSupervisor(AccessStorage):
                 self.project.sort_stratigraphic_column()
 
             self.project.extract_geology_contacts()
+            self.process(SampleType.GEOLOGY)
 
         elif sampletype == SampleType.STRUCTURE:
 
@@ -253,6 +257,7 @@ class SampleSupervisor(AccessStorage):
                 return self.samples[sampletype]
 
             if self.dirtyflags[StateType.DATA] is False:
+                self.process(sampletype)
                 return self.samples[sampletype]
 
         # return the requested sample after reprocessing if the data is changed

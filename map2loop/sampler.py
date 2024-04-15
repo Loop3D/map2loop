@@ -145,17 +145,18 @@ class SamplerSpacing(Sampler):
                 points = [target.interpolate(distance) for distance in distances]
                 df2["X"] = [point.x for point in points]
                 df2["Y"] = [point.y for point in points]
-                
+
                 # # account for holes//rings in polygons
                 df2["segNum"] = str(a)
-                if target.is_ring: # 1. check if line is "closed"
+                if target.is_ring:  # 1. check if line is "closed"
                     target_polygon = shapely.geometry.Polygon(target)
-                    if target_polygon.exterior.is_ccw: #if counterclockwise --> hole
-                        for j, target2 in enumerate(targets): # which poly is the hole in? assign segnum of the same poly
+                    if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
+                        for j, target2 in enumerate(
+                            targets
+                        ):  # which poly is the hole in? assign segnum of the same poly
                             t2_polygon = shapely.geometry.Polygon(target2)
-                            if target.within(t2_polygon):# 
+                            if target.within(t2_polygon):  #
                                 df2['segNum'] = str(j)
-                
 
                 if "ID" in spatial_data.columns:
                     df2["ID"] = row["ID"]

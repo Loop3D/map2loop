@@ -134,6 +134,9 @@ class Project(object):
 
         self.sample_supervisor = SampleSupervisor(self)
         self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"])
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -445,8 +448,8 @@ class Project(object):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.sample_supervisor(SampleType.FAULT))
 
+        self.map_data.get_value_from_raster_df(Datatype.DTM, self.sample_supervisor(SampleType.FAULT))
         self.deformation_history.summarise_data(self.sample_supervisor(SampleType.FAULT))
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
@@ -636,7 +639,7 @@ class Project(object):
         LPF.Set(self.loop_filename, "faultLog", data=faults_data, verbose=True)
 
         # Save structural information
-        observations = numpy.zeros(len(self.structure_samples), LPF.stratigraphicObservationType)
+        observations = numpy.zeros(len(self.sample_supervisor(SampleType.STRUCTURE)), LPF.stratigraphicObservationType)
         observations["layer"] = "s0"
         observations["layerId"] = self.sample_supervisor(SampleType.STRUCTURE)["layerID"]
         observations["easting"] = self.sample_supervisor(SampleType.STRUCTURE)["X"]

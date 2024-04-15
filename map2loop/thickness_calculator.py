@@ -156,8 +156,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
         thicknesses["thickness"] = thicknesses.apply(
-            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"],
-            axis=1,
+            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1
         )
         return thicknesses
 
@@ -297,15 +296,13 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                 ]
                 if basal_contact is not None and top_contact is not None:
                     interp_points = interpolated_orientations.loc[
-                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i],
-                        "geometry",
+                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "geometry"
                     ].copy()
                     dip = interpolated_orientations.loc[
-                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i],
-                        "dip",
+                        interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
                     _thickness = []
-                    for j, row in basal_contact.iterrows():
+                    for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         self.lines.append(short_line)

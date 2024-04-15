@@ -18,9 +18,6 @@ def load_config(state):
     return stream
 
 
-######## this works if map2loop is NOT installed in editable mode
-
-
 class AustraliaStateUrls:
     aus_geology_urls = {
         "WA": "http://13.211.217.129:8080/geoserver/loop/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=loop:500k_geol_28350&bbox={BBOX_STR}&srs=EPSG:28350&outputFormat=shape-zip",

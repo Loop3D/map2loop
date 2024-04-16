@@ -386,8 +386,10 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        self.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.sampled_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
+            self.map_data.basal_contacts
+        )
+        self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -443,6 +445,7 @@ class Project(object):
             self.stratigraphic_column.stratigraphicUnits,
             self.stratigraphic_column.column,
             self.map_data.basal_contacts,
+            self.structure_samples,
             self.map_data,
         )
 
@@ -507,8 +510,8 @@ class Project(object):
 
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
-        self.calculate_unit_thicknesses()
         self.sample_map_data()
+        self.calculate_unit_thicknesses()
         self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()
@@ -605,11 +608,11 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.sampled_contacts["ID"]
-        contacts_data["easting"] = self.sampled_contacts["X"]
-        contacts_data["northing"] = self.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.sampled_contacts["Z"]
+        contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
+        contacts_data["layerId"] = self.map_data.sampled_contacts["ID"]
+        contacts_data["easting"] = self.map_data.sampled_contacts["X"]
+        contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
+        contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -721,7 +724,7 @@ class Project(object):
 
                 return
             elif overlay == "contacts":
-                points = self.sampled_contacts
+                points = self.map_data.sampled_contacts
             elif overlay == "orientations":
                 points = self.structure_samples
             elif overlay == "faults":

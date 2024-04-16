@@ -30,6 +30,7 @@ proj = Project(
     use_australian_state_data="WA",
     working_projection="EPSG:28350",
     bounding_box=bbox_3d,
+    clut_file_legacy=False,
     verbose_level=VerboseLevel.NONE,
     loop_project_filename=loop_project_filename,
 )

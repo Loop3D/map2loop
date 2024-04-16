@@ -15,7 +15,6 @@ from shapely.geometry import Point
 import shapely
 
 
-
 class ThicknessCalculator(ABC):
     """
     Base Class of Thickness Calculator used to force structure of ThicknessCalculator

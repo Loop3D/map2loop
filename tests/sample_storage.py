@@ -6,6 +6,9 @@ from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from datetime import datetime
 import LoopProjectFile as LPF
 import pandas
+import gdown
+
+os.system('gdown --folder https://drive.google.com/drive/folders/1ZEJvPN4lpGpvoepjGMZgzYPGaY3mT46p')
 
 @pytest.fixture
 def sample_supervisor():
@@ -70,7 +73,7 @@ def test_set_sampler(sample_supervisor):
     sampler = SamplerSpacing(100.0)
     sample_supervisor.set_sampler(SampleType.STRUCTURE, sampler)
     assert sample_supervisor.samplers[SampleType.STRUCTURE] == sampler
-    assert sample_supervisor.sampler_dirtyflags[SampleType.STRUCTURE] == True
+    assert sample_supervisor.sampler_dirtyflags[SampleType.STRUCTURE] is True
 
 
 def test_get_sampler(sample_supervisor):
@@ -94,25 +97,25 @@ def test_store(sample_supervisor):
 
 def test_check_state(sample_supervisor):
     sample_supervisor.check_state(SampleType.STRUCTURE)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
-    assert sample_supervisor.dirtyflags[StateType.SAMPLER] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
+    assert sample_supervisor.dirtyflags[StateType.SAMPLER] is False
 
 def test_load(sample_supervisor):
     sample_supervisor.load(SampleType.STRUCTURE)
     sample_supervisor.check_state(SampleType.STRUCTURE)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
     sample_supervisor.load(SampleType.GEOLOGY)
     sample_supervisor.check_state(SampleType.GEOLOGY)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
     sample_supervisor.load(SampleType.FAULT)
     sample_supervisor.check_state(SampleType.FAULT)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
     sample_supervisor.load(SampleType.FOLD)
     sample_supervisor.check_state(SampleType.FOLD)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
     sample_supervisor.load(SampleType.FAULT_ORIENTATION)
     sample_supervisor.check_state(SampleType.FAULT_ORIENTATION)
-    assert sample_supervisor.dirtyflags[StateType.DATA] == False
+    assert sample_supervisor.dirtyflags[StateType.DATA] is False
 
 def test_process(sample_supervisor):
     sample_supervisor.process(SampleType.STRUCTURE)

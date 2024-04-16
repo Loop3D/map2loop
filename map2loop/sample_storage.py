@@ -242,27 +242,27 @@ class SampleSupervisor(AccessStorage):
         # run the sampler only if no sample was generated before
         if self.samples[sampletype] is None:
             # if the data is changed, load and reprocess the data and generate a new sample
-            if self.dirtyflags[StateType.DATA]:
+            if self.dirtyflags[StateType.DATA] is True:
                 self.load(sampletype)
                 self.reprocess(sampletype)
                 return self.samples[sampletype]
 
-            if not self.dirtyflags[StateType.DATA]:
+            if self.dirtyflags[StateType.DATA] is False:
                 self.process(sampletype)
                 return self.samples[sampletype]
 
         # return the requested sample after reprocessing if the data is changed
         elif self.samples[sampletype] is not None:
-            if not self.dirtyflags[StateType.DATA]:
-                if self.dirtyflags[StateType.SAMPLER]:
+            if self.dirtyflags[StateType.DATA] is False:
+                if self.dirtyflags[StateType.SAMPLER] is True:
                     self.reprocess(sampletype)
                     return self.samples[sampletype]
 
-                if not self.dirtyflags[StateType.SAMPLER]:
+                if self.dirtyflags[StateType.SAMPLER] is False:
                     return self.samples[sampletype]
 
-            if self.dirtyflags[StateType.DATA]:
-                if not self.dirtyflags[StateType.SAMPLER]:
-                    self.load(sampletype)
-                    self.reprocess(sampletype)
-                    return self.samples[sampletype]
+            if self.dirtyflags[StateType.DATA] is True:
+
+                self.load(sampletype)
+                self.reprocess(sampletype)
+                return self.samples[sampletype]

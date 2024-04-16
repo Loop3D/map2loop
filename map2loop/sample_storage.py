@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from .m2l_enums import Datatype, SampleType, StateType
 from .sampler import SamplerDecimator, SamplerSpacing, Sampler
 import beartype
-from .mapdata import MapData
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,7 +9,6 @@ if TYPE_CHECKING:
 
 
 class AccessStorage(ABC):
-
     def __init__(self):
         self.storage_label = "AccessStorageAbstractClass"
 
@@ -49,26 +47,25 @@ class AccessStorage(ABC):
 
 class SampleSupervisor(AccessStorage):
     """
-       The SampleSupervisor class is responsible for managing the samples and samplers in the project.
-       It extends the AccessStorage abstract base class.
+    The SampleSupervisor class is responsible for managing the samples and samplers in the project.
+    It extends the AccessStorage abstract base class.
 
-       Attributes:
-           storage_label (str): The label of the storage.
-           samples (list): A list of samples.
-           samplers (list): A list of samplers.
-           sampler_dirtyflags (list): A list of flags indicating if the sampler has changed.
-           dirtyflags (list): A list of flags indicating the state of the data, sample or sampler.
-           project (Project): The project associated with the SampleSupervisor.
-           map_data (MapData): The map data associated with the project.
+    Attributes:
+        storage_label (str): The label of the storage.
+        samples (list): A list of samples.
+        samplers (list): A list of samplers.
+        sampler_dirtyflags (list): A list of flags indicating if the sampler has changed.
+        dirtyflags (list): A list of flags indicating the state of the data, sample or sampler.
+        project (Project): The project associated with the SampleSupervisor.
+        map_data (MapData): The map data associated with the project.
     """
 
-    def __init__(self, project: 'Project'):
-
+    def __init__(self, project: "Project"):
         """
-             The constructor for the SampleSupervisor class.
+        The constructor for the SampleSupervisor class.
 
-             Args:
-                 project (Project): The Project class associated with the SampleSupervisor.
+        Args:
+            project (Project): The Project class associated with the SampleSupervisor.
         """
 
         self.storage_label = "SampleSupervisor"
@@ -127,7 +124,6 @@ class SampleSupervisor(AccessStorage):
 
     @beartype.beartype
     def store(self, sampletype: SampleType, data):
-
         """
         Stores the sample data.
 
@@ -143,11 +139,11 @@ class SampleSupervisor(AccessStorage):
     @beartype.beartype
     def check_state(self, sampletype: SampleType):
         """
-          Checks the state of the data, sample and sampler.
+        Checks the state of the data, sample and sampler.
 
-          Args:
-              sampletype (SampleType): The type of the sample.
-          """
+        Args:
+            sampletype (SampleType): The type of the sample.
+        """
 
         self.dirtyflags[StateType.DATA] = self.map_data.dirtyflags[sampletype]
         self.dirtyflags[StateType.SAMPLER] = self.sampler_dirtyflags[sampletype]
@@ -155,25 +151,22 @@ class SampleSupervisor(AccessStorage):
     @beartype.beartype
     def load(self, sampletype: SampleType):
         """
-         Loads the map data or raster map data based on the sample type.
+        Loads the map data or raster map data based on the sample type.
 
-         Args:
-             sampletype (SampleType): The type of the sample.
-         """
+        Args:
+            sampletype (SampleType): The type of the sample.
+        """
         datatype = Datatype(sampletype)
 
         if datatype == Datatype.DTM:
-
             self.map_data.load_raster_map_data(datatype)
 
         else:
-
             # load map data
             self.map_data.load_map_data(datatype)
 
     @beartype.beartype
     def process(self, sampletype: SampleType):
-
         """
         Processes the sample based on the sample type.
 
@@ -182,20 +175,24 @@ class SampleSupervisor(AccessStorage):
         """
 
         if sampletype == SampleType.CONTACT:
-
-            self.store(SampleType.CONTACT, self.samplers[SampleType.CONTACT].sample(
-                self.map_data.basal_contacts, self.map_data)
-                       )
+            self.store(
+                SampleType.CONTACT,
+                self.samplers[SampleType.CONTACT].sample(
+                    self.map_data.basal_contacts, self.map_data
+                ),
+            )
 
         else:
             datatype = Datatype(sampletype)
-            self.store(sampletype, self.samplers[sampletype].sample(
-                self.map_data.get_map_data(datatype), self.map_data
-            ))
+            self.store(
+                sampletype,
+                self.samplers[sampletype].sample(
+                    self.map_data.get_map_data(datatype), self.map_data
+                ),
+            )
 
     @beartype.beartype
     def reprocess(self, sampletype: SampleType):
-
         """
         Reprocesses the data based on the sample type.
 
@@ -204,32 +201,26 @@ class SampleSupervisor(AccessStorage):
         """
 
         if sampletype == SampleType.GEOLOGY or sampletype == SampleType.CONTACT:
-
             self.map_data.extract_all_contacts()
 
             if self.project.stratigraphic_column.column is None:
-
                 self.project.calculate_stratigraphic_order()
 
             else:
-
                 self.project.sort_stratigraphic_column()
 
             self.project.extract_geology_contacts()
             self.process(SampleType.GEOLOGY)
 
         elif sampletype == SampleType.STRUCTURE:
-
             self.process(SampleType.STRUCTURE)
 
         elif sampletype == SampleType.FAULT:
-
             self.project.calculate_fault_orientations()
             self.project.summarise_fault_data()
             self.process(SampleType.FAULT)
 
         elif sampletype == SampleType.FOLD:
-
             self.process(SampleType.FOLD)
 
     @beartype.beartype
@@ -262,9 +253,7 @@ class SampleSupervisor(AccessStorage):
 
         # return the requested sample after reprocessing if the data is changed
         elif self.samples[sampletype] is not None:
-
             if self.dirtyflags[StateType.DATA] is False:
-
                 if self.dirtyflags[StateType.SAMPLER] is True:
                     self.reprocess(sampletype)
                     return self.samples[sampletype]
@@ -273,7 +262,6 @@ class SampleSupervisor(AccessStorage):
                     return self.samples[sampletype]
 
             if self.dirtyflags[StateType.DATA] is True:
-
                 if self.dirtyflags[StateType.SAMPLER] is False:
                     self.load(sampletype)
                     self.reprocess(sampletype)

@@ -6,7 +6,20 @@ Generate 3D geological model inputs from geological maps — a high-level implem
 
 ## Install
 
-You will need some flavour of conda (a python package manager, [see here](https://docs.anaconda.com/anaconda/install/index.html)), as well as Python ≥ 3.8
+You will need some flavour of conda (a Python package manager, [see here](https://docs.anaconda.com/anaconda/install/index.html)), as well as Python ≥ 3.8. 
+
+### Adding  ```conda-forge``` to Anaconda channels
+map2loop installation may run smoother if ```conda-forge``` is added to the channels. 
+To check for that, run 
+
+```bash
+conda config --show channels
+```
+if conda-forge is not in the output, the channel can be added with:
+
+```bash
+conda config --add channels conda-forge
+```
 
 ### Run
 
@@ -18,7 +31,7 @@ conda install -c conda-forge -c loop3d map2loop -y
 
 ### Documentation
 
-If you can call it that, is available <a href="http://13.211.217.129/m2ldocs/">here</a>
+If you can call it that, is available <a href="https://loop3d.org/map2loop/">here</a>
 
 ### Development
 
@@ -32,14 +45,14 @@ Or get the source + example notebooks with
 
 ```bash
 git clone https://github.com/Loop3D/map2loop.git
-git clone --single-branch --branch yohan https://github.com/Loop3D/map2loop-3-notebooks
+git clone https://github.com/Loop3D/map2loop-3-notebooks
 ```
 
 Navigate into map2loop, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
 
 ```bash
 conda install -c loop3d --file dependencies.txt
-pip install .
+pip install -e .
 ```
 
 ## Building with Docker
@@ -72,7 +85,7 @@ Fair warning, we recommend conda to almost everyone. With great software develop
 
 Our notebooks cover use cases in more detail, but here is an example of processing Loop's South Australia remote geospatial data in just 20 lines of Python.
 
-First, lets import map2loop and define a bounding box. You can use GIS software to find one or use [Loop's Graphical User Interface](https://loop3d.github.io/downloads.html) for the best experience and complete toolset. Remember what projection your coordinates are in!
+First, let's import map2loop and define a bounding box. You can use GIS software to find one or use [Loop's Graphical User Interface](https://loop3d.github.io/downloads.html) for the best experience and complete toolset. Remember what projection your coordinates are in!
 
 ```python
 from map2loop.project import Project

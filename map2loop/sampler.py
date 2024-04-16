@@ -124,7 +124,7 @@ class SamplerSpacing(Sampler):
         Returns:
             pandas.DataFrame: the sampled data points
         """
-        schema = {"ID": str, "X": float, "Y": float}
+        schema = {"ID": str, "X": float, "Y": float, "segNum": str}
         df = pandas.DataFrame(columns=schema.keys()).astype(schema)
         for _, row in spatial_data.iterrows():
             if type(row.geometry) is shapely.geometry.multipolygon.MultiPolygon:
@@ -139,19 +139,34 @@ class SamplerSpacing(Sampler):
                 targets = []
 
             # For the main cases Polygon and LineString the list 'targets' has one element
-            for target in targets:
+            for a, target in enumerate(targets):
                 df2 = pandas.DataFrame(columns=schema.keys()).astype(schema)
                 distances = numpy.arange(0, target.length, self.spacing)[:-1]
                 points = [target.interpolate(distance) for distance in distances]
                 df2["X"] = [point.x for point in points]
                 df2["Y"] = [point.y for point in points]
+
+                # # account for holes//rings in polygons
+                df2["segNum"] = str(a)
+                if target.is_ring:  # 1. check if line is "closed"
+                    target_polygon = shapely.geometry.Polygon(target)
+                    if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
+                        for j, target2 in enumerate(
+                            targets
+                        ):  # which poly is the hole in? assign segnum of the same poly
+                            t2_polygon = shapely.geometry.Polygon(target2)
+                            if target.within(t2_polygon):  #
+                                df2['segNum'] = str(j)
+
                 if "ID" in spatial_data.columns:
                     df2["ID"] = row["ID"]
                 else:
                     df2["ID"] = 0
+
                 if len(df) == 0:
                     df = df2
                 else:
                     df = pandas.concat([df, df2])
+
         df.reset_index(drop=True, inplace=True)
         return df

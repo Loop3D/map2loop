@@ -8,7 +8,13 @@ from statistics import mean
 from .mapdata import MapData
 from scipy.interpolate import Rbf
 from .interpolators import DipDipDirectionInterpolator
-from .utils import create_points, rebuild_sampled_basal_contacts, calculate_endpoints, multiline_to_line, find_segment_strike_from_pt
+from .utils import (
+    create_points,
+    rebuild_sampled_basal_contacts,
+    calculate_endpoints,
+    multiline_to_line,
+    find_segment_strike_from_pt,
+)
 from .m2l_enums import Datatype
 from shapely.geometry import Point
 import shapely
@@ -367,7 +373,11 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         geology = map_data.get_map_data(datatype=Datatype.GEOLOGY)
         geology[['minx', 'miny', 'maxx', 'maxy']] = geology.bounds
 
-        sampled_structures = geopandas.GeoDataFrame(sampled_structures, geometry=geopandas.points_from_xy(sampled_structures.X, sampled_structures.Y), crs = basal_contacts.crs)
+        sampled_structures = geopandas.GeoDataFrame(
+            sampled_structures,
+            geometry=geopandas.points_from_xy(sampled_structures.X, sampled_structures.Y),
+            crs=basal_contacts.crs,
+        )
         sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
         sampled_basal_contacts = rebuild_sampled_basal_contacts(basal_contacts, sampled_contacts)
 
@@ -376,7 +386,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
 
         map_dx = geology.total_bounds[2] - geology.total_bounds[0]
         map_dy = geology.total_bounds[3] - geology.total_bounds[1]
-        
+
         ths = []
         lis = []
 
@@ -385,43 +395,64 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             measurement = sampled_structures.iloc[s]
             measurement_pt = shapely.Point(measurement.X, measurement.Y)
             litho_in = measurement['unit_name']
-            strike = (measurement['DIPDIR']-90) % 360
+            strike = (measurement['DIPDIR'] - 90) % 360
 
-            bbox_poly = geology[geology['UNITNAME']==litho_in][['minx', 'miny', 'maxx', 'maxy']]
+            bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]
 
-            GEO_SUB = geology[geology['UNITNAME']==litho_in]['geometry'].values[0]
-            neighbour_list = list(basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit'])
+            GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+            neighbour_list = list(
+                basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
+            )
             B = calculate_endpoints(measurement_pt, strike, 10000, bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
-            all_intersections = sampled_basal_contacts.overlay(b, how = 'intersection', keep_geom_type=False)
-            all_intersections = all_intersections[all_intersections['geometry'].geom_type == 'Point']
+            all_intersections = sampled_basal_contacts.overlay(
+                b, how='intersection', keep_geom_type=False
+            )
+            all_intersections = all_intersections[
+                all_intersections['geometry'].geom_type == 'Point'
+            ]
 
-            final_intersections = all_intersections[all_intersections['basal_unit'].isin(neighbour_list)]
+            final_intersections = all_intersections[
+                all_intersections['basal_unit'].isin(neighbour_list)
+            ]
 
             if 'MultiPoint' in final_intersections['geometry'].geom_type.values:
-                multi = final_intersections[final_intersections['geometry'].geom_type == 'MultiPoint'].index
+                multi = final_intersections[
+                    final_intersections['geometry'].geom_type == 'MultiPoint'
+                ].index
                 for m in multi:
-                    nearest_ = shapely.ops.nearest_points(final_intersections.loc[m, :].geometry, measurement_pt)[0]
+                    nearest_ = shapely.ops.nearest_points(
+                        final_intersections.loc[m, :].geometry, measurement_pt
+                    )[0]
                     final_intersections.at[m, 'geometry'] = nearest_
                     final_intersections.at[m, 'geometry'] = nearest_
 
-            if len(final_intersections)<2:
+            if len(final_intersections) < 2:
                 # print("Measurement n. ", s, "in litho ", litho_in, " has not enough intersections")
                 continue
 
-            if len(final_intersections['basal_unit'].unique())==1:
+            if len(final_intersections['basal_unit'].unique()) == 1:
                 # print("Measurement n. ", s, "in litho ", litho_in, "does not cross two lithologies")
                 continue
-         
+
             int_pt1 = final_intersections.iloc[0].geometry
             int_pt2 = final_intersections.iloc[1].geometry
- 
-            if math.sqrt(((int_pt1.x-int_pt2.x)**2) + ((int_pt1.y-int_pt2.y)**2)) > map_dx/2 or math.sqrt(((int_pt1.x-int_pt2.x)**2) + ((int_pt1.y-int_pt2.y)**2)) > map_dy/2:
+
+            if (
+                math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+                > map_dx / 2
+                or math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+                > map_dy / 2
+            ):
                 continue
 
-            seg1 = sampled_basal_contacts[sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']].geometry.iloc[0]
-            seg2 = sampled_basal_contacts[sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']].geometry.iloc[0]
+            seg1 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
+            ].geometry.iloc[0]
+            seg2 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
+            ].geometry.iloc[0]
 
             if seg1.geom_type == 'MultiLineString':
                 seg1 = multiline_to_line(seg1)
@@ -430,14 +461,14 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
 
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
-            
+
             b_s = strike - 30, strike + 30
             if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
                 pass
             else:
                 continue
 
-            L = math.sqrt(((int_pt1.x-int_pt2.x)**2) + ((int_pt1.y-int_pt2.y)**2))
+            L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
             th = L * math.sin(math.radians(measurement['DIP']))
 
             ths.append(th)
@@ -449,7 +480,6 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         output_units = units.copy()
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
 
-
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
             output_units.loc[idx, 'gammaThickness'] = unit['median']
@@ -458,18 +488,35 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         # double check the stratigraphic order, assign top and bottom of the column as 100 and if something has not been calculated, add the nearest unit thickness
         for unit in names_not_in_result:
 
-            if output_units[output_units['name']==unit]['gammaThickness'].isna().all() and unit == stratigraphic_order[0]:
-                output_units.loc[output_units["name"]==unit, "gammaThickness"] = 100.0
-                output_units.loc[output_units["name"]==unit, "gammaStdDev"] = 0 ####### not sure if this value is ok?
+            if (
+                output_units[output_units['name'] == unit]['gammaThickness'].isna().all()
+                and unit == stratigraphic_order[0]
+            ):
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = 100.0
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = (
+                    0  ####### not sure if this value is ok?
+                )
 
-            if output_units[output_units['name']==unit]['gammaThickness'].isna().all() and unit == stratigraphic_order[-1]:
-                output_units.loc[output_units["name"]==unit, "gammaThickness"] = 100.0 
-                output_units.loc[output_units["name"]==unit, "gammaStdDev"] = 0 ####### not sure if this value is ok?
+            if (
+                output_units[output_units['name'] == unit]['gammaThickness'].isna().all()
+                and unit == stratigraphic_order[-1]
+            ):
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = 100.0
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = (
+                    0  ####### not sure if this value is ok?
+                )
 
             # if no thickness has been calculated for the unit
-            if output_units[output_units['name']==unit]['gammaThickness'].isna().all():
+            if output_units[output_units['name'] == unit]['gammaThickness'].isna().all():
                 idx = stratigraphic_order.index(unit)
-                print('It was not possible to calculate thickness between unit ', unit, "and ", stratigraphic_order[idx+1], ': Assigning the nearest unit thickness')
-                output_units.loc[output_units["name"]==unit, "gammaThickness"] = output_units.loc[output_units["name"]==stratigraphic_order[idx+1], "gammaThickness"].values[0]
+                print(
+                    'It was not possible to calculate thickness between unit ',
+                    unit,
+                    "and ",
+                    stratigraphic_order[idx + 1],
+                    ': Assigning the nearest unit thickness',
+                )
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = output_units.loc[
+                    output_units["name"] == stratigraphic_order[idx + 1], "gammaThickness"
+                ].values[0]
         return output_units
-

@@ -3,7 +3,7 @@ import math
 import shapely
 import geopandas
 import beartype
-from typing import Union, Tuple, Dict
+from typing import Union
 import pandas
 
 
@@ -132,7 +132,9 @@ def create_points(xy: Union[list, tuple, numpy.ndarray]):
 
 
 @beartype.beartype
-def find_segment_strike_from_pt(line: shapely.LineString, point: shapely.Point, measurement: pandas.Series) -> float:  
+def find_segment_strike_from_pt(
+    line: shapely.LineString, point: shapely.Point, measurement: pandas.Series
+) -> float:
     """
     Finds the strike of a line segment (contact) closest to a given point (structural measurement).
 
@@ -153,15 +155,15 @@ def find_segment_strike_from_pt(line: shapely.LineString, point: shapely.Point, 
 
     if 0 <= measurement['DIPDIR'] <= 180:
         # 1 is the upper point
-        #find the index point in seg a that has highest y value
+        # find the index point in seg a that has highest y value
         idx1 = numpy.argmin(nearest_line.coords.xy[1])
         x1 = nearest_line.coords.xy[0][idx1]
         y1 = nearest_line.coords.xy[1][idx1]
         idx2 = numpy.argmax(nearest_line.coords.xy[1])
         x2 = nearest_line.coords.xy[0][idx2]
         y2 = nearest_line.coords.xy[1][idx2]
-    
-    if 180 < measurement['DIPDIR'] <=360:
+
+    if 180 < measurement['DIPDIR'] <= 360:
         # 1 is the lower point
         idx1 = numpy.argmax(nearest_line.coords.xy[1])
         x1 = nearest_line.coords.xy[0][idx1]
@@ -170,12 +172,14 @@ def find_segment_strike_from_pt(line: shapely.LineString, point: shapely.Point, 
         x2 = nearest_line.coords.xy[0][idx2]
         y2 = nearest_line.coords.xy[1][idx2]
 
-    strike = numpy.degrees(math.atan2((x2-x1), (y2-y1))) % 360
+    strike = numpy.degrees(math.atan2((x2 - x1), (y2 - y1))) % 360
     return strike
 
 
 @beartype.beartype
-def calculate_endpoints(start_point: shapely.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame) -> shapely.geometry.LineString:
+def calculate_endpoints(
+    start_point: shapely.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
+) -> shapely.geometry.LineString:
     """
     Calculate the endpoints of a line segment given a start point, azimuth angle, distance, and bounding box.
 
@@ -191,36 +195,39 @@ def calculate_endpoints(start_point: shapely.Point, azimuth_deg: float, distance
     bbox = numpy.array(bbox)[0]
     minx, miny, maxx, maxy = bbox[0], bbox[1], bbox[2], bbox[3]
     x, y = start_point.coords[0]
-    azimuth_rad = math.radians(90-azimuth_deg)
-    
+    azimuth_rad = math.radians(90 - azimuth_deg)
+
     # Calculate the perpendicular azimuths in radians
     right_azimuth_rad = (azimuth_rad + math.pi / 2) % (2 * math.pi)
     left_azimuth_rad = (azimuth_rad - math.pi / 2) % (2 * math.pi)
-    
+
     # Calculate offsets for the right-hand perpendicular direction
     dx_right = distance * math.cos(right_azimuth_rad)
     dy_right = distance * math.sin(right_azimuth_rad)
     right_endpoint = (x + dx_right, y + dy_right)
-    
+
     # Calculate offsets for the left-hand perpendicular direction
     dx_left = distance * math.cos(left_azimuth_rad)
     dy_left = distance * math.sin(left_azimuth_rad)
     left_endpoint = (x + dx_left, y + dy_left)
-    
+
     line = shapely.LineString([left_endpoint, right_endpoint])
 
     new_line = shapely.ops.clip_by_rect(line, minx, miny, maxx, maxy)
-    
+
     return new_line
 
+
 @beartype.beartype
-def multiline_to_line(geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString]) -> shapely.geometry.LineString:
+def multiline_to_line(
+    geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString]
+) -> shapely.geometry.LineString:
     """
     Converts a multiline geometry to a single line geometry.
-    
+
     Args:
         geometry (Union[LineString, MultiLineString]): The input geometry to be converted.
-        
+
     Returns:
         LineString: The converted line geometry.
     """
@@ -232,11 +239,11 @@ def multiline_to_line(geometry: Union[shapely.geometry.LineString, shapely.geome
 
 
 @beartype.beartype
-def rebuild_sampled_basal_contacts(basal_contacts: geopandas.GeoDataFrame, 
-                                   sampled_contacts: pandas.DataFrame) -> geopandas.GeoDataFrame:
-
+def rebuild_sampled_basal_contacts(
+    basal_contacts: geopandas.GeoDataFrame, sampled_contacts: pandas.DataFrame
+) -> geopandas.GeoDataFrame:
     """
-    Rebuilds the basal contacts as linestrings --> sampled_basal_contacts, based on the existing sampled contact points. 
+    Rebuilds the basal contacts as linestrings --> sampled_basal_contacts, based on the existing sampled contact points.
     The rebuild process uses the segNum column in the sampled_contacts DataFrame to find contacts that may be represented as multiline geometries.
 
     Parameters:
@@ -244,22 +251,26 @@ def rebuild_sampled_basal_contacts(basal_contacts: geopandas.GeoDataFrame,
         sampled_contacts (DataFrame): A DataFrame containing the sampled contact points with columns 'X' and 'Y' for coordinates, 'segNum' for segment number, and 'ID'.
 
     Returns:
-        geopandas.GeoDataFrame: A new GeoDataFrame containing sampled_basal_contacts: unique basal units and their corresponding LineString or 
-        MultiLineString geometries, rebuilt from the sampled_contacts. 
+        geopandas.GeoDataFrame: A new GeoDataFrame containing sampled_basal_contacts: unique basal units and their corresponding LineString or
+        MultiLineString geometries, rebuilt from the sampled_contacts.
     """
 
-    sampled_geology = geopandas.GeoDataFrame(sampled_contacts, 
-                                geometry=geopandas.points_from_xy(sampled_contacts.X, sampled_contacts.Y), 
-                                crs = basal_contacts.crs)
+    sampled_geology = geopandas.GeoDataFrame(
+        sampled_contacts,
+        geometry=geopandas.points_from_xy(sampled_contacts.X, sampled_contacts.Y),
+        crs=basal_contacts.crs,
+    )
 
     basal_contacts['geometry'] = basal_contacts.buffer(1)
-    sampled_basal_contacts = sampled_geology.sjoin(basal_contacts, how='left', predicate='intersects').dropna()
+    sampled_basal_contacts = sampled_geology.sjoin(
+        basal_contacts, how='left', predicate='intersects'
+    ).dropna()
 
     r = []
 
     for basal_u in sampled_basal_contacts['basal_unit'].unique():
 
-        subset = sampled_basal_contacts[sampled_basal_contacts['basal_unit']==basal_u]
+        subset = sampled_basal_contacts[sampled_basal_contacts['basal_unit'] == basal_u]
         unique_segments = subset['segNum'].unique()
 
         if len(unique_segments) == 1:
@@ -275,16 +286,17 @@ def rebuild_sampled_basal_contacts(basal_contacts: geopandas.GeoDataFrame,
                 if len(seg_subset) > 1:  # Ensure each segment has at least two points
                     line_ = shapely.LineString(seg_subset.geometry.tolist())
                     lines.append(line_)
-            
+
             # If multiple lines were created, combine them into a MultiLineString
             if lines:
                 line = shapely.MultiLineString(lines)
                 r.append(line)
-    
+
     sampled_basal_contacts = geopandas.GeoDataFrame(
-        sampled_basal_contacts['basal_unit'].unique(), 
-        geometry = r,
-        crs = basal_contacts.crs, 
-        columns = ['basal_unit'])
-        
+        sampled_basal_contacts['basal_unit'].unique(),
+        geometry=r,
+        crs=basal_contacts.crs,
+        columns=['basal_unit'],
+    )
+
     return sampled_basal_contacts

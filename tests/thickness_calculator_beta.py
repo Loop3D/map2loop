@@ -7,6 +7,8 @@ from map2loop.m2l_enums import VerboseLevel
 from datetime import datetime
 
 os.system('gdown --folder https://drive.google.com/drive/folders/1ZEJvPN4lpGpvoepjGMZgzYPGaY3mT46p')
+
+
 @pytest.fixture
 def project():
     bounding_box = {"minx": 0, "miny": 0, "maxx": 10000, "maxy": 10000, "base": 0, "top": -5000}
@@ -74,8 +76,18 @@ def map_data(project):
     return project.map_data
 
 
-def test_compute(thickness_calculator_beta, units, stratigraphic_order, basal_contacts, samples, map_data, project):
-    result = thickness_calculator_beta.compute(units, stratigraphic_order, basal_contacts, samples, map_data)
+def test_compute(
+    thickness_calculator_beta,
+    units,
+    stratigraphic_order,
+    basal_contacts,
+    samples,
+    map_data,
+    project,
+):
+    result = thickness_calculator_beta.compute(
+        units, stratigraphic_order, basal_contacts, samples, map_data
+    )
     assert thickness_calculator_beta.thickness_calculator_label == "ThicknessCalculatorBeta"
     assert isinstance(result, pd.DataFrame)
     assert 'betaThickness' in result.columns

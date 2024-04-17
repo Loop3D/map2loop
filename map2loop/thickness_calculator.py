@@ -450,7 +450,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
 
 
-        for i, unit in result.iterrows():
+        for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
             output_units.loc[idx, 'gammaThickness'] = unit['median']
             output_units.loc[idx, 'gammaStdDev'] = unit['std']

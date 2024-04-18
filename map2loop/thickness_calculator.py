@@ -504,7 +504,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
 
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
-
+ 
             b_s = strike - 30, strike + 30
             if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
                 pass
@@ -528,38 +528,23 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             output_units.loc[idx, 'gammaThickness'] = unit['median']
             output_units.loc[idx, 'gammaStdDev'] = unit['std']
 
-        # double check the stratigraphic order, assign top and bottom of the column as 100 and if something has not been calculated, add the nearest unit thickness
         for unit in names_not_in_result:
 
-            if (
-                output_units[output_units['name'] == unit]['gammaThickness'].isna().all()
-                and unit == stratigraphic_order[0]
-            ):
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = 100.0
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = (
-                    0  ####### not sure if this value is ok?
-                )
-
-            if (
-                output_units[output_units['name'] == unit]['gammaThickness'].isna().all()
-                and unit == stratigraphic_order[-1]
-            ):
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = 100.0
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = (
-                    0  ####### not sure if this value is ok?
-                )
-
             # if no thickness has been calculated for the unit
-            if output_units[output_units['name'] == unit]['gammaThickness'].isna().all():
+            if (output_units[output_units['name'] == unit]['gammaThickness'].isna().all()) and (unit != stratigraphic_order[-1]) and (unit != stratigraphic_order[0]):
+                # not a top//bottom unit
                 idx = stratigraphic_order.index(unit)
                 print(
                     'It was not possible to calculate thickness between unit ',
                     unit,
                     "and ",
                     stratigraphic_order[idx + 1],
-                    ': Assigning the nearest unit thickness',
+                    'Assigning thickness of -1'
                 )
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = output_units.loc[
-                    output_units["name"] == stratigraphic_order[idx + 1], "gammaThickness"
-                ].values[0]
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+            if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
+                # top//bottom unit
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
         return output_units

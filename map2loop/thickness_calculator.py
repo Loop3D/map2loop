@@ -504,7 +504,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
 
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
- 
+
             b_s = strike - 30, strike + 30
             if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
                 pass
@@ -531,7 +531,11 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         for unit in names_not_in_result:
 
             # if no thickness has been calculated for the unit
-            if (output_units[output_units['name'] == unit]['gammaThickness'].isna().all()) and (unit != stratigraphic_order[-1]) and (unit != stratigraphic_order[0]):
+            if (
+                (output_units[output_units['name'] == unit]['gammaThickness'].isna().all())
+                and (unit != stratigraphic_order[-1])
+                and (unit != stratigraphic_order[0])
+            ):
                 # not a top//bottom unit
                 idx = stratigraphic_order.index(unit)
                 print(
@@ -539,7 +543,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                     unit,
                     "and ",
                     stratigraphic_order[idx + 1],
-                    'Assigning thickness of -1'
+                    'Assigning thickness of -1',
                 )
                 output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
                 output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1

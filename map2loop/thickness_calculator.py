@@ -351,7 +351,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
 
 class ThicknessCalculatorGamma(ThicknessCalculator):
     '''
-    This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation using a deterministic workflow based on stratigraphic measurements. 
+    This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation using a deterministic workflow based on stratigraphic measurements.
 
     Attributes:
         thickness_calculator_label (str): A string that stores the label of the thickness calculator.
@@ -362,6 +362,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         -> pandas.DataFrame: Calculates the thickness in meters for each unit in the stratigraphic column.
 
     '''
+
     def __init__(self):
         self.sorter_label = "ThicknessCalculatorGamma"
 
@@ -374,21 +375,20 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
-        
         """
         Method overview:
         - define perpendicular line, with strike perpendicular to the stratigraphic measurement's strike
         - find intersection points between the perpendicular line and the geological contacts
-        - Perform the following checks: 
+        - Perform the following checks:
             1) is there more than one intersection?
-            2) are the intersections between two different lithologies, and if so, grab the neighbouring lithologies only. 
+            2) are the intersections between two different lithologies, and if so, grab the neighbouring lithologies only.
             3) is the distance between the two intersections less than half the map dimensions? (avoids incorrect intersections to be picked)
             4) is the stratigraphic measurement strike within 30 degrees of the strike of the geological contacts?
 
         - once the intersections pass the checks, calculate the thickness of the unit at the intersection points, using the general formula L*sin(dip)
-        
+
         Attributes:
-        ----------- 
+        -----------
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
@@ -401,14 +401,14 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             pandas.DataFrame: units dataframe with added thickness columns:
             "gammaThickness" is the median thickness of the unit,
             "gammaStdDev" is the standard deviation of the thickness of the unit
-        
+
         Note:
-        ----- 
-            This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts. 
-            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. Future versions of map2loop will attempt to solve for this. 
+        -----
+            This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts.
+            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. Future versions of map2loop will attempt to solve for this.
             If the thickness is not calculated for a given unit, the assigned thickness will be -1.
-            For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1. 
-        """ 
+            For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
+        """
         sampled_contacts = map_data.sampled_contacts
         sampled_structures = structure_data
         basal_contacts = basal_contacts.copy()

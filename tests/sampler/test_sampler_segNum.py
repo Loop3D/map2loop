@@ -23,7 +23,9 @@ for _, poly in geology_original.iterrows():
         if poly.geometry.area < sampler_space:
             continue
         # check if zero featureId
-        assert corresponding_rows['featureId'].unique() == '0', "Polygon with featureId 0 is not sampled."
+        assert (
+            corresponding_rows['featureId'].unique() == '0'
+        ), "Polygon with featureId 0 is not sampled."
 
         # check if in the right place
         for _, sample in corresponding_rows.iterrows():

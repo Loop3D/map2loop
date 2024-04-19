@@ -244,11 +244,11 @@ def rebuild_sampled_basal_contacts(
 ) -> geopandas.GeoDataFrame:
     """
     Rebuilds the basal contacts as linestrings --> sampled_basal_contacts, based on the existing sampled contact points.
-    The rebuild process uses the segNum column in the sampled_contacts DataFrame to find contacts that may be represented as multiline geometries.
+    The rebuild process uses the featureId column in the sampled_contacts DataFrame to find contacts that may be represented as multiline geometries.
 
     Parameters:
         basal_contacts (geopandas.GeoDataFrame): A GeoDataFrame containing the original basal contacts (based on full contact data).
-        sampled_contacts (DataFrame): A DataFrame containing the sampled contact points with columns 'X' and 'Y' for coordinates, 'segNum' for segment number, and 'ID'.
+        sampled_contacts (DataFrame): A DataFrame containing the sampled contact points with columns 'X' and 'Y' for coordinates, 'featureId' for segment number, and 'ID'.
 
     Returns:
         geopandas.GeoDataFrame: A new GeoDataFrame containing sampled_basal_contacts: unique basal units and their corresponding LineString or
@@ -271,7 +271,7 @@ def rebuild_sampled_basal_contacts(
     for basal_u in sampled_basal_contacts['basal_unit'].unique():
 
         subset = sampled_basal_contacts[sampled_basal_contacts['basal_unit'] == basal_u]
-        unique_segments = subset['segNum'].unique()
+        unique_segments = subset['featureId'].unique()
 
         if len(unique_segments) == 1:
             # make a linestring with all the points in subset
@@ -281,8 +281,8 @@ def rebuild_sampled_basal_contacts(
         else:
             lines = []
             # Process each segment number
-            for segnum in unique_segments:
-                seg_subset = subset[subset['segNum'] == segnum]
+            for featureId in unique_segments:
+                seg_subset = subset[subset['featureId'] == featureId]
                 if len(seg_subset) > 1:  # Ensure each segment has at least two points
                     line_ = shapely.LineString(seg_subset.geometry.tolist())
                     lines.append(line_)

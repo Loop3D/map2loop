@@ -9,11 +9,11 @@ import os
 import shapely
 import geopandas
 import tempfile
+import map2loop
 from map2loop import Project
 from map2loop.m2l_enums import Datatype
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
-import gc
-import shutil
+import pytest
 
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
@@ -201,7 +201,7 @@ proj = Project(
     fold_filename=os.path.join(path, "faults.shp"),
     structure_filename=os.path.join(path, "structures.shp"),
     dtm_filename=os.path.join(path, 'DEM.tif'),
-    clut_filename=r'C:\Users\angel\Documents\GitHub\map2loop\map2loop\_datasets\clut_files\WA_clut.csv',
+    clut_filename=os.path.join(os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"),
     config_dictionary=config,
     clut_file_legacy=False,
     working_projection="EPSG:7854",
@@ -217,46 +217,42 @@ proj.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
 proj.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
 
+def test_thickness_gamma(proj=proj):
+    # 1. are all lithologies in the geology returned?
+    assert all(
+        element in geology['UNITNAME'].unique().tolist()
+        for element in proj.stratigraphic_column.stratigraphicUnits['name'].to_list()
+    ), "gamma thickness not calculating for all lithologies in geology"
 
-# 1. are all lithologies in the geology returned?
-assert all(
-    element in geology['UNITNAME'].unique().tolist()
-    for element in proj.stratigraphic_column.stratigraphicUnits['name'].to_list()
-), "gamma thickness not calculating for all lithologies in geology"
+    # 2. is gammaThickness a column in the stratigraphicUnits?
+    assert (
+        'gammaThickness' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
+    ), "gammaThickness not in resulting stratigraphicUnits"
 
-# 2. is gammaThickness a column in the stratigraphicUnits?
-assert (
-    'gammaThickness' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
-), "gammaThickness not in resulting stratigraphicUnits"
-
-# 2. are bottom and top units assigned as -1?
-assert (
-    proj.stratigraphic_column.stratigraphicUnits[
-        proj.stratigraphic_column.stratigraphicUnits['Order']
-        == min(proj.stratigraphic_column.stratigraphicUnits['Order'])
-    ]['gammaThickness'].values
-    == -1
-), "gamma thickness: top unit not assigned as -1"
-assert (
-    proj.stratigraphic_column.stratigraphicUnits[
-        proj.stratigraphic_column.stratigraphicUnits['Order']
-        == max(proj.stratigraphic_column.stratigraphicUnits['Order'])
-    ]['gammaThickness'].values
-    == -1
-), "gamma thickness: bottom unit not assigned as -1"
-
-# 3. Is the thickness being calculated correctly? Should be ~ 89
-assert (
-    round(
+    # 2. are bottom and top units assigned as -1?
+    assert (
         proj.stratigraphic_column.stratigraphicUnits[
-            proj.stratigraphic_column.stratigraphicUnits['name'] == 'Litho_F'
-        ]['gammaThickness']
-    ).values
-    == 89.0
-), "gamma thickness not calculating thickness correctly"
+            proj.stratigraphic_column.stratigraphicUnits['Order']
+            == min(proj.stratigraphic_column.stratigraphicUnits['Order'])
+        ]['gammaThickness'].values
+        == -1
+    ), "gamma thickness: top unit not assigned as -1"
+    assert (
+        proj.stratigraphic_column.stratigraphicUnits[
+            proj.stratigraphic_column.stratigraphicUnits['Order']
+            == max(proj.stratigraphic_column.stratigraphicUnits['Order'])
+        ]['gammaThickness'].values
+        == -1
+    ), "gamma thickness: bottom unit not assigned as -1"
 
-del proj
+    # 3. Is the thickness being calculated correctly? Should be ~ 89
+    assert (
+        round(
+            proj.stratigraphic_column.stratigraphicUnits[
+                proj.stratigraphic_column.stratigraphicUnits['name'] == 'Litho_F'
+            ]['gammaThickness']
+        ).values
+        == 89.0
+    ), "gamma thickness not calculating thickness correctly"
 
-gc.collect()
 
-shutil.rmtree(path)  # remove temp file

@@ -13,7 +13,6 @@ import map2loop
 from map2loop import Project
 from map2loop.m2l_enums import Datatype
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
-import pytest
 
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
@@ -201,7 +200,9 @@ proj = Project(
     fold_filename=os.path.join(path, "faults.shp"),
     structure_filename=os.path.join(path, "structures.shp"),
     dtm_filename=os.path.join(path, 'DEM.tif'),
-    clut_filename=os.path.join(os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"),
+    clut_filename=os.path.join(
+        os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"
+    ),
     config_dictionary=config,
     clut_file_legacy=False,
     working_projection="EPSG:7854",
@@ -216,6 +217,7 @@ column = ['Litho_G', 'Litho_F', 'Litho_E']
 proj.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
 proj.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
+
 
 def test_thickness_gamma(proj=proj):
     # 1. are all lithologies in the geology returned?
@@ -254,5 +256,3 @@ def test_thickness_gamma(proj=proj):
         ).values
         == 89.0
     ), "gamma thickness not calculating thickness correctly"
-
-

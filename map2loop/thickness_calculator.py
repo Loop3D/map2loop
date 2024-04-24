@@ -470,17 +470,18 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                     final_intersections.at[m, 'geometry'] = nearest_
                     final_intersections.at[m, 'geometry'] = nearest_
 
+            # check to see if there's less than 2 intersections
             if len(final_intersections) < 2:
-                # print("Measurement n. ", s, "in litho ", litho_in, " has not enough intersections")
                 continue
 
+            #check to see if the intersections cross two lithologies")
             if len(final_intersections['basal_unit'].unique()) == 1:
-                # print("Measurement n. ", s, "in litho ", litho_in, "does not cross two lithologies")
                 continue
 
             int_pt1 = final_intersections.iloc[0].geometry
             int_pt2 = final_intersections.iloc[1].geometry
 
+            # if the intersections are too far apart, skip
             if (
                 math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
                 > map_dx / 2
@@ -488,7 +489,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                 > map_dy / 2
             ):
                 continue
-
+            
             seg1 = sampled_basal_contacts[
                 sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
             ].geometry.iloc[0]
@@ -504,6 +505,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
 
+            # check to see if the strike of the stratigraphic measurement is within 30 degrees of the strike of the geological contact
             b_s = strike - 30, strike + 30
             if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
                 pass

@@ -512,11 +512,9 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
 
-            # check to see if the strike of the stratigraphic measurement is within 30 degrees of the strike of the geological contact
+            # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
             b_s = strike - self.strike_allowance, strike + self.strike_allowance
-            if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
-                pass
-            else:
+            if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))

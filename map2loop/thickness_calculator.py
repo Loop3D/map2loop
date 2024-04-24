@@ -372,6 +372,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
     def __init__(self):
         self.sorter_label = "ThicknessCalculatorGamma"
         self.line_lenght = 10000
+        self.strike_allowance = 30
 
     @beartype.beartype
     def compute(
@@ -508,12 +509,11 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                 seg1 = multiline_to_line(seg1)
             if seg2.geom_type == 'MultiLineString':
                 seg2 = multiline_to_line(seg2)
-
             strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
             strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
 
             # check to see if the strike of the stratigraphic measurement is within 30 degrees of the strike of the geological contact
-            b_s = strike - 30, strike + 30
+            b_s = strike - self.strike_allowance, strike + self.strike_allowance
             if b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]:
                 pass
             else:

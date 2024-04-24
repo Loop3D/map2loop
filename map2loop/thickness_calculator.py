@@ -430,7 +430,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         map_dx = geology.total_bounds[2] - geology.total_bounds[0]
         map_dy = geology.total_bounds[3] - geology.total_bounds[1]
 
-        ths = []
+        thicknesses = []
         lis = []
 
         for s in range(0, len(sampled_structures)):
@@ -511,12 +511,12 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                 continue
 
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
-            th = L * math.sin(math.radians(measurement['DIP']))
+            thickness = L * math.sin(math.radians(measurement['DIP']))
 
-            ths.append(th)
+            thicknesses.append(thickness)
             lis.append(litho_in)
 
-        result = pandas.DataFrame({'unit': lis, 'thickness': ths})
+        result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'std']).reset_index()
 
         output_units = units.copy()

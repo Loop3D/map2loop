@@ -405,7 +405,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         Note:
         -----
             This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts.
-            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. Future versions of map2loop will attempt to solve for this.
+            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. ThicknessCalculatorBeta may be used for such situations and future versions of map2loop will attempt to solve for this.
             If the thickness is not calculated for a given unit, the assigned thickness will be -1.
             For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
         """

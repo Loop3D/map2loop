@@ -480,7 +480,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             if len(final_intersections) < 2:
                 continue
 
-            #check to see if the intersections cross two lithologies")
+            # check to see if the intersections cross two lithologies")
             if len(final_intersections['basal_unit'].unique()) == 1:
                 continue
 
@@ -495,7 +495,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                 > map_dy / 2
             ):
                 continue
-            
+
             seg1 = sampled_basal_contacts[
                 sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
             ].geometry.iloc[0]

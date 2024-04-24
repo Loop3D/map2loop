@@ -66,6 +66,12 @@ class ThicknessCalculator(ABC):
 
         Returns:
             pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
+
+        Note:
+        -----
+        Geological units' thicknesses are returned in meters. The thickness is calculated based on the stratigraphic order of the units.
+        If the thickness is not calculated for a given unit, the assigned thickness is -1.
+        For the bottom and top units of the stratigraphic sequence, the assigned thickness is -1.
         """
         pass
 

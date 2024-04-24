@@ -417,7 +417,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             If the thickness is not calculated for a given unit, the assigned thickness will be -1.
             For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
         """
-        
+
         sampled_structures = structure_data
         basal_contacts = basal_contacts.copy()
 
@@ -430,7 +430,9 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             crs=basal_contacts.crs,
         )
         sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
-        sampled_basal_contacts = rebuild_sampled_basal_contacts(basal_contacts, map_data.sampled_contacts)
+        sampled_basal_contacts = rebuild_sampled_basal_contacts(
+            basal_contacts, map_data.sampled_contacts
+        )
 
         basal_contacts_bu = basal_contacts.copy()
         basal_contacts_bu['geometry'] = basal_contacts_bu.buffer(0.1)

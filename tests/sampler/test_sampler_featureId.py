@@ -1,7 +1,6 @@
 import pandas
 from map2loop.sampler import SamplerSpacing
 import shapely
-import pytest
 import geopandas
 
 geology_original = pandas.read_csv("./tests/sampler/geo_test.csv")

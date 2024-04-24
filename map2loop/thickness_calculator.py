@@ -434,7 +434,6 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         lis = []
 
         for s in range(0, len(sampled_structures)):
-            th = None
             measurement = sampled_structures.iloc[s]
             measurement_pt = shapely.Point(measurement.X, measurement.Y)
             litho_in = measurement['unit_name']

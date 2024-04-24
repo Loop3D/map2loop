@@ -371,6 +371,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
 
     def __init__(self):
         self.sorter_label = "ThicknessCalculatorGamma"
+        self.line_lenght = 10000
 
     @beartype.beartype
     def compute(
@@ -451,7 +452,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
             neighbour_list = list(
                 basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
             )
-            B = calculate_endpoints(measurement_pt, strike, 10000, bbox_poly)
+            B = calculate_endpoints(measurement_pt, strike, self.line_lenght, bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
             all_intersections = sampled_basal_contacts.overlay(

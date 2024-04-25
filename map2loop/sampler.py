@@ -124,7 +124,7 @@ class SamplerSpacing(Sampler):
         Returns:
             pandas.DataFrame: the sampled data points
         """
-        schema = {"ID": str, "X": float, "Y": float, "segNum": str}
+        schema = {"ID": str, "X": float, "Y": float, "featureId": str}
         df = pandas.DataFrame(columns=schema.keys()).astype(schema)
         for _, row in spatial_data.iterrows():
             if type(row.geometry) is shapely.geometry.multipolygon.MultiPolygon:
@@ -147,16 +147,16 @@ class SamplerSpacing(Sampler):
                 df2["Y"] = [point.y for point in points]
 
                 # # account for holes//rings in polygons
-                df2["segNum"] = str(a)
+                df2["featureId"] = str(a)
                 if target.is_ring:  # 1. check if line is "closed"
                     target_polygon = shapely.geometry.Polygon(target)
                     if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
                         for j, target2 in enumerate(
                             targets
-                        ):  # which poly is the hole in? assign segnum of the same poly
+                        ):  # which poly is the hole in? assign featureId of the same poly
                             t2_polygon = shapely.geometry.Polygon(target2)
                             if target.within(t2_polygon):  #
-                                df2['segNum'] = str(j)
+                                df2['featureId'] = str(j)
 
                 if "ID" in spatial_data.columns:
                     df2["ID"] = row["ID"]

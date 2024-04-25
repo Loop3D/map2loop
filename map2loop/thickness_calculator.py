@@ -8,10 +8,17 @@ from statistics import mean
 from .mapdata import MapData
 from scipy.interpolate import Rbf
 from .interpolators import DipDipDirectionInterpolator
-from .utils import create_points
+from .utils import (
+    create_points,
+    rebuild_sampled_basal_contacts,
+    calculate_endpoints,
+    multiline_to_line,
+    find_segment_strike_from_pt,
+)
 from .m2l_enums import Datatype
 from shapely.geometry import Point
 import shapely
+import math
 
 
 class ThicknessCalculator(ABC):
@@ -59,6 +66,12 @@ class ThicknessCalculator(ABC):
 
         Returns:
             pandas.DataFrame: units dataframe with added thickness column for calculated thickness values
+
+        Note:
+        -----
+        Geological units' thicknesses are returned in meters. The thickness is calculated based on the stratigraphic order of the units.
+        If the thickness is not calculated for a given unit, the assigned thickness is -1.
+        For the bottom and top units of the stratigraphic sequence, the assigned thickness is -1.
         """
         pass
 
@@ -340,3 +353,239 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
                 )
 
         return thicknesses
+
+
+class ThicknessCalculatorGamma(ThicknessCalculator):
+    '''
+    This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation using a deterministic workflow based on stratigraphic measurements.
+
+    Attributes:
+        thickness_calculator_label (str): A string that stores the label of the thickness calculator.
+        For this class, it is "ThicknessCalculatorGamma".
+
+    Methods:
+        compute(units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData)
+        -> pandas.DataFrame: Calculates the thickness in meters for each unit in the stratigraphic column.
+
+    '''
+
+    def __init__(self):
+        self.sorter_label = "ThicknessCalculatorGamma"
+        self.line_length = 10000
+        self.strike_allowance = 30
+
+    @beartype.beartype
+    def compute(
+        self,
+        units: pandas.DataFrame,
+        stratigraphic_order: list,
+        basal_contacts: geopandas.GeoDataFrame,
+        structure_data: pandas.DataFrame,
+        map_data: MapData,
+    ) -> pandas.DataFrame:
+        """
+        Method overview:
+        - define perpendicular line, with strike perpendicular to the stratigraphic measurement's strike
+        - find intersection points between the perpendicular line and the geological contacts
+        - Perform the following checks:
+            1) is there more than one intersection?
+            2) are the intersections between two different lithologies, and if so, grab the neighboring lithologies only.
+            3) is the distance between the two intersections less than half the map dimensions? (avoids incorrect intersections to be picked)
+            4) is the stratigraphic measurement strike within 30 degrees of the strike of the geological contacts?
+
+        - once the intersections pass the checks, calculate the thickness of the unit at the intersection points, using the general formula L*sin(dip)
+
+        Attributes:
+        -----------
+            units (pandas.DataFrame): the data frame of units to add thicknesses to
+            stratigraphic_order (list): a list of unit names sorted from youngest to oldest
+            basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
+            the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            structure_data (pandas.DataFrame): sampled structural data
+            map_data (map2loop.MapData): a catchall so that access to all map data is available
+
+        Returns:
+        --------
+            pandas.DataFrame: units dataframe with added thickness columns:
+            "gammaThickness" is the median thickness of the unit,
+            "gammaStdDev" is the standard deviation of the thickness of the unit
+
+        Note:
+        -----
+            This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts.
+            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. ThicknessCalculatorBeta may be used for such situations and future versions of map2loop will attempt to solve for this.
+            If the thickness is not calculated for a given unit, the assigned thickness will be -1.
+            For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
+        """
+        # input sampled data
+        sampled_structures = structure_data
+        basal_contacts = basal_contacts.copy()
+
+        # grab geology polygons and calculate bounding boxes for each lithology
+        geology = map_data.get_map_data(datatype=Datatype.GEOLOGY)
+        geology[['minx', 'miny', 'maxx', 'maxy']] = geology.bounds
+
+        # create a GeoDataFrame of the sampled structures
+        sampled_structures = geopandas.GeoDataFrame(
+            sampled_structures,
+            geometry=geopandas.points_from_xy(sampled_structures.X, sampled_structures.Y),
+            crs=basal_contacts.crs,
+        )
+        # add unitname to the sampled structures
+        sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
+
+        # rebuild basal contacts lines based on sampled dataset
+        sampled_basal_contacts = rebuild_sampled_basal_contacts(
+            basal_contacts, map_data.sampled_contacts
+        )
+
+        # calculate map dimensions
+        map_dx = geology.total_bounds[2] - geology.total_bounds[0]
+        map_dy = geology.total_bounds[3] - geology.total_bounds[1]
+
+        # create empty lists to store thicknesses and lithologies
+        thicknesses = []
+        lis = []
+
+        # loop over each sampled structural measurement
+        for s in range(0, len(sampled_structures)):
+
+            # make a shapely point from the measurement
+            measurement = sampled_structures.iloc[s]
+            measurement_pt = shapely.Point(measurement.X, measurement.Y)
+
+            # find unit and strike
+            litho_in = measurement['unit_name']
+            strike = (measurement['DIPDIR'] - 90) % 360
+
+            # find bounding box of the lithology
+            bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]
+
+            # make a subset of the geology polygon & find neighbour units
+            GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+            neighbor_list = list(
+                basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
+            )
+            # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
+            B = calculate_endpoints(measurement_pt, strike, self.line_length, bbox_poly)
+            b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
+
+            # find all intersections
+            all_intersections = sampled_basal_contacts.overlay(
+                b, how='intersection', keep_geom_type=False
+            )
+            all_intersections = all_intersections[
+                all_intersections['geometry'].geom_type == 'Point'
+            ]
+
+            # clip intersections by the neighbouring geology polygons
+            final_intersections = all_intersections[
+                all_intersections['basal_unit'].isin(neighbor_list)
+            ]
+
+            # sometimes the intersections will return as MultiPoint, so we need to convert them to nearest point
+            if 'MultiPoint' in final_intersections['geometry'].geom_type.values:
+                multi = final_intersections[
+                    final_intersections['geometry'].geom_type == 'MultiPoint'
+                ].index
+                for m in multi:
+                    nearest_ = shapely.ops.nearest_points(
+                        final_intersections.loc[m, :].geometry, measurement_pt
+                    )[0]
+                    final_intersections.at[m, 'geometry'] = nearest_
+                    final_intersections.at[m, 'geometry'] = nearest_
+
+            # check to see if there's less than 2 intersections
+            if len(final_intersections) < 2:
+                continue
+
+            # check to see if the intersections cross two lithologies"
+            if len(final_intersections['basal_unit'].unique()) == 1:
+                continue
+
+            # declare the two intersection points
+            int_pt1 = final_intersections.iloc[0].geometry
+            int_pt2 = final_intersections.iloc[1].geometry
+
+            # if the intersections are too far apart, skip
+            if (
+                math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+                > map_dx / 2
+                or math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+                > map_dy / 2
+            ):
+                continue
+
+            # find the segments that the intersections belong to
+            seg1 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
+            ].geometry.iloc[0]
+            seg2 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
+            ].geometry.iloc[0]
+
+            # simplify the geometries to LineString
+            if seg1.geom_type == 'MultiLineString':
+                seg1 = multiline_to_line(seg1)
+            if seg2.geom_type == 'MultiLineString':
+                seg2 = multiline_to_line(seg2)
+
+            # find the strike of the segments
+            strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
+            strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
+
+            # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
+            b_s = strike - self.strike_allowance, strike + self.strike_allowance
+            if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
+                continue
+
+            # find the lenght of the segment
+            L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+            # calculate thickness
+            thickness = L * math.sin(math.radians(measurement['DIP']))
+
+            thicknesses.append(thickness)
+            lis.append(litho_in)
+
+        # create a DataFrame of the thicknesses median and standard deviation by lithology
+        result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
+        result = result.groupby('unit')['thickness'].agg(['median', 'std']).reset_index()
+
+        output_units = units.copy()
+        # find which units have no thickness calculated
+        names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
+
+        # assign the thicknesses to the each unit
+        for _, unit in result.iterrows():
+            idx = units.index[units['name'] == unit['unit']].tolist()[0]
+            output_units.loc[idx, 'gammaThickness'] = unit['median']
+            output_units.loc[idx, 'gammaStdDev'] = unit['std']
+
+        # handle the units that have no thickness
+        for unit in names_not_in_result:
+            # if no thickness has been calculated for the unit
+            if (
+                # not a top//bottom unit
+                (output_units[output_units['name'] == unit]['gammaThickness'].isna().all())
+                and (unit != stratigraphic_order[-1])
+                and (unit != stratigraphic_order[0])
+            ):
+                idx = stratigraphic_order.index(unit)
+                # throw warning to user
+                print(
+                    'It was not possible to calculate thickness between unit ',
+                    unit,
+                    "and ",
+                    stratigraphic_order[idx + 1],
+                    'Assigning thickness of -1',
+                )
+                # assign -1 as thickness
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+
+            # if top//bottom unit assign -1
+            if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
+                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
+                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+
+        return output_units

@@ -45,14 +45,17 @@ def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
 
 
 def strike_dip_vector(
-    strike: Union[float, list, numpy.ndarray], dip: Union[float, list, numpy.ndarray]
+        strike: Union[float, list, numpy.ndarray], dip: Union[float, list, numpy.ndarray]
 ) -> numpy.ndarray:
+
     """
     Calculates the strike-dip vector from the given strike and dip angles.
 
     Args:
-        strike (Union[float, list, numpy.ndarray]): The strike angle(s) in degrees. Can be a single value or an array of values.
-        dip (Union[float, list, numpy.ndarray]): The dip angle(s) in degrees. Can be a single value or an array of values.
+        strike (Union[float, list, numpy.ndarray]): The strike angle(s) in degrees.
+        Can be a single value or an array of values.
+        dip (Union[float, list, numpy.ndarray]): The dip angle(s) in degrees.
+        Can be a single value or an array of values.
 
     Returns:
         numpy.ndarray: The calculated strike-dip vector(s). Each row corresponds to a vector,
@@ -133,7 +136,7 @@ def create_points(xy: Union[list, tuple, numpy.ndarray]):
 
 @beartype.beartype
 def find_segment_strike_from_pt(
-    line: shapely.LineString, point: shapely.Point, measurement: pandas.Series
+        line: shapely.LineString, point: shapely.Point, measurement: pandas.Series
 ) -> float:
     """
     Finds the strike of a line segment (contact) closest to a given point (structural measurement).
@@ -178,7 +181,7 @@ def find_segment_strike_from_pt(
 
 @beartype.beartype
 def calculate_endpoints(
-    start_point: shapely.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
+        start_point: shapely.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
 ) -> shapely.geometry.LineString:
     """
     Calculate the endpoints of a line segment given a start point, azimuth angle, distance, and bounding box.
@@ -220,7 +223,7 @@ def calculate_endpoints(
 
 @beartype.beartype
 def multiline_to_line(
-    geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString]
+        geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString]
 ) -> shapely.geometry.LineString:
     """
     Converts a multiline geometry to a single line geometry.
@@ -240,7 +243,7 @@ def multiline_to_line(
 
 @beartype.beartype
 def rebuild_sampled_basal_contacts(
-    basal_contacts: geopandas.GeoDataFrame, sampled_contacts: pandas.DataFrame
+        basal_contacts: geopandas.GeoDataFrame, sampled_contacts: pandas.DataFrame
 ) -> geopandas.GeoDataFrame:
     """
     Rebuilds the basal contacts as linestrings --> sampled_basal_contacts, based on the existing sampled contact points.
@@ -300,3 +303,24 @@ def rebuild_sampled_basal_contacts(
     )
 
     return sampled_basal_contacts
+
+
+@beartype.beartype
+def is_collinear(points: list) -> bool:
+    """
+    Checks if three points are collinear in 2D space.
+
+    This function checks if three given points are collinear, i.e., they lie on the same straight line.
+    The function uses the formula for the area of a triangle formed by the three points. If the area is zero,
+    the points are collinear.
+
+    Args:
+        points (list): A list of three points in 2D space. Each point should be a shapely.geometry.Point
+
+    Returns:
+        bool: True if the points are collinear, False otherwise.
+    """
+
+    p1, p2, p3 = points
+
+    return int((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y))) == 0

@@ -1,9 +1,5 @@
 from abc import ABC, abstractmethod
 import beartype
-import pandas
-import math
-from .mapdata import MapData
-from .utils import is_collinear
 from skspatial.objects import Plane
 import numpy
 
@@ -33,10 +29,7 @@ class BaseDipCalculator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def compute(
-            self,
-            points: list
-    ):
+    def compute(self, points: list):
         """
         Execute dip calculator method (abstract method)
 
@@ -76,10 +69,7 @@ class DipCalculator(BaseDipCalculator):
         return self.dip_calculator_label
 
     @beartype.beartype
-    def compute(
-            self,
-            points: list
-    ):
+    def compute(self, points: list):
         """
         Execute dip calculator method
 
@@ -101,4 +91,3 @@ class DipCalculator(BaseDipCalculator):
         dip = numpy.degrees(numpy.arccos(normal_vector[2]))
 
         return dip
-

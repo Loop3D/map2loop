@@ -132,10 +132,10 @@ class Project(object):
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
-        self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"])
-        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"])
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -569,6 +569,7 @@ class Project(object):
                 depth=[self.map_data.bounding_box["top"], self.map_data.bounding_box["base"]],
                 spacing=[1000, 1000, 500],
                 preference="utm",
+                epsg=self.map_data.get_working_projection(),
             )
         else:
             # TODO: Check loopfile extents match project extents before continuing
@@ -612,6 +613,7 @@ class Project(object):
         contacts_data["easting"] = self.map_data.sampled_contacts["X"]
         contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
         contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
+        contacts_data["segNum"] = self.map_data.sampled_contacts["featureId"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -623,6 +625,7 @@ class Project(object):
         faults_obs_data["easting"][0 : len(self.fault_samples)] = self.fault_samples["X"]
         faults_obs_data["northing"][0 : len(self.fault_samples)] = self.fault_samples["Y"]
         faults_obs_data["altitude"][0 : len(self.fault_samples)] = self.fault_samples["Z"]
+        faults_obs_data["segNum"][0 : len(self.fault_samples)] = self.fault_samples["featureId"]
         faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
@@ -634,6 +637,7 @@ class Project(object):
         faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
         faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
         faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
+        faults_obs_data["segNum"][len(self.fault_samples) :] = self.fault_orientations["featureId"]
         faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
         faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0

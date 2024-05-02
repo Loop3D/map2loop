@@ -329,7 +329,6 @@ class MapData:
                     AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
                 )
                 self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
-            print(self.config_filename)
         else:
             raise ValueError(f"Australian state {state} not in state url database")
 

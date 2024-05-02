@@ -1,6 +1,7 @@
 import geopandas
 import pandas
 import numpy
+import pathlib
 import shapely
 from osgeo import gdal, osr
 from owslib.wcs import WebCoverageService
@@ -318,12 +319,15 @@ class MapData:
             if os.environ.get("DOCUMENTATION_TEST", False):
                 import map2loop
 
-                dataset_path = os.path.join(os.path.dirname(map2loop.__file__), "_datasets")
+                module_path = map2loop.__file__
+                config_path_str = '_datasets\\config_files\\{}.json'.format(state)
                 self.set_config_filename(
-                    os.path.join(dataset_path, "config_files", state + ".json")
+                    pathlib.Path(module_path) / pathlib.Path(config_path_str)
                 )
+
+                colour_file_str = '_datasets\\clut_files\\{}_clut.csv'.format(state)
                 self.set_colour_filename(
-                    os.path.join(dataset_path, "clut_files", state + "_clut.csv")
+                    pathlib.Path(module_path) / pathlib.Path(colour_file_str)
                 )
             else:
                 self.set_config_filename(

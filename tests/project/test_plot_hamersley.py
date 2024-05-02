@@ -5,20 +5,19 @@ from map2loop.sorter import SorterAlpha
 from map2loop.sampler import SamplerSpacing
 from pyproj.exceptions import CRSError
 
-def setup_project():
-    bbox_3d = {
-        "minx": 515687.31005864,
-        "miny": 7493446.76593407,
-        "maxx": 562666.860106543,
-        "maxy": 7521273.57407786,
-        "base": -3200,
-        "top": 3000,
-    }
-    loop_project_filename = "wa_output.loop3d"
-    return proj
+
+bbox_3d = {
+    "minx": 515687.31005864,
+    "miny": 7493446.76593407,
+    "maxx": 562666.860106543,
+    "maxy": 7521273.57407786,
+    "base": -3200,
+    "top": 3000,
+}
+loop_project_filename = "wa_output.loop3d"
+
 
 def test_run_all_catches_all_errors():
-    proj = setup_project()
     
     try:
         proj = Project(

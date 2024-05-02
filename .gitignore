@@ -220,3 +220,5 @@ m2l_data_tmp/*
 docs/examples/m2l_data_tmp/*
 docs/source/sg_execution_times.rst
 docs/source/auto_examples/*
+tests/m2l_data_tmp/*
+

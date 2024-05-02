@@ -172,7 +172,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         return thicknesses
 
 
-class ThicknessCalculatorBeta(ThicknessCalculator):
+class InterpolatedStructure(ThicknessCalculator):
     """
     This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation
     method for a given set of interpolated data points.
@@ -255,7 +255,7 @@ class ThicknessCalculatorBeta(ThicknessCalculator):
         bounding_box = map_data.get_bounding_box()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator.interpolate(bounding_box, structure_data, interpolator=Rbf)
+        dip = interpolator(bounding_box, structure_data, interpolator=Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame

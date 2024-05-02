@@ -179,7 +179,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
     Attributes:
         thickness_calculator_label (str): A string that stores the label of the thickness calculator.
-        For this class, it is "ThicknessCalculatorBeta".
+        For this class, it is "InterpolatedStructure".
 
     Methods:
         compute(units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData)
@@ -188,7 +188,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
     def __init__(self):
         """
-        Initialiser for beta version of the thickness calculator
+        Initialiser for interplated structure version of the thickness calculator
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []
@@ -223,16 +223,16 @@ class InterpolatedStructure(ThicknessCalculator):
 
         Returns:
             pandas.DataFrame: units dataframe with added thickness columns:
-            "betaThickness" is the median thickness of the unit,
-            "betaStdDev" is the standard deviation of the thickness of the unit
+            "ThicknessMedian" is the median thickness of the unit,
+            "ThicknessStdDev" is the standard deviation of the thickness of the unit
         """
 
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"].copy()
         thicknesses = units.copy()
         # Set default value
-        # thicknesses["betaThickness"] is the median thickness of the unit
-        thicknesses["Thickness"] = -1.0
-        # thicknesses["betaStdDev"] is the standard deviation of the thickness of the unit
+        # thicknesses["ThicknessMedian"] is the median thickness of the unit
+        thicknesses["ThicknessMedian"] = -1.0
+        # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
         thicknesses["ThicknessStdDev"] = 0
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
@@ -345,7 +345,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]
                     ].tolist()[0]
-                    thicknesses.loc[idx, "Thickness"] = median
+                    thicknesses.loc[idx, "ThicknessMedian"] = median
                     thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
             else:
                 print(
@@ -355,13 +355,13 @@ class InterpolatedStructure(ThicknessCalculator):
         return thicknesses
 
 
-class ThicknessCalculatorGamma(ThicknessCalculator):
+class StructuralPoint(ThicknessCalculator):
     '''
     This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation using a deterministic workflow based on stratigraphic measurements.
 
     Attributes:
         thickness_calculator_label (str): A string that stores the label of the thickness calculator.
-        For this class, it is "ThicknessCalculatorGamma".
+        For this class, it is "StrucuturalPoint".
 
     Methods:
         compute(units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData)
@@ -370,7 +370,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
     '''
 
     def __init__(self):
-        self.sorter_label = "ThicknessCalculatorGamma"
+        self.sorter_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
 
@@ -407,13 +407,13 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         Returns:
         --------
             pandas.DataFrame: units dataframe with added thickness columns:
-            "gammaThickness" is the median thickness of the unit,
-            "gammaStdDev" is the standard deviation of the thickness of the unit
+            "ThicknessMedian" is the median thickness of the unit,
+            "ThicknessStdDev" is the standard deviation of the thickness of the unit
 
         Note:
         -----
             This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts.
-            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. ThicknessCalculatorBeta may be used for such situations and future versions of map2loop will attempt to solve for this.
+            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. Interpolated Structure may be used for such situations and future versions of map2loop will attempt to solve for this.
             If the thickness is not calculated for a given unit, the assigned thickness will be -1.
             For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
         """
@@ -558,15 +558,15 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         # assign the thicknesses to the each unit
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
-            output_units.loc[idx, 'gammaThickness'] = unit['median']
-            output_units.loc[idx, 'gammaStdDev'] = unit['std']
+            output_units.loc[idx, 'ThicknessMedian'] = unit['median']
+            output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
 
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
             if (
                 # not a top//bottom unit
-                (output_units[output_units['name'] == unit]['gammaThickness'].isna().all())
+                (output_units[output_units['name'] == unit]['ThicknessMedian'].isna().all())
                 and (unit != stratigraphic_order[-1])
                 and (unit != stratigraphic_order[0])
             ):
@@ -580,12 +580,12 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                     'Assigning thickness of -1',
                 )
                 # assign -1 as thickness
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
             # if top//bottom unit assign -1
             if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
         return output_units

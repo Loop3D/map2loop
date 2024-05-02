@@ -195,7 +195,7 @@ class Config:
 
         try:
             filename = str(filename)
-            
+
             if filename.startswith("http") or filename.startswith("ftp"):
                 try_count = 10
                 success = False

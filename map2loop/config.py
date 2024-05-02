@@ -4,6 +4,7 @@ import urllib
 import time
 from pathlib import Path
 
+
 class Config:
     """
     A data structure containing column name mappings for files and keywords

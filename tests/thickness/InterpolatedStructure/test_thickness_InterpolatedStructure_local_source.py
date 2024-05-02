@@ -14,7 +14,7 @@ from map2loop.sampler import SamplerSpacing, SamplerDecimator
 
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
-from map2loop.sampler import SamplerSpacing
+
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
     minx, miny, maxx, maxy = bbox
@@ -257,5 +257,3 @@ def test_thickness_InterpolatedStructure(proj=proj):
     #     ).values
     #     == 89.0
     # ), "thickness calculator InterpolatedStructure not calculating thickness correctly"
-
-

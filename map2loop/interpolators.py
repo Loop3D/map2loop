@@ -372,7 +372,7 @@ class DipDipDirectionInterpolator(Interpolator):
             Rbf: radial basis function object
         """
         if interpolator is Rbf:
-            self.interpolator = Rbf(self.x, self.y, ni, function="linear")
+            rbf = Rbf(self.x, self.y, ni, function="linear")
             return rbf(self.xi, self.yi)
 
         if interpolator is LinearNDInterpolator:

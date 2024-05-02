@@ -231,9 +231,9 @@ class InterpolatedStructure(ThicknessCalculator):
         thicknesses = units.copy()
         # Set default value
         # thicknesses["betaThickness"] is the median thickness of the unit
-        thicknesses["betaThickness"] = -1.0
+        thicknesses["Thickness"] = -1.0
         # thicknesses["betaStdDev"] is the standard deviation of the thickness of the unit
-        thicknesses["betaStdDev"] = 0
+        thicknesses["ThicknessStdDev"] = 0
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
@@ -345,8 +345,8 @@ class InterpolatedStructure(ThicknessCalculator):
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]
                     ].tolist()[0]
-                    thicknesses.loc[idx, "betaThickness"] = median
-                    thicknesses.loc[idx, "betaStdDev"] = std_dev
+                    thicknesses.loc[idx, "Thickness"] = median
+                    thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
             else:
                 print(
                     f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"

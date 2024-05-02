@@ -1,9 +1,9 @@
 # This test runs on a portion of the dataset in https://github.com/Loop3D/m2l3_examples/tree/main/Laurent2016_V2_variable_thicknesses (only for lithologies E, F, and G)
-# structures are confined to litho_F, and the test confirms if the gamma thickness is calculated, for all lithologies, if the thickness is correct for F (~90 m), and top/bottom units are assigned -1
+# structures are confined to litho_F, and the test confirms if the StructuralPoint thickness is calculated, for all lithologies, if the thickness is correct for F (~90 m), and top/bottom units are assigned -1
 # this creates a temp folder in Appdata to store the data to run the proj, checks the thickness, and then deletes the temp folder
 # this was done to avoid overflow of file creation in the tests folder
 
-from map2loop.thickness_calculator import ThicknessCalculatorGamma
+from map2loop.thickness_calculator import StructuralPoint
 from osgeo import gdal, osr
 import os
 import shapely
@@ -210,7 +210,7 @@ proj = Project(
     loop_project_filename=loop_project_filename,
 )
 
-proj.set_thickness_calculator(ThicknessCalculatorGamma())
+proj.set_thickness_calculator(StructuralPoint())
 
 column = ['Litho_G', 'Litho_F', 'Litho_E']
 
@@ -219,40 +219,40 @@ proj.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
 
 
-def test_thickness_gamma(proj=proj):
+def test_thickness_structuralPoint(proj=proj):
     # 1. are all lithologies in the geology returned?
     assert all(
         element in geology['UNITNAME'].unique().tolist()
         for element in proj.stratigraphic_column.stratigraphicUnits['name'].to_list()
-    ), "gamma thickness not calculating for all lithologies in geology"
+    ), " thickness calculator not calculating for all lithologies in geology"
 
-    # 2. is gammaThickness a column in the stratigraphicUnits?
+    # 2. is ThicknessMedian a column in the stratigraphicUnits?
     assert (
-        'gammaThickness' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
-    ), "gammaThickness not in resulting stratigraphicUnits"
+        'ThicknessMedian' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
+    ), "ThicknessMedian not in resulting stratigraphicUnits"
 
     # 2. are bottom and top units assigned as -1?
     assert (
         proj.stratigraphic_column.stratigraphicUnits[
             proj.stratigraphic_column.stratigraphicUnits['Order']
             == min(proj.stratigraphic_column.stratigraphicUnits['Order'])
-        ]['gammaThickness'].values
+        ]['ThicknessMedian'].values
         == -1
-    ), "gamma thickness: top unit not assigned as -1"
+    ), "StructuralPoint thickness calculator: top unit not assigned as -1"
     assert (
         proj.stratigraphic_column.stratigraphicUnits[
             proj.stratigraphic_column.stratigraphicUnits['Order']
             == max(proj.stratigraphic_column.stratigraphicUnits['Order'])
-        ]['gammaThickness'].values
+        ]['ThicknessMedian'].values
         == -1
-    ), "gamma thickness: bottom unit not assigned as -1"
+    ), "thickness calculator StructuralPoint: bottom unit not assigned as -1"
 
     # 3. Is the thickness being calculated correctly? Should be ~ 89
     assert (
         round(
             proj.stratigraphic_column.stratigraphicUnits[
                 proj.stratigraphic_column.stratigraphicUnits['name'] == 'Litho_F'
-            ]['gammaThickness']
+            ]['ThicknessMedian']
         ).values
         == 89.0
-    ), "gamma thickness not calculating thickness correctly"
+    ), "thickness calculator StructuralPoint not calculating thickness correctly"

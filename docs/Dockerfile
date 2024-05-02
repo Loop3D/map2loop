@@ -17,16 +17,13 @@ RUN apt-get update -qq && \
     
 RUN conda install python=3.11 -y
 COPY . /map2loop
-WORKDIR map2loop
-COPY dependencies.txt dependencies.txt
 
-RUN conda install -c conda-forge -c loop3d --file dependencies.txt
-RUN conda install -c conda-forge -c loop3d LoopStructural
+RUN conda install -c conda-forge -c loop3d --file ./map2loop/dependencies.txt -y
+RUN conda install -c conda-forge -c loop3d LoopStructural -y
 
-COPY docs/requirements.txt requirements.txt
-RUN conda install -c conda-forge --file requirements.txt
+RUN conda install -c conda-forge --file ./map2loop/docs/requirements.txt -y
 
-RUN pip install .
+RUN pip install ./map2loop
 RUN pip install lavavu-osmesa==1.8.45 
 ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.10/site-packages/lavavu_osmesa.libs
 

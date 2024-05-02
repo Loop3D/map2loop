@@ -10,14 +10,11 @@ import shapely
 import geopandas
 import tempfile
 import map2loop
-from map2loop import Project
-from map2loop.m2l_enums import Datatype
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 
 from map2loop.project import Project
-from map2loop.m2l_enums import VerboseLevel, Datatype
+from map2loop.m2l_enums import Datatype
 from map2loop.sampler import SamplerSpacing
-from pyproj.exceptions import CRSError
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
     minx, miny, maxx, maxy = bbox

@@ -639,7 +639,9 @@ class Project(object):
         faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
         faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
         faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
-        faults_obs_data["featureId"][len(self.fault_samples) :] = self.fault_orientations["featureId"]
+        faults_obs_data["featureId"][len(self.fault_samples) :] = self.fault_orientations[
+            "featureId"
+        ]
         faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
         faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0

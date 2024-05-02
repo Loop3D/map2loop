@@ -190,7 +190,7 @@ class InterpolatedStructure(ThicknessCalculator):
         """
         Initialiser for beta version of the thickness calculator
         """
-        self.thickness_calculator_label = "ThicknessCalculatorBeta"
+        self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []
 
     @beartype.beartype

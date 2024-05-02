@@ -1,6 +1,6 @@
 numpy
 pandas
-geopandas=0.12.2
+geopandas
 shapely
 tqdm
 networkx

@@ -61,7 +61,7 @@ class Interpolator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def interpolator(self, ni: Union[list, numpy.ndarray]):
+    def interpolate(self, ni: Union[list, numpy.ndarray]):
         """
         Interpolator method
 
@@ -78,8 +78,8 @@ class Interpolator(ABC):
 
     @beartype.beartype
     @abstractmethod
-    def interpolate(
-        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = None
+    def __call__(
+            self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = None
     ) -> Any:
         """
         Execute interpolate method (abstract method)
@@ -148,9 +148,9 @@ class NormalVectorInterpolator(Interpolator):
         """
         # the following code is a slightly modified version from LoopStructural's InputDataProcessor
         if (
-            "nx" not in structure_data.columns
-            or "ny" not in structure_data.columns
-            or "nz" not in structure_data.columns
+                "nx" not in structure_data.columns
+                or "ny" not in structure_data.columns
+                or "nz" not in structure_data.columns
         ):
             if "strike" not in structure_data.columns and "azimuth" in structure_data.columns:
                 structure_data["strike"] = structure_data["azimuth"] - 90
@@ -178,18 +178,18 @@ class NormalVectorInterpolator(Interpolator):
                 )
 
             if (
-                "nx" not in structure_data.columns
-                or "ny" not in structure_data.columns
-                or "nz" not in structure_data.columns
+                    "nx" not in structure_data.columns
+                    or "ny" not in structure_data.columns
+                    or "nz" not in structure_data.columns
             ):
                 raise ValueError(
                     "Contact orientation data must contain either strike/dipdir, dip, or nx, ny, nz"
                 )
 
             if (
-                "X" not in structure_data.columns
-                or "Y" not in structure_data.columns
-                or "Z" not in structure_data.columns
+                    "X" not in structure_data.columns
+                    or "Y" not in structure_data.columns
+                    or "Z" not in structure_data.columns
             ):
                 if "X" not in structure_data.columns and "easting" in structure_data.columns:
                     structure_data["X"] = structure_data["easting"]
@@ -206,9 +206,9 @@ class NormalVectorInterpolator(Interpolator):
                     structure_data["Z"] = 0
 
                 if (
-                    "X" not in structure_data.columns
-                    or "Y" not in structure_data.columns
-                    or "Z" not in structure_data.columns
+                        "X" not in structure_data.columns
+                        or "Y" not in structure_data.columns
+                        or "Z" not in structure_data.columns
                 ):
                     raise ValueError(
                         "Contact orientation data must contain either X, Y, Z or easting, northing, altitude"
@@ -235,7 +235,7 @@ class NormalVectorInterpolator(Interpolator):
         self.xi, self.yi = generate_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
+    def interpolate(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
         # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
@@ -256,8 +256,8 @@ class NormalVectorInterpolator(Interpolator):
             return lnd_interpolator(self.xi, self.yi)
 
     @beartype.beartype
-    def interpolate(
-        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = Rbf
+    def __call__(
+            self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = Rbf
     ) -> numpy.ndarray:
         """
         Execute interpolation method
@@ -279,9 +279,9 @@ class NormalVectorInterpolator(Interpolator):
         nz = self.dataframe["nz"].to_numpy()
 
         # interpolate each component of the normal vector nx, ny, nz
-        nx_interp = self.interpolator(nx)
-        ny_interp = self.interpolator(ny)
-        nz_interp = self.interpolator(nz)
+        nx_interp = self.interpolate(nx)
+        ny_interp = self.interpolate(ny)
+        nz_interp = self.interpolate(nz)
 
         vecs = numpy.array([nx_interp, ny_interp, nz_interp]).T
         # normalize the vectors
@@ -356,7 +356,10 @@ class DipDipDirectionInterpolator(Interpolator):
         self.xi, self.yi = generate_grid(bounding_box)
 
     @beartype.beartype
-    def interpolator(self, ni: Union[ndarray, list], interpolator: Any = Rbf) -> numpy.ndarray:
+    def interpolate(
+            self,
+            ni: Union[ndarray, list],
+            interpolator: Any = Rbf):
         # TODO: 1. add code to use LoopStructural interpolators
         """
         Inverse Distance Weighting interpolation method
@@ -369,7 +372,7 @@ class DipDipDirectionInterpolator(Interpolator):
             Rbf: radial basis function object
         """
         if interpolator is Rbf:
-            rbf = Rbf(self.x, self.y, ni, function="linear")
+            self.interpolator = Rbf(self.x, self.y, ni, function="linear")
             return rbf(self.xi, self.yi)
 
         if interpolator is LinearNDInterpolator:
@@ -377,8 +380,11 @@ class DipDipDirectionInterpolator(Interpolator):
             return lnd_interpolator(self.xi, self.yi)
 
     @beartype.beartype
-    def interpolate(
-        self, bounding_box: dict, structure_data: pandas.DataFrame, interpolator: Any = Rbf
+    def __call__(
+            self,
+            bounding_box: dict,
+            structure_data: pandas.DataFrame,
+            interpolator: Any = Rbf
     ):
         """
         Execute interpolation method (abstract method)
@@ -398,13 +404,13 @@ class DipDipDirectionInterpolator(Interpolator):
 
         # interpolate dip and dip direction
         if self.dip is not None and self.dipdir is not None:
-            interpolated_dip = self.interpolator(self.dip, interpolator)
-            interpolated_dipdir = self.interpolator(self.dipdir, interpolator)
+            interpolated_dip = self.interpolate(self.dip, interpolator)
+            interpolated_dipdir = self.interpolate(self.dipdir, interpolator)
             interpolated = numpy.array([interpolated_dip, interpolated_dipdir]).T
             return interpolated
 
         if self.dip is not None and self.dipdir is None:
-            return self.interpolator(self.dip, interpolator)
+            return self.interpolate(self.dip, interpolator)
 
         if self.dipdir is not None and self.dip is None:
-            return self.interpolator(self.dipdir, interpolator)
+            return self.interpolate(self.dipdir, interpolator)

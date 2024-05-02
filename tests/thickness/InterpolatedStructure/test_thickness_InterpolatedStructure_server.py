@@ -1,11 +1,10 @@
-from map2loop.thickness_calculator import StructuralPoint
+from map2loop.thickness_calculator import InterpolatedStructure
 from osgeo import gdal, osr
 import os
 import shapely
 import geopandas
 import tempfile
 import map2loop
-from map2loop import Project
 
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
@@ -30,8 +29,8 @@ def test_from_aus_state():
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename)
         
-    proj.set_thickness_calculator(StructuralPoint())
+    proj.set_thickness_calculator(InterpolatedStructure())
     proj.run_all()
-    assert proj.thickness_calculator.sorter_label == "StructuralPoint", 'Thickness_calc structural point not being set properly'
-    assert "ThicknessMedian" in proj.stratigraphic_column.stratigraphicUnits.columns, 'Thickness not being calculated in StructuralPointCalculator'
-    assert "ThicknessStdDev" in proj.stratigraphic_column.stratigraphicUnits.columns, 'Thickness std not being calculated in StructuralPointCalculator'
+    assert proj.thickness_calculator.sorter_label == "InterpolatedStructure", 'Thickness_calc structural point not being set properly'
+    assert "ThicknessMedian" in proj.stratigraphic_column.stratigraphicUnits.columns, 'Thickness not being calculated in InterpolatedStructureCalculator'
+    assert "ThicknessStdDev" in proj.stratigraphic_column.stratigraphicUnits.columns, 'Thickness std not being calculated in InterpolatedStructureCalculator'

@@ -14,6 +14,7 @@ from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
 
+
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
     minx, miny, maxx, maxy = bbox
     cols = int((maxx - minx) / pixel_size)
@@ -255,5 +256,3 @@ def test_thickness_structuralPoint(proj=proj):
         ).values
         == 89.0
     ), "thickness calculator StructuralPoint not calculating thickness correctly"
-
-

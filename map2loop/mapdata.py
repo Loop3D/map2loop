@@ -326,7 +326,7 @@ class MapData:
                 )
             else:
                 self.set_config_filename(
-                    AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
+                    AustraliaStateUrls.aus_config_urls[state], legacy_format=False, lower=lower
                 )
                 self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
             print(self.config_filename)

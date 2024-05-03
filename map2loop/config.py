@@ -2,8 +2,8 @@ import beartype
 import hjson
 import urllib
 import time
-from pathlib import Path
-
+import pathlib
+from typing import Union
 
 class Config:
     """
@@ -180,7 +180,7 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: Path, legacy_format: bool = False, lower: bool = False):
+    def update_from_file(self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False):
         """
         Update the config dictionary from the provided json filename or url
 

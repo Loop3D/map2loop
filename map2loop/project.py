@@ -1,5 +1,5 @@
 import beartype
-
+import pathlib
 from map2loop.fault_orientation import FaultOrientationNearest
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
@@ -12,7 +12,7 @@ from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
 import LoopProjectFile as LPF
-
+from typing import Union
 import numpy
 import pandas
 import geopandas
@@ -64,9 +64,9 @@ class Project(object):
         fault_orientation_filename: str = "",
         fold_filename: str = "",
         dtm_filename: str = "",
-        config_filename: pathlib.Path = "",
+        config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
-        clut_filename: pathlib.Path = "",
+        clut_filename: Union[pathlib.Path, str]-"",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",

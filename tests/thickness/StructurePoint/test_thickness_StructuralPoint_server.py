@@ -15,12 +15,12 @@ def test_from_aus_state():
         "top": 3000,
     }
     loop_project_filename = "wa_output.loop3d"
-
+    module_path = map2loop.__file__.replace("__init__.py", "")
     proj = Project(
         use_australian_state_data="WA",
         working_projection="EPSG:28350",
         bounding_box=bbox_3d,
-        config_filename=  pathlib.Path(map2loop.__file__) / pathlib.Path("_datasets/clut_files/WA_clut.csv"),
+        config_filename=  pathlib.Path(module_path) / pathlib.Path("map2loop/_datasets/clut_files/WA_clut.csv"),
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,

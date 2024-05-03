@@ -3,7 +3,7 @@ from map2loop.sampler import SamplerSpacing
 import shapely
 import geopandas
 
-geology_original = pandas.read_csv("map2loop/tests/sampler/geo_test.csv")
+geology_original = pandas.read_csv("tests/sampler/geo_test.csv")
 geology_original['geometry'] = geology_original['geometry'].apply(shapely.wkt.loads)
 geology_original = geopandas.GeoDataFrame(geology_original, crs='epsg:7854')
 

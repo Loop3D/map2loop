@@ -200,9 +200,6 @@ proj = Project(
     fold_filename=os.path.join(path, "faults.shp"),
     structure_filename=os.path.join(path, "structures.shp"),
     dtm_filename=os.path.join(path, 'DEM.tif'),
-    clut_filename=os.path.join(
-        os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"
-    ),
     config_dictionary=config,
     clut_file_legacy=False,
     working_projection="EPSG:7854",

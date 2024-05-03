@@ -73,7 +73,7 @@ def test_from_aus_state():
         use_australian_state_data="WA",
         working_projection="EPSG:28350",
         bounding_box=bbox_3d,
-        config=config, 
+        config_dictionary=config, 
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,

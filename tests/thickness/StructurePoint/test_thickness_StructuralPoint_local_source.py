@@ -12,6 +12,8 @@ import tempfile
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
+from pathlib import Path
+import map2loop
 
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
@@ -192,7 +194,6 @@ config = {
     },
 }
 
-from pathlib import Path
 
 proj = Project(
     geology_filename=os.path.join(f_path, "geology.shp"),

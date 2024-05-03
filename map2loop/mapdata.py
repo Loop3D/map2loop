@@ -9,7 +9,6 @@ import urllib
 from gzip import GzipFile
 from uuid import uuid4
 import beartype
-from pathlib import Path
 import os
 from io import BytesIO
 from .m2l_enums import Datatype, Datastate
@@ -230,7 +229,9 @@ class MapData:
             return None
 
     @beartype.beartype
-    def set_config_filename(self, filename: Path, legacy_format: bool = False, lower: bool = False):
+    def set_config_filename(
+        self, filename: pathlib.Path, legacy_format: bool = False, lower: bool = False
+    ):
         """
         Set the config filename and update the config structure
 
@@ -253,7 +254,7 @@ class MapData:
         return self.config_filename
 
     @beartype.beartype
-    def set_colour_filename(self, filename: Path):
+    def set_colour_filename(self, filename: pathlib.Path):
         """
         Set the filename of the colour csv file
 

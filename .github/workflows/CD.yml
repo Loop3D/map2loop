@@ -46,10 +46,12 @@ jobs:
           pip install .
 
       - name: Testing
-        working-directory: map2loop
+        
         shell: bash -l {0}
         run: |
+          cd map2loop
           pytest
+          cd ..
           
   documentation-test:
     runs-on: ubuntu-latest

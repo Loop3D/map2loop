@@ -319,11 +319,11 @@ class MapData:
             if os.environ.get("DOCUMENTATION_TEST", False):
                 import map2loop
 
-                #because doc tests runs on docker from within the m2l folder
+                # because doc tests runs on docker from within the m2l folder
                 module_path = map2loop.__file__.replace("__init__.py", "")
 
                 config_path_str = '_datasets/config_files/{}.json'.format(state)
-                self.set_config_filename(pathlib.Path(module_path)/pathlib.Path(config_path_str))
+                self.set_config_filename(pathlib.Path(module_path) / pathlib.Path(config_path_str))
 
                 colour_file_str = '_datasets/clut_files/{}_clut.csv'.format(state)
                 self.set_colour_filename(pathlib.Path(colour_file_str))

@@ -1,8 +1,6 @@
 from map2loop.thickness_calculator import StructuralPoint
-import pathlib
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
-import map2loop
 
 config = {
     "structure": {
@@ -54,7 +52,6 @@ config = {
         "objectid_column": "objectid",
     },
 }
-
 
 
 def test_from_aus_state():

@@ -9,10 +9,10 @@ import os
 import shapely
 import geopandas
 import tempfile
+import pathlib
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
-from pathlib import Path
 import map2loop
 
 
@@ -201,7 +201,7 @@ proj = Project(
     fold_filename=os.path.join(f_path, "faults.shp"),
     structure_filename=os.path.join(f_path, "structures.shp"),
     dtm_filename=os.path.join(f_path, 'DEM.tif'),
-    clut_filename=Path(
+    clut_filename=pathlib.Path(
         os.path.join(os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv")
     ),
     config_dictionary=config,

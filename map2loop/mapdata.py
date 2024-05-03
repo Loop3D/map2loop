@@ -326,7 +326,7 @@ class MapData:
                 self.set_config_filename(pathlib.Path(module_path) / pathlib.Path(config_path_str))
 
                 colour_file_str = '_datasets/clut_files/{}_clut.csv'.format(state)
-                self.set_colour_filename(pathlib.Path(module_path) /pathlib.Path(colour_file_str))
+                self.set_colour_filename(pathlib.Path(module_path) / pathlib.Path(colour_file_str))
 
             else:
                 self.set_config_filename(

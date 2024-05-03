@@ -44,6 +44,13 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install .
+
+      - name: Testing
+        working-directory: map2loop
+        shell: bash -l {0}
+        run: |
+          pytest
+          
   documentation-test:
     runs-on: ubuntu-latest
     #needs: continuous-integration

@@ -49,9 +49,9 @@ jobs:
       - name: Testing
         shell: bash -l {0}
         run: |
-          pytest
           cd ..
-
+          pytest
+          
   documentation-test:
     runs-on: ubuntu-latest
     #needs: continuous-integration

@@ -4,6 +4,58 @@ from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
 import map2loop
 
+config = {
+    "structure": {
+        "orientation_type": "strike",
+        "dipdir_column": "strike2",
+        "dip_column": "dip_2",
+        "description_column": "DESCRIPTION",
+        "bedding_text": "Bed",
+        "overturned_column": "structypei",
+        "overturned_text": "BEOI",
+        "objectid_column": "objectid",
+        "desciption_column": "feature",
+    },
+    "geology": {
+        "unitname_column": "UNITNAME",
+        "alt_unitname_column": "UNITNAME",
+        "group_column": "GROUP",
+        "supergroup_column": "supersuite",
+        "description_column": "descriptn",
+        "minage_column": "min_age_ma",
+        "maxage_column": "max_age_ma",
+        "rocktype_column": "rocktype1",
+        "alt_rocktype_column": "rocktype2",
+        "sill_text": "sill",
+        "intrusive_text": "intrusive",
+        "volcanic_text": "volcanic",
+        "objectid_column": "ID",
+        "ignore_codes": ["cover"],
+    },
+    "fault": {
+        "structtype_column": "feature",
+        "fault_text": "Fault",
+        "dip_null_value": "0",
+        "dipdir_flag": "num",
+        "dipdir_column": "dip_dir",
+        "dip_column": "dip",
+        "orientation_type": "dip direction",
+        "dipestimate_column": "dip_est",
+        "dipestimate_text": "gentle,moderate,steep",
+        "name_column": "name",
+        "objectid_column": "objectid",
+    },
+    "fold": {
+        "structtype_column": "feature",
+        "fold_text": "Fold axial trace",
+        "description_column": "type",
+        "synform_text": "syncline",
+        "foldname_column": "NAME",
+        "objectid_column": "objectid",
+    },
+}
+
+
 
 def test_from_aus_state():
 
@@ -16,13 +68,12 @@ def test_from_aus_state():
         "top": 3000,
     }
     loop_project_filename = "wa_output.loop3d"
-    module_path = map2loop.__file__.replace("__init__.py", "")
+
     proj = Project(
         use_australian_state_data="WA",
         working_projection="EPSG:28350",
         bounding_box=bbox_3d,
-        config_filename=pathlib.Path(module_path)
-        / pathlib.Path("map2loop/_datasets/clut_files/WA_clut.csv"),
+        config=config, 
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,

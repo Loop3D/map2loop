@@ -47,7 +47,6 @@ jobs:
       - name: Testing
         shell: bash -l {0}
         run: |
-          cd ..
           pytest
           
   documentation-test:

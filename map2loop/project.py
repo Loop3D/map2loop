@@ -8,6 +8,7 @@ from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
+from pathlib import Path
 
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
@@ -63,9 +64,9 @@ class Project(object):
         fault_orientation_filename: str = "",
         fold_filename: str = "",
         dtm_filename: str = "",
-        config_filename: str = "",
+        config_filename: Path = "",
         config_dictionary: dict = {},
-        clut_filename: str = "",
+        clut_filename: Path = "",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",

@@ -125,22 +125,22 @@ structures = geopandas.GeoDataFrame(structures, crs='epsg:7854')
 
 faults = geopandas.GeoDataFrame(columns=['geometry'], crs='epsg:7854')
 
-path = tempfile.mkdtemp()
+f_path = tempfile.mkdtemp()
 
 bounding_box = {"minx": 0, "miny": 0, "maxx": 10000, "maxy": 10000, "base": 0, "top": -5000}
 
 create_raster(
-    os.path.join(path, "DEM.tif"),
+    os.path.join(f_path, "DEM.tif"),
     (bounding_box['minx'], bounding_box['miny'], bounding_box['maxx'], bounding_box['maxy']),
     7854,
     1000,
 )
 
-geology.to_file(os.path.join(path, "geology.shp"))
-structures.to_file(os.path.join(path, "structures.shp"))
-faults.to_file(os.path.join(path, "faults.shp"))
+geology.to_file(os.path.join(f_path, "geology.shp"))
+structures.to_file(os.path.join(f_path, "structures.shp"))
+faults.to_file(os.path.join(f_path, "faults.shp"))
 
-loop_project_filename = os.path.join(path, "local_source.loop3d")
+loop_project_filename = os.path.join(f_path, "local_source.loop3d")
 
 config = {
     "structure": {
@@ -193,13 +193,17 @@ config = {
     },
 }
 
+from pathlib import Path
 
 proj = Project(
-    geology_filename=os.path.join(path, "geology.shp"),
-    fault_filename=os.path.join(path, "faults.shp"),
-    fold_filename=os.path.join(path, "faults.shp"),
-    structure_filename=os.path.join(path, "structures.shp"),
-    dtm_filename=os.path.join(path, 'DEM.tif'),
+    geology_filename=os.path.join(f_path, "geology.shp"),
+    fault_filename=os.path.join(f_path, "faults.shp"),
+    fold_filename=os.path.join(f_path, "faults.shp"),
+    structure_filename=os.path.join(f_path, "structures.shp"),
+    dtm_filename=os.path.join(f_path, 'DEM.tif'),
+    clut_filename=Path(os.path.join(
+        os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"
+    )),
     config_dictionary=config,
     clut_file_legacy=False,
     working_projection="EPSG:7854",

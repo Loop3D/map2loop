@@ -1,8 +1,8 @@
 from map2loop.thickness_calculator import StructuralPoint
-
+import pathlib
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
-
+import map2loop
 
 def test_from_aus_state():
 
@@ -20,6 +20,8 @@ def test_from_aus_state():
         use_australian_state_data="WA",
         working_projection="EPSG:28350",
         bounding_box=bbox_3d,
+        config_filename=  pathlib.Path(
+        pathlib.Path(map2loop.__file__), pathlib.Path("_datasets/clut_files/WA_clut.csv")),
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,

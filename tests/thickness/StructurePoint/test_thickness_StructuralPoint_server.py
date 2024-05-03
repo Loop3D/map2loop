@@ -1,8 +1,6 @@
 from map2loop.thickness_calculator import StructuralPoint
-import pathlib
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
-import map2loop
 
 config = {
     "structure": {
@@ -56,7 +54,6 @@ config = {
 }
 
 
-
 def test_from_aus_state():
 
     bbox_3d = {
@@ -73,7 +70,7 @@ def test_from_aus_state():
         use_australian_state_data="WA",
         working_projection="EPSG:28350",
         bounding_box=bbox_3d,
-        config=config, 
+        config=config,
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,

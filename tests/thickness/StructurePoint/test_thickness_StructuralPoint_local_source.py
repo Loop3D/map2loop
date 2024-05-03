@@ -9,7 +9,6 @@ import os
 import shapely
 import geopandas
 import tempfile
-import map2loop
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype

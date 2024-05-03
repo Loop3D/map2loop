@@ -18,6 +18,7 @@ from .aus_state_urls import AustraliaStateUrls
 from .random_colour import random_colours_hex
 from typing import Union
 
+
 class MapData:
     """
     A data structure containing all the map data loaded from map files

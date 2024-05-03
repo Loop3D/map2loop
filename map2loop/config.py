@@ -5,6 +5,7 @@ import time
 import pathlib
 from typing import Union
 
+
 class Config:
     """
     A data structure containing column name mappings for files and keywords
@@ -180,7 +181,9 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False):
+    def update_from_file(
+        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+    ):
         """
         Update the config dictionary from the provided json filename or url
 

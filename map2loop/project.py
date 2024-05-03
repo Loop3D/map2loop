@@ -66,7 +66,7 @@ class Project(object):
         dtm_filename: str = "",
         config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
-        clut_filename: Union[pathlib.Path, str]-"",
+        clut_filename: Union[pathlib.Path, str]="",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",

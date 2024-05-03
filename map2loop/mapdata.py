@@ -16,7 +16,7 @@ from .m2l_enums import VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .random_colour import random_colours_hex
-
+from typing import Union
 
 class MapData:
     """
@@ -230,7 +230,7 @@ class MapData:
 
     @beartype.beartype
     def set_config_filename(
-        self, filename: pathlib.Path, legacy_format: bool = False, lower: bool = False
+        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
     ):
         """
         Set the config filename and update the config structure
@@ -254,7 +254,7 @@ class MapData:
         return self.config_filename
 
     @beartype.beartype
-    def set_colour_filename(self, filename: pathlib.Path):
+    def set_colour_filename(self, filename: Union[pathlib.Path, str]):
         """
         Set the filename of the colour csv file
 

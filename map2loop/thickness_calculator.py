@@ -317,11 +317,17 @@ class InterpolatedStructure(ThicknessCalculator):
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         self.lines.append(short_line)
                         # extract the end points of the shortest line
-                        p1 = numpy.asarray(short_line[0].coords[0])
+                        p1 = numpy.zeros(3)
+                        p1[0] = numpy.asarray(short_line[0].coords[0][0])
+                        p1[1] = numpy.asarray(short_line[0].coords[0][1])
+                        # get the elevation Z of the end point p1
+                        p1[2] = map_data.get_value_from_raster(Datatype.DTM, p1[0], p1[1])
                         # create array to store xyz coordinates of the end point p2
                         p2 = numpy.zeros(3)
                         p2[0] = numpy.asarray(short_line[0].coords[-1][0])
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
+                        # get the elevation Z of the end point p2
+                        p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line

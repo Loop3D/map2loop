@@ -5,12 +5,22 @@ module_path = os.path.dirname(__file__)
 
 
 def load_clut(state):
-    stream = pathlib.Path(module_path) / pathlib.Path('_datasets') / pathlib.Path('clut_files') / pathlib.Path(f'{state}_clut.csv')
+    stream = (
+        pathlib.Path(module_path)
+        / pathlib.Path('_datasets')
+        / pathlib.Path('clut_files')
+        / pathlib.Path(f'{state}_clut.csv')
+    )
     return stream
 
 
 def load_config(state):
-    stream = pathlib.Path(module_path) / pathlib.Path('_datasets') / pathlib.Path('config_files') / pathlib.Path(f'{state}.json')
+    stream = (
+        pathlib.Path(module_path)
+        / pathlib.Path('_datasets')
+        / pathlib.Path('config_files')
+        / pathlib.Path(f'{state}.json')
+    )
     return stream
 
 

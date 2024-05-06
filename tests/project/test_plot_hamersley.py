@@ -1,8 +1,6 @@
 import pytest
 from map2loop.project import Project
-from map2loop.m2l_enums import VerboseLevel, Datatype
-from map2loop.sorter import SorterAlpha
-from map2loop.sampler import SamplerSpacing
+from map2loop.m2l_enums import VerboseLevel
 from pyproj.exceptions import CRSError
 import os
 
@@ -16,6 +14,7 @@ bbox_3d = {
 }
 loop_project_filename = "wa_output.loop3d"
 
+
 def test_project_execution():
     proj = Project(
         use_australian_state_data="WA",
@@ -28,9 +27,11 @@ def test_project_execution():
     proj.run_all(take_best=True)
     assert proj is not None, "Plot Hamersley Basin failed to execute"
 
+
 def test_file_creation():
     expected_file = loop_project_filename
     assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
+
 
 ###################################################################
 ## test if wrong crs will throw a crs error

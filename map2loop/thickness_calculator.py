@@ -556,8 +556,12 @@ class StructuralPoint(ThicknessCalculator):
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'std']).reset_index()
+        result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
         output_units = units.copy()
+        output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
+        output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
+
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
 

@@ -188,7 +188,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
     def __init__(self):
         """
-        Initialiser for interplated structure version of the thickness calculator
+        Initialiser for interpolated structure version of the thickness calculator
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []

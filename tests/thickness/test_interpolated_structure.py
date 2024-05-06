@@ -90,11 +90,11 @@ def test_compute(
     )
     assert interpolated_structure_thickness.thickness_calculator_label == "InterpolatedStructure"
     assert isinstance(result, pd.DataFrame)
-    assert 'Thickness' in result.columns
-    assert result['Thickness'].dtypes == float
+    assert 'ThicknessMedian' in result.columns
+    assert result['ThicknessMedian'].dtypes == float
     assert 'ThicknessStdDev' in result.columns
     assert result['ThicknessStdDev'].dtypes == float
-    assert int(result.loc[result['name'] == 'Litho_A', 'Thickness'].to_numpy()[0]) == -1
-    assert int(result.loc[result['name'] == 'Litho_B', 'Thickness'].to_numpy()[0]) == 2649
-    assert int(result.loc[result['name'] == 'Litho_C', 'Thickness'].to_numpy()[0]) == 950
-    assert int(result.loc[result['name'] == 'Litho_D', 'Thickness'].to_numpy()[0]) == -1
+    assert int(result.loc[result['name'] == 'Litho_A', 'ThicknessMedian'].to_numpy()[0]) == -1
+    assert int(result.loc[result['name'] == 'Litho_B', 'ThicknessMedian'].to_numpy()[0]) == 2649
+    assert int(result.loc[result['name'] == 'Litho_C', 'ThicknessMedian'].to_numpy()[0]) == 950
+    assert int(result.loc[result['name'] == 'Litho_D', 'ThicknessMedian'].to_numpy()[0]) == -1

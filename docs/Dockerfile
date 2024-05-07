@@ -3,7 +3,6 @@ LABEL maintainer="lachlan.grose@monash.edu"
 #This docker image has been adapted from the lavavu dockerfile
 # install things
 
-
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
     gcc \
@@ -16,15 +15,15 @@ RUN apt-get update -qq && \
     libgl1-mesa-glx
     
 RUN conda install python=3.11 -y
-COPY . /map2loop
-WORKDIR map2loop
+COPY . /map2loop 
+
+WORKDIR /map2loop
+
 COPY dependencies.txt dependencies.txt
+RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
+RUN conda install -c conda-forge -c loop3d LoopStructural -y
 
-RUN conda install -c conda-forge -c loop3d --file dependencies.txt
-RUN conda install -c conda-forge -c loop3d LoopStructural
-
-COPY docs/requirements.txt requirements.txt
-RUN conda install -c conda-forge --file requirements.txt
+RUN conda install -c conda-forge --file ./docs/requirements.txt -y
 
 RUN pip install .
 RUN pip install lavavu-osmesa==1.8.45 

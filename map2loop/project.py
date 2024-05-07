@@ -1,5 +1,5 @@
 import beartype
-
+import pathlib
 from map2loop.fault_orientation import FaultOrientationNearest
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
@@ -8,17 +8,17 @@ from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
-
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
 import LoopProjectFile as LPF
-
+from typing import Union
 import numpy
 import pandas
 import geopandas
 import os
 import re
+
 from matplotlib.colors import to_rgba
 from osgeo import gdal
 
@@ -63,9 +63,9 @@ class Project(object):
         fault_orientation_filename: str = "",
         fold_filename: str = "",
         dtm_filename: str = "",
-        config_filename: str = "",
+        config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
-        clut_filename: str = "",
+        clut_filename: Union[pathlib.Path, str] = "",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
@@ -132,10 +132,12 @@ class Project(object):
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
-        self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"])
-        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fault_orientations = pandas.DataFrame(
+            columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
+        )
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -569,6 +571,7 @@ class Project(object):
                 depth=[self.map_data.bounding_box["top"], self.map_data.bounding_box["base"]],
                 spacing=[1000, 1000, 500],
                 preference="utm",
+                epsg=self.map_data.get_working_projection(),
             )
         else:
             # TODO: Check loopfile extents match project extents before continuing
@@ -612,6 +615,7 @@ class Project(object):
         contacts_data["easting"] = self.map_data.sampled_contacts["X"]
         contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
         contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
+        contacts_data["featureId"] = self.map_data.sampled_contacts["featureId"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -623,6 +627,7 @@ class Project(object):
         faults_obs_data["easting"][0 : len(self.fault_samples)] = self.fault_samples["X"]
         faults_obs_data["northing"][0 : len(self.fault_samples)] = self.fault_samples["Y"]
         faults_obs_data["altitude"][0 : len(self.fault_samples)] = self.fault_samples["Z"]
+        faults_obs_data["featureId"][0 : len(self.fault_samples)] = self.fault_samples["featureId"]
         faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
@@ -634,6 +639,9 @@ class Project(object):
         faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
         faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
         faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
+        faults_obs_data["featureId"][len(self.fault_samples) :] = self.fault_orientations[
+            "featureId"
+        ]
         faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
         faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0

@@ -45,7 +45,7 @@ def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
 
 
 def strike_dip_vector(
-    strike: Union[float, list, numpy.ndarray], dip: Union[float, list, numpy.ndarray]
+    strike: Union[list, numpy.ndarray], dip: Union[list, numpy.ndarray]
 ) -> numpy.ndarray:
     """
     Calculates the strike-dip vector from the given strike and dip angles.

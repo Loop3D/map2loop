@@ -32,21 +32,25 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-          # miniforge-variant: Mambaforge
-          # miniforge-version: latest
-          # use-mamba: true
+
       - name: Installing dependencies
         shell: bash -l {0}
         run: |
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
+          conda install pytest gdown -y
 
       - name: Building and install
         shell: bash -l {0}
         run: |
           pip install .
+
+      - name: Testing
+        shell: bash -l {0}
+        run: |
+          pytest
+          
   documentation-test:
     runs-on: ubuntu-latest
-    #needs: continuous-integration
     steps:
       - uses: actions/checkout@v4
       - run: |

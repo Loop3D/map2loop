@@ -222,3 +222,9 @@ docs/source/sg_execution_times.rst
 docs/source/auto_examples/*
 tests/m2l_data_tmp/*
 
+tests/project/m2l_data_tmp/*
+tests/project/m2l_data_tmp/*
+tests/thickness/m2l_data_tmp/*
+docs/m2l_data_tmp/*
+tests/thickness/StructurePoint/m2l_data_tmp/*
+

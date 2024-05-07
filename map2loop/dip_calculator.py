@@ -3,7 +3,6 @@ from typing import Union
 import beartype
 from skspatial.objects import Plane
 import numpy
-import shapely
 
 
 class DipCalculator(ABC):

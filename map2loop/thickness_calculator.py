@@ -234,8 +234,8 @@ class InterpolatedStructure(ThicknessCalculator):
         # thicknesses["ThicknessMedian"] is the median thickness of the unit
         thicknesses["ThicknessMedian"] = -1.0
         # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
-        thicknesses["ThicknessStdDev"] = -1.0
-
+        thicknesses["ThicknessStdDev"] = 0
+        thicknesses['ThicknessStdDev'] = thicknesses['ThicknessStdDev'].astype('float64')
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
@@ -337,7 +337,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the length of the shortest line
                         line_length = euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
-                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.1)
+                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within
                         # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
@@ -345,14 +345,17 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the true thickness t = L . sin dip
                         thickness = line_length * numpy.sin(_dip)
                         # Average thickness along the shortest line
-                        _thickness.append(numpy.nanmean(thickness))
+                        if all(numpy.isnan(thickness)):
+                            pass
+                        else:
+                            _thickness.append(numpy.nanmean(thickness))
 
 
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
 
                     median = numpy.nanmedian(_thickness)
-                    std_dev = numpy.nanstd(_thickness)
+                    std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
 
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]

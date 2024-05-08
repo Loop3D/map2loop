@@ -69,6 +69,7 @@ class Project(object):
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
+        overwrite_loopprojectfile: bool = False,
         **kwargs,
     ):
         """
@@ -126,6 +127,7 @@ class Project(object):
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.loop_filename = loop_project_filename
+        self.overwrite_lpf = overwrite_loopprojectfile
 
         self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
@@ -524,15 +526,35 @@ class Project(object):
         Creates or updates a loop project file with all the data extracted from the map2loop process
         """
         # Open project file
-        if self.loop_filename is None or self.loop_filename == "":
+        if not self.loop_filename:
             self.loop_filename = os.path.join(
                 self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
-            )
+        )
 
-        # Check overwrite of mismatch version
+        
         file_exists = os.path.isfile(self.loop_filename)
+
+
+        if file_exists:
+            if self.overwrite_lpf:
+                try:
+                    os.remove(self.loop_filename)
+                    file_exists = False
+                    print(f"Existing file '{self.loop_filename}' was successfully deleted.")
+                except Exception as e:
+                    print(f"Failed to delete existing file '{self.loop_filename}': {e}")
+                    return
+            else:
+                print(f"There is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this")
+                return
+
+    # Initialize the LoopProjectFile
+        if not file_exists:
+            LPF.CreateBasic(self.loop_filename)
+
         version_mismatch = False
         existing_extents = None
+
         if file_exists:
             file_version = LPF.Get(self.loop_filename, "version", verbose=False)
             if file_version["errorFlag"] is True:
@@ -550,9 +572,6 @@ class Project(object):
             resp = LPF.Get(self.loop_filename, "extents")
             if not resp["errorFlag"]:
                 existing_extents = resp["value"]
-
-        if not file_exists or (version_mismatch):
-            LPF.CreateBasic(self.loop_filename)
 
         # Save extents
         if existing_extents is None:

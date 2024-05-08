@@ -116,7 +116,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
         # Set default value
-        thicknesses["thickness"] = no_distance
+        thicknesses["ThicknessMedian"] = no_distance
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         if len(stratigraphic_order) < 3:
             print(
@@ -152,22 +152,22 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
             idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
-            if thicknesses.loc[idx, "thickness"] == -1:
+            if thicknesses.loc[idx, "ThicknessMedian"] == -1:
                 val = distance
             else:
-                val = min(distance, thicknesses.at[idx, "thickness"])
-            thicknesses.loc[idx, "thickness"] = val
+                val = min(distance, thicknesses.at[idx, "ThicknessMedian"])
+            thicknesses.loc[idx, "ThicknessMedian"] = val
 
         # If no thickness calculations can be made with current stratigraphic column set all units
         # to a uniform thickness value
-        if len(thicknesses[thicknesses["thickness"] > 0]) < 1:
-            thicknesses["thickness"] = 100.0
-        mean_thickness = mean(thicknesses[thicknesses["thickness"] > 0]["thickness"])
+        if len(thicknesses[thicknesses["ThicknessMedian"] > 0]) < 1:
+            thicknesses["ThicknessMedian"] = 100.0
+        mean_thickness = mean(thicknesses[thicknesses["ThicknessMedian"] > 0]["ThicknessMedian"])
 
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
-        thicknesses["thickness"] = thicknesses.apply(
-            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1
+        thicknesses["ThicknessMedian"] = thicknesses.apply(
+            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"], axis=1
         )
         return thicknesses
 
@@ -568,7 +568,6 @@ class StructuralPoint(ThicknessCalculator):
 
         output_units = units.copy()
         # remove the old thickness column
-        output_units = output_units.drop('thickness', axis=1)
         output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
         output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
 
@@ -607,5 +606,4 @@ class StructuralPoint(ThicknessCalculator):
             if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
-
         return output_units

@@ -234,6 +234,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # Set default value
         # thicknesses["ThicknessMedian"] is the median thickness of the unit
         thicknesses["ThicknessMedian"] = -1.0
+        thicknesses['ThicknessMean'] = -1.0
         # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
         thicknesses["ThicknessStdDev"] = 0
         thicknesses['ThicknessStdDev'] = thicknesses['ThicknessStdDev'].astype('float64')
@@ -355,13 +356,16 @@ class InterpolatedStructure(ThicknessCalculator):
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
 
                     median = numpy.nanmedian(_thickness)
+                    mean = numpy.nanmean(_thickness)
                     std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
 
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]
                     ].tolist()[0]
+                    thicknesses.loc[idx, "ThicknessMean"] = mean
                     thicknesses.loc[idx, "ThicknessMedian"] = median
                     thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
+                    
             else:
                 print(
                     f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
@@ -564,12 +568,13 @@ class StructuralPoint(ThicknessCalculator):
 
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
-        result = result.groupby('unit')['thickness'].agg(['median', 'std']).reset_index()
+        result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
         output_units = units.copy()
         # remove the old thickness column
         output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
+        output_units['ThicknessMean'] = numpy.empty((len(output_units)))
         output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
 
         # find which units have no thickness calculated
@@ -579,6 +584,7 @@ class StructuralPoint(ThicknessCalculator):
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
+            output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
 
         # handle the units that have no thickness
@@ -601,10 +607,13 @@ class StructuralPoint(ThicknessCalculator):
                 )
                 # assign -1 as thickness
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
             # if top//bottom unit assign -1
             if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
+
         return output_units

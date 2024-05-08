@@ -274,6 +274,9 @@ def test_compute(
     assert (
         'ThicknessMedian' in result.columns
     ), 'Thickness not being calculated in InterpolatedStructure calculator'
+    assert (
+        'ThicknessMean' in result.columns
+    ), 'Thickness not being calculated in InterpolatedStructure calculator'
     assert result['ThicknessMedian'].dtypes == float, 'ThicknessMedian column is not float'
     assert (
         'ThicknessStdDev' in result.columns

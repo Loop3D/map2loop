@@ -14,7 +14,7 @@ RUN apt-get update -qq && \
     libtiff5\
     libgl1-mesa-glx
     
-RUN conda install python=3.11 -y
+
 COPY . /map2loop 
 
 WORKDIR /map2loop

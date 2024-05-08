@@ -541,7 +541,7 @@ class Project(object):
                     print(f"Existing file '{self.loop_filename}' was successfully deleted.")
                 except Exception as e:
                     print(f"Failed to delete existing file '{self.loop_filename}': {e}")
-                    return
+                    raise e
             else:
                 print(
                     f"There is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"

@@ -33,6 +33,7 @@ proj = Project(
     clut_file_legacy=False,
     verbose_level=VerboseLevel.NONE,
     loop_project_filename=loop_project_filename,
+    overwrite_loopprojectfile=False
 )
 
 # Set the distance between sample points for arial and linestring geometry

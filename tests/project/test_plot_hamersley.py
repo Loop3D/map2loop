@@ -30,6 +30,7 @@ def test_project_execution():
         clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,
+        overwrite_loopprojectfile=True,
     )
     proj.run_all(take_best=True)
     assert proj is not None, "Plot Hamersley Basin failed to execute"
@@ -39,8 +40,6 @@ def test_file_creation():
     expected_file = loop_project_filename
     assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
 
-
-remove_LPF()
 
 ###################################################################
 ## test if wrong crs will throw a crs error
@@ -55,11 +54,10 @@ def test_expect_crs_error():
             clut_file_legacy=False,
             verbose_level=VerboseLevel.NONE,
             loop_project_filename=loop_project_filename,
+            overwrite_loopprojectfile=True,
         )
     print("CRSError was raised as expected.")
 
-
-remove_LPF()
 
 ###################################################################
 ## test if wrong state throws an error
@@ -75,12 +73,11 @@ def test_expect_state_error():
             clut_file_legacy=False,
             verbose_level=VerboseLevel.NONE,
             loop_project_filename=loop_project_filename,
+            overwrite_loopprojectfile=True,
         )
 
     print("ValueError was raised as expected.")
 
-
-remove_LPF()
 
 
 ###################################################################
@@ -95,8 +92,6 @@ def test_expect_config_error():
             config_filename='NittyGrittyConfig.csv',
             verbose_level=VerboseLevel.NONE,
             loop_project_filename=loop_project_filename,
+            overwrite_loopprojectfile=True,
         )
     print("FileNotFoundError//Exception by catchall in project.py was raised as expected.")
-
-
-remove_LPF()

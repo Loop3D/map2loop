@@ -610,10 +610,16 @@ class Project(object):
         # stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits[
         #     "ThicknessMedian"
         # ]
-        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits['ThicknessMean']
-        stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits['ThicknessMedian']
-        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev']
-        
+        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessMean'
+        ]
+        stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessMedian'
+        ]
+        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessStdDev'
+        ]
+
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
         ]

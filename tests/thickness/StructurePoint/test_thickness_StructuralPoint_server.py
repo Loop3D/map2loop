@@ -34,6 +34,7 @@ def test_from_aus_state():
         # clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,
+        overwrite_loopprojectfile=True,
     )
 
     proj.set_thickness_calculator(StructuralPoint())

@@ -209,6 +209,7 @@ proj = Project(
     working_projection="EPSG:7854",
     bounding_box=bounding_box,
     loop_project_filename=loop_project_filename,
+    overwrite_loopprojectfile=True,
 )
 
 proj.set_thickness_calculator(StructuralPoint())

@@ -350,7 +350,6 @@ class InterpolatedStructure(ThicknessCalculator):
                         else:
                             _thickness.append(numpy.nanmean(thickness))
 
-
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
 
@@ -568,8 +567,8 @@ class StructuralPoint(ThicknessCalculator):
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
         output_units = units.copy()
-        #remove the old thickness column
-        output_units = output_units.drop('thickness', axis= 1)
+        # remove the old thickness column
+        output_units = output_units.drop('thickness', axis=1)
         output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
         output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
 

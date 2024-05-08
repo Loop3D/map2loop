@@ -607,7 +607,9 @@ class Project(object):
         stratigraphic_data["name"] = self.stratigraphic_column.stratigraphicUnits["name"]
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
-        stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits["ThicknessMedian"]
+        stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits[
+            "ThicknessMedian"
+        ]
 
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]

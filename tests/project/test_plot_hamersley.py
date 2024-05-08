@@ -15,9 +15,10 @@ bbox_3d = {
 
 loop_project_filename = "wa_output.loop3d"
 
-lpf_exists = os.path.exists(loop_project_filename)
-if lpf_exists:
-    os.remove(loop_project_filename)
+def remove_LPF():
+    lpf_exists = os.path.exists(loop_project_filename)
+    if lpf_exists:
+        os.remove(loop_project_filename)
 
 def test_project_execution():
     proj = Project(
@@ -36,7 +37,7 @@ def test_file_creation():
     expected_file = loop_project_filename
     assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
 
-os.remove(loop_project_filename)
+remove_LPF()
 
 ###################################################################
 ## test if wrong crs will throw a crs error
@@ -54,9 +55,7 @@ def test_expect_crs_error():
         )
     print("CRSError was raised as expected.")
 
-lpf_exists = os.path.exists(loop_project_filename)
-if lpf_exists:
-    os.remove(loop_project_filename)
+remove_LPF()
 
 ###################################################################
 ## test if wrong state throws an error
@@ -76,9 +75,7 @@ def test_expect_state_error():
 
     print("ValueError was raised as expected.")
 
-lpf_exists = os.path.exists(loop_project_filename)
-if lpf_exists:
-    os.remove(loop_project_filename)
+remove_LPF()
 
 ###################################################################
 # test if it catches wrong config file
@@ -94,7 +91,5 @@ def test_expect_config_error():
             loop_project_filename=loop_project_filename,
         )
     print("FileNotFoundError//Exception by catchall in project.py was raised as expected.")
-    
-lpf_exists = os.path.exists(loop_project_filename)
-if lpf_exists:
-    os.remove(loop_project_filename)
+
+remove_LPF()

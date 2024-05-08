@@ -116,7 +116,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
         # Set default value
-        thicknesses["thickness"] = no_distance
+        thicknesses["ThicknessMedian"] = no_distance
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         if len(stratigraphic_order) < 3:
             print(
@@ -152,22 +152,23 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
             idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
-            if thicknesses.loc[idx, "thickness"] == -1:
+            if thicknesses.loc[idx, "ThicknessMedian"] == -1:
                 val = distance
             else:
-                val = min(distance, thicknesses.at[idx, "thickness"])
-            thicknesses.loc[idx, "thickness"] = val
+                val = min(distance, thicknesses.at[idx, "ThicknessMedian"])
+            thicknesses.loc[idx, "ThicknessMedian"] = val
 
         # If no thickness calculations can be made with current stratigraphic column set all units
         # to a uniform thickness value
-        if len(thicknesses[thicknesses["thickness"] > 0]) < 1:
-            thicknesses["thickness"] = 100.0
-        mean_thickness = mean(thicknesses[thicknesses["thickness"] > 0]["thickness"])
+        if len(thicknesses[thicknesses["ThicknessMedian"] > 0]) < 1:
+            thicknesses["ThicknessMedian"] = 100.0
+        mean_thickness = mean(thicknesses[thicknesses["ThicknessMedian"] > 0]["ThicknessMedian"])
 
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
-        thicknesses["thickness"] = thicknesses.apply(
-            lambda row: mean_thickness if row["thickness"] == -1 else row["thickness"], axis=1
+        thicknesses["ThicknessMedian"] = thicknesses.apply(
+            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"],
+            axis=1,
         )
         return thicknesses
 
@@ -179,7 +180,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
     Attributes:
         thickness_calculator_label (str): A string that stores the label of the thickness calculator.
-        For this class, it is "ThicknessCalculatorBeta".
+        For this class, it is "InterpolatedStructure".
 
     Methods:
         compute(units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData)
@@ -188,7 +189,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
     def __init__(self):
         """
-        Initialiser for beta version of the thickness calculator
+        Initialiser for interpolated structure version of the thickness calculator
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []
@@ -223,24 +224,28 @@ class InterpolatedStructure(ThicknessCalculator):
 
         Returns:
             pandas.DataFrame: units dataframe with added thickness columns:
-            "betaThickness" is the median thickness of the unit,
-            "betaStdDev" is the standard deviation of the thickness of the unit
+            "ThicknessMedian" is the median thickness of the unit,
+            "ThicknessStdDev" is the standard deviation of the thickness of the unit
         """
 
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"].copy()
+
         thicknesses = units.copy()
         # Set default value
-        # thicknesses["betaThickness"] is the median thickness of the unit
-        thicknesses["Thickness"] = -1.0
-        # thicknesses["betaStdDev"] is the standard deviation of the thickness of the unit
+        # thicknesses["ThicknessMedian"] is the median thickness of the unit
+        thicknesses["ThicknessMedian"] = -1.0
+        # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
         thicknesses["ThicknessStdDev"] = 0
+        thicknesses['ThicknessStdDev'] = thicknesses['ThicknessStdDev'].astype('float64')
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
         # get the sampled contacts
         contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
         # build points from x and y coordinates
-        contacts["geometry"] = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        contacts.set_geometry(geometry2, inplace=True)
+
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the contacts
@@ -266,7 +271,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations["Y"] = interpolator.yi
         xy = numpy.array([interpolator.xi, interpolator.yi]).T
         # create Point objects from the x and y coordinates
-        interpolated_orientations["geometry"] = create_points(xy)
+        interpolated_orientations.set_geometry(create_points(xy), inplace=True)
         # set the crs of the interpolated orientations to the crs of the units
         interpolated_orientations = interpolated_orientations.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the interpolated points
@@ -333,7 +338,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the length of the shortest line
                         line_length = euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
-                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.1)
+                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within
                         # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
@@ -341,17 +346,21 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the true thickness t = L . sin dip
                         thickness = line_length * numpy.sin(_dip)
                         # Average thickness along the shortest line
-                        _thickness.append(numpy.nanmean(thickness))
+                        if all(numpy.isnan(thickness)):
+                            pass
+                        else:
+                            _thickness.append(numpy.nanmean(thickness))
 
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
+
                     median = numpy.nanmedian(_thickness)
-                    std_dev = numpy.nanstd(_thickness)
+                    std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
 
                     idx = thicknesses.index[
                         thicknesses["name"] == stratigraphic_order[i + 1]
                     ].tolist()[0]
-                    thicknesses.loc[idx, "Thickness"] = median
+                    thicknesses.loc[idx, "ThicknessMedian"] = median
                     thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
             else:
                 print(
@@ -361,13 +370,13 @@ class InterpolatedStructure(ThicknessCalculator):
         return thicknesses
 
 
-class ThicknessCalculatorGamma(ThicknessCalculator):
+class StructuralPoint(ThicknessCalculator):
     '''
     This class is a subclass of the ThicknessCalculator abstract base class. It implements the thickness calculation using a deterministic workflow based on stratigraphic measurements.
 
     Attributes:
         thickness_calculator_label (str): A string that stores the label of the thickness calculator.
-        For this class, it is "ThicknessCalculatorGamma".
+        For this class, it is "StrucuturalPoint".
 
     Methods:
         compute(units: pandas.DataFrame, stratigraphic_order: list, basal_contacts: pandas.DataFrame, map_data: MapData)
@@ -376,7 +385,7 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
     '''
 
     def __init__(self):
-        self.sorter_label = "ThicknessCalculatorGamma"
+        self.sorter_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
 
@@ -413,13 +422,13 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         Returns:
         --------
             pandas.DataFrame: units dataframe with added thickness columns:
-            "gammaThickness" is the median thickness of the unit,
-            "gammaStdDev" is the standard deviation of the thickness of the unit
+            "ThicknessMedian" is the median thickness of the unit,
+            "ThicknessStdDev" is the standard deviation of the thickness of the unit
 
         Note:
         -----
             This method is highly dependent on the existence of stratigraphic measurements that follow the strike of the geological contacts.
-            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. ThicknessCalculatorBeta may be used for such situations and future versions of map2loop will attempt to solve for this.
+            If an unit does not contain a stratigraphic measurement, the thickness will not be calculated. Interpolated Structure may be used for such situations and future versions of map2loop will attempt to solve for this.
             If the thickness is not calculated for a given unit, the assigned thickness will be -1.
             For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
         """
@@ -556,23 +565,28 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'std']).reset_index()
+        result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
         output_units = units.copy()
+        # remove the old thickness column
+        output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
+        output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
+
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
 
         # assign the thicknesses to the each unit
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
-            output_units.loc[idx, 'gammaThickness'] = unit['median']
-            output_units.loc[idx, 'gammaStdDev'] = unit['std']
+            output_units.loc[idx, 'ThicknessMedian'] = unit['median']
+            output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
 
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
             if (
                 # not a top//bottom unit
-                (output_units[output_units['name'] == unit]['gammaThickness'].isna().all())
+                (output_units[output_units['name'] == unit]['ThicknessMedian'].isna().all())
                 and (unit != stratigraphic_order[-1])
                 and (unit != stratigraphic_order[0])
             ):
@@ -586,12 +600,11 @@ class ThicknessCalculatorGamma(ThicknessCalculator):
                     'Assigning thickness of -1',
                 )
                 # assign -1 as thickness
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
             # if top//bottom unit assign -1
             if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
-                output_units.loc[output_units["name"] == unit, "gammaThickness"] = -1
-                output_units.loc[output_units["name"] == unit, "gammaStdDev"] = -1
-
+                output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
+                output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
         return output_units

@@ -1,18 +1,19 @@
 # This test runs on a portion of the dataset in https://github.com/Loop3D/m2l3_examples/tree/main/Laurent2016_V2_variable_thicknesses (only for lithologies E, F, and G)
-# structures are confined to litho_F, and the test confirms if the gamma thickness is calculated, for all lithologies, if the thickness is correct for F (~90 m), and top/bottom units are assigned -1
+# structures are confined to litho_F, and the test confirms if the StructuralPoint thickness is calculated, for all lithologies, if the thickness is correct for F (~90 m), and top/bottom units are assigned -1
 # this creates a temp folder in Appdata to store the data to run the proj, checks the thickness, and then deletes the temp folder
 # this was done to avoid overflow of file creation in the tests folder
 
-from map2loop.thickness_calculator import ThicknessCalculatorGamma
+from map2loop.thickness_calculator import StructuralPoint
 from osgeo import gdal, osr
 import os
 import shapely
 import geopandas
 import tempfile
-import map2loop
-from map2loop import Project
-from map2loop.m2l_enums import Datatype
+import pathlib
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
+from map2loop.project import Project
+from map2loop.m2l_enums import Datatype
+import map2loop
 
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
@@ -125,22 +126,22 @@ structures = geopandas.GeoDataFrame(structures, crs='epsg:7854')
 
 faults = geopandas.GeoDataFrame(columns=['geometry'], crs='epsg:7854')
 
-path = tempfile.mkdtemp()
+f_path = tempfile.mkdtemp()
 
 bounding_box = {"minx": 0, "miny": 0, "maxx": 10000, "maxy": 10000, "base": 0, "top": -5000}
 
 create_raster(
-    os.path.join(path, "DEM.tif"),
+    os.path.join(f_path, "DEM.tif"),
     (bounding_box['minx'], bounding_box['miny'], bounding_box['maxx'], bounding_box['maxy']),
     7854,
     1000,
 )
 
-geology.to_file(os.path.join(path, "geology.shp"))
-structures.to_file(os.path.join(path, "structures.shp"))
-faults.to_file(os.path.join(path, "faults.shp"))
+geology.to_file(os.path.join(f_path, "geology.shp"))
+structures.to_file(os.path.join(f_path, "structures.shp"))
+faults.to_file(os.path.join(f_path, "faults.shp"))
 
-loop_project_filename = os.path.join(path, "local_source.loop3d")
+loop_project_filename = os.path.join(f_path, "local_source.loop3d")
 
 config = {
     "structure": {
@@ -195,64 +196,64 @@ config = {
 
 
 proj = Project(
-    geology_filename=os.path.join(path, "geology.shp"),
-    fault_filename=os.path.join(path, "faults.shp"),
-    fold_filename=os.path.join(path, "faults.shp"),
-    structure_filename=os.path.join(path, "structures.shp"),
-    dtm_filename=os.path.join(path, 'DEM.tif'),
-    clut_filename=os.path.join(
-        os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv"
+    geology_filename=os.path.join(f_path, "geology.shp"),
+    fault_filename=os.path.join(f_path, "faults.shp"),
+    fold_filename=os.path.join(f_path, "faults.shp"),
+    structure_filename=os.path.join(f_path, "structures.shp"),
+    dtm_filename=os.path.join(f_path, 'DEM.tif'),
+    clut_filename=pathlib.Path(
+        os.path.join(os.path.dirname(map2loop.__file__), "_datasets/clut_files/WA_clut.csv")
     ),
     config_dictionary=config,
     clut_file_legacy=False,
     working_projection="EPSG:7854",
     bounding_box=bounding_box,
     loop_project_filename=loop_project_filename,
+    overwrite_loopprojectfile=True,
 )
 
-proj.set_thickness_calculator(ThicknessCalculatorGamma())
+proj.set_thickness_calculator(StructuralPoint())
 
 column = ['Litho_G', 'Litho_F', 'Litho_E']
-
 proj.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
 proj.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
 
 
-def test_thickness_gamma(proj=proj):
+def test_thickness_structuralPoint(proj=proj):
     # 1. are all lithologies in the geology returned?
     assert all(
         element in geology['UNITNAME'].unique().tolist()
         for element in proj.stratigraphic_column.stratigraphicUnits['name'].to_list()
-    ), "gamma thickness not calculating for all lithologies in geology"
+    ), " thickness calculator not calculating for all lithologies in geology"
 
-    # 2. is gammaThickness a column in the stratigraphicUnits?
+    # 2. is ThicknessMedian a column in the stratigraphicUnits?
     assert (
-        'gammaThickness' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
-    ), "gammaThickness not in resulting stratigraphicUnits"
+        'ThicknessMedian' in proj.stratigraphic_column.stratigraphicUnits.columns.to_list()
+    ), "ThicknessMedian not in resulting stratigraphicUnits"
 
     # 2. are bottom and top units assigned as -1?
     assert (
         proj.stratigraphic_column.stratigraphicUnits[
             proj.stratigraphic_column.stratigraphicUnits['Order']
             == min(proj.stratigraphic_column.stratigraphicUnits['Order'])
-        ]['gammaThickness'].values
+        ]['ThicknessMedian'].values
         == -1
-    ), "gamma thickness: top unit not assigned as -1"
+    ), "StructuralPoint thickness calculator: top unit not assigned as -1"
     assert (
         proj.stratigraphic_column.stratigraphicUnits[
             proj.stratigraphic_column.stratigraphicUnits['Order']
             == max(proj.stratigraphic_column.stratigraphicUnits['Order'])
-        ]['gammaThickness'].values
+        ]['ThicknessMedian'].values
         == -1
-    ), "gamma thickness: bottom unit not assigned as -1"
+    ), "thickness calculator StructuralPoint: bottom unit not assigned as -1"
 
     # 3. Is the thickness being calculated correctly? Should be ~ 89
     assert (
         round(
             proj.stratigraphic_column.stratigraphicUnits[
                 proj.stratigraphic_column.stratigraphicUnits['name'] == 'Litho_F'
-            ]['gammaThickness']
+            ]['ThicknessMedian']
         ).values
         == 89.0
-    ), "gamma thickness not calculating thickness correctly"
+    ), "thickness calculator StructuralPoint not calculating thickness correctly"

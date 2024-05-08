@@ -538,13 +538,13 @@ class Project(object):
                 try:
                     os.remove(self.loop_filename)
                     file_exists = False
-                    print(f"Existing file '{self.loop_filename}' was successfully deleted.")
+                    print(f"\nExisting file '{self.loop_filename}' was successfully deleted.")
                 except Exception as e:
-                    print(f"Failed to delete existing file '{self.loop_filename}': {e}")
+                    print(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
                     raise e
             else:
                 print(
-                    f"There is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"
+                    f"\nThere is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"
                 )
                 return
 

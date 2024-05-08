@@ -79,7 +79,6 @@ def test_expect_state_error():
     print("ValueError was raised as expected.")
 
 
-
 ###################################################################
 # test if it catches wrong config file
 def test_expect_config_error():

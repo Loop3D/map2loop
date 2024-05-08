@@ -20,6 +20,7 @@ def remove_LPF():
     if lpf_exists:
         os.remove(loop_project_filename)
 
+
 def test_project_execution():
     proj = Project(
         use_australian_state_data="WA",
@@ -76,6 +77,7 @@ def test_expect_state_error():
     print("ValueError was raised as expected.")
 
 remove_LPF()
+
 
 ###################################################################
 # test if it catches wrong config file

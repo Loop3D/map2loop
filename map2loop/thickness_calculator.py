@@ -365,7 +365,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     thicknesses.loc[idx, "ThicknessMean"] = mean
                     thicknesses.loc[idx, "ThicknessMedian"] = median
                     thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
-                    
+
             else:
                 print(
                     f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"

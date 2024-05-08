@@ -607,9 +607,7 @@ class Project(object):
         stratigraphic_data["name"] = self.stratigraphic_column.stratigraphicUnits["name"]
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
-        # stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits[
-        #     "ThicknessMedian"
-        # ]
+
         stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits['ThicknessMean']
         stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits['ThicknessMedian']
         stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev']

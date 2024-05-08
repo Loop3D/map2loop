@@ -167,7 +167,8 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
         # the mean thickness of the other units
         thicknesses["ThicknessMedian"] = thicknesses.apply(
-            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"], axis=1
+            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"],
+            axis=1,
         )
         return thicknesses
 

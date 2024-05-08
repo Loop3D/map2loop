@@ -279,3 +279,6 @@ def test_compute(
         'ThicknessStdDev' in result.columns
     ), 'Thickness std not being calculated in InterpolatedStructure calculator'
     assert result['ThicknessStdDev'].dtypes == float, 'ThicknessStdDev column is not float'
+
+    # check for nas in thickness
+    assert result['ThicknessMedian'].isna().sum() == 0, 'ThicknessMedian column has NaNs'

@@ -37,7 +37,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
-          conda install pytest gdown -y
+          conda install pytest -y
 
       - name: Building and install
         shell: bash -l {0}

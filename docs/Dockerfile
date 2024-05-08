@@ -26,6 +26,7 @@ RUN conda install -c conda-forge -c loop3d LoopStructural -y
 RUN conda install -c conda-forge --file ./docs/requirements.txt -y
 
 RUN pip install .
+
 RUN pip install lavavu-osmesa==1.8.45 
 ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.10/site-packages/lavavu_osmesa.libs
 

@@ -228,19 +228,23 @@ class InterpolatedStructure(ThicknessCalculator):
         """
 
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"].copy()
+
         thicknesses = units.copy()
         # Set default value
         # thicknesses["ThicknessMedian"] is the median thickness of the unit
         thicknesses["ThicknessMedian"] = -1.0
         # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
-        thicknesses["ThicknessStdDev"] = 0
+        thicknesses["ThicknessStdDev"] = -1.0
+
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
         # get the sampled contacts
         contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
         # build points from x and y coordinates
-        contacts["geometry"] = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        contacts.set_geometry(geometry2, inplace=True)
+
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the contacts
@@ -266,7 +270,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations["Y"] = interpolator.yi
         xy = numpy.array([interpolator.xi, interpolator.yi]).T
         # create Point objects from the x and y coordinates
-        interpolated_orientations["geometry"] = create_points(xy)
+        interpolated_orientations.set_geometry(create_points(xy), inplace=True)
         # set the crs of the interpolated orientations to the crs of the units
         interpolated_orientations = interpolated_orientations.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the interpolated points
@@ -343,8 +347,10 @@ class InterpolatedStructure(ThicknessCalculator):
                         # Average thickness along the shortest line
                         _thickness.append(numpy.nanmean(thickness))
 
+
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
+
                     median = numpy.nanmedian(_thickness)
                     std_dev = numpy.nanstd(_thickness)
 
@@ -559,6 +565,8 @@ class StructuralPoint(ThicknessCalculator):
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
         output_units = units.copy()
+        #remove the old thickness column
+        output_units = output_units.drop('thickness', axis= 1)
         output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
         output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
 

@@ -529,11 +529,9 @@ class Project(object):
         if not self.loop_filename:
             self.loop_filename = os.path.join(
                 self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
-        )
+            )
 
-        
         file_exists = os.path.isfile(self.loop_filename)
-
 
         if file_exists:
             if self.overwrite_lpf:
@@ -545,10 +543,12 @@ class Project(object):
                     print(f"Failed to delete existing file '{self.loop_filename}': {e}")
                     return
             else:
-                print(f"There is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this")
+                print(
+                    f"There is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"
+                )
                 return
 
-    # Initialize the LoopProjectFile
+        # Initialize the LoopProjectFile
         if not file_exists:
             LPF.CreateBasic(self.loop_filename)
 

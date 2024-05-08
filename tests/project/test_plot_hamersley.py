@@ -15,6 +15,7 @@ bbox_3d = {
 
 loop_project_filename = "wa_output.loop3d"
 
+
 def remove_LPF():
     lpf_exists = os.path.exists(loop_project_filename)
     if lpf_exists:
@@ -38,6 +39,7 @@ def test_file_creation():
     expected_file = loop_project_filename
     assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
 
+
 remove_LPF()
 
 ###################################################################
@@ -55,6 +57,7 @@ def test_expect_crs_error():
             loop_project_filename=loop_project_filename,
         )
     print("CRSError was raised as expected.")
+
 
 remove_LPF()
 
@@ -76,6 +79,7 @@ def test_expect_state_error():
 
     print("ValueError was raised as expected.")
 
+
 remove_LPF()
 
 
@@ -93,5 +97,6 @@ def test_expect_config_error():
             loop_project_filename=loop_project_filename,
         )
     print("FileNotFoundError//Exception by catchall in project.py was raised as expected.")
+
 
 remove_LPF()

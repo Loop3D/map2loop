@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/Loop3D/map2loop/compare/v3.1.0...v3.1.1) (2024-05-09)
+
+
+### Bug Fixes
+
+* trigger build ([f1879ce](https://github.com/Loop3D/map2loop/commit/f1879ced58154610ccadd46488cdf7f109ca1810))
+
 ## 3.1.0 (2024-05-09)
 
 

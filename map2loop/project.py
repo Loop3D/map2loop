@@ -1,5 +1,5 @@
 import beartype
-
+import pathlib
 from map2loop.fault_orientation import FaultOrientationNearest
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
@@ -8,17 +8,17 @@ from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
-
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
 import LoopProjectFile as LPF
-
+from typing import Union
 import numpy
 import pandas
 import geopandas
 import os
 import re
+
 from matplotlib.colors import to_rgba
 from osgeo import gdal
 
@@ -63,12 +63,13 @@ class Project(object):
         fault_orientation_filename: str = "",
         fold_filename: str = "",
         dtm_filename: str = "",
-        config_filename: str = "",
+        config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
-        clut_filename: str = "",
+        clut_filename: Union[pathlib.Path, str] = "",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
+        overwrite_loopprojectfile: bool = False,
         **kwargs,
     ):
         """
@@ -126,16 +127,19 @@ class Project(object):
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.loop_filename = loop_project_filename
+        self.overwrite_lpf = overwrite_loopprojectfile
 
         self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
-        self.fault_orientations = pandas.DataFrame(columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z"])
-        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
-        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z"])
+        self.fault_orientations = pandas.DataFrame(
+            columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
+        )
+        self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+        self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -386,8 +390,10 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        self.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.sampled_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
+            self.map_data.basal_contacts
+        )
+        self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -443,6 +449,7 @@ class Project(object):
             self.stratigraphic_column.stratigraphicUnits,
             self.stratigraphic_column.column,
             self.map_data.basal_contacts,
+            self.structure_samples,
             self.map_data,
         )
 
@@ -507,8 +514,8 @@ class Project(object):
 
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
-        self.calculate_unit_thicknesses()
         self.sample_map_data()
+        self.calculate_unit_thicknesses()
         self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()
@@ -519,15 +526,35 @@ class Project(object):
         Creates or updates a loop project file with all the data extracted from the map2loop process
         """
         # Open project file
-        if self.loop_filename is None or self.loop_filename == "":
+        if not self.loop_filename:
             self.loop_filename = os.path.join(
                 self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
             )
 
-        # Check overwrite of mismatch version
         file_exists = os.path.isfile(self.loop_filename)
+
+        if file_exists:
+            if self.overwrite_lpf:
+                try:
+                    os.remove(self.loop_filename)
+                    file_exists = False
+                    print(f"\nExisting file '{self.loop_filename}' was successfully deleted.")
+                except Exception as e:
+                    print(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
+                    raise e
+            else:
+                print(
+                    f"\nThere is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"
+                )
+                return
+
+        # Initialize the LoopProjectFile
+        if not file_exists:
+            LPF.CreateBasic(self.loop_filename)
+
         version_mismatch = False
         existing_extents = None
+
         if file_exists:
             file_version = LPF.Get(self.loop_filename, "version", verbose=False)
             if file_version["errorFlag"] is True:
@@ -546,9 +573,6 @@ class Project(object):
             if not resp["errorFlag"]:
                 existing_extents = resp["value"]
 
-        if not file_exists or (version_mismatch):
-            LPF.CreateBasic(self.loop_filename)
-
         # Save extents
         if existing_extents is None:
             LPF.Set(
@@ -566,6 +590,7 @@ class Project(object):
                 depth=[self.map_data.bounding_box["top"], self.map_data.bounding_box["base"]],
                 spacing=[1000, 1000, 500],
                 preference="utm",
+                epsg=self.map_data.get_working_projection(),
             )
         else:
             # TODO: Check loopfile extents match project extents before continuing
@@ -582,8 +607,16 @@ class Project(object):
         stratigraphic_data["name"] = self.stratigraphic_column.stratigraphicUnits["name"]
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
-        stratigraphic_data["rank"] = 0
-        stratigraphic_data["thickness"] = self.stratigraphic_column.stratigraphicUnits["thickness"]
+
+        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessMean'
+        ]
+        stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessMedian'
+        ]
+        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
+            'ThicknessStdDev'
+        ]
 
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
@@ -605,11 +638,12 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.sampled_contacts["ID"]
-        contacts_data["easting"] = self.sampled_contacts["X"]
-        contacts_data["northing"] = self.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.sampled_contacts["Z"]
+        contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
+        contacts_data["layerId"] = self.map_data.sampled_contacts["ID"]
+        contacts_data["easting"] = self.map_data.sampled_contacts["X"]
+        contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
+        contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
+        contacts_data["featureId"] = self.map_data.sampled_contacts["featureId"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -621,7 +655,7 @@ class Project(object):
         faults_obs_data["easting"][0 : len(self.fault_samples)] = self.fault_samples["X"]
         faults_obs_data["northing"][0 : len(self.fault_samples)] = self.fault_samples["Y"]
         faults_obs_data["altitude"][0 : len(self.fault_samples)] = self.fault_samples["Z"]
-        faults_obs_data["type"][0 : len(self.fault_samples)] = 0
+        faults_obs_data["featureId"][0 : len(self.fault_samples)] = self.fault_samples["featureId"]
         faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
@@ -633,7 +667,9 @@ class Project(object):
         faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
         faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
         faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
-        faults_obs_data["type"][len(self.fault_samples) :] = 0
+        faults_obs_data["featureId"][len(self.fault_samples) :] = self.fault_orientations[
+            "featureId"
+        ]
         faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
         faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
         faults_obs_data["posOnly"][len(self.fault_samples) :] = 0
@@ -721,7 +757,7 @@ class Project(object):
 
                 return
             elif overlay == "contacts":
-                points = self.sampled_contacts
+                points = self.map_data.sampled_contacts
             elif overlay == "orientations":
                 points = self.structure_samples
             elif overlay == "faults":

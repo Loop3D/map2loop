@@ -1,2 +1,3 @@
 pip install ./map2loop
-make -C map2loop/docs html
+export DOCUMENTATION_TEST=True
+make -C ./map2loop/docs html

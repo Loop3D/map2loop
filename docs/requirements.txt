@@ -1,4 +1,6 @@
-sphinx
-sphinx-gallery
-pydata-sphinx-theme
-myst-parser
+# all on conda forge
+sphinx 
+sphinx-gallery 
+pydata-sphinx-theme 
+myst-parser 
+sphinxcontrib-bibtex

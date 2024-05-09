@@ -190,7 +190,9 @@ class Project(object):
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
         if config_filename != "":
             if clut_file_legacy:
-                print(f"DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2")
+                print(
+                    "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
+                )
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)

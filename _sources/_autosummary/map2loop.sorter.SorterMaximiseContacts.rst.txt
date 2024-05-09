@@ -1,0 +1,27 @@
+map2loop.sorter.SorterMaximiseContacts
+======================================
+
+.. currentmodule:: map2loop.sorter
+
+.. autoclass:: SorterMaximiseContacts
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SorterMaximiseContacts.__init__
+      ~SorterMaximiseContacts.sort
+      ~SorterMaximiseContacts.type
+   
+   
+
+   
+   
+   

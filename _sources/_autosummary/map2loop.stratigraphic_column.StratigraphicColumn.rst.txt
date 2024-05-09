@@ -1,0 +1,32 @@
+map2loop.stratigraphic\_column.StratigraphicColumn
+==================================================
+
+.. currentmodule:: map2loop.stratigraphic_column
+
+.. autoclass:: StratigraphicColumn
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StratigraphicColumn.__init__
+      ~StratigraphicColumn.addLithologyUnit
+      ~StratigraphicColumn.addStratigraphicUnit
+      ~StratigraphicColumn.findLithologyUnit
+      ~StratigraphicColumn.findStratigraphicUnit
+      ~StratigraphicColumn.populate
+      ~StratigraphicColumn.set_stratigraphic_unit_parameter_by_name
+      ~StratigraphicColumn.sort_from_relationship_list
+   
+   
+
+   
+   
+   

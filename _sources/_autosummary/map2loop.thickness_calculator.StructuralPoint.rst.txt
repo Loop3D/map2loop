@@ -1,0 +1,27 @@
+map2loop.thickness\_calculator.StructuralPoint
+==============================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autoclass:: StructuralPoint
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StructuralPoint.__init__
+      ~StructuralPoint.compute
+      ~StructuralPoint.type
+   
+   
+
+   
+   
+   

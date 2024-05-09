@@ -1,0 +1,48 @@
+map2loop.mapdata.Datastate
+==========================
+
+.. currentmodule:: map2loop.mapdata
+
+.. autoclass:: Datastate
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Datastate.conjugate
+      ~Datastate.bit_length
+      ~Datastate.bit_count
+      ~Datastate.to_bytes
+      ~Datastate.from_bytes
+      ~Datastate.as_integer_ratio
+      ~Datastate.is_integer
+      ~Datastate.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Datastate.real
+      ~Datastate.imag
+      ~Datastate.numerator
+      ~Datastate.denominator
+      ~Datastate.UNNAMED
+      ~Datastate.UNLOADED
+      ~Datastate.LOADED
+      ~Datastate.REPROJECTED
+      ~Datastate.CLIPPED
+      ~Datastate.COMPLETE
+      ~Datastate.ERRORED
+   
+   

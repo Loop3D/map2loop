@@ -6,9 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Calculating stratigraphic thicknesses &#8212; map2loop 3.0.6 documentation</title>
+    <title>Calculating stratigraphic thicknesses &#8212; map2loop 3.1.2 documentation</title>
   
   
   
@@ -18,29 +18,29 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=c3365b21"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/stratigraphic_thickness';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -59,7 +59,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -99,10 +98,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -122,7 +119,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.0.6 documentation</p>
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
   
 </a></div>
     
@@ -139,13 +136,6 @@
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
-                        Examples
                       </a>
                     </li>
                 
@@ -252,9 +242,8 @@ document.write(`
   
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -277,13 +266,6 @@ document.write(`
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
-                        Examples
                       </a>
                     </li>
                 
@@ -489,34 +471,20 @@ extendable.  The whole template is shown below:</p>
 </div>
 <p>Using this abstract base class a new class can be created by taking that base class and
 replacing the __init__ and compute functions, the simplest example is shown below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">myThicknessCalculator</span><span class="p">(</span><span class="n">ThicknessCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">thickness_calculator_label</span> <span class="o">=</span> <span class="s2">&quot;myThicknessCalculator&quot;</span>
-
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">units</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-        <span class="n">stratigraphic_order</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-        <span class="n">basal_contacts</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-        <span class="n">map_data</span><span class="p">:</span> <span class="n">MapData</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="n">output_units</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">output_units</span><span class="p">[</span><span class="s1">&#39;thickness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
-        <span class="k">return</span> <span class="n">output_units</span>
-</pre></div>
-</div>
 <p>This example will set all unit thicknesses to 100m.</p>
 <p>To use this new thickness calculator in the map2loop project one final line needs to
 be added after the Project has been initialised:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">proj</span> <span class="o">=</span> <span class="n">map2loop</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
 
-<span class="n">proj</span><span class="o">.</span><span class="n">set_thickness_calculator</span><span class="p">(</span><span class="n">myThicknessCalculator</span><span class="p">())</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">set_thickness_calculator</span><span class="p">(</span><span class="n">myThicknessCalculator</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
 </pre></div>
 </div>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
 <p>You need to set the thickness calculator as an instance of myThicknessCalculator
-(with the ()s) rather than the definition.</p>
+(with the ()s) rather than the definition.  If you want to set the default thickness using
+this class you can create the class with the thickness parameter as above
+(myThicknessCalculator(50)).</p>
 <p>The thickness calculator takes the existing units dataframe, changes the values in the
 thickness column and then returns the modified dataframe.  While you have control of
 this dataframe you have the power to add or remove units, and change features
@@ -619,8 +587,8 @@ problems within the map2loop workflow.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 <script type="text/javascript">
   $(document).ready(function () {

@@ -1,0 +1,6 @@
+map2loop.interpolators.generate\_grid
+=====================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autofunction:: generate_grid

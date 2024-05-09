@@ -1,0 +1,6 @@
+map2loop.utils.find\_segment\_strike\_from\_pt
+==============================================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: find_segment_strike_from_pt

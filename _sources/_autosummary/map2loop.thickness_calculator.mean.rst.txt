@@ -1,0 +1,6 @@
+map2loop.thickness\_calculator.mean
+===================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autofunction:: mean

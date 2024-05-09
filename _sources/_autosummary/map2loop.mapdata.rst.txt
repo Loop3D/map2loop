@@ -1,0 +1,49 @@
+map2loop.mapdata
+================
+
+.. automodule:: map2loop.mapdata
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      WebCoverageService
+      random_colours_hex
+      uuid4
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      AustraliaStateUrls
+      BytesIO
+      Config
+      Datastate
+      Datatype
+      GzipFile
+      MapData
+      VerboseLevel
+   
+   
+
+   
+   
+   
+
+
+

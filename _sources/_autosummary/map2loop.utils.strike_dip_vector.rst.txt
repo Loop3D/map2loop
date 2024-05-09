@@ -1,0 +1,6 @@
+map2loop.utils.strike\_dip\_vector
+==================================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: strike_dip_vector

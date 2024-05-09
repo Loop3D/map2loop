@@ -1,0 +1,27 @@
+map2loop.sorter.SorterObservationProjections
+============================================
+
+.. currentmodule:: map2loop.sorter
+
+.. autoclass:: SorterObservationProjections
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SorterObservationProjections.__init__
+      ~SorterObservationProjections.sort
+      ~SorterObservationProjections.type
+   
+   
+
+   
+   
+   

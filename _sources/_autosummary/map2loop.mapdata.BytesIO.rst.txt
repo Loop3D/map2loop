@@ -1,0 +1,52 @@
+map2loop.mapdata.BytesIO
+========================
+
+.. currentmodule:: map2loop.mapdata
+
+.. autoclass:: BytesIO
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BytesIO.__init__
+      ~BytesIO.close
+      ~BytesIO.detach
+      ~BytesIO.fileno
+      ~BytesIO.flush
+      ~BytesIO.getbuffer
+      ~BytesIO.getvalue
+      ~BytesIO.isatty
+      ~BytesIO.read
+      ~BytesIO.read1
+      ~BytesIO.readable
+      ~BytesIO.readinto
+      ~BytesIO.readinto1
+      ~BytesIO.readline
+      ~BytesIO.readlines
+      ~BytesIO.seek
+      ~BytesIO.seekable
+      ~BytesIO.tell
+      ~BytesIO.truncate
+      ~BytesIO.writable
+      ~BytesIO.write
+      ~BytesIO.writelines
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BytesIO.closed
+   
+   

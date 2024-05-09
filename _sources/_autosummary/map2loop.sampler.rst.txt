@@ -1,0 +1,45 @@
+map2loop.sampler
+================
+
+.. automodule:: map2loop.sampler
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      abstractmethod
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      ABC
+      Datatype
+      MapData
+      Sampler
+      SamplerDecimator
+      SamplerSpacing
+   
+   
+
+   
+   
+   
+
+
+

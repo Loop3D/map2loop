@@ -1,0 +1,37 @@
+map2loop.deformation\_history.DeformationHistory
+================================================
+
+.. currentmodule:: map2loop.deformation_history
+
+.. autoclass:: DeformationHistory
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DeformationHistory.__init__
+      ~DeformationHistory.addFault
+      ~DeformationHistory.addFold
+      ~DeformationHistory.findfault
+      ~DeformationHistory.findfold
+      ~DeformationHistory.get_fault_relationships_with_ids
+      ~DeformationHistory.get_faults_for_export
+      ~DeformationHistory.get_minimum_fault_length
+      ~DeformationHistory.populate
+      ~DeformationHistory.removeFaultByEventId
+      ~DeformationHistory.removeFaultByName
+      ~DeformationHistory.set_minimum_fault_length
+      ~DeformationHistory.summarise_data
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+map2loop.utils.normal\_vector\_to\_dipdirection\_dip
+====================================================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: normal_vector_to_dipdirection_dip

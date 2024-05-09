@@ -1,0 +1,37 @@
+map2loop.aus\_state\_urls.AustraliaStateUrls
+============================================
+
+.. currentmodule:: map2loop.aus_state_urls
+
+.. autoclass:: AustraliaStateUrls
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AustraliaStateUrls.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AustraliaStateUrls.aus_clut_urls
+      ~AustraliaStateUrls.aus_config_urls
+      ~AustraliaStateUrls.aus_fault_urls
+      ~AustraliaStateUrls.aus_fold_urls
+      ~AustraliaStateUrls.aus_geology_urls
+      ~AustraliaStateUrls.aus_mindep_loopdata
+      ~AustraliaStateUrls.aus_structure_urls
+   
+   

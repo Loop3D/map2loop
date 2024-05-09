@@ -1,0 +1,27 @@
+map2loop.project.SorterUseNetworkX
+==================================
+
+.. currentmodule:: map2loop.project
+
+.. autoclass:: SorterUseNetworkX
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SorterUseNetworkX.__init__
+      ~SorterUseNetworkX.sort
+      ~SorterUseNetworkX.type
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+map2loop.thickness\_calculator.multiline\_to\_line
+==================================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autofunction:: multiline_to_line

@@ -1,0 +1,6 @@
+map2loop.utils.create\_points
+=============================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: create_points

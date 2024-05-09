@@ -1,0 +1,41 @@
+map2loop.m2l\_enums.IntEnum
+===========================
+
+.. currentmodule:: map2loop.m2l_enums
+
+.. autoclass:: IntEnum
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~IntEnum.conjugate
+      ~IntEnum.bit_length
+      ~IntEnum.bit_count
+      ~IntEnum.to_bytes
+      ~IntEnum.from_bytes
+      ~IntEnum.as_integer_ratio
+      ~IntEnum.is_integer
+      ~IntEnum.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~IntEnum.real
+      ~IntEnum.imag
+      ~IntEnum.numerator
+      ~IntEnum.denominator
+   
+   

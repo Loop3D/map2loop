@@ -1,0 +1,49 @@
+map2loop.interpolators
+======================
+
+.. automodule:: map2loop.interpolators
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      abstractmethod
+      generate_grid
+      strike_dip_vector
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      ABC
+      Any
+      DipDipDirectionInterpolator
+      Interpolator
+      LinearNDInterpolator
+      NormalVectorInterpolator
+      Rbf
+      ndarray
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,6 @@
+map2loop.thickness\_calculator.create\_points
+=============================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autofunction:: create_points

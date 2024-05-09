@@ -1,0 +1,48 @@
+map2loop.sorter
+===============
+
+.. automodule:: map2loop.sorter
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      abstractmethod
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      ABC
+      MapData
+      Sorter
+      SorterAgeBased
+      SorterAlpha
+      SorterMaximiseContacts
+      SorterObservationProjections
+      SorterUseHint
+      SorterUseNetworkX
+   
+   
+
+   
+   
+   
+
+
+

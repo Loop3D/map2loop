@@ -1,0 +1,29 @@
+map2loop.thickness\_calculator.DipDipDirectionInterpolator
+==========================================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autoclass:: DipDipDirectionInterpolator
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DipDipDirectionInterpolator.__init__
+      ~DipDipDirectionInterpolator.interpolate
+      ~DipDipDirectionInterpolator.setup_grid
+      ~DipDipDirectionInterpolator.setup_interpolation
+      ~DipDipDirectionInterpolator.type
+   
+   
+
+   
+   
+   

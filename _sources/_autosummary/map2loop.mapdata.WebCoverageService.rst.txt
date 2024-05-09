@@ -1,0 +1,6 @@
+map2loop.mapdata.WebCoverageService
+===================================
+
+.. currentmodule:: map2loop.mapdata
+
+.. autofunction:: WebCoverageService

@@ -1,0 +1,27 @@
+map2loop.sampler.Sampler
+========================
+
+.. currentmodule:: map2loop.sampler
+
+.. autoclass:: Sampler
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sampler.__init__
+      ~Sampler.sample
+      ~Sampler.type
+   
+   
+
+   
+   
+   

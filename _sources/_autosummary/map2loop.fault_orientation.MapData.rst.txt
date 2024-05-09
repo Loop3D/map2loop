@@ -1,0 +1,66 @@
+map2loop.fault\_orientation.MapData
+===================================
+
+.. currentmodule:: map2loop.fault_orientation
+
+.. autoclass:: MapData
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MapData.__init__
+      ~MapData.calculate_bounding_box_and_projection
+      ~MapData.check_filename
+      ~MapData.check_filenames
+      ~MapData.check_map
+      ~MapData.colour_units
+      ~MapData.export_wkt_format_files
+      ~MapData.extract_all_contacts
+      ~MapData.extract_basal_contacts
+      ~MapData.get_bounding_box
+      ~MapData.get_colour_filename
+      ~MapData.get_config_filename
+      ~MapData.get_empty_dataframe
+      ~MapData.get_filename
+      ~MapData.get_ignore_codes
+      ~MapData.get_map_data
+      ~MapData.get_raw_map_data
+      ~MapData.get_value_from_raster
+      ~MapData.get_value_from_raster_df
+      ~MapData.get_working_projection
+      ~MapData.load_all_map_data
+      ~MapData.load_map_data
+      ~MapData.load_raster_map_data
+      ~MapData.open_http_query
+      ~MapData.parse_fault_map
+      ~MapData.parse_fault_orientations
+      ~MapData.parse_fold_map
+      ~MapData.parse_geology_map
+      ~MapData.parse_structure_map
+      ~MapData.recreate_bounding_box_str
+      ~MapData.save_all_map_data
+      ~MapData.save_raw_map_data
+      ~MapData.set_bounding_box
+      ~MapData.set_colour_filename
+      ~MapData.set_config_filename
+      ~MapData.set_filename
+      ~MapData.set_filenames_from_australian_state
+      ~MapData.set_ignore_codes
+      ~MapData.set_working_projection
+      ~MapData.set_working_projection_on_map_data
+      ~MapData.update_filename_with_bounding_box
+      ~MapData.update_filename_with_projection
+   
+   
+
+   
+   
+   

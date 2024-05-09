@@ -6,9 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>map2loop &#8212; map2loop 3.0.6 documentation</title>
+    <title>map2loop &#8212; map2loop 3.1.2 documentation</title>
   
   
   
@@ -18,35 +18,36 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=c3365b21"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="map2loop.Project" href="map2loop.Project.html" />
-    <link rel="prev" title="Hamersley, Western Australia" href="../_auto_examples/plot_hamersley.html" />
+    <link rel="prev" title="Exporting" href="../user_guide/exporting.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -59,7 +60,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -99,10 +99,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -122,7 +120,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.0.6 documentation</p>
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
   
 </a></div>
     
@@ -139,13 +137,6 @@
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../user_guide/index.html">
                         User Guide
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
-                        Examples
                       </a>
                     </li>
                 
@@ -252,9 +243,8 @@ document.write(`
   
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -277,13 +267,6 @@ document.write(`
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../user_guide/index.html">
                         User Guide
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../_auto_examples/index.html">
-                        Examples
                       </a>
                     </li>
                 
@@ -362,6 +345,26 @@ document.write(`
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="map2loop.Project.html">map2loop.Project</a></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.aus_state_urls.html">map2loop.aus_state_urls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.config.html">map2loop.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.deformation_history.html">map2loop.deformation_history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.fault_orientation.html">map2loop.fault_orientation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
+</ul>
 </div>
 </nav></div>
     </div>
@@ -425,6 +428,65 @@ document.write(`
 </tr>
 </tbody>
 </table>
+<p class="rubric">Modules</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.aus_state_urls.html#module-map2loop.aus_state_urls" title="map2loop.aus_state_urls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.aus_state_urls</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.config.html#module-map2loop.config" title="map2loop.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.config</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.deformation_history.html#module-map2loop.deformation_history" title="map2loop.deformation_history"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.deformation_history</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.fault_orientation.html#module-map2loop.fault_orientation" title="map2loop.fault_orientation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.fault_orientation</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.interpolators.html#module-map2loop.interpolators" title="map2loop.interpolators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.interpolators</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.m2l_enums.html#module-map2loop.m2l_enums" title="map2loop.m2l_enums"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.m2l_enums</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.map2model_wrapper.html#module-map2loop.map2model_wrapper" title="map2loop.map2model_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.map2model_wrapper</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.mapdata.html#module-map2loop.mapdata" title="map2loop.mapdata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.mapdata</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.html#module-map2loop.project" title="map2loop.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.project</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.random.html#module-map2loop.random" title="map2loop.random"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.random</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.random_colour.html#module-map2loop.random_colour" title="map2loop.random_colour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.random_colour</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.sampler.html#module-map2loop.sampler" title="map2loop.sampler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.sampler</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.sorter.html#module-map2loop.sorter" title="map2loop.sorter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.sorter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.stratigraphic_column.html#module-map2loop.stratigraphic_column" title="map2loop.stratigraphic_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.stratigraphic_column</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.thickness_calculator.html#module-map2loop.thickness_calculator" title="map2loop.thickness_calculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.thickness_calculator</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.throw_calculator.html#module-map2loop.throw_calculator" title="map2loop.throw_calculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.throw_calculator</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.utils.html#module-map2loop.utils" title="map2loop.utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.utils</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.version.html#module-map2loop.version" title="map2loop.version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map2loop.version</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
@@ -438,12 +500,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../_auto_examples/plot_hamersley.html"
+       href="../user_guide/exporting.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Hamersley, Western Australia</p>
+        <p class="prev-next-title">Exporting</p>
       </div>
     </a>
     <a class="right-next"
@@ -487,8 +549,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 <script type="text/javascript">
   $(document).ready(function () {

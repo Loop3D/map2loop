@@ -1,0 +1,1430 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>map2loop.mapdata.MapData &#8212; map2loop 3.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.mapdata.MapData';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="map2loop.mapdata.VerboseLevel" href="map2loop.mapdata.VerboseLevel.html" />
+    <link rel="prev" title="map2loop.mapdata.GzipFile" href="map2loop.mapdata.GzipFile.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.Project.html">map2loop.Project</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.aus_state_urls.html">map2loop.aus_state_urls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.config.html">map2loop.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.deformation_history.html">map2loop.deformation_history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.fault_orientation.html">map2loop.fault_orientation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.WebCoverageService.html">map2loop.mapdata.WebCoverageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.random_colours_hex.html">map2loop.mapdata.random_colours_hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.uuid4.html">map2loop.mapdata.uuid4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.AustraliaStateUrls.html">map2loop.mapdata.AustraliaStateUrls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.BytesIO.html">map2loop.mapdata.BytesIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Config.html">map2loop.mapdata.Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datastate.html">map2loop.mapdata.Datastate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datatype.html">map2loop.mapdata.Datatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.GzipFile.html">map2loop.mapdata.GzipFile</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.mapdata.MapData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.VerboseLevel.html">map2loop.mapdata.VerboseLevel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="map2loop.mapdata.html" class="nav-link">map2loop.mapdata</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">map2loop.map...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="map2loop-mapdata-mapdata">
+<h1>map2loop.mapdata.MapData<a class="headerlink" href="#map2loop-mapdata-mapdata" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">map2loop.mapdata.</span></span><span class="sig-name descname"><span class="pre">MapData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.VerboseLevel.html#map2loop.m2l_enums.VerboseLevel" title="map2loop.m2l_enums.VerboseLevel"><span class="pre">VerboseLevel</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">VerboseLevel.ALL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A data structure containing all the map data loaded from map files</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.raw_data">
+<span class="sig-name descname"><span class="pre">raw_data</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.raw_data" title="Link to this definition">#</a></dt>
+<dd><p>A list containing the raw geopanda data frames before any modification</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of geopandas.DataFrames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.data" title="Link to this definition">#</a></dt>
+<dd><p>A list containing the geopanda data frames or raster image of all the different map data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of geopandas.DataFrames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.contacts">
+<span class="sig-name descname"><span class="pre">contacts</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.contacts" title="Link to this definition">#</a></dt>
+<dd><p>A dataframe containing the contacts between units in polylines</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>geopandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.basal_contacts">
+<span class="sig-name descname"><span class="pre">basal_contacts</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.basal_contacts" title="Link to this definition">#</a></dt>
+<dd><p>A dataframe containing the contacts between units labelled with whether it is basal or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>geopandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.filenames">
+<span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.filenames" title="Link to this definition">#</a></dt>
+<dd><p>A list of the filenames/urls of where to find the data to be loaded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of data source filenames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.dirtyflags">
+<span class="sig-name descname"><span class="pre">dirtyflags</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.dirtyflags" title="Link to this definition">#</a></dt>
+<dd><p>A list of flags indicating whether the data has been loaded or dirtied</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of booleans</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.data_states">
+<span class="sig-name descname"><span class="pre">data_states</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.data_states" title="Link to this definition">#</a></dt>
+<dd><p>Enums representing the state of each of the data sets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>intEnum</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.working_projection">
+<span class="sig-name descname"><span class="pre">working_projection</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.working_projection" title="Link to this definition">#</a></dt>
+<dd><p>A string containing the projection e.g. “EPSG:28350”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.bounding_box">
+<span class="sig-name descname"><span class="pre">bounding_box</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.bounding_box" title="Link to this definition">#</a></dt>
+<dd><p>The bounding box in cartesian coordinates with 6 elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.bounding_box_polygon">
+<span class="sig-name descname"><span class="pre">bounding_box_polygon</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.bounding_box_polygon" title="Link to this definition">#</a></dt>
+<dd><p>The bounding box in polygonal form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>shapely.Polygon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.bounding_box_str">
+<span class="sig-name descname"><span class="pre">bounding_box_str</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.bounding_box_str" title="Link to this definition">#</a></dt>
+<dd><p>The bounding box in string form (used for url requests)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.config_filename">
+<span class="sig-name descname"><span class="pre">config_filename</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.config_filename" title="Link to this definition">#</a></dt>
+<dd><p>The filename of the json config file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.colour_filename">
+<span class="sig-name descname"><span class="pre">colour_filename</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.colour_filename" title="Link to this definition">#</a></dt>
+<dd><p>The filename of the csv colour table file (columns are unit name and colour in #000000 form)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.tmp_path">
+<span class="sig-name descname"><span class="pre">tmp_path</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.tmp_path" title="Link to this definition">#</a></dt>
+<dd><p>The path to the directory holding the temporary files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.verbose_level">
+<span class="sig-name descname"><span class="pre">verbose_level</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.verbose_level" title="Link to this definition">#</a></dt>
+<dd><p>A selection that defines how much console logging is output</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.m2l_enums.VerboseLevel.html#map2loop.m2l_enums.VerboseLevel" title="map2loop.m2l_enums.VerboseLevel">m2l_enums.VerboseLevel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.config">
+<span class="sig-name descname"><span class="pre">config</span></span><a class="headerlink" href="#map2loop.mapdata.MapData.config" title="Link to this definition">#</a></dt>
+<dd><p>A link to the config structure which is defined in config.py</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.mapdata.Config.html#map2loop.mapdata.Config" title="map2loop.mapdata.Config">Config</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The initialiser for the map data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tmp_path</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory for storing temporary files. Defaults to “”.</p></li>
+<li><p><strong>verbose_level</strong> (<a class="reference internal" href="map2loop.mapdata.VerboseLevel.html#map2loop.mapdata.VerboseLevel" title="map2loop.mapdata.VerboseLevel"><em>VerboseLevel</em></a><em>, </em><em>optional</em>) – How much console output is sent. Defaults to VerboseLevel.ALL.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.VerboseLevel.html#map2loop.m2l_enums.VerboseLevel" title="map2loop.m2l_enums.VerboseLevel"><span class="pre">VerboseLevel</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">VerboseLevel.ALL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.__init__" title="Link to this definition">#</a></dt>
+<dd><p>The initialiser for the map data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tmp_path</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory for storing temporary files. Defaults to “”.</p></li>
+<li><p><strong>verbose_level</strong> (<a class="reference internal" href="map2loop.mapdata.VerboseLevel.html#map2loop.mapdata.VerboseLevel" title="map2loop.mapdata.VerboseLevel"><em>VerboseLevel</em></a><em>, </em><em>optional</em>) – How much console output is sent. Defaults to VerboseLevel.ALL.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.__init__" title="map2loop.mapdata.MapData.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([tmp_path, verbose_level])</p></td>
+<td><p>The initialiser for the map data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.calculate_bounding_box_and_projection" title="map2loop.mapdata.MapData.calculate_bounding_box_and_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_bounding_box_and_projection</span></code></a>()</p></td>
+<td><p>Calculate the bounding box and projection from the geology file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.check_filename" title="map2loop.mapdata.MapData.check_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_filename</span></code></a>(datatype)</p></td>
+<td><p>Check the filename for datatype is set</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.check_filenames" title="map2loop.mapdata.MapData.check_filenames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_filenames</span></code></a>()</p></td>
+<td><p>Check all filenames to see if they are valid</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.check_map" title="map2loop.mapdata.MapData.check_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_map</span></code></a>(datatype)</p></td>
+<td><p>Check the validity of a map data from file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.colour_units" title="map2loop.mapdata.MapData.colour_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">colour_units</span></code></a>(stratigraphic_units[, random])</p></td>
+<td><p>Add a colour column to the units in the stratigraphic units structure</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.export_wkt_format_files" title="map2loop.mapdata.MapData.export_wkt_format_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_wkt_format_files</span></code></a>()</p></td>
+<td><p>Save out the geology and fault GeoDataFrames in WKT format This is used by map2model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.extract_all_contacts" title="map2loop.mapdata.MapData.extract_all_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_all_contacts</span></code></a>([save_contacts])</p></td>
+<td><p>Extract the contacts between units in the geology GeoDataFrame</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.extract_basal_contacts" title="map2loop.mapdata.MapData.extract_basal_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_basal_contacts</span></code></a>(stratigraphic_column)</p></td>
+<td><p>Identify the basal unit of the contacts based on the stratigraphic column</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_bounding_box" title="map2loop.mapdata.MapData.get_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bounding_box</span></code></a>([polygon])</p></td>
+<td><p>Get the bounding box in dict or polygon form</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_colour_filename" title="map2loop.mapdata.MapData.get_colour_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_colour_filename</span></code></a>()</p></td>
+<td><p>Get the colour lookup table filename</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_config_filename" title="map2loop.mapdata.MapData.get_config_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config_filename</span></code></a>()</p></td>
+<td><p>Get the config filename</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_empty_dataframe" title="map2loop.mapdata.MapData.get_empty_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_empty_dataframe</span></code></a>(datatype)</p></td>
+<td><p>Create a basic empty geodataframe for a specified datatype</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_filename" title="map2loop.mapdata.MapData.get_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_filename</span></code></a>(datatype)</p></td>
+<td><p>Get a filename of a specified datatype</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_ignore_codes" title="map2loop.mapdata.MapData.get_ignore_codes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ignore_codes</span></code></a>()</p></td>
+<td><p>Get the list of codes to ingnore</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_map_data" title="map2loop.mapdata.MapData.get_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_map_data</span></code></a>(datatype)</p></td>
+<td><p>Get the data geopanda of the specified datatype</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_raw_map_data" title="map2loop.mapdata.MapData.get_raw_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_raw_map_data</span></code></a>(datatype)</p></td>
+<td><p>Get the raw data geopanda of the specified datatype</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_value_from_raster" title="map2loop.mapdata.MapData.get_value_from_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value_from_raster</span></code></a>(datatype, x, y)</p></td>
+<td><p>Get the value from a raster map at the specified point</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_value_from_raster_df" title="map2loop.mapdata.MapData.get_value_from_raster_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value_from_raster_df</span></code></a>(datatype, df)</p></td>
+<td><p>Add a 'Z' column to a dataframe with the heights from the 'X' and 'Y' coordinates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.get_working_projection" title="map2loop.mapdata.MapData.get_working_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_working_projection</span></code></a>()</p></td>
+<td><p>Get the working projection</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.load_all_map_data" title="map2loop.mapdata.MapData.load_all_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_all_map_data</span></code></a>()</p></td>
+<td><p>Load all the map data for each datatype.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.load_map_data" title="map2loop.mapdata.MapData.load_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_map_data</span></code></a>(datatype)</p></td>
+<td><p>Load map data from file, reproject and clip it and then check data is valid</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.load_raster_map_data" title="map2loop.mapdata.MapData.load_raster_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_raster_map_data</span></code></a>(datatype)</p></td>
+<td><p>Load raster map data from file, reproject and clip it and then check data is valid</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.open_http_query" title="map2loop.mapdata.MapData.open_http_query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_http_query</span></code></a>()</p></td>
+<td><p>Attempt to open the http url and unzip the file if required Note: This is specific to opening remotely hosted dtm data in geotiff format</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.parse_fault_map" title="map2loop.mapdata.MapData.parse_fault_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_fault_map</span></code></a>()</p></td>
+<td><p>Parse the fault shapefile data into a consistent format</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.parse_fault_orientations" title="map2loop.mapdata.MapData.parse_fault_orientations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_fault_orientations</span></code></a>()</p></td>
+<td><p>Parse the fault orientations shapefile data into a consistent format</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.parse_fold_map" title="map2loop.mapdata.MapData.parse_fold_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_fold_map</span></code></a>()</p></td>
+<td><p>Parse the fold shapefile data into a consistent format</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.parse_geology_map" title="map2loop.mapdata.MapData.parse_geology_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_geology_map</span></code></a>()</p></td>
+<td><p>Parse the geology shapefile data into a consistent format</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.parse_structure_map" title="map2loop.mapdata.MapData.parse_structure_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_structure_map</span></code></a>()</p></td>
+<td><p>Parse the structure shapefile data into a consistent format</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.recreate_bounding_box_str" title="map2loop.mapdata.MapData.recreate_bounding_box_str"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recreate_bounding_box_str</span></code></a>()</p></td>
+<td><p>Creates the bounding box string from the bounding box dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.save_all_map_data" title="map2loop.mapdata.MapData.save_all_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_all_map_data</span></code></a>(output_dir[, extension])</p></td>
+<td><p>Save all the map data to file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.save_raw_map_data" title="map2loop.mapdata.MapData.save_raw_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_raw_map_data</span></code></a>(output_dir, datatype[, ...])</p></td>
+<td><p>Save the map data from datatype to file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_bounding_box" title="map2loop.mapdata.MapData.set_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bounding_box</span></code></a>(bounding_box)</p></td>
+<td><p>Set the bounding box of the map data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_colour_filename" title="map2loop.mapdata.MapData.set_colour_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_colour_filename</span></code></a>(filename)</p></td>
+<td><p>Set the filename of the colour csv file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_config_filename" title="map2loop.mapdata.MapData.set_config_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_config_filename</span></code></a>(filename[, ...])</p></td>
+<td><p>Set the config filename and update the config structure</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_filename" title="map2loop.mapdata.MapData.set_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_filename</span></code></a>(datatype, filename)</p></td>
+<td><p>Set the filename for a specific datatype</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_filenames_from_australian_state" title="map2loop.mapdata.MapData.set_filenames_from_australian_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_filenames_from_australian_state</span></code></a>(state)</p></td>
+<td><p>Set the shape/dtm filenames appropriate to the Australian state</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_ignore_codes" title="map2loop.mapdata.MapData.set_ignore_codes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_ignore_codes</span></code></a>(codes)</p></td>
+<td><p>Set the codes to ignore in the geology shapefile</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_working_projection" title="map2loop.mapdata.MapData.set_working_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_working_projection</span></code></a>(projection)</p></td>
+<td><p>Set the working projection for the map data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.set_working_projection_on_map_data" title="map2loop.mapdata.MapData.set_working_projection_on_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_working_projection_on_map_data</span></code></a>(datatype)</p></td>
+<td><p>Set the working projection on the GeoDataFrame structure or if already set reproject the data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.update_filename_with_bounding_box" title="map2loop.mapdata.MapData.update_filename_with_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_filename_with_bounding_box</span></code></a>(filename)</p></td>
+<td><p>Update the filename/url with the bounding box This replace all instances of {BBOX_STR} with the bounding_box_str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.MapData.update_filename_with_projection" title="map2loop.mapdata.MapData.update_filename_with_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_filename_with_projection</span></code></a>(filename)</p></td>
+<td><p>Update the filename/url with the projection This replace all instances of {PROJ_STR} with the projection string</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.calculate_bounding_box_and_projection">
+<span class="sig-name descname"><span class="pre">calculate_bounding_box_and_projection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.calculate_bounding_box_and_projection" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the bounding box and projection from the geology file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>dict, str</em> – The bounding box and projection of the geology shapefile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.check_filename">
+<span class="sig-name descname"><span class="pre">check_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.check_filename" title="Link to this definition">#</a></dt>
+<dd><p>Check the filename for datatype is set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the filename to check</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>bool</em> – true if the filename is set, false otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.check_filenames">
+<span class="sig-name descname"><span class="pre">check_filenames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.check_filenames" title="Link to this definition">#</a></dt>
+<dd><p>Check all filenames to see if they are valid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>bool</em> – true if the filenames are set, false otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.check_map">
+<span class="sig-name descname"><span class="pre">check_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.check_map" title="Link to this definition">#</a></dt>
+<dd><p>Check the validity of a map data from file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype to check</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.colour_units">
+<span class="sig-name descname"><span class="pre">colour_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stratigraphic_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.colour_units" title="Link to this definition">#</a></dt>
+<dd><p>Add a colour column to the units in the stratigraphic units structure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stratigraphic_units</strong> (<em>pandas.DataFrame</em>) – The stratigraphic units data</p></li>
+<li><p><strong>random</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag of whether to add random colours to missing entries in the colour lookup table. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – The modified units</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.export_wkt_format_files">
+<span class="sig-name descname"><span class="pre">export_wkt_format_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.export_wkt_format_files" title="Link to this definition">#</a></dt>
+<dd><p>Save out the geology and fault GeoDataFrames in WKT format
+This is used by map2model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.extract_all_contacts">
+<span class="sig-name descname"><span class="pre">extract_all_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_contacts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.extract_all_contacts" title="Link to this definition">#</a></dt>
+<dd><p>Extract the contacts between units in the geology GeoDataFrame</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.extract_basal_contacts">
+<span class="sig-name descname"><span class="pre">extract_basal_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stratigraphic_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_contacts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.extract_basal_contacts" title="Link to this definition">#</a></dt>
+<dd><p>Identify the basal unit of the contacts based on the stratigraphic column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stratigraphic_column</strong> (<em>list</em>) – The stratigraphic column to use</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_bounding_box">
+<span class="sig-name descname"><span class="pre">get_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_bounding_box" title="Link to this definition">#</a></dt>
+<dd><p>Get the bounding box in dict or polygon form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polygon</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to get the bounding box in polygon form. Defaults to False.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict or shapely.Polygon</em> – The bounding box in the requested form</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_colour_filename">
+<span class="sig-name descname"><span class="pre">get_colour_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_colour_filename" title="Link to this definition">#</a></dt>
+<dd><p>Get the colour lookup table filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – The colour lookup table filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_config_filename">
+<span class="sig-name descname"><span class="pre">get_config_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_config_filename" title="Link to this definition">#</a></dt>
+<dd><p>Get the config filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – The config filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_empty_dataframe">
+<span class="sig-name descname"><span class="pre">get_empty_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_empty_dataframe" title="Link to this definition">#</a></dt>
+<dd><p>Create a basic empty geodataframe for a specified datatype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the empty dataset</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>geopandas.GeoDataFrame or None</em> – The created geodataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_filename">
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_filename" title="Link to this definition">#</a></dt>
+<dd><p>Get a filename of a specified datatype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the filename wanted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>string</em> – The filename of the datatype specified</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_ignore_codes">
+<span class="sig-name descname"><span class="pre">get_ignore_codes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.get_ignore_codes" title="Link to this definition">#</a></dt>
+<dd><p>Get the list of codes to ingnore</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>list</em> – The list of strings to ignore</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_map_data">
+<span class="sig-name descname"><span class="pre">get_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Get the data geopanda of the specified datatype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype to retrieve</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>geopandas.GeoDataFrame</em> – The dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_raw_map_data">
+<span class="sig-name descname"><span class="pre">get_raw_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_raw_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Get the raw data geopanda of the specified datatype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype to retrieve</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>geopandas.GeoDataFrame</em> – The raw data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_value_from_raster">
+<span class="sig-name descname"><span class="pre">get_value_from_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_value_from_raster" title="Link to this definition">#</a></dt>
+<dd><p>Get the value from a raster map at the specified point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the raster map to retrieve from</p></li>
+<li><p><strong>x</strong> (<em>float</em><em> or </em><em>int</em>) – The easting coordinate of the value</p></li>
+<li><p><strong>y</strong> (<em>float</em><em> or </em><em>int</em>) – The northing coordinate of the value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>float or int</em> – The value at the point specified</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_value_from_raster_df">
+<span class="sig-name descname"><span class="pre">get_value_from_raster_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_value_from_raster_df" title="Link to this definition">#</a></dt>
+<dd><p>Add a ‘Z’ column to a dataframe with the heights from the ‘X’ and ‘Y’ coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the raster map to retrieve from</p></li>
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The original dataframe with ‘X’ and ‘Y’ columns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pandas.DataFrame</em> – The modified dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.get_working_projection">
+<span class="sig-name descname"><span class="pre">get_working_projection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.get_working_projection" title="Link to this definition">#</a></dt>
+<dd><p>Get the working projection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – The working projection in “EPSG:&lt;int&gt;” form</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.load_all_map_data">
+<span class="sig-name descname"><span class="pre">load_all_map_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.load_all_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Load all the map data for each datatype.  Cycles through each type and loads it</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.load_map_data">
+<span class="sig-name descname"><span class="pre">load_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.load_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Load map data from file, reproject and clip it and then check data is valid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype to load</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.load_raster_map_data">
+<span class="sig-name descname"><span class="pre">load_raster_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.load_raster_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Load raster map data from file, reproject and clip it and then check data is valid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The raster datatype to load</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.open_http_query">
+<span class="sig-name descname"><span class="pre">open_http_query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.open_http_query" title="Link to this definition">#</a></dt>
+<dd><p>Attempt to open the http url and unzip the file if required
+Note: This is specific to opening remotely hosted dtm data in geotiff format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> (<em>str</em>) – The url to open</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>_type_</em> – The geotiff file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.parse_fault_map">
+<span class="sig-name descname"><span class="pre">parse_fault_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.parse_fault_map" title="Link to this definition">#</a></dt>
+<dd><p>Parse the fault shapefile data into a consistent format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>tuple</em> – A tuple of (bool: success/fail, str: failure message)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.parse_fault_orientations">
+<span class="sig-name descname"><span class="pre">parse_fault_orientations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.parse_fault_orientations" title="Link to this definition">#</a></dt>
+<dd><p>Parse the fault orientations shapefile data into a consistent format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>tuple</em> – A tuple of (bool: success/fail, str: failure message)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.parse_fold_map">
+<span class="sig-name descname"><span class="pre">parse_fold_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.parse_fold_map" title="Link to this definition">#</a></dt>
+<dd><p>Parse the fold shapefile data into a consistent format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>tuple</em> – A tuple of (bool: success/fail, str: failure message)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.parse_geology_map">
+<span class="sig-name descname"><span class="pre">parse_geology_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.parse_geology_map" title="Link to this definition">#</a></dt>
+<dd><p>Parse the geology shapefile data into a consistent format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>tuple</em> – A tuple of (bool: success/fail, str: failure message)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.parse_structure_map">
+<span class="sig-name descname"><span class="pre">parse_structure_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#map2loop.mapdata.MapData.parse_structure_map" title="Link to this definition">#</a></dt>
+<dd><p>Parse the structure shapefile data into a consistent format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>tuple</em> – A tuple of (bool: success/fail, str: failure message)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.recreate_bounding_box_str">
+<span class="sig-name descname"><span class="pre">recreate_bounding_box_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.recreate_bounding_box_str" title="Link to this definition">#</a></dt>
+<dd><p>Creates the bounding box string from the bounding box dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.save_all_map_data">
+<span class="sig-name descname"><span class="pre">save_all_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.csv'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.save_all_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Save all the map data to file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em>) – The directory to save to</p></li>
+<li><p><strong>extension</strong> (<em>str</em><em>, </em><em>optional</em>) – The extension to use for the data. Defaults to “.csv”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.save_raw_map_data">
+<span class="sig-name descname"><span class="pre">save_raw_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.shp.zip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.save_raw_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Save the map data from datatype to file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em>) – The directory to save to</p></li>
+<li><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype of the geopanda to save</p></li>
+<li><p><strong>extension</strong> (<em>str</em><em>, </em><em>optional</em>) – The extension to use for the data. Defaults to “.csv”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_bounding_box">
+<span class="sig-name descname"><span class="pre">set_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounding_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_bounding_box" title="Link to this definition">#</a></dt>
+<dd><p>Set the bounding box of the map data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bounding_box</strong> (<em>tuple</em><em> or </em><em>dict</em>) – The bounding box to use for maps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_colour_filename">
+<span class="sig-name descname"><span class="pre">set_colour_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_colour_filename" title="Link to this definition">#</a></dt>
+<dd><p>Set the filename of the colour csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The csv colour look up table filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_config_filename">
+<span class="sig-name descname"><span class="pre">set_config_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_config_filename" title="Link to this definition">#</a></dt>
+<dd><p>Set the config filename and update the config structure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The filename of the config file</p></li>
+<li><p><strong>legacy_format</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the file is in m2lv2 form. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_filename">
+<span class="sig-name descname"><span class="pre">set_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_filename" title="Link to this definition">#</a></dt>
+<dd><p>Set the filename for a specific datatype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype for the filename specified</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – The filename to store</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_filenames_from_australian_state">
+<span class="sig-name descname"><span class="pre">set_filenames_from_australian_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_filenames_from_australian_state" title="Link to this definition">#</a></dt>
+<dd><p>Set the shape/dtm filenames appropriate to the Australian state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>str</em>) – The abbreviated Australian state name</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – state string not in state list [‘WA’, ‘SA’, ‘QLD’, ‘NSW’, ‘TAS’, ‘VIC’, ‘ACT’, ‘NT’]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_ignore_codes">
+<span class="sig-name descname"><span class="pre">set_ignore_codes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_ignore_codes" title="Link to this definition">#</a></dt>
+<dd><p>Set the codes to ignore in the geology shapefile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>codes</strong> (<em>list</em>) – The list of codes to ignore</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_working_projection">
+<span class="sig-name descname"><span class="pre">set_working_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_working_projection" title="Link to this definition">#</a></dt>
+<dd><p>Set the working projection for the map data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projection</strong> (<em>int</em><em> or </em><em>str</em>) – The projection to use for map reprojection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.set_working_projection_on_map_data">
+<span class="sig-name descname"><span class="pre">set_working_projection_on_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="map2loop.m2l_enums.Datatype.html#map2loop.m2l_enums.Datatype" title="map2loop.m2l_enums.Datatype"><span class="pre">Datatype</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.set_working_projection_on_map_data" title="Link to this definition">#</a></dt>
+<dd><p>Set the working projection on the GeoDataFrame structure or if already set reproject the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference internal" href="map2loop.mapdata.Datatype.html#map2loop.mapdata.Datatype" title="map2loop.mapdata.Datatype"><em>Datatype</em></a>) – The datatype to set or reproject</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.update_filename_with_bounding_box">
+<span class="sig-name descname"><span class="pre">update_filename_with_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.update_filename_with_bounding_box" title="Link to this definition">#</a></dt>
+<dd><p>Update the filename/url with the bounding box
+This replace all instances of {BBOX_STR} with the bounding_box_str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The original filename</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Filename is blank</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – The modified filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.MapData.update_filename_with_projection">
+<span class="sig-name descname"><span class="pre">update_filename_with_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.MapData.update_filename_with_projection" title="Link to this definition">#</a></dt>
+<dd><p>Update the filename/url with the projection
+This replace all instances of {PROJ_STR} with the projection string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The original filename</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Filename is blank</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – The modified filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="map2loop.mapdata.GzipFile.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">map2loop.mapdata.GzipFile</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="map2loop.mapdata.VerboseLevel.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">map2loop.mapdata.VerboseLevel</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData"><code class="docutils literal notranslate"><span class="pre">MapData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.raw_data"><code class="docutils literal notranslate"><span class="pre">MapData.raw_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.data"><code class="docutils literal notranslate"><span class="pre">MapData.data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.contacts"><code class="docutils literal notranslate"><span class="pre">MapData.contacts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.basal_contacts"><code class="docutils literal notranslate"><span class="pre">MapData.basal_contacts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.filenames"><code class="docutils literal notranslate"><span class="pre">MapData.filenames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.dirtyflags"><code class="docutils literal notranslate"><span class="pre">MapData.dirtyflags</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.data_states"><code class="docutils literal notranslate"><span class="pre">MapData.data_states</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.working_projection"><code class="docutils literal notranslate"><span class="pre">MapData.working_projection</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.bounding_box"><code class="docutils literal notranslate"><span class="pre">MapData.bounding_box</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.bounding_box_polygon"><code class="docutils literal notranslate"><span class="pre">MapData.bounding_box_polygon</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.bounding_box_str"><code class="docutils literal notranslate"><span class="pre">MapData.bounding_box_str</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.config_filename"><code class="docutils literal notranslate"><span class="pre">MapData.config_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.colour_filename"><code class="docutils literal notranslate"><span class="pre">MapData.colour_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.tmp_path"><code class="docutils literal notranslate"><span class="pre">MapData.tmp_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.verbose_level"><code class="docutils literal notranslate"><span class="pre">MapData.verbose_level</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.config"><code class="docutils literal notranslate"><span class="pre">MapData.config</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.__init__"><code class="docutils literal notranslate"><span class="pre">MapData.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.calculate_bounding_box_and_projection"><code class="docutils literal notranslate"><span class="pre">MapData.calculate_bounding_box_and_projection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.check_filename"><code class="docutils literal notranslate"><span class="pre">MapData.check_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.check_filenames"><code class="docutils literal notranslate"><span class="pre">MapData.check_filenames()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.check_map"><code class="docutils literal notranslate"><span class="pre">MapData.check_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.colour_units"><code class="docutils literal notranslate"><span class="pre">MapData.colour_units()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.export_wkt_format_files"><code class="docutils literal notranslate"><span class="pre">MapData.export_wkt_format_files()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.extract_all_contacts"><code class="docutils literal notranslate"><span class="pre">MapData.extract_all_contacts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.extract_basal_contacts"><code class="docutils literal notranslate"><span class="pre">MapData.extract_basal_contacts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_bounding_box"><code class="docutils literal notranslate"><span class="pre">MapData.get_bounding_box()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_colour_filename"><code class="docutils literal notranslate"><span class="pre">MapData.get_colour_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_config_filename"><code class="docutils literal notranslate"><span class="pre">MapData.get_config_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_empty_dataframe"><code class="docutils literal notranslate"><span class="pre">MapData.get_empty_dataframe()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_filename"><code class="docutils literal notranslate"><span class="pre">MapData.get_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_ignore_codes"><code class="docutils literal notranslate"><span class="pre">MapData.get_ignore_codes()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.get_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_raw_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.get_raw_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_value_from_raster"><code class="docutils literal notranslate"><span class="pre">MapData.get_value_from_raster()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_value_from_raster_df"><code class="docutils literal notranslate"><span class="pre">MapData.get_value_from_raster_df()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.get_working_projection"><code class="docutils literal notranslate"><span class="pre">MapData.get_working_projection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.load_all_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.load_all_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.load_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.load_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.load_raster_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.load_raster_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.open_http_query"><code class="docutils literal notranslate"><span class="pre">MapData.open_http_query()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.parse_fault_map"><code class="docutils literal notranslate"><span class="pre">MapData.parse_fault_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.parse_fault_orientations"><code class="docutils literal notranslate"><span class="pre">MapData.parse_fault_orientations()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.parse_fold_map"><code class="docutils literal notranslate"><span class="pre">MapData.parse_fold_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.parse_geology_map"><code class="docutils literal notranslate"><span class="pre">MapData.parse_geology_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.parse_structure_map"><code class="docutils literal notranslate"><span class="pre">MapData.parse_structure_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.recreate_bounding_box_str"><code class="docutils literal notranslate"><span class="pre">MapData.recreate_bounding_box_str()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.save_all_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.save_all_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.save_raw_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.save_raw_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_bounding_box"><code class="docutils literal notranslate"><span class="pre">MapData.set_bounding_box()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_colour_filename"><code class="docutils literal notranslate"><span class="pre">MapData.set_colour_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_config_filename"><code class="docutils literal notranslate"><span class="pre">MapData.set_config_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_filename"><code class="docutils literal notranslate"><span class="pre">MapData.set_filename()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_filenames_from_australian_state"><code class="docutils literal notranslate"><span class="pre">MapData.set_filenames_from_australian_state()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_ignore_codes"><code class="docutils literal notranslate"><span class="pre">MapData.set_ignore_codes()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_working_projection"><code class="docutils literal notranslate"><span class="pre">MapData.set_working_projection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.set_working_projection_on_map_data"><code class="docutils literal notranslate"><span class="pre">MapData.set_working_projection_on_map_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.update_filename_with_bounding_box"><code class="docutils literal notranslate"><span class="pre">MapData.update_filename_with_bounding_box()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.MapData.update_filename_with_projection"><code class="docutils literal notranslate"><span class="pre">MapData.update_filename_with_projection()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/map2loop.mapdata.MapData.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".toggle > *").hide();
+    $(".toggle .header").show();
+    $(".toggle .header").click(function () {
+      $(this).parent().children().not(".header").toggle(400);
+      $(this).parent().children(".header").toggleClass("open");
+    });
+  });
+</script>
+
+  </body>
+</html>

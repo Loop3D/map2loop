@@ -1,0 +1,606 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>map2loop.project &#8212; map2loop 3.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.project';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="map2loop.project.to_rgba" href="map2loop.project.to_rgba.html" />
+    <link rel="prev" title="map2loop.mapdata.VerboseLevel" href="map2loop.mapdata.VerboseLevel.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.Project.html">map2loop.Project</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.aus_state_urls.html">map2loop.aus_state_urls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.config.html">map2loop.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.deformation_history.html">map2loop.deformation_history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.fault_orientation.html">map2loop.fault_orientation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">map2loop.project</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.to_rgba.html">map2loop.project.to_rgba</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Datatype.html">map2loop.project.Datatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.DeformationHistory.html">map2loop.project.DeformationHistory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ErrorState.html">map2loop.project.ErrorState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.FaultOrientation.html">map2loop.project.FaultOrientation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.FaultOrientationNearest.html">map2loop.project.FaultOrientationNearest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Map2ModelWrapper.html">map2loop.project.Map2ModelWrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.MapData.html">map2loop.project.MapData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Project.html">map2loop.project.Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Sampler.html">map2loop.project.Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SamplerDecimator.html">map2loop.project.SamplerDecimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SamplerSpacing.html">map2loop.project.SamplerSpacing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Sorter.html">map2loop.project.Sorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterAgeBased.html">map2loop.project.SorterAgeBased</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterAlpha.html">map2loop.project.SorterAlpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterUseHint.html">map2loop.project.SorterUseHint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterUseNetworkX.html">map2loop.project.SorterUseNetworkX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.StratigraphicColumn.html">map2loop.project.StratigraphicColumn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThicknessCalculator.html">map2loop.project.ThicknessCalculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThicknessCalculatorAlpha.html">map2loop.project.ThicknessCalculatorAlpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThrowCalculator.html">map2loop.project.ThrowCalculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThrowCalculatorAlpha.html">map2loop.project.ThrowCalculatorAlpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.VerboseLevel.html">map2loop.project.VerboseLevel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">map2loop.project</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-map2loop.project">
+<span id="map2loop-project"></span><h1>map2loop.project<a class="headerlink" href="#module-map2loop.project" title="Link to this heading">#</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.to_rgba.html#map2loop.project.to_rgba" title="map2loop.project.to_rgba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_rgba</span></code></a>(c[, alpha])</p></td>
+<td><p>Convert <em>c</em> to an RGBA color.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.Datatype.html#map2loop.project.Datatype" title="map2loop.project.Datatype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Datatype</span></code></a>(value[, names, module, qualname, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.DeformationHistory.html#map2loop.project.DeformationHistory" title="map2loop.project.DeformationHistory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeformationHistory</span></code></a>()</p></td>
+<td><p>A class containing all the fault and fold summaries and relationships</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.ErrorState.html#map2loop.project.ErrorState" title="map2loop.project.ErrorState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorState</span></code></a>(value[, names, module, qualname, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.FaultOrientation.html#map2loop.project.FaultOrientation" title="map2loop.project.FaultOrientation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FaultOrientation</span></code></a>()</p></td>
+<td><p>Base Class of Fault Orientation assigner to force structure of FaultOrientation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.FaultOrientationNearest.html#map2loop.project.FaultOrientationNearest" title="map2loop.project.FaultOrientationNearest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FaultOrientationNearest</span></code></a>()</p></td>
+<td><p>FaultOrientation class which estimates fault orientation based on nearest orientation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.Map2ModelWrapper.html#map2loop.project.Map2ModelWrapper" title="map2loop.project.Map2ModelWrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Map2ModelWrapper</span></code></a>(map_data[, verbose_level])</p></td>
+<td><p>A wrapper around map2model functionality</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.MapData.html#map2loop.project.MapData" title="map2loop.project.MapData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MapData</span></code></a>([tmp_path, verbose_level])</p></td>
+<td><p>A data structure containing all the map data loaded from map files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.Project.html#map2loop.project.Project" title="map2loop.project.Project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Project</span></code></a>([verbose_level, tmp_path, ...])</p></td>
+<td><p>The main entry point into using map2loop</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.Sampler.html#map2loop.project.Sampler" title="map2loop.project.Sampler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sampler</span></code></a>()</p></td>
+<td><p>Base Class of Sampler used to force structure of Sampler</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.SamplerDecimator.html#map2loop.project.SamplerDecimator" title="map2loop.project.SamplerDecimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SamplerDecimator</span></code></a>([decimation])</p></td>
+<td><p>Decimator sampler class which decimates the geo data frame based on the decimation value ie.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.SamplerSpacing.html#map2loop.project.SamplerSpacing" title="map2loop.project.SamplerSpacing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SamplerSpacing</span></code></a>([spacing])</p></td>
+<td><p>Spacing based sampler which decimates the geo data frame based on the distance between points along a line or in the case of a polygon along the boundary of that polygon ie.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.Sorter.html#map2loop.project.Sorter" title="map2loop.project.Sorter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sorter</span></code></a>()</p></td>
+<td><p>Base Class of Sorter used to force structure of Sorter</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.SorterAgeBased.html#map2loop.project.SorterAgeBased" title="map2loop.project.SorterAgeBased"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SorterAgeBased</span></code></a>()</p></td>
+<td><p>Sorter class which returns a sorted list of units based on the min and max ages of the units</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.SorterAlpha.html#map2loop.project.SorterAlpha" title="map2loop.project.SorterAlpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SorterAlpha</span></code></a>()</p></td>
+<td><p>Sorter class which returns a sorted list of units based on the adjacency of units prioritising the units with lower number of contacting units</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.SorterUseHint.html#map2loop.project.SorterUseHint" title="map2loop.project.SorterUseHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SorterUseHint</span></code></a>()</p></td>
+<td><p>Sorter class which only returns the hint (no algorithm for sorting is done in this class)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.SorterUseNetworkX.html#map2loop.project.SorterUseNetworkX" title="map2loop.project.SorterUseNetworkX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SorterUseNetworkX</span></code></a>()</p></td>
+<td><p>Sorter class which returns a sorted list of units based on the unit relationships using a topological graph sorting algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.StratigraphicColumn.html#map2loop.project.StratigraphicColumn" title="map2loop.project.StratigraphicColumn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StratigraphicColumn</span></code></a>()</p></td>
+<td><p>A class containing all the fault and fold summaries and relationships</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.ThicknessCalculator.html#map2loop.project.ThicknessCalculator" title="map2loop.project.ThicknessCalculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThicknessCalculator</span></code></a>()</p></td>
+<td><p>Base Class of Thickness Calculator used to force structure of ThicknessCalculator</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.ThicknessCalculatorAlpha.html#map2loop.project.ThicknessCalculatorAlpha" title="map2loop.project.ThicknessCalculatorAlpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThicknessCalculatorAlpha</span></code></a>()</p></td>
+<td><p>ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.ThrowCalculator.html#map2loop.project.ThrowCalculator" title="map2loop.project.ThrowCalculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThrowCalculator</span></code></a>()</p></td>
+<td><p>Base Class of Throw Calculator used to force structure of ThrowCalculator</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.ThrowCalculatorAlpha.html#map2loop.project.ThrowCalculatorAlpha" title="map2loop.project.ThrowCalculatorAlpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThrowCalculatorAlpha</span></code></a>()</p></td>
+<td><p>ThrowCalculator class which estimates fault throw values based on units, basal_contacts and stratigraphic order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="map2loop.project.VerboseLevel.html#map2loop.project.VerboseLevel" title="map2loop.project.VerboseLevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VerboseLevel</span></code></a>(value[, names, module, ...])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="map2loop.mapdata.VerboseLevel.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">map2loop.mapdata.VerboseLevel</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="map2loop.project.to_rgba.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">map2loop.project.to_rgba</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/map2loop.project.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".toggle > *").hide();
+    $(".toggle .header").show();
+    $(".toggle .header").click(function () {
+      $(this).parent().children().not(".header").toggle(400);
+      $(this).parent().children(".header").toggleClass("open");
+    });
+  });
+</script>
+
+  </body>
+</html>

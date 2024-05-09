@@ -1,0 +1,6 @@
+map2loop.throw\_calculator.abstractmethod
+=========================================
+
+.. currentmodule:: map2loop.throw_calculator
+
+.. autofunction:: abstractmethod

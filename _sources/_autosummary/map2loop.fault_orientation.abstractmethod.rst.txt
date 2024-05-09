@@ -1,0 +1,6 @@
+map2loop.fault\_orientation.abstractmethod
+==========================================
+
+.. currentmodule:: map2loop.fault_orientation
+
+.. autofunction:: abstractmethod

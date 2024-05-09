@@ -1,0 +1,6 @@
+map2loop.thickness\_calculator.calculate\_endpoints
+===================================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autofunction:: calculate_endpoints

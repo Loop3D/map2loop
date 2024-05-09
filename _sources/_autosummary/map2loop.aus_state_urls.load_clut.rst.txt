@@ -1,0 +1,6 @@
+map2loop.aus\_state\_urls.load\_clut
+====================================
+
+.. currentmodule:: map2loop.aus_state_urls
+
+.. autofunction:: load_clut

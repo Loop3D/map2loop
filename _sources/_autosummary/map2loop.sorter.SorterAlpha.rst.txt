@@ -1,0 +1,27 @@
+map2loop.sorter.SorterAlpha
+===========================
+
+.. currentmodule:: map2loop.sorter
+
+.. autoclass:: SorterAlpha
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SorterAlpha.__init__
+      ~SorterAlpha.sort
+      ~SorterAlpha.type
+   
+   
+
+   
+   
+   

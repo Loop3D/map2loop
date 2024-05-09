@@ -1,0 +1,27 @@
+map2loop.sorter.SorterUseHint
+=============================
+
+.. currentmodule:: map2loop.sorter
+
+.. autoclass:: SorterUseHint
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SorterUseHint.__init__
+      ~SorterUseHint.sort
+      ~SorterUseHint.type
+   
+   
+
+   
+   
+   

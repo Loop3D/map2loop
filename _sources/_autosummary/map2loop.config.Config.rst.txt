@@ -1,0 +1,29 @@
+map2loop.config.Config
+======================
+
+.. currentmodule:: map2loop.config
+
+.. autoclass:: Config
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Config.__init__
+      ~Config.to_dict
+      ~Config.update_from_dictionary
+      ~Config.update_from_file
+      ~Config.update_from_legacy_file
+   
+   
+
+   
+   
+   

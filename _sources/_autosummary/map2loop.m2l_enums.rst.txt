@@ -1,0 +1,36 @@
+map2loop.m2l\_enums
+===================
+
+.. automodule:: map2loop.m2l_enums
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      Datastate
+      Datatype
+      ErrorState
+      IntEnum
+      VerboseLevel
+   
+   
+
+   
+   
+   
+
+
+

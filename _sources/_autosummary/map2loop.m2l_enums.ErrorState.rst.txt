@@ -1,0 +1,44 @@
+map2loop.m2l\_enums.ErrorState
+==============================
+
+.. currentmodule:: map2loop.m2l_enums
+
+.. autoclass:: ErrorState
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ErrorState.conjugate
+      ~ErrorState.bit_length
+      ~ErrorState.bit_count
+      ~ErrorState.to_bytes
+      ~ErrorState.from_bytes
+      ~ErrorState.as_integer_ratio
+      ~ErrorState.is_integer
+      ~ErrorState.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ErrorState.real
+      ~ErrorState.imag
+      ~ErrorState.numerator
+      ~ErrorState.denominator
+      ~ErrorState.NONE
+      ~ErrorState.URLERROR
+      ~ErrorState.CONFIGERROR
+   
+   

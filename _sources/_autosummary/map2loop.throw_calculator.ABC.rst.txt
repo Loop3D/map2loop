@@ -1,0 +1,25 @@
+map2loop.throw\_calculator.ABC
+==============================
+
+.. currentmodule:: map2loop.throw_calculator
+
+.. autoclass:: ABC
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ABC.__init__
+   
+   
+
+   
+   
+   

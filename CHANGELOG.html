@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; map2loop 3.0.6 documentation</title>
+    <title>Changelog &#8212; map2loop 3.1.2 documentation</title>
   
   
   
@@ -39,8 +39,8 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="_static/documentation_options.js?v=c3365b21"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'CHANGELOG';</script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.0.6 documentation</p>
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
   
 </a></div>
     
@@ -134,13 +134,6 @@
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="user_guide/index.html">
                         User Guide
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_auto_examples/index.html">
-                        Examples
                       </a>
                     </li>
                 
@@ -278,13 +271,6 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="_auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="_autosummary/map2loop.html">
                         map2loop
                       </a>
@@ -402,45 +388,284 @@ document.write(`
   <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <section id="id1">
-<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/3.0.5...3.0.6">3.0.6</a> (2024-01-25)<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/v3.1.1...v3.1.2">3.1.2</a> (2024-05-09)<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <section id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>update doc deploy (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/cf0de5b937c251ac71522488392f7ba7d65d78c6">cf0de5b</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/v3.1.0...v3.1.1">3.1.1</a> (2024-05-09)<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>trigger build (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f1879ced58154610ccadd46488cdf7f109ca1810">f1879ce</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id4">
+<h2>3.1.0 (2024-05-09)<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add new stratigraphic column sorters based on contact length and unit relationships fix: transpose dtm for height calculations, export geotiff using gdal (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/36ddcca650d7f12c102b77e5df23d7a2b7710ee3">36ddcca</a>)</p></li>
+<li><p>added utils function (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/3c01767c0f3adde4ccae59d84e01e65849b30993">3c01767</a>)</p></li>
+<li><p>Allow for empty dataframes if no filename specified. Mainly for fault and fold files (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f81d9b4496a9d863864f72d2c1d2813871bccb24">f81d9b4</a>)</p></li>
+<li><p>new ThicknessCalculatorBeta (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f7038326fb2ff291ab23e3c3e52e7ad653b68e1a">f703832</a>)</p></li>
+<li><p>thickness calculator gamma (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6926a4540198f8fb25dd2c8905be5c2072ea511a">6926a45</a>)</p></li>
+<li><p>two interpolators for thickness calculations (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e118f6afb7202595e09c6ef3798c28c4ea7035f6">e118f6a</a>)</p></li>
+<li><p>two interpolators for thickness calculators (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/11f3a0455103b464285b47878dc226916b7bc233">11f3a04</a>)</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Bug Fixes<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>3.12 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/264b4c069fc069cd84d30c43d4931f5815391fc4">264b4c0</a>)</p></li>
+<li><p>actually remove the rank &amp; type lines (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/16801d23c52d74c291161a52ac2fbb541a133529">16801d2</a>)</p></li>
+<li><p>add back the project import (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/01dc0bbacfa605aa5aac12dca94aed4d158420fa">01dc0bb</a>)</p></li>
+<li><p>add comments to the gamma calculator (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/936b495d10ea28c52349f66cb35638d79ed329ff">936b495</a>)</p></li>
+<li><p>Add data files as package_data so that it installs with .py files (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/09b0cb8a72d9eed06c6a3de7c62a0931ceb6b846">09b0cb8</a>)</p></li>
+<li><p>add descriptive variable names (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/672bece19ddd3e0dac775a47a4577a7d5c163d45">672bece</a>)</p></li>
+<li><p>Add exception handling around hjson access (<a class="reference external" href="https://github.com/Loop3D/map2loop/issues/24">#24</a>) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f627f83079ba0c1315fc59d98fc2bb2fe27a0191">f627f83</a>)</p></li>
+<li><p>Add exception handling around hjson access, throw with better message (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d8804de89a9ecc8705914f959b3c4a4858f968d9">d8804de</a>)</p></li>
+<li><p>add feature to count segnum of polygons with holes (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/03bcbcc00b6df28a0dc0879d6fa41ae0bc355cf8">03bcbcc</a>)</p></li>
+<li><p>Add layer id to structural data using a spatial join (<a class="reference external" href="https://github.com/Loop3D/map2loop/issues/38">#38</a>) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/09c53d6fbb6b44c46b9e88cf9044f7ccd1ebd555">09c53d6</a>)</p></li>
+<li><p>add lazy function to load files from state name (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0e0bfa7f72f80e89aba5a548a7282743dc0bd04a">0e0bfa7</a>)</p></li>
+<li><p>add LPF 0.1.0 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a4165b3f81c1f9d2625f1268561583e8b967bd7f">a4165b3</a>)</p></li>
+<li><p>Add multiple tries to online config file access (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/8a137cedc298596ea4ce858a5ff4e256eb169b7c">8a137ce</a>)</p></li>
+<li><p>add option for user defined line length (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/23aeb06c0f422598e054727ab0d8357da76a7705">23aeb06</a>)</p></li>
+<li><p>add options/warnings to overwrite existing lpf files (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/165bc17f7a8181f9d1bab717120a4f3e86dab81a">165bc17</a>)</p></li>
+<li><p>Add owslib as dependency for testing (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0439da869856b187defbed631c592a848b3684a1">0439da8</a>)</p></li>
+<li><p>add Pathlib to aus state (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e9d7addcbf545d67a0547c0cd0bf5dc73b9748d8">e9d7add</a>)</p></li>
+<li><p>add remaining thickness fields (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/130af988df47ca27ad5aa3ecba67655517697430">130af98</a>)</p></li>
+<li><p>add some comments throughout the script and remove unnecessary comments (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/390b864545223e01bb7a475429d4d6a7298732d2">390b864</a>)</p></li>
+<li><p>Add special case for SA config file to lowercase the column names.  Also check for empty map2model relationship files and deal appropriately with them (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/82054dfec9f82b353a63b42e5f3d815fdeff5fee">82054df</a>)</p></li>
+<li><p>add str and Pathlib to beartypes (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/16a02470b520b3a118c69e29a63e3bb7eeda25a2">16a0247</a>)</p></li>
+<li><p>add strike attribute to the class (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/80e4445bcfbe73f3a430c77dce0a96de56c913c6">80e4445</a>)</p></li>
+<li><p>add test datafiles to gitignore (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/951e7fea8ea358a00426fd7cdcedf552e865acc2">951e7fe</a>)</p></li>
+<li><p>Add test for featureId (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/37f5a96dce30ee3115105701f1c2c96f58d3d9fe">37f5a96</a>)</p></li>
+<li><p>add thickness fields to proj and thickness_calculators (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f6ec60faf0d075fe8fa8fedcc60884840b9dc0f9">f6ec60f</a>)</p></li>
+<li><p>added function to find the datasets folder after install. (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9623d48643f664683e9403d14208a1e6a991f949">9623d48</a>)</p></li>
+<li><p>Added new stratigraphic sorters, a placeholder for throw calculators and updated thickness calculator (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e08e010f38070c175412f0b92946b5ce705c5409">e08e010</a>)</p></li>
+<li><p>added option for grid resolution (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a0ef130bb12148bab8cb2bb7bddf7fb33db4f085">a0ef130</a>)</p></li>
+<li><p>added segNum to geology samples (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0ad69839dc25d7400e80a4ef2deed5e2ace7dcf3">0ad6983</a>)</p></li>
+<li><p>adding beartype to requreiments (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/4d66b8fd76d8ba5a64abdc0838b9797dfcc75dca">4d66b8f</a>)</p></li>
+<li><p>adding empty samples to project class (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/bf100b2c23a284072d11d54e080d882da0460942">bf100b2</a>)</p></li>
+<li><p>adding fault orientation calculation (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e35f0b6a78ae85482a66f6636b54bc079432dd51">e35f0b6</a>)</p></li>
+<li><p>adding fault orientation calculator (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/08c9f5e943ee31b52ca613c4da44b3521018eb22">08c9f5e</a>)</p></li>
+<li><p>adding fault orientation data type (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f0e82e20553f7f930ea4237c7516a18c61907090">f0e82e2</a>)</p></li>
+<li><p>adding orientation type to fault config. (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/635993739bac4acf5c6e6ad83a884c391602285c">6359937</a>)</p></li>
+<li><p>adding random colour generator (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e6315c47b9f3c18140da62f3d124021e79ae403b">e6315c4</a>)</p></li>
+<li><p>adding to_dict for config (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/968504e27e56b343feee58a8a1ed297f493c5d87">968504e</a>)</p></li>
+<li><p>adding to_dict for config (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/968504e27e56b343feee58a8a1ed297f493c5d87">968504e</a>)</p></li>
+<li><p>adding to_dict for config (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/258254e7fc4e2628c035a400083c04dc4f81866b">258254e</a>)</p></li>
+<li><p>adding version and ignoring init file for f401 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/db6ac5b48f7ade6d57b2a6a094811c083c996bd0">db6ac5b</a>)</p></li>
+<li><p>adding version attribute (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1a2ed677443ae2497aee9bc6b0a929e7566632b7">1a2ed67</a>)</p></li>
+<li><p>avoid future warnings from geopandas (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e877d936426fca7b58f9825e8f82687660edf5c2">e877d93</a>)</p></li>
+<li><p>can access sampled data for thickness calculations (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1ae2d2d199806c2d15e828543f890a73b56909ee">1ae2d2d</a>)</p></li>
+<li><p>change config file name convention for clarity (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/15123ac68a590b85010cd766f588a4fa859b4d05">15123ac</a>)</p></li>
+<li><p>change docker to see if documentation builds (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/10f4fdea4a9a856ce30941cb5f1878e63d226870">10f4fde</a>)</p></li>
+<li><p>change make html statement in docs build (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/26aeba65d10bc4251f97d584a15ded9c04ad5b74">26aeba6</a>)</p></li>
+<li><p>change segNum to featureId (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/aab8c8c90c42dbe3a85431ed669f386a187a4349">aab8c8c</a>)</p></li>
+<li><p>change segNum to featureId (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/2689a3a7307ae49a7f9198be7365471c43ccdad2">2689a3a</a>)</p></li>
+<li><p>changing boolean comparison (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d90df183cb9042a994525cfd698297aa588ea04f">d90df18</a>)</p></li>
+<li><p>changing isinstance to issubclass (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0e9ecc82b37a0a979aefc8fb3ae83b406f30a37a">0e9ecc8</a>)</p></li>
+<li><p>Check for empty dataframe before concat (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c475513c84c356d1a2b09bcd331c861f124b3317">c475513</a>)</p></li>
+<li><p>correct typo on actions &amp; reverse test path (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a5fbdbcc394629a4d77bc04b2e7f65c4e0aa05e8">a5fbdbc</a>)</p></li>
+<li><p>data works without init files on subfolders (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/cc833bbee451f1b540237cc9fa6abc3c3747979d">cc833bb</a>)</p></li>
+<li><p>default fault dip/dipdir to nan (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/917cee6bc7c27ed18a067403e7780d54656f92f5">917cee6</a>)</p></li>
+<li><p>default fault values to nan not 0 to prevent unexpected behaviours (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/87863c76654da4fee87fed45ac5015e30c49defa">87863c7</a>)</p></li>
+<li><p>Default temp path changed to work in linux (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5bd773bdd27268aa8b516b799a16dca141056c0f">5bd773b</a>)</p></li>
+<li><p>Default to not showing file access debug info (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/fbcf10df02eb98fdeb5c2dfafffe5624835eac60">fbcf10d</a>)</p></li>
+<li><p>delete runtime from repo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/36d59bce5bd7a8dfedd279c877a1d9b7ee6bf18b">36d59bc</a>)</p></li>
+<li><p>Dependencies issue with new version of geopandas breaking read_file on remote zip files. Also, fixed errant line that installed the old version of map2model (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/4eb720a2d766b821d0cf31e46bc8b3f571ea6fc7">4eb720a</a>)</p></li>
+<li><p>edit path of config filename (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6864d7d1efa204ff286b9ff4533103d984d5ec9b">6864d7d</a>)</p></li>
+<li><p>endpoints have correct length (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c36995dc2a31ce16d64e3ef46a721c53ee8c602c">c36995d</a>)</p></li>
+<li><p>fix typo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f69b42f8640827df2b7ca7e35629aac729d34684">f69b42f</a>)</p></li>
+<li><p>fixed NaN values and NaN warnings (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f7cbd78cae78043916b79ada02d2c6677408db1b">f7cbd78</a>)</p></li>
+<li><p>Forgot that env varibles can’t have hyphons (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c31bb1cfe33b992ad9f6bebb3d406bd1f5563d45">c31bb1c</a>)</p></li>
+<li><p>formatted using ruff (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/06ce94d6d4926eea7743341bbb17e766e3156bfa">06ce94d</a>)</p></li>
+<li><p>init file recovered (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f9f56cccab3eb310d6a80058305b4ca19746264c">f9f56cc</a>)</p></li>
+<li><p>install pytest with gh actions (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/7b25639310e03186c4db3df7312070825b034a2b">7b25639</a>)</p></li>
+<li><p>Issue with conda build test env not working, skipping (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/2fffb696556f48f0620dfbac356971301fb15e89">2fffb69</a>)</p></li>
+<li><p>letting docs build run on docker (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/8b4ade0675aa5d497cbd469a85f59b1d19b09239">8b4ade0</a>)</p></li>
+<li><p>linting (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c1bf893ee6d2316d153f4e0fb66f57f90a7dc9af">c1bf893</a>)</p></li>
+<li><p>linting (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/4cf51b73192972c826e74373181e11883455b2a0">4cf51b7</a>)</p></li>
+<li><p>make sure Pathlib builds the right path (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f10270d2666c75b38f936a94800532edc630ff53">f10270d</a>)</p></li>
+<li><p>minor adds/delete (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e4798750c6b13ac74214d639add556dce6111e9f">e479875</a>)</p></li>
+<li><p>minor changes to the test for gamma thickness calc (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/921182667babe99bca6e1bed3df1ef7dac073504">9211826</a>)</p></li>
+<li><p>more updates to agree with Pathlib (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/7a19f345db25a2079b9768722619b72a08b42f99">7a19f34</a>)</p></li>
+<li><p>Move clut and config files to _datasets directory and use local files for doc-test case (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/23e6b8b2d85c6bc5e29d0d766d23d981279e8a0e">23e6b8b</a>)</p></li>
+<li><p>neat output details (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/085d4ebbb213a800bb9850e1f496aa4c3993c7e8">085d4eb</a>)</p></li>
+<li><p>new flake8 compliance (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6776e25a4c22faf483ffd70010202211b0b874b2">6776e25</a>)</p></li>
+<li><p>Pass featureId of multi lines to project file, also unpin geopandas (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1a4299e16f616a8286f241262dbccfea0f069586">1a4299e</a>)</p></li>
+<li><p>Path typo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/883b4978be6f0479c17ee50038fa3f2577628ca9">883b497</a>)</p></li>
+<li><p>Remove deprecation ignore warnings and then deprecations (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/79cd33317625c96091690c9b97309be74cba2fdd">79cd333</a>)</p></li>
+<li><p>Remove j in loop as it was not referenced (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/33148287a8c978c775d016eeb293923907c9f3c6">3314828</a>)</p></li>
+<li><p>remove print statement (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/ecd1e4449fe3736f555e9cffe6dbae64e61017ba">ecd1e44</a>)</p></li>
+<li><p>remove segNum_test (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/cbd05f22256ce1b2d115112b3921a8bbf25443a3">cbd05f2</a>)</p></li>
+<li><p>remove this test for now and see if everything else is ok. (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/16a3b882d82ebef47fc814dd5e9bfaf5729d0082">16a3b88</a>)</p></li>
+<li><p>remove unnecessary else stat (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/bea7e7aa26f28691b325617b8439704dae093d30">bea7e7a</a>)</p></li>
+<li><p>remove unnecessary print statements (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/58535bf07ec3d172dbf0881a9c0cc3be95b042f8">58535bf</a>)</p></li>
+<li><p>remove unnecessary variable declarations (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/fb44fef387ef521d0b5e0f48f205144a35190ba4">fb44fef</a>)</p></li>
+<li><p>remove unsused variable (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/fa3e4bbc71e939ff0836a55166268d32ebc5b866">fa3e4bb</a>)</p></li>
+<li><p>removed float type hint (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/87713d62dbcd086b7662cb1d6145b048729bae3d">87713d6</a>)</p></li>
+<li><p>removed rank &amp; type from LPF obs tables (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/750acbd505f901c74b892b1df261893fb414d681">750acbd</a>)</p></li>
+<li><p>removing commented code (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/22db1668448e088fa02caa4f5bd2e17980774dc2">22db166</a>)</p></li>
+<li><p>rename in thicknessCalc names in test (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/fda68e686bc36195e95e24cb733d3a2475b90b54">fda68e6</a>)</p></li>
+<li><p>Rename segNum to featureId (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/274becaad09bb8500f29edc097c1d877bd7487e4">274beca</a>)</p></li>
+<li><p>renaming compute to calculate (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f5a0ffb3beeb6c59dc2c3758bcc7251a74cea9a1">f5a0ffb</a>)</p></li>
+<li><p>replace beta and gamma nomenclature (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a9040b0f365b7035d67af7846ad5e3ca4a54574a">a9040b0</a>)</p></li>
+<li><p>revert hjson back to loop3d version as hjson-py does not work (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/84b846ae8efd293428acb2bb1c4515f0f48e6a31">84b846a</a>)</p></li>
+<li><p>revert naming conversion to original (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5e7e5ec43d5cb557590205893db1953be8b74545">5e7e5ec</a>)</p></li>
+<li><p>Reworked dataframe to avoid chained assignment (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/77b322f5daccbf74d316bd6adfd3e1dd70e47d5e">77b322f</a>)</p></li>
+<li><p>ruff linter and docs fix (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c7e42a68e4824ee1eff7a0c8c8797e1c2b7365db">c7e42a6</a>)</p></li>
+<li><p>run ci on all branches but only release from master (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9e0f977a4d4dbee51ef357db638b339810863b25">9e0f977</a>)</p></li>
+<li><p>sampled_contacts are in map_data now (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9d57d95f6bca4a2f5e6ce4f0ab9fbcd5fed647a7">9d57d95</a>)</p></li>
+<li><p>setup_grid docstring updated (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/67b453b5a32239004936ff1d31dc6a094f068975">67b453b</a>)</p></li>
+<li><p>simplify output generation; assignment of -1 to uncalculated thickness (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6acd2d5eea382fa9fcf72aaefb0c628014681bce">6acd2d5</a>)</p></li>
+<li><p>simplify the procedure to get the relative path of the library (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/416d101d73cf850381dc2169d5f6569f0f175b69">416d101</a>)</p></li>
+<li><p>Still forcing versioning for release-please (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/08e647bac1dded0c807bbb9a3571a741505bd488">08e647b</a>)</p></li>
+<li><p>store xyz end points correctly (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/af29ab6b6bb6937baa836cfe73e7003ebecd11a4">af29ab6</a>)</p></li>
+<li><p>test changing dirs to see if docs build (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/98098fcd3c829a075de884bb613e331c6e9b0e1e">98098fc</a>)</p></li>
+<li><p>testing change tests directory to map2loop folder, because of json file location (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/371a2a2e54aeb4b5619c7daf16b85123e71ee74e">371a2a2</a>)</p></li>
+<li><p>testing test location again (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c775ed9ce45e6653e9b752b59a8592246df848fb">c775ed9</a>)</p></li>
+<li><p>This environment variable has to go somewhere (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/2495a89093f5808cd75c184b442576bfdc1083ee">2495a89</a>)</p></li>
+<li><p>Try again setting environment variable for documentation test case (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/4e6348bfebd6131db471cd9273c34330165f0e99">4e6348b</a>)</p></li>
+<li><p>try getting colour data, if file doesn’t load print warning (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/dd4f36517d6fdeb5f04d7aee571260129e69d019">dd4f365</a>)</p></li>
+<li><p>typo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/025de10e07fac9e045e516a2f6311a51b2fed1b1">025de10</a>)</p></li>
+<li><p>typo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/ea6d0cd692fb47adec6403d4e16edb9ce6a1eb00">ea6d0cd</a>)</p></li>
+<li><p>Typo fix for config dictionary converter (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/15b543bc077550c683c94d7bb97a74389b1de29e">15b543b</a>)</p></li>
+<li><p>typo in calculate (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c0ec36b2444fb136b80e0356debf5f13ad454258">c0ec36b</a>)</p></li>
+<li><p>Typo in intrusion flag, ignoring intrusions for contact calculations, remove errant sorter from take_best option (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/527de6c339e56ead036ab5ed5d94d06d77673ae6">527de6c</a>)</p></li>
+<li><p>upd v3.1 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/182079ba13693d4bd3b6a8373c5954076f36ec8a">182079b</a>)</p></li>
+<li><p>update (thanks RT &amp; LG) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f6f59cf2dc2cbcf40351745cba1359db9c8db552">f6f59cf</a>)</p></li>
+<li><p>update all to overwrite LPF (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d0e38db735984103a4e95d43ffd5dc974ae6755f">d0e38db</a>)</p></li>
+<li><p>update aus clut files with documentation links (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/55bc84516224001e29fcc79b7663cffdb90d5655">55bc845</a>)</p></li>
+<li><p>update clut file names (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c2c020fa0db8a625cc3b9095c231a9ebd22975d2">c2c020f</a>)</p></li>
+<li><p>update code as per Roy’s review (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/450b372cfc43063a2de2eebf2b6e05458114c425">450b372</a>)</p></li>
+<li><p>update docs dockerfile build (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/deefe4933db82b8a6633deb154eab6ed26582a5c">deefe49</a>)</p></li>
+<li><p>update for python 3.12 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/23c3d76f06a7d195b083f1eafb793fa147554ed9">23c3d76</a>)</p></li>
+<li><p>update gh actions to revert to roiginal test location (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9b341ad0c4658cfe909a981e70c80b05358ce5c7">9b341ad</a>)</p></li>
+<li><p>update gitignore (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d2df2670cd4e3153def613c0c56e294326495a8e">d2df267</a>)</p></li>
+<li><p>update LPF dependencies (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/cbb54899368ae5950b29a101bfca648b900d6527">cbb5489</a>)</p></li>
+<li><p>update test to check segnum &amp; geology ID and spatial match (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/7cbf143b84a4c7cb3f34b563d2f9ef3202b0433e">7cbf143</a>)</p></li>
+<li><p>update tests to run from upper folder (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1a8210dc41942164b202b0cfbea044091c67e5b0">1a8210d</a>)</p></li>
+<li><p>update the rest of the variable names to thicknessMedian except in LPF (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/2f8816becbb090219717cd8dde0ad6a390753c0f">2f8816b</a>)</p></li>
+<li><p>update the StructuralPoint test (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/dc7c6dafab01cef2dd215a5df52f6e7af9391463">dc7c6da</a>)</p></li>
+<li><p>update to new thickness variable name (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5f797064cf557f0cc47c32bdd6e73dd60b20853e">5f79706</a>)</p></li>
+<li><p>update to pathlib in documentation test environment (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/fd263c20e86b9b58a0f44a2ed84cca912e8660e9">fd263c2</a>)</p></li>
+<li><p>update to solve the Pathlib (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5b0ace70e96f6ec3c5f70873579d474c1232761b">5b0ace7</a>)</p></li>
+<li><p>update variable names for thicknesscalculator StructPoint (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f6a22076c174e4eed0c17db0a38a62d386b91e23">f6a2207</a>)</p></li>
+<li><p>updated docstring (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/93d47bfac84397cf842a9398d1b0bd0dae873c5b">93d47bf</a>)</p></li>
+<li><p>updated type hint for basal_constacts (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c125c6340f822fbe13f5839f8fda3e8463da44b9">c125c63</a>)</p></li>
+<li><p>use correct variable rbf (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/79791f125dfe0748b80e243ef79f86ad10197752">79791f1</a>)</p></li>
+<li><p>Use geology sampler for contact sampling (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/615d19adefddeb736871ed4b4ad5329e8b1ac9e8">615d19a</a>)</p></li>
+<li><p>Use MANIFEST.in to include clut and config files in installation (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d49a53f526ba7b4d14b7f88f5091986054717841">d49a53f</a>)</p></li>
+<li><p>use Nx3 array instead of vector components (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/ae6739eaceb0d0b4aabb2650a593e799f11c4a24">ae6739e</a>)</p></li>
+<li><p>use shapely.object to avoid clashes (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/73dd77f4f911eb10237819c862382bb36481fc34">73dd77f</a>)</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>add 3.11 back on so docs build (LPF needs 3.12 as well) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9f817beba63e581a85145fea2521bb95c6942c29">9f817be</a>)</p></li>
+<li><p>add back the .sh to build docs locally (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a5ccb0fdf6557dba3b38245c49833128b3093f0c">a5ccb0f</a>)</p></li>
+<li><p>add docstrings for ThicknessCalculatorGamma (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/39187f773f2e5d4647992630d4bf25c7eee2897d">39187f7</a>)</p></li>
+<li><p>Add import modules and example parameters to sorter and thickness calculator docs. (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/3ed1ea73128bcce142fbd84a38947fd99b24332e">3ed1ea7</a>)</p></li>
+<li><p>Add import modules and example parameters to sorter and thickness calculator docs. (<a class="reference external" href="https://github.com/Loop3D/map2loop/issues/33">#33</a>) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/b4e6247117baf012009c7a81c4b923beb38bef5c">b4e6247</a>)</p></li>
+<li><p>add m2l verson (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c5cf10243f0824731649623c423078cb159e61c7">c5cf102</a>)</p></li>
+<li><p>add space to avoid warning (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d615498c6356fdeb239f0bd631ceb8767998c9c5">d615498</a>)</p></li>
+<li><p>added thickness to the base class. (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e2633892dec2489609bc79ec7992ee99f597fd99">e263389</a>)</p></li>
+<li><p>adding aylas code template (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/48c10935654b35aef191c160aa7c2cb69dc38332">48c1093</a>)</p></li>
+<li><p>adding clut presets to docs (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/65b23fdaf935711c7ed6f775176840eaaa474a7c">65b23fd</a>)</p></li>
+<li><p>adding doc specific requirments (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/b26d4dd9558792db939e4212b7b6bd2ada36a35b">b26d4dd</a>)</p></li>
+<li><p>adding docker file (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0acf2e44bfc68b313d7be7c249583d74c8067b66">0acf2e4</a>)</p></li>
+<li><p>adding documentaion to map2loop (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/2a30da44329d0adc0eb8026e861c7cc8fa23ffac">2a30da4</a>)</p></li>
+<li><p>adding example for hamersley (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/3e7688d1053225b12ab2ed3b897900f3bc4b4648">3e7688d</a>)</p></li>
+<li><p>adding hjson file (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1d03505debdf67ce2e7bc313e935173ed6868f38">1d03505</a>)</p></li>
+<li><p>adding m2l template (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/b2f8ea0dd92455d5106a5d8260e56053ac5e2199">b2f8ea0</a>)</p></li>
+<li><p>adding readme to docs (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e43968ce25535fe6fb943b4d3fef8ce6e4b165dd">e43968c</a>)</p></li>
+<li><p>adding sphinx (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6e9b068dd46aed3dff40a19d4059f126cf265338">6e9b068</a>)</p></li>
+<li><p>adding the remaining classes to docs (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c652d842616091f00a4d38f291be1776b798e763">c652d84</a>)</p></li>
+<li><p>adding user guide (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/47c8d9b939d303ae7f68832c1550bd8da1735bca">47c8d9b</a>)</p></li>
+<li><p>adding user guide for map2loop  (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/57c22633d46d598f9a013e09984287a2a9953535">57c2263</a>)</p></li>
+<li><p>change docker run folder location (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/54d596949dae8815487037e802e7af4e39d362e6">54d5969</a>)</p></li>
+<li><p>changing map2loop-3 to map2loop (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/1fe8c4051d8e7c3489fa60f96d5245c3b0163467">1fe8c40</a>)</p></li>
+<li><p>finding the right json path may be the problem (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/85ddcb396cae2864f2f5b329ea0ce9513c03a71f">85ddcb3</a>)</p></li>
+<li><p>fix channel typo on readme (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/feee724c9e7afdbdb388521229fe2b4641162fbe">feee724</a>)</p></li>
+<li><p>fix link formatting for Brockman Syncline (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/0dba31f50ee7f953e947f051c0b6d61be1945009">0dba31f</a>)</p></li>
+<li><p>fix short underline (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9ecd5b40f646d4604ea78901e36080320530b804">9ecd5b4</a>)</p></li>
+<li><p>fix the path for clut with PathLib too (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5c525af1ecae4490ff8bd4615274329852f52922">5c525af</a>)</p></li>
+<li><p>Fixed indentation of code block (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5be5208d0e3121ce3328dcc788309d7e81d7c199">5be5208</a>)</p></li>
+<li><p>fixing path to images (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/6b311d6a6f3ce53e896c39e620823285b0ff79db">6b311d6</a>)</p></li>
+<li><p>geographical –&gt; geological (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/b368c196e31484c023a21b2b61b6c6b2c8c9f2e0">b368c19</a>)</p></li>
+<li><p>ignore files (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9de740f274a155b87e80a50776383a70b12e572a">9de740f</a>)</p></li>
+<li><p>keep consistent levels (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/052de43496decf1c1b99f3b32990e06701f678af">052de43</a>)</p></li>
+<li><p>make sure m2l is updated with local docker build (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/dc4d8ccb3ee70fac9d9f3e489cd1510b9f945047">dc4d8cc</a>)</p></li>
+<li><p>making code block work (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d0ed967eede6cab6373da3d92dfcdf7d004b678c">d0ed967</a>)</p></li>
+<li><p>Move examples dir for doc generation (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/241444fabf3bba69c8fdfbee279cef6d97b01f04">241444f</a>)</p></li>
+<li><p>moving images (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/a800455496e92c34853e82bef618ee541072358f">a800455</a>)</p></li>
+<li><p>no need for lavavu (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/efe4b9d9263bb04437c33f882af6443052aa7f71">efe4b9d</a>)</p></li>
+<li><p>overwrite LPF (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/62e75b0e2974e5af47646be64736c3dd384875d1">62e75b0</a>)</p></li>
+<li><p>paths fixed to work with pathlib within docker (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5b5b503e1c69018ed02a44d34d97ef4d91f02380">5b5b503</a>)</p></li>
+<li><p>remove conda channel from dependencies installation (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/59fe775f9c4307352e7e5320c9648c984927ffc2">59fe775</a>)</p></li>
+<li><p>remove python3.11 bind. m2model updated to 3.12 (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/5e84484420db6845159d2bb56a0ec5fdf99a5db0">5e84484</a>)</p></li>
+<li><p>removing LS import for config (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/bcee03998035ae92cb48dd2d02f921ce39bed91b">bcee039</a>)</p></li>
+<li><p>revert back to original (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/f8d6d2caa79d54c64827d4ce3172c1173a95d096">f8d6d2c</a>)</p></li>
+<li><p>revert docs to update m2l build locally (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/e46c45e983f3481268a1fe294770cb5adb0a2651">e46c45e</a>)</p></li>
+<li><p>test to see if python3.11 allows docs to build (map2model requirement) (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/9d15efde25407512da1240cffcba7acb42528728">9d15efd</a>)</p></li>
+<li><p>typo (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/bdbe907bb16695865f42f74ad95f786a9976d0af">bdbe907</a>)</p></li>
+<li><p>update docstring for thickness calc gamma class (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/bfebedccb0802b56a54c60c9889ddc3f6802f7e4">bfebedc</a>)</p></li>
+<li><p>update hamersley example to not use the legacy (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/d85ffb93d86159b21aa2e74948e64d8684cf485e">d85ffb9</a>)</p></li>
+<li><p>update installation steps for small clarifications (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/c975f6f6a9b484d709c007bdaea214751e9fd649">c975f6f</a>)</p></li>
+<li><p>update installation steps with channels (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/76d7897160f869ccb74945ae3487cce07d5c7bec">76d7897</a>)</p></li>
+<li><p>update link (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/184e522f45d6acc0a4e9fd14fbd16503adbc8f7f">184e522</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id6">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/3.0.5...3.0.6">3.0.6</a> (2024-01-25)<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<section id="id7">
+<h3>Bug Fixes<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove deprecation ignore warnings and then deprecations (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/79cd33317625c96091690c9b97309be74cba2fdd">79cd333</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id2">
-<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/3.0.4...3.0.5">3.0.5</a> (2024-01-25)<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
-<section id="id3">
-<h3>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<section id="id8">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop/compare/3.0.4...3.0.5">3.0.5</a> (2024-01-25)<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="id9">
+<h3>Bug Fixes<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Typo in intrusion flag, ignoring intrusions for contact calculations, remove errant sorter from take_best option (<a class="reference external" href="https://github.com/Loop3D/map2loop/commit/527de6c339e56ead036ab5ed5d94d06d77673ae6">527de6c</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id4">
-<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.3...3.0.4">3.0.4</a> (2024-01-11)<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
-<section id="id5">
-<h3>Bug Fixes<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id10">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.3...3.0.4">3.0.4</a> (2024-01-11)<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<section id="id11">
+<h3>Bug Fixes<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Issue with conda build test env not working, skipping (<a class="reference external" href="https://github.com/Loop3D/map2loop-3/commit/2fffb696556f48f0620dfbac356971301fb15e89">2fffb69</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id6">
-<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.2...3.0.3">3.0.3</a> (2024-01-11)<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
-<section id="id7">
-<h3>Bug Fixes<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<section id="id12">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.2...3.0.3">3.0.3</a> (2024-01-11)<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<section id="id13">
+<h3>Bug Fixes<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add owslib as dependency for testing (<a class="reference external" href="https://github.com/Loop3D/map2loop-3/commit/0439da869856b187defbed631c592a848b3684a1">0439da8</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id8">
-<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.1...3.0.2">3.0.2</a> (2024-01-11)<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
-<section id="id9">
-<h3>Bug Fixes<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<section id="id14">
+<h2><a class="reference external" href="https://github.com/Loop3D/map2loop-3/compare/3.0.1...3.0.2">3.0.2</a> (2024-01-11)<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<section id="id15">
+<h3>Bug Fixes<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Still forcing versioning for release-please (<a class="reference external" href="https://github.com/Loop3D/map2loop-3/commit/08e647bac1dded0c807bbb9a3571a741505bd488">08e647b</a>)</p></li>
 </ul>
@@ -476,24 +701,38 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.0.6 (2024-01-25)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1.2 (2024-05-09)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.0.5 (2024-01-25)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.1.1 (2024-05-09)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Bug Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">3.0.4 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">3.1.0 (2024-05-09)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Bug Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">3.0.3 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">3.0.6 (2024-01-25)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Bug Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">3.0.2 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">3.0.5 (2024-01-25)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">3.0.4 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">3.0.3 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">3.0.2 (2024-01-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Bug Fixes</a></li>
 </ul>
 </li>
 </ul>

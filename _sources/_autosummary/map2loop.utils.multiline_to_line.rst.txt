@@ -1,0 +1,6 @@
+map2loop.utils.multiline\_to\_line
+==================================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: multiline_to_line

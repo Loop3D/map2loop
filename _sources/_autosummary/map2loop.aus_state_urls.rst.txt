@@ -1,0 +1,41 @@
+map2loop.aus\_state\_urls
+=========================
+
+.. automodule:: map2loop.aus_state_urls
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      load_clut
+      load_config
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      AustraliaStateUrls
+   
+   
+
+   
+   
+   
+
+
+

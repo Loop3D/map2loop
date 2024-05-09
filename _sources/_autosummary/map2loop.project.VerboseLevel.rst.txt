@@ -1,0 +1,44 @@
+map2loop.project.VerboseLevel
+=============================
+
+.. currentmodule:: map2loop.project
+
+.. autoclass:: VerboseLevel
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VerboseLevel.conjugate
+      ~VerboseLevel.bit_length
+      ~VerboseLevel.bit_count
+      ~VerboseLevel.to_bytes
+      ~VerboseLevel.from_bytes
+      ~VerboseLevel.as_integer_ratio
+      ~VerboseLevel.is_integer
+      ~VerboseLevel.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~VerboseLevel.real
+      ~VerboseLevel.imag
+      ~VerboseLevel.numerator
+      ~VerboseLevel.denominator
+      ~VerboseLevel.NONE
+      ~VerboseLevel.TEXTONLY
+      ~VerboseLevel.ALL
+   
+   

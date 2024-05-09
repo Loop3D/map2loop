@@ -1,0 +1,27 @@
+map2loop.thickness\_calculator.ThicknessCalculatorAlpha
+=======================================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autoclass:: ThicknessCalculatorAlpha
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ThicknessCalculatorAlpha.__init__
+      ~ThicknessCalculatorAlpha.compute
+      ~ThicknessCalculatorAlpha.type
+   
+   
+
+   
+   
+   

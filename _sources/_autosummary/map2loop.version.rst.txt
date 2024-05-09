@@ -1,0 +1,23 @@
+map2loop.version
+================
+
+.. automodule:: map2loop.version
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

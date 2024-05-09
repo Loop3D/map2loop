@@ -1,0 +1,32 @@
+map2loop.deformation\_history
+=============================
+
+.. automodule:: map2loop.deformation_history
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      DeformationHistory
+   
+   
+
+   
+   
+   
+
+
+

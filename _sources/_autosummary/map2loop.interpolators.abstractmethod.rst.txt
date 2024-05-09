@@ -1,0 +1,6 @@
+map2loop.interpolators.abstractmethod
+=====================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autofunction:: abstractmethod

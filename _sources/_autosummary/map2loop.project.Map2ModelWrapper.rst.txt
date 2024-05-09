@@ -1,0 +1,31 @@
+map2loop.project.Map2ModelWrapper
+=================================
+
+.. currentmodule:: map2loop.project
+
+.. autoclass:: Map2ModelWrapper
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Map2ModelWrapper.__init__
+      ~Map2ModelWrapper.get_fault_fault_relationships
+      ~Map2ModelWrapper.get_sorted_units
+      ~Map2ModelWrapper.get_unit_fault_relationships
+      ~Map2ModelWrapper.get_unit_unit_relationships
+      ~Map2ModelWrapper.reset
+      ~Map2ModelWrapper.run
+   
+   
+
+   
+   
+   

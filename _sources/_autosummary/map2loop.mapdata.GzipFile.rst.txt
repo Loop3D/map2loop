@@ -1,0 +1,54 @@
+map2loop.mapdata.GzipFile
+=========================
+
+.. currentmodule:: map2loop.mapdata
+
+.. autoclass:: GzipFile
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GzipFile.__init__
+      ~GzipFile.close
+      ~GzipFile.detach
+      ~GzipFile.fileno
+      ~GzipFile.flush
+      ~GzipFile.isatty
+      ~GzipFile.peek
+      ~GzipFile.read
+      ~GzipFile.read1
+      ~GzipFile.readable
+      ~GzipFile.readinto
+      ~GzipFile.readinto1
+      ~GzipFile.readline
+      ~GzipFile.readlines
+      ~GzipFile.rewind
+      ~GzipFile.seek
+      ~GzipFile.seekable
+      ~GzipFile.tell
+      ~GzipFile.truncate
+      ~GzipFile.writable
+      ~GzipFile.write
+      ~GzipFile.writelines
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GzipFile.closed
+      ~GzipFile.mtime
+      ~GzipFile.myfileobj
+   
+   

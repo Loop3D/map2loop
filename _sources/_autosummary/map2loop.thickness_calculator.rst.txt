@@ -1,0 +1,56 @@
+map2loop.thickness\_calculator
+==============================
+
+.. automodule:: map2loop.thickness_calculator
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      abstractmethod
+      calculate_endpoints
+      create_points
+      euclidean
+      find_segment_strike_from_pt
+      mean
+      multiline_to_line
+      rebuild_sampled_basal_contacts
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      ABC
+      Datatype
+      DipDipDirectionInterpolator
+      InterpolatedStructure
+      MapData
+      Point
+      Rbf
+      StructuralPoint
+      ThicknessCalculator
+      ThicknessCalculatorAlpha
+   
+   
+
+   
+   
+   
+
+
+

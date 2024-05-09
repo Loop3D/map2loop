@@ -1,0 +1,61 @@
+map2loop.project
+================
+
+.. automodule:: map2loop.project
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      to_rgba
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      Datatype
+      DeformationHistory
+      ErrorState
+      FaultOrientation
+      FaultOrientationNearest
+      Map2ModelWrapper
+      MapData
+      Project
+      Sampler
+      SamplerDecimator
+      SamplerSpacing
+      Sorter
+      SorterAgeBased
+      SorterAlpha
+      SorterUseHint
+      SorterUseNetworkX
+      StratigraphicColumn
+      ThicknessCalculator
+      ThicknessCalculatorAlpha
+      ThrowCalculator
+      ThrowCalculatorAlpha
+      VerboseLevel
+   
+   
+
+   
+   
+   
+
+
+

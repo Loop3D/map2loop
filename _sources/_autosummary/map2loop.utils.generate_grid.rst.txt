@@ -1,0 +1,6 @@
+map2loop.utils.generate\_grid
+=============================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: generate_grid

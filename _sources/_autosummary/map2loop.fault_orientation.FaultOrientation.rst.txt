@@ -1,0 +1,27 @@
+map2loop.fault\_orientation.FaultOrientation
+============================================
+
+.. currentmodule:: map2loop.fault_orientation
+
+.. autoclass:: FaultOrientation
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FaultOrientation.__init__
+      ~FaultOrientation.calculate
+      ~FaultOrientation.type
+   
+   
+
+   
+   
+   

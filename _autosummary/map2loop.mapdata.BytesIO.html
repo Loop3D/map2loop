@@ -1,0 +1,800 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>map2loop.mapdata.BytesIO &#8212; map2loop 3.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.mapdata.BytesIO';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="map2loop.mapdata.Config" href="map2loop.mapdata.Config.html" />
+    <link rel="prev" title="map2loop.mapdata.AustraliaStateUrls" href="map2loop.mapdata.AustraliaStateUrls.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.Project.html">map2loop.Project</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.aus_state_urls.html">map2loop.aus_state_urls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.config.html">map2loop.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.deformation_history.html">map2loop.deformation_history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.fault_orientation.html">map2loop.fault_orientation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.WebCoverageService.html">map2loop.mapdata.WebCoverageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.random_colours_hex.html">map2loop.mapdata.random_colours_hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.uuid4.html">map2loop.mapdata.uuid4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.AustraliaStateUrls.html">map2loop.mapdata.AustraliaStateUrls</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.mapdata.BytesIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Config.html">map2loop.mapdata.Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datastate.html">map2loop.mapdata.Datastate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datatype.html">map2loop.mapdata.Datatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.GzipFile.html">map2loop.mapdata.GzipFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.MapData.html">map2loop.mapdata.MapData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.VerboseLevel.html">map2loop.mapdata.VerboseLevel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="map2loop.mapdata.html" class="nav-link">map2loop.mapdata</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">map2loop.map...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="map2loop-mapdata-bytesio">
+<h1>map2loop.mapdata.BytesIO<a class="headerlink" href="#map2loop-mapdata-bytesio" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">map2loop.mapdata.</span></span><span class="sig-name descname"><span class="pre">BytesIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BufferedIOBase</span></code></p>
+<p>Buffered I/O implementation using an in-memory bytes buffer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.__init__" title="map2loop.mapdata.BytesIO.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.close" title="map2loop.mapdata.BytesIO.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>Disable all I/O operations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.detach" title="map2loop.mapdata.BytesIO.detach"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detach</span></code></a>()</p></td>
+<td><p>Disconnect this buffer from its underlying raw stream and return it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.fileno" title="map2loop.mapdata.BytesIO.fileno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fileno</span></code></a>()</p></td>
+<td><p>Return underlying file descriptor if one exists.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.flush" title="map2loop.mapdata.BytesIO.flush"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flush</span></code></a>()</p></td>
+<td><p>Does nothing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.getbuffer" title="map2loop.mapdata.BytesIO.getbuffer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbuffer</span></code></a>()</p></td>
+<td><p>Get a read-write view over the contents of the BytesIO object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.getvalue" title="map2loop.mapdata.BytesIO.getvalue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getvalue</span></code></a>()</p></td>
+<td><p>Retrieve the entire contents of the BytesIO object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.isatty" title="map2loop.mapdata.BytesIO.isatty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isatty</span></code></a>()</p></td>
+<td><p>Always returns False.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.read" title="map2loop.mapdata.BytesIO.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>([size])</p></td>
+<td><p>Read at most size bytes, returned as a bytes object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.read1" title="map2loop.mapdata.BytesIO.read1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read1</span></code></a>([size])</p></td>
+<td><p>Read at most size bytes, returned as a bytes object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.readable" title="map2loop.mapdata.BytesIO.readable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readable</span></code></a>()</p></td>
+<td><p>Returns True if the IO object can be read.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.readinto" title="map2loop.mapdata.BytesIO.readinto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readinto</span></code></a>(buffer, /)</p></td>
+<td><p>Read bytes into buffer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">readinto1</span></code>(buffer, /)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.readline" title="map2loop.mapdata.BytesIO.readline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readline</span></code></a>([size])</p></td>
+<td><p>Next line from the file, as a bytes object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.readlines" title="map2loop.mapdata.BytesIO.readlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readlines</span></code></a>([size])</p></td>
+<td><p>List of bytes objects, each a line from the file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.seek" title="map2loop.mapdata.BytesIO.seek"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seek</span></code></a>(pos[, whence])</p></td>
+<td><p>Change stream position.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.seekable" title="map2loop.mapdata.BytesIO.seekable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seekable</span></code></a>()</p></td>
+<td><p>Returns True if the IO object can be seeked.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.tell" title="map2loop.mapdata.BytesIO.tell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tell</span></code></a>()</p></td>
+<td><p>Current file position, an integer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.truncate" title="map2loop.mapdata.BytesIO.truncate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncate</span></code></a>([size])</p></td>
+<td><p>Truncate the file to at most size bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.writable" title="map2loop.mapdata.BytesIO.writable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writable</span></code></a>()</p></td>
+<td><p>Returns True if the IO object can be written.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.write" title="map2loop.mapdata.BytesIO.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(b, /)</p></td>
+<td><p>Write bytes to file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.writelines" title="map2loop.mapdata.BytesIO.writelines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writelines</span></code></a>(lines, /)</p></td>
+<td><p>Write lines to the file.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.mapdata.BytesIO.closed" title="map2loop.mapdata.BytesIO.closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closed</span></code></a></p></td>
+<td><p>True if the file is closed.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.close" title="Link to this definition">#</a></dt>
+<dd><p>Disable all I/O operations.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.closed">
+<span class="sig-name descname"><span class="pre">closed</span></span><a class="headerlink" href="#map2loop.mapdata.BytesIO.closed" title="Link to this definition">#</a></dt>
+<dd><p>True if the file is closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.detach">
+<span class="sig-name descname"><span class="pre">detach</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.detach" title="Link to this definition">#</a></dt>
+<dd><p>Disconnect this buffer from its underlying raw stream and return it.</p>
+<p>After the raw stream has been detached, the buffer is in an unusable
+state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.fileno">
+<span class="sig-name descname"><span class="pre">fileno</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.fileno" title="Link to this definition">#</a></dt>
+<dd><p>Return underlying file descriptor if one exists.</p>
+<p>Raise OSError if the IO object does not use a file descriptor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.flush" title="Link to this definition">#</a></dt>
+<dd><p>Does nothing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.getbuffer">
+<span class="sig-name descname"><span class="pre">getbuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.getbuffer" title="Link to this definition">#</a></dt>
+<dd><p>Get a read-write view over the contents of the BytesIO object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.getvalue">
+<span class="sig-name descname"><span class="pre">getvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.getvalue" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the entire contents of the BytesIO object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.isatty">
+<span class="sig-name descname"><span class="pre">isatty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.isatty" title="Link to this definition">#</a></dt>
+<dd><p>Always returns False.</p>
+<p>BytesIO objects are not connected to a TTY-like device.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.read" title="Link to this definition">#</a></dt>
+<dd><p>Read at most size bytes, returned as a bytes object.</p>
+<p>If the size argument is negative, read until EOF is reached.
+Return an empty bytes object at EOF.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.read1">
+<span class="sig-name descname"><span class="pre">read1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.read1" title="Link to this definition">#</a></dt>
+<dd><p>Read at most size bytes, returned as a bytes object.</p>
+<p>If the size argument is negative or omitted, read until EOF is reached.
+Return an empty bytes object at EOF.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.readable">
+<span class="sig-name descname"><span class="pre">readable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.readable" title="Link to this definition">#</a></dt>
+<dd><p>Returns True if the IO object can be read.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.readinto">
+<span class="sig-name descname"><span class="pre">readinto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.readinto" title="Link to this definition">#</a></dt>
+<dd><p>Read bytes into buffer.</p>
+<p>Returns number of bytes read (0 for EOF), or None if the object
+is set not to block and has no data to read.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.readline">
+<span class="sig-name descname"><span class="pre">readline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.readline" title="Link to this definition">#</a></dt>
+<dd><p>Next line from the file, as a bytes object.</p>
+<p>Retain newline.  A non-negative size argument limits the maximum
+number of bytes to return (an incomplete line may be returned then).
+Return an empty bytes object at EOF.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.readlines">
+<span class="sig-name descname"><span class="pre">readlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.readlines" title="Link to this definition">#</a></dt>
+<dd><p>List of bytes objects, each a line from the file.</p>
+<p>Call readline() repeatedly and return a list of the lines so read.
+The optional size argument, if given, is an approximate bound on the
+total number of bytes in the lines returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.seek">
+<span class="sig-name descname"><span class="pre">seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.seek" title="Link to this definition">#</a></dt>
+<dd><p>Change stream position.</p>
+<dl class="simple">
+<dt>Seek to byte offset pos relative to position indicated by whence:</dt><dd><p>0  Start of stream (the default).  pos should be &gt;= 0;
+1  Current position - pos may be negative;
+2  End of stream - pos usually negative.</p>
+</dd>
+</dl>
+<p>Returns the new absolute position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.seekable">
+<span class="sig-name descname"><span class="pre">seekable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.seekable" title="Link to this definition">#</a></dt>
+<dd><p>Returns True if the IO object can be seeked.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.tell">
+<span class="sig-name descname"><span class="pre">tell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.tell" title="Link to this definition">#</a></dt>
+<dd><p>Current file position, an integer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.truncate">
+<span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.truncate" title="Link to this definition">#</a></dt>
+<dd><p>Truncate the file to at most size bytes.</p>
+<p>Size defaults to the current file position, as returned by tell().
+The current file position is unchanged.  Returns the new size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.writable">
+<span class="sig-name descname"><span class="pre">writable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.writable" title="Link to this definition">#</a></dt>
+<dd><p>Returns True if the IO object can be written.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.write" title="Link to this definition">#</a></dt>
+<dd><p>Write bytes to file.</p>
+<p>Return the number of bytes written.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.mapdata.BytesIO.writelines">
+<span class="sig-name descname"><span class="pre">writelines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.mapdata.BytesIO.writelines" title="Link to this definition">#</a></dt>
+<dd><p>Write lines to the file.</p>
+<p>Note that newlines are not added.  lines can be any iterable object
+producing bytes-like objects. This is equivalent to calling write() for
+each element.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="map2loop.mapdata.AustraliaStateUrls.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">map2loop.mapdata.AustraliaStateUrls</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="map2loop.mapdata.Config.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">map2loop.mapdata.Config</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO"><code class="docutils literal notranslate"><span class="pre">BytesIO</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.__init__"><code class="docutils literal notranslate"><span class="pre">BytesIO.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.close"><code class="docutils literal notranslate"><span class="pre">BytesIO.close()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.closed"><code class="docutils literal notranslate"><span class="pre">BytesIO.closed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.detach"><code class="docutils literal notranslate"><span class="pre">BytesIO.detach()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.fileno"><code class="docutils literal notranslate"><span class="pre">BytesIO.fileno()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.flush"><code class="docutils literal notranslate"><span class="pre">BytesIO.flush()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.getbuffer"><code class="docutils literal notranslate"><span class="pre">BytesIO.getbuffer()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.getvalue"><code class="docutils literal notranslate"><span class="pre">BytesIO.getvalue()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.isatty"><code class="docutils literal notranslate"><span class="pre">BytesIO.isatty()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.read"><code class="docutils literal notranslate"><span class="pre">BytesIO.read()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.read1"><code class="docutils literal notranslate"><span class="pre">BytesIO.read1()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.readable"><code class="docutils literal notranslate"><span class="pre">BytesIO.readable()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.readinto"><code class="docutils literal notranslate"><span class="pre">BytesIO.readinto()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.readline"><code class="docutils literal notranslate"><span class="pre">BytesIO.readline()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.readlines"><code class="docutils literal notranslate"><span class="pre">BytesIO.readlines()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.seek"><code class="docutils literal notranslate"><span class="pre">BytesIO.seek()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.seekable"><code class="docutils literal notranslate"><span class="pre">BytesIO.seekable()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.tell"><code class="docutils literal notranslate"><span class="pre">BytesIO.tell()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.truncate"><code class="docutils literal notranslate"><span class="pre">BytesIO.truncate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.writable"><code class="docutils literal notranslate"><span class="pre">BytesIO.writable()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.write"><code class="docutils literal notranslate"><span class="pre">BytesIO.write()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.BytesIO.writelines"><code class="docutils literal notranslate"><span class="pre">BytesIO.writelines()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/map2loop.mapdata.BytesIO.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".toggle > *").hide();
+    $(".toggle .header").show();
+    $(".toggle .header").click(function () {
+      $(this).parent().children().not(".header").toggle(400);
+      $(this).parent().children(".header").toggleClass("open");
+    });
+  });
+</script>
+
+  </body>
+</html>

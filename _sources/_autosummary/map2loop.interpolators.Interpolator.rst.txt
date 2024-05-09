@@ -1,0 +1,29 @@
+map2loop.interpolators.Interpolator
+===================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autoclass:: Interpolator
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Interpolator.__init__
+      ~Interpolator.interpolate
+      ~Interpolator.setup_grid
+      ~Interpolator.setup_interpolation
+      ~Interpolator.type
+   
+   
+
+   
+   
+   

@@ -1,0 +1,27 @@
+map2loop.sampler.SamplerSpacing
+===============================
+
+.. currentmodule:: map2loop.sampler
+
+.. autoclass:: SamplerSpacing
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SamplerSpacing.__init__
+      ~SamplerSpacing.sample
+      ~SamplerSpacing.type
+   
+   
+
+   
+   
+   

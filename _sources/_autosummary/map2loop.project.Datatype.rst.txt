@@ -1,0 +1,47 @@
+map2loop.project.Datatype
+=========================
+
+.. currentmodule:: map2loop.project
+
+.. autoclass:: Datatype
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Datatype.conjugate
+      ~Datatype.bit_length
+      ~Datatype.bit_count
+      ~Datatype.to_bytes
+      ~Datatype.from_bytes
+      ~Datatype.as_integer_ratio
+      ~Datatype.is_integer
+      ~Datatype.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Datatype.real
+      ~Datatype.imag
+      ~Datatype.numerator
+      ~Datatype.denominator
+      ~Datatype.GEOLOGY
+      ~Datatype.STRUCTURE
+      ~Datatype.FAULT
+      ~Datatype.FOLD
+      ~Datatype.DTM
+      ~Datatype.FAULT_ORIENTATION
+   
+   

@@ -1,0 +1,52 @@
+map2loop.project.Project
+========================
+
+.. currentmodule:: map2loop.project
+
+.. autoclass:: Project
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Project.__init__
+      ~Project.apply_colour_to_units
+      ~Project.calculate_fault_orientations
+      ~Project.calculate_stratigraphic_order
+      ~Project.calculate_unit_thicknesses
+      ~Project.draw_geology_map
+      ~Project.extract_geology_contacts
+      ~Project.get_fault_orientation
+      ~Project.get_minimum_fault_length
+      ~Project.get_sampler
+      ~Project.get_sorter
+      ~Project.get_thickness_calculator
+      ~Project.get_throw_calculator
+      ~Project.run_all
+      ~Project.sample_map_data
+      ~Project.save_geotiff_raster
+      ~Project.save_into_projectfile
+      ~Project.save_mapdata_to_files
+      ~Project.set_default_samplers
+      ~Project.set_fault_orientation
+      ~Project.set_ignore_codes
+      ~Project.set_minimum_fault_length
+      ~Project.set_sampler
+      ~Project.set_sorter
+      ~Project.set_thickness_calculator
+      ~Project.set_throw_calculator
+      ~Project.sort_stratigraphic_column
+      ~Project.summarise_fault_data
+   
+   
+
+   
+   
+   

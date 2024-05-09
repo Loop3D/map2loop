@@ -1,0 +1,6 @@
+map2loop.thickness\_calculator.rebuild\_sampled\_basal\_contacts
+================================================================
+
+.. currentmodule:: map2loop.thickness_calculator
+
+.. autofunction:: rebuild_sampled_basal_contacts

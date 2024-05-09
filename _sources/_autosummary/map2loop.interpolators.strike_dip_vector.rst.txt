@@ -1,0 +1,6 @@
+map2loop.interpolators.strike\_dip\_vector
+==========================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autofunction:: strike_dip_vector

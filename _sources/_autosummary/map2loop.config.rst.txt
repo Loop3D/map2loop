@@ -1,0 +1,32 @@
+map2loop.config
+===============
+
+.. automodule:: map2loop.config
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      Config
+   
+   
+
+   
+   
+   
+
+
+

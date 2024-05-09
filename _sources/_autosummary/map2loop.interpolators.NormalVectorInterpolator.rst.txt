@@ -1,0 +1,29 @@
+map2loop.interpolators.NormalVectorInterpolator
+===============================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autoclass:: NormalVectorInterpolator
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NormalVectorInterpolator.__init__
+      ~NormalVectorInterpolator.interpolate
+      ~NormalVectorInterpolator.setup_grid
+      ~NormalVectorInterpolator.setup_interpolation
+      ~NormalVectorInterpolator.type
+   
+   
+
+   
+   
+   

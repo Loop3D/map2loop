@@ -1,0 +1,6 @@
+map2loop.mapdata.uuid4
+======================
+
+.. currentmodule:: map2loop.mapdata
+
+.. autofunction:: uuid4

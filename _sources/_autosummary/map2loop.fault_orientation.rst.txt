@@ -1,0 +1,43 @@
+map2loop.fault\_orientation
+===========================
+
+.. automodule:: map2loop.fault_orientation
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      abstractmethod
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      ABC
+      FaultOrientation
+      FaultOrientationNearest
+      MapData
+   
+   
+
+   
+   
+   
+
+
+

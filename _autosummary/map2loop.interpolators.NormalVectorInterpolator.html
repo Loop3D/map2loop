@@ -1,0 +1,739 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>map2loop.interpolators.NormalVectorInterpolator &#8212; map2loop 3.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=4e920bdf"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.interpolators.NormalVectorInterpolator';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="map2loop.interpolators.Rbf" href="map2loop.interpolators.Rbf.html" />
+    <link rel="prev" title="map2loop.interpolators.LinearNDInterpolator" href="map2loop.interpolators.LinearNDInterpolator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">map2loop 3.1.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="map2loop.html">
+                        map2loop
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://www.loop3d.org">
+                    Loop3d
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.Project.html">map2loop.Project</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="map2loop.aus_state_urls.html">map2loop.aus_state_urls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.config.html">map2loop.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.deformation_history.html">map2loop.deformation_history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.fault_orientation.html">map2loop.fault_orientation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.abstractmethod.html">map2loop.interpolators.abstractmethod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.generate_grid.html">map2loop.interpolators.generate_grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.strike_dip_vector.html">map2loop.interpolators.strike_dip_vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.ABC.html">map2loop.interpolators.ABC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.Any.html">map2loop.interpolators.Any</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.DipDipDirectionInterpolator.html">map2loop.interpolators.DipDipDirectionInterpolator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.Interpolator.html">map2loop.interpolators.Interpolator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.LinearNDInterpolator.html">map2loop.interpolators.LinearNDInterpolator</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.interpolators.NormalVectorInterpolator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.Rbf.html">map2loop.interpolators.Rbf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.interpolators.ndarray.html">map2loop.interpolators.ndarray</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="map2loop.interpolators.html" class="nav-link">map2loop.interpolators</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">map2loop.int...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="map2loop-interpolators-normalvectorinterpolator">
+<h1>map2loop.interpolators.NormalVectorInterpolator<a class="headerlink" href="#map2loop-interpolators-normalvectorinterpolator" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">map2loop.interpolators.</span></span><span class="sig-name descname"><span class="pre">NormalVectorInterpolator</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="map2loop.interpolators.Interpolator.html#map2loop.interpolators.Interpolator" title="map2loop.interpolators.Interpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interpolator</span></code></a></p>
+<p>This class is a subclass of the Interpolator abstract base class. It implements the normal vector interpolation
+method for a given set of data points.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.dataframe">
+<span class="sig-name descname"><span class="pre">dataframe</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.dataframe" title="Link to this definition">#</a></dt>
+<dd><p>A DataFrame that stores the processed data points for interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.x" title="Link to this definition">#</a></dt>
+<dd><p>A numpy array that stores the x-coordinates of the data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.interpolators.ndarray.html#map2loop.interpolators.ndarray" title="numpy.ndarray">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.y" title="Link to this definition">#</a></dt>
+<dd><p>A numpy array that stores the y-coordinates of the data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.interpolators.ndarray.html#map2loop.interpolators.ndarray" title="numpy.ndarray">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.xi">
+<span class="sig-name descname"><span class="pre">xi</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.xi" title="Link to this definition">#</a></dt>
+<dd><p>A numpy array that stores the x-coordinates of the grid points for interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.interpolators.ndarray.html#map2loop.interpolators.ndarray" title="numpy.ndarray">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.yi">
+<span class="sig-name descname"><span class="pre">yi</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.yi" title="Link to this definition">#</a></dt>
+<dd><p>A numpy array that stores the y-coordinates of the grid points for interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="map2loop.interpolators.ndarray.html#map2loop.interpolators.ndarray" title="numpy.ndarray">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.interpolator_label">
+<span class="sig-name descname"><span class="pre">interpolator_label</span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.interpolator_label" title="Link to this definition">#</a></dt>
+<dd><p>A string that stores the label of the interpolator. For this class, it is</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&quot;NormalVectorInterpolator&quot;.</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.type">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.type" title="Link to this definition">#</a></dt>
+<dd><p>Returns the label of the interpolator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setup_interpolation(structure_data</span></span></dt>
+<dd><p>pandas.DataFrame): Sets up the interpolation by preparing the data points for interpolation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setup_grid(bounding_box</span></span></dt>
+<dd><p>dict): Sets up the grid for interpolation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">interpolator(ni</span></span></dt>
+<dd><p>Any) -&gt; numpy.ndarray: Performs the interpolation for a given set of values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">interpolate(bounding_box</span></span></dt>
+<dd><p>dict, structure_data: pandas.DataFrame, interpolator: Any) -&gt; numpy.ndarray: Executes the interpolation method.</p>
+</dd></dl>
+
+<p>Initialiser of for NormalVectorInterpolator class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialiser of for NormalVectorInterpolator class</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.interpolators.NormalVectorInterpolator.__init__" title="map2loop.interpolators.NormalVectorInterpolator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
+<td><p>Initialiser of for NormalVectorInterpolator class</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.interpolators.NormalVectorInterpolator.interpolate" title="map2loop.interpolators.NormalVectorInterpolator.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a>(ni[, interpolator])</p></td>
+<td><p>Inverse Distance Weighting interpolation method</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.interpolators.NormalVectorInterpolator.setup_grid" title="map2loop.interpolators.NormalVectorInterpolator.setup_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_grid</span></code></a>(bounding_box)</p></td>
+<td><p>Setup the grid for interpolation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map2loop.interpolators.NormalVectorInterpolator.setup_interpolation" title="map2loop.interpolators.NormalVectorInterpolator.setup_interpolation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_interpolation</span></code></a>(structure_data)</p></td>
+<td><p>Setup the interpolation method (abstract method)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="map2loop.interpolators.NormalVectorInterpolator.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a>()</p></td>
+<td><p>Getter for subclass type label</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.interpolate">
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ni:</span> <span class="pre">~numpy.ndarray</span> <span class="pre">|</span> <span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolator:</span> <span class="pre">~typing.Any</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'scipy.interpolate._rbf.Rbf'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="map2loop.interpolators.ndarray.html#map2loop.interpolators.ndarray" title="numpy.ndarray"><span class="pre">ndarray</span></a></span></span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.interpolate" title="Link to this definition">#</a></dt>
+<dd><p>Inverse Distance Weighting interpolation method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ni</strong> (<em>int</em>) – value to interpolate</p></li>
+<li><p><strong>interpolator</strong> – type of interpolator to use by default SciPy Rbf interpolator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Rbf</em> – radial basis function object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.setup_grid">
+<span class="sig-name descname"><span class="pre">setup_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounding_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.setup_grid" title="Link to this definition">#</a></dt>
+<dd><p>Setup the grid for interpolation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounding_box</strong> (<em>dict</em>) – a dictionary containing the bounding box of the map data.</p></li>
+<li><p><strong>format</strong> (<em>The bounding box dictionary should comply with the following</em>) – <p>{
+“minx”: value,
+“maxx”: value,
+“miny”: value,
+“maxy”: value,</p>
+</p></li>
+<li><p><strong>}</strong></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="map2loop.interpolators.NormalVectorInterpolator.setup_interpolation">
+<span class="sig-name descname"><span class="pre">setup_interpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.interpolators.NormalVectorInterpolator.setup_interpolation" title="Link to this definition">#</a></dt>
+<dd><p>Setup the interpolation method (abstract method)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure_data</strong> (<em>pandas.DataFrame</em>) – sampled structural data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd><p>Getter for subclass type label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – Name of subclass</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="map2loop.interpolators.LinearNDInterpolator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">map2loop.interpolators.LinearNDInterpolator</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="map2loop.interpolators.Rbf.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">map2loop.interpolators.Rbf</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.dataframe"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.dataframe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.x"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.y"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.xi"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.xi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.yi"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.yi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.interpolator_label"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.interpolator_label</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.type"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.type()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.__init__"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.interpolate"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.interpolate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.setup_grid"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.setup_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.interpolators.NormalVectorInterpolator.setup_interpolation"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.setup_interpolation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">NormalVectorInterpolator.type()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/map2loop.interpolators.NormalVectorInterpolator.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".toggle > *").hide();
+    $(".toggle .header").show();
+    $(".toggle .header").click(function () {
+      $(this).parent().children().not(".header").toggle(400);
+      $(this).parent().children(".header").toggleClass("open");
+    });
+  });
+</script>
+
+  </body>
+</html>

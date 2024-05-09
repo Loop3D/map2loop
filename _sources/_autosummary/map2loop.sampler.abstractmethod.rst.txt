@@ -1,0 +1,6 @@
+map2loop.sampler.abstractmethod
+===============================
+
+.. currentmodule:: map2loop.sampler
+
+.. autofunction:: abstractmethod

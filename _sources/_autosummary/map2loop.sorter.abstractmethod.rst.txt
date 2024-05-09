@@ -1,0 +1,6 @@
+map2loop.sorter.abstractmethod
+==============================
+
+.. currentmodule:: map2loop.sorter
+
+.. autofunction:: abstractmethod

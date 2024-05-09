@@ -1,0 +1,27 @@
+map2loop.fault\_orientation.FaultOrientationNearest
+===================================================
+
+.. currentmodule:: map2loop.fault_orientation
+
+.. autoclass:: FaultOrientationNearest
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FaultOrientationNearest.__init__
+      ~FaultOrientationNearest.calculate
+      ~FaultOrientationNearest.type
+   
+   
+
+   
+   
+   

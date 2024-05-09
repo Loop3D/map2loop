@@ -1,0 +1,38 @@
+map2loop.utils
+==============
+
+.. automodule:: map2loop.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      calculate_endpoints
+      create_points
+      find_segment_strike_from_pt
+      generate_grid
+      multiline_to_line
+      normal_vector_to_dipdirection_dip
+      rebuild_sampled_basal_contacts
+      strike_dip_vector
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

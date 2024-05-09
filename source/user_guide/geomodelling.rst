@@ -28,8 +28,9 @@ In order to use map2loop, you will first need to create a digital QGIS map conta
    * - Orientation_data.shp
      - Represents orientation data (eg. bedding measurements, foliations etc) as points on your QGIS map
      - Point 
+
 Notes:
-~~~~~
+~~~~~~
 * If your map doesn’t have any faults in it, you will need to create a blank lineString shapefile to pass map2loop as an input. 
 * Axial trace data is not yet used by map2loop, so irrespective of whether you include it in the line shape file, you will have to manually add axial traces using LoopStructural. 
 * Faults are currently modelled using a single orientation measurement (dip and dip direction). This makes it difficult to model faults with changing dip using map2loop. This issue is currently being worked on, but in the meantime if you would like to model complex fault systems it may be best to use LoopStructural to generate these. 
@@ -86,7 +87,7 @@ This file contains point data that is used to represent orientation data (e.g. b
 
 An example of the QGIS attribute table for simple orientation data is shown in the image below: 
 
-.. image:: ../images/ori_attributes_table.png
+.. image:: _static/images/ori_attributes_table.png
    :width: 400
 
 LineString Shapefile 
@@ -130,7 +131,7 @@ This shapefile contains lineStrings that represent fault traces at the surface. 
 
 An example of the QGIS attribute table for a single fault is shown in the image below: 
 
-.. image:: ../images/fault_attributes_table.png
+.. image:: _static/images/fault_attributes_table.png
    :width: 400
 
 
@@ -205,7 +206,7 @@ This contains polygons representing different lithologies and the contacts betwe
 
 A simple example of the QGIS attribute table for lithology data is shown in the image below: 
 
-.. image:: ../images/litho_attributes_table.png
+.. image:: _static/images/litho_attributes_table.png
    :width: 400
 
 Tips and Trouble Shooting for QGIS map 
@@ -220,6 +221,6 @@ Adding Data
 Once you’ve set up the aforementioned shapefiles, you can start to add your data into the corresponding QGIS layers. 
 
 Tip
-~~~
+===
 
 * If you are working in a complex system, or an area with fine geological detail, you may need to upscale your data. It is usually easier to start modelling the large scale structures and then you can try to add in relevant detail once you have a decent model. 

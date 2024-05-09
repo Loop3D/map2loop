@@ -1,0 +1,32 @@
+map2loop.stratigraphic\_column
+==============================
+
+.. automodule:: map2loop.stratigraphic_column
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      StratigraphicColumn
+   
+   
+
+   
+   
+   
+
+
+

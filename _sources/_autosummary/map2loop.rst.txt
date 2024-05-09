@@ -30,3 +30,29 @@
 
 
 
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   map2loop.aus_state_urls
+   map2loop.config
+   map2loop.deformation_history
+   map2loop.fault_orientation
+   map2loop.interpolators
+   map2loop.m2l_enums
+   map2loop.map2model_wrapper
+   map2loop.mapdata
+   map2loop.project
+   map2loop.random
+   map2loop.random_colour
+   map2loop.sampler
+   map2loop.sorter
+   map2loop.stratigraphic_column
+   map2loop.thickness_calculator
+   map2loop.throw_calculator
+   map2loop.utils
+   map2loop.version
+

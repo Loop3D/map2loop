@@ -1,0 +1,25 @@
+map2loop.interpolators.LinearNDInterpolator
+===========================================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autoclass:: LinearNDInterpolator
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LinearNDInterpolator.__init__
+   
+   
+
+   
+   
+   

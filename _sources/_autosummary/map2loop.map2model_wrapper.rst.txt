@@ -1,0 +1,33 @@
+map2loop.map2model\_wrapper
+===========================
+
+.. automodule:: map2loop.map2model_wrapper
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst
+      :recursive:              
+   
+      Map2ModelWrapper
+      VerboseLevel
+   
+   
+
+   
+   
+   
+
+
+

@@ -27,12 +27,9 @@ RUN conda install -c conda-forge --file ./docs/requirements.txt -y
 
 RUN pip install .
 
-# RUN pip install lavavu-osmesa==1.8.45 
-ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.10/site-packages/lavavu_osmesa.libs
-
 ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
-# ENTRYPOINT ["/tini", "--"]
+ENTRYPOINT ["/tini", "--"]
 
 WORKDIR /

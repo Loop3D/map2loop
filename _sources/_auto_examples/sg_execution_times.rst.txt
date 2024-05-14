@@ -1,12 +1,12 @@
 
 :orphan:
 
-.. _sphx_glr_auto_examples_sg_execution_times:
+.. _sphx_glr__auto_examples_sg_execution_times:
 
 
 Computation times
 =================
-**00:08.665** total execution time for 1 file **from auto_examples**:
+**00:08.827** total execution time for 1 file **from _auto_examples**:
 
 .. container::
 
@@ -32,6 +32,6 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_plot_hamersley.py` (``plot_hamersley.py``)
-     - 00:08.665
+   * - :ref:`sphx_glr__auto_examples_plot_hamersley.py` (``plot_hamersley.py``)
+     - 00:08.827
      - 0.0

@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.3](https://github.com/Loop3D/map2loop/compare/v3.1.2...v3.1.3) (2024-05-14)
+
+
+### Bug Fixes
+
+* remove tini from docker ([89fd60f](https://github.com/Loop3D/map2loop/commit/89fd60f35445f96894c153d3f8c5f6451bcbf0ed))
+
+
+### Documentation
+
+* remove lavavu; no need for 3D vis for the examples ([e8b1ada](https://github.com/Loop3D/map2loop/commit/e8b1ada0345cfebef114be555e770fd594155b16))
+
 ## [3.1.2](https://github.com/Loop3D/map2loop/compare/v3.1.1...v3.1.2) (2024-05-09)
 
 

@@ -510,3 +510,13 @@ class SorterObservationProjections(Sorter):
                 dd.add_node(edge[1])
                 dd.add_edge(edge[0], edge[1])
         return list(nx.dfs_preorder_nodes(dd, source=list(dd.nodes())[0]))
+
+
+__json__ = [
+    {'classname': "SorterUseHint", 'decription': '', 'parameters': []},
+    {'classname': "SorterUseNetworkX", 'decription': '', 'parameters': []},
+    {'classname': 'SorterAgedBased', 'decription': '', 'parameters': []},
+    {'classname': 'SorterAlpha', 'decription': '', 'parameters': []},
+    {'classname': 'SorterMaximiseContacts', 'decription': '', 'parameters': []},
+    {'classname': 'SorterObservationProjections', 'decription': '', 'parameters': []},
+]

@@ -71,6 +71,26 @@ class Config:
             "objectid_column": "ID",
         }
 
+    def __getitem__(self, key):
+        """
+        Get the value of a key in the config
+
+        Args:
+            key (str): The key to get the value of
+
+        Returns:
+            dict: The value of the key
+        """
+        if key == "structure":
+            return self.structure_config
+        if key == "geology":
+            return self.geology_config
+        if key == "fault":
+            return self.fault_config
+        if key == "fold":
+            return self.fold_config
+        return None
+
     def to_dict(self):
         """
         Convert the config dictionary to a dictionary

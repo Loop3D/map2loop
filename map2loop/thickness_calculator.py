@@ -617,3 +617,23 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
         return output_units
+
+
+__json__ = [
+    {
+        'classname': "ThicknessCalculatorAlpha",
+        'description': 'Calculate thickness using shortest map distance between basal contacts',
+        'parameters': [],
+    },
+    {
+        'classname': "InterpolatedStructure",
+        'description': 'Calculate thickness by interpolating structures and projecting map distance into 3d',
+        'parameters': [],
+    },
+    {
+        'classname': "StructuralPoint",
+        'description': 'Calculates thickness for each structural measurement by projecting a line across\n'
+        + 'stratigraphy and projecting the map thickness using the dip',
+        'parameters': [],
+    },
+]

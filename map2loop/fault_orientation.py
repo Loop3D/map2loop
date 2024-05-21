@@ -92,3 +92,12 @@ class FaultOrientationNearest(FaultOrientation):
             orientations.loc[i, "Y"] = p.y
 
         return orientations.drop(columns="geometry")
+
+
+__json__ = [
+    {
+        'classname': "FaultOrientationNearest",
+        'description': 'Assigns the nearest fault orientation to a fault',
+        'parameters': [],
+    }
+]

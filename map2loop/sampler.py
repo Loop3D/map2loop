@@ -174,3 +174,17 @@ class SamplerSpacing(Sampler):
 
         df.reset_index(drop=True, inplace=True)
         return df
+
+
+__json__ = [
+    {
+        'classname': "SamplerDecimator",
+        'description': 'Sample by decimation',
+        'parameters': [{'name': 'decimation', 'type': 'number', 'value': 1}],
+    },
+    {
+        'classname': 'SamplerSpacing',
+        'description': 'Sample using a fixed spacing along a line or polygon',
+        'parameters': [{'name': 'spacing', 'type': 'number', 'value': 50.0}],
+    },
+]

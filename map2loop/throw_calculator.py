@@ -97,3 +97,11 @@ class ThrowCalculatorAlpha(ThrowCalculator):
             lambda row: 100 if row["avgDisplacement"] == -1 else row["avgDisplacement"], axis=1
         )
         return faults
+
+
+__json__ = [
+    {
+        'classname': "ThrowCalculatorAlpha",
+        'description': "ThrowCalculator class which estimates fault throw values based on units, basal_contacts and stratigraphic order",
+    }
+]

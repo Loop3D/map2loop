@@ -1,4 +1,4 @@
-name: "📓 Documentation Request"
+name: "Documentation Request"
 description: "Help us improve map2loop documentation!"
 title: "[Documentation] - "
 labels: ["documentation"]
@@ -9,7 +9,16 @@ body:
         ## Documentation Request
 
         Please use this template to suggest an improvement or addition to map2loop documentation. 
-        Provide as much detail as possible to help us understand and implement your request efficiently
+        Provide as much detail as possible to help us understand and implement your request efficiently.
+
+  - type: input
+    id: doc_title
+    attributes:
+      label: "Documentation Title"
+      description: "Provide a concise and descriptive title for the documentation request."
+      placeholder: "Enter the title of the documentation request"
+    validations:
+      required: true
 
   - type: textarea
     id: doc_details
@@ -24,7 +33,7 @@ body:
     id: additional_context
     attributes:
       label: "Additional Context"
-      description: "Any other context or information that may be helpful."
+      description: "Provide any other context or information that may be helpful."
       placeholder: "Enter any additional context"
     validations:
       required: false

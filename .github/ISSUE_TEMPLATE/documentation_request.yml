@@ -8,7 +8,16 @@ body:
       value: |
         ## Documentation Request
         Please use this template to suggest an improvement or addition to map2loop documentation. 
-        Provide as much detail as possible to help us understand and implement your request efficiently
+        Provide as much detail as possible to help us understand and implement your request efficiently.
+
+  - type: input
+    id: doc_title
+    attributes:
+      label: "Documentation Title"
+      description: "Provide a concise and descriptive title for the documentation request."
+      placeholder: "Enter the title of the documentation request"
+    validations:
+      required: true
 
   - type: textarea
     id: doc_details

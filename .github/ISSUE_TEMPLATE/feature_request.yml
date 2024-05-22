@@ -7,6 +7,7 @@ body:
     attributes:
       value: |
         ## Feature Request
+
         Please use this template to submit your feature request. Provide as much detail as possible to help us understand and implement your request efficiently.
 
   - type: input
@@ -71,5 +72,6 @@ body:
         - label: "stratigraphic column"
           value: "stratigraphic column"
         - label: "data types"
-        - label: "faults"
+          value: "data types"
         - label: "Other"
+          value: "other"

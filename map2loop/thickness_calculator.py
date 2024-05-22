@@ -13,8 +13,6 @@ from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
     calculate_endpoints,
-    multiline_to_line,
-    find_segment_strike_from_pt,
 )
 from .m2l_enums import Datatype, SampleType
 from shapely.geometry import Point
@@ -523,7 +521,7 @@ class StructuralPoint(ThicknessCalculator):
             # check to see if the intersections cross two lithologies"
             if len(final_intersections['basal_unit'].unique()) == 1:
                 continue
-                
+
             # declare the two intersection points
             int_pt1 = final_intersections.iloc[0].geometry
             int_pt2 = final_intersections.iloc[1].geometry
@@ -536,7 +534,6 @@ class StructuralPoint(ThicknessCalculator):
                 > map_dy / 2
             ):
                 continue
-            
 
             # find the segments that the intersections belong to
             # seg1 = sampled_basal_contacts[
@@ -560,7 +557,6 @@ class StructuralPoint(ThicknessCalculator):
             # b_s = strike - self.strike_allowance, strike + self.strike_allowance
             # if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
             #     continue
-                
 
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
@@ -574,9 +570,6 @@ class StructuralPoint(ThicknessCalculator):
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
-
-        
-        
 
         output_units = units.copy()
         # remove the old thickness column
@@ -597,7 +590,7 @@ class StructuralPoint(ThicknessCalculator):
             # if no thickness has been calculated for the unit
             if (
                 # not a top//bottom unit
-                (output_units[output_units['name'] == unit]['ThicknessMedian'].all()==0)
+                (output_units[output_units['name'] == unit]['ThicknessMedian'].all() == 0)
                 and (unit != stratigraphic_order[-1])
                 and (unit != stratigraphic_order[0])
             ):

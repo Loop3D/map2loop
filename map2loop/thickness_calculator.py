@@ -523,7 +523,7 @@ class StructuralPoint(ThicknessCalculator):
             # check to see if the intersections cross two lithologies"
             if len(final_intersections['basal_unit'].unique()) == 1:
                 continue
-
+                
             # declare the two intersection points
             int_pt1 = final_intersections.iloc[0].geometry
             int_pt2 = final_intersections.iloc[1].geometry
@@ -536,29 +536,31 @@ class StructuralPoint(ThicknessCalculator):
                 > map_dy / 2
             ):
                 continue
+            
 
-            # find the segments that the intersections belong to
-            seg1 = sampled_basal_contacts[
-                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
-            ].geometry.iloc[0]
-            seg2 = sampled_basal_contacts[
-                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
-            ].geometry.iloc[0]
+            # # find the segments that the intersections belong to
+            # seg1 = sampled_basal_contacts[
+            #     sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
+            # ].geometry.iloc[0]
+            # seg2 = sampled_basal_contacts[
+            #     sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
+            # ].geometry.iloc[0]
 
-            # simplify the geometries to LineString
-            if seg1.geom_type == 'MultiLineString':
-                seg1 = multiline_to_line(seg1)
-            if seg2.geom_type == 'MultiLineString':
-                seg2 = multiline_to_line(seg2)
+            # # simplify the geometries to LineString
+            # if seg1.geom_type == 'MultiLineString':
+            #     seg1 = multiline_to_line(seg1)
+            # if seg2.geom_type == 'MultiLineString':
+            #     seg2 = multiline_to_line(seg2)
 
-            # find the strike of the segments
-            strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
-            strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
+            # # find the strike of the segments
+            # strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
+            # strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
 
-            # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
-            b_s = strike - self.strike_allowance, strike + self.strike_allowance
-            if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
-                continue
+            # # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
+            # b_s = strike - self.strike_allowance, strike + self.strike_allowance
+            # if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
+            #     continue
+                
 
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
@@ -573,6 +575,9 @@ class StructuralPoint(ThicknessCalculator):
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
+        
+        
+
         output_units = units.copy()
         # remove the old thickness column
         output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
@@ -581,20 +586,18 @@ class StructuralPoint(ThicknessCalculator):
 
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
-
         # assign the thicknesses to the each unit
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
-
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
             if (
                 # not a top//bottom unit
-                (output_units[output_units['name'] == unit]['ThicknessMedian'].isna().all())
+                (output_units[output_units['name'] == unit]['ThicknessMedian'].all()==0)
                 and (unit != stratigraphic_order[-1])
                 and (unit != stratigraphic_order[0])
             ):

@@ -1,6 +1,6 @@
 ## Description
 
-Please include a summary of the added test. List relevant functions tested. 
+Please include a summary of the added or modified test. List relevant functions tested. 
 
 Fixes #(issue)
 

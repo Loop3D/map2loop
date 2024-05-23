@@ -6,7 +6,7 @@ pull_request_templates:
     file: pull_request_template/bug_fix_template.md
     
   - name: Feature Template
-    description: Use this template for new features.
+    description: Use this template for adding new features.
     file: pull_request_template/feature_template.md
 
   - name: Documentation Update Template

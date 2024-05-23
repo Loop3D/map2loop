@@ -8,7 +8,13 @@ from statistics import mean
 from .mapdata import MapData
 from scipy.interpolate import Rbf
 from .interpolators import DipDipDirectionInterpolator
-from .utils import create_points, rebuild_sampled_basal_contacts, calculate_endpoints, multiline_to_line, find_segment_strike_from_pt
+from .utils import (
+    create_points,
+    rebuild_sampled_basal_contacts,
+    calculate_endpoints,
+    multiline_to_line,
+    find_segment_strike_from_pt,
+)
 from .m2l_enums import Datatype
 from shapely.geometry import Point
 import shapely

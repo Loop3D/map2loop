@@ -14,8 +14,8 @@ Provide branch name so we can reproduce.
 
 ## Checklist:
 
-- [ ] This branch is up-to-date with the master branch
-- [ ] All github-action checks are passing
+- [ ] This branch is up-to-date with master
+- [ ] All gh-action checks are passing
 - [ ] I have performed a self-review of my own documentation
 - [ ] I have built the documentation locally with make.bat
 - [ ] I have built this documentation in docker, following the docker configuration in map2loop/docs

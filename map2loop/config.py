@@ -2,6 +2,8 @@ import beartype
 import hjson
 import urllib
 import time
+import pathlib
+from typing import Union
 
 
 class Config:
@@ -131,7 +133,7 @@ class Config:
             "otype": (self.structure_config, "orientation_type"),
             "dd": (self.structure_config, "dipdir_column"),
             "d": (self.structure_config, "dip_column"),
-            "sf": (self.structure_config, "desciption_column"),
+            "sf": (self.structure_config, "description_column"),
             "bedding": (self.structure_config, "bedding_text"),
             "bo": (self.structure_config, "overturned_column"),
             "btype": (self.structure_config, "overturned_text"),
@@ -179,7 +181,9 @@ class Config:
             print(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
-    def update_from_file(self, filename: str, legacy_format: bool = False, lower: bool = False):
+    def update_from_file(
+        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+    ):
         """
         Update the config dictionary from the provided json filename or url
 
@@ -193,6 +197,8 @@ class Config:
             func = self.update_from_dictionary
 
         try:
+            filename = str(filename)
+
             if filename.startswith("http") or filename.startswith("ftp"):
                 try_count = 10
                 success = False

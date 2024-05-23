@@ -1,6 +1,7 @@
 import geopandas
 import pandas
 import numpy
+import pathlib
 import shapely
 from osgeo import gdal, osr
 from owslib.wcs import WebCoverageService
@@ -15,6 +16,7 @@ from .m2l_enums import VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .random_colour import random_colours_hex
+from typing import Union
 
 
 class MapData:
@@ -228,7 +230,9 @@ class MapData:
             return None
 
     @beartype.beartype
-    def set_config_filename(self, filename: str, legacy_format: bool = False, lower: bool = False):
+    def set_config_filename(
+        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+    ):
         """
         Set the config filename and update the config structure
 
@@ -251,7 +255,7 @@ class MapData:
         return self.config_filename
 
     @beartype.beartype
-    def set_colour_filename(self, filename: str):
+    def set_colour_filename(self, filename: Union[pathlib.Path, str]):
         """
         Set the filename of the colour csv file
 
@@ -317,19 +321,20 @@ class MapData:
             if os.environ.get("DOCUMENTATION_TEST", False):
                 import map2loop
 
-                dataset_path = os.path.join(os.path.dirname(map2loop.__file__), "_datasets")
-                self.set_config_filename(
-                    os.path.join(dataset_path, "config_files", state + ".json")
-                )
-                self.set_colour_filename(
-                    os.path.join(dataset_path, "clut_files", state + "_clut.csv")
-                )
+                # because doc tests runs on docker from within the m2l folder
+                module_path = map2loop.__file__.replace("__init__.py", "")
+
+                config_path_str = '_datasets/config_files/{}.json'.format(state)
+                self.set_config_filename(pathlib.Path(module_path) / pathlib.Path(config_path_str))
+
+                colour_file_str = '_datasets/clut_files/{}_clut.csv'.format(state)
+                self.set_colour_filename(pathlib.Path(module_path) / pathlib.Path(colour_file_str))
+
             else:
                 self.set_config_filename(
-                    AustraliaStateUrls.aus_config_urls[state], legacy_format=True, lower=lower
+                    AustraliaStateUrls.aus_config_urls[state], legacy_format=False, lower=lower
                 )
                 self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
-            print(self.config_filename)
         else:
             raise ValueError(f"Australian state {state} not in state url database")
 

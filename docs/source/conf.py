@@ -99,23 +99,22 @@ html_theme = "pydata_sphinx_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+autosummary_generate = True
+
 autosummary_mock_imports = ["LoopStructural.interpolators._cython"]
 # Sphinx gallery examples
 
 
-try:
-    from LoopStructural.visualisation.sphinx_scraper import Scraper as LoopScraper
-    from sphinx_gallery.sorting import ExampleTitleSortKey
+# from LoopStructural.visualisation.sphinx_scraper import Scraper as LoopScraper
+from sphinx_gallery.sorting import ExampleTitleSortKey
 
-    sphinx_gallery_conf = {
-        "examples_dirs": ["../examples/"],
-        "gallery_dirs": ["_auto_examples/"],  # path to where to save gallery generated output
-        "image_scrapers": ("matplotlib", LoopScraper()),
-        "within_subsection_order": ExampleTitleSortKey,
-        "reference_url": {"LoopStructural": None},
-    }
-except ImportError:
-    pass
+sphinx_gallery_conf = {
+    "examples_dirs": ["../examples/"],
+    "gallery_dirs": ["_auto_examples/"],  # path to where to save gallery generated output
+    "image_scrapers": ("matplotlib"),
+    "within_subsection_order": ExampleTitleSortKey,
+    "reference_url": {"LoopStructural": None},
+}
 
 # def setup(app):
 #     app.add_stylesheet('custom.css')

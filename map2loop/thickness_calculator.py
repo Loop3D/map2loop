@@ -8,7 +8,7 @@ from statistics import mean
 from .mapdata import MapData
 from scipy.interpolate import Rbf
 from .interpolators import DipDipDirectionInterpolator
-from .utils import create_points, rebuild_sampled_basal_contacts, calculate_endpoints
+from .utils import create_points, rebuild_sampled_basal_contacts, calculate_endpoints, multiline_to_line, find_segment_strike_from_pt
 from .m2l_enums import Datatype
 from shapely.geometry import Point
 import shapely
@@ -530,27 +530,27 @@ class StructuralPoint(ThicknessCalculator):
                 continue
 
             # find the segments that the intersections belong to
-            # seg1 = sampled_basal_contacts[
-            #     sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
-            # ].geometry.iloc[0]
-            # seg2 = sampled_basal_contacts[
-            #     sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
-            # ].geometry.iloc[0]
+            seg1 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[0]['basal_unit']
+            ].geometry.iloc[0]
+            seg2 = sampled_basal_contacts[
+                sampled_basal_contacts['basal_unit'] == final_intersections.iloc[1]['basal_unit']
+            ].geometry.iloc[0]
 
-            # # simplify the geometries to LineString
-            # if seg1.geom_type == 'MultiLineString':
-            #     seg1 = multiline_to_line(seg1)
-            # if seg2.geom_type == 'MultiLineString':
-            #     seg2 = multiline_to_line(seg2)
+            # simplify the geometries to LineString
+            if seg1.geom_type == 'MultiLineString':
+                seg1 = multiline_to_line(seg1)
+            if seg2.geom_type == 'MultiLineString':
+                seg2 = multiline_to_line(seg2)
 
-            # # find the strike of the segments
-            # strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
-            # strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
+            # find the strike of the segments
+            strike1 = find_segment_strike_from_pt(seg1, int_pt1, measurement)
+            strike2 = find_segment_strike_from_pt(seg2, int_pt2, measurement)
 
-            # # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
-            # b_s = strike - self.strike_allowance, strike + self.strike_allowance
-            # if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
-            #     continue
+            # check to see if the strike of the stratigraphic measurement is within the strike allowance of the strike of the geological contact
+            b_s = strike - self.strike_allowance, strike + self.strike_allowance
+            if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
+                continue
 
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))

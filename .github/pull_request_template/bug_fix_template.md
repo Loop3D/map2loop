@@ -1,6 +1,6 @@
 ## Description
 
-Please describe the issue that this pull request addresses and summarize the changes.
+Please describe the issue that this pull request addresses and summarize the changes you are implementing. 
 
 Fixes #(issue)
 
@@ -10,7 +10,7 @@ Fixes #(issue)
 
 ## How Has This Been Tested?
 
-Please describe the tests that you ran to verify your changes. 
+Please describe any tests that you ran to verify your changes. 
 Provide branch name so we can reproduce.
 
 ## Checklist:

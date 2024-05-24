@@ -2,7 +2,6 @@ import pandas
 from map2loop.sampler import SamplerSpacing
 import shapely
 import geopandas
-import pytest
 
 geology_original = pandas.read_csv("tests/sampler/geo_test.csv")
 geology_original['geometry'] = geology_original['geometry'].apply(shapely.wkt.loads)

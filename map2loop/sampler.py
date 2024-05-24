@@ -153,7 +153,11 @@ class SamplerSpacing(Sampler):
                     if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
                         for j, target2 in enumerate(
                             targets
-                        ):  # which poly is the hole in? assign featureId of the same poly
+                        ):  
+                            # skip if line or point
+                            if len(target2.coords) >= 2:
+                                continue
+                            # which poly is the hole in? assign featureId of the same poly
                             t2_polygon = shapely.geometry.Polygon(target2)
                             if target.within(t2_polygon):  #
                                 df2['featureId'] = str(j)

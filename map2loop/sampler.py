@@ -151,9 +151,7 @@ class SamplerSpacing(Sampler):
                 if target.is_ring:  # 1. check if line is "closed"
                     target_polygon = shapely.geometry.Polygon(target)
                     if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
-                        for j, target2 in enumerate(
-                            targets
-                        ):  
+                        for j, target2 in enumerate(targets):
                             # skip if line or point
                             if len(target2.coords) >= 2:
                                 continue

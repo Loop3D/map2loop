@@ -1,8 +1,5 @@
-numpy
-pandas
 geopandas
 shapely
-tqdm
 networkx
 owslib
 map2model

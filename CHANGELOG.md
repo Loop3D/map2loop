@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.2.0](https://github.com/Loop3D/map2loop/compare/v3.1.3...v3.2.0) (2024-05-26)
+
+
+### Features
+
+* added issue_templates ([bad96ed](https://github.com/Loop3D/map2loop/commit/bad96ed7325fa4f0e5c8f546eb50441d9566a6ab))
+
+
+### Bug Fixes
+
+* add pull request template ([8e2b386](https://github.com/Loop3D/map2loop/commit/8e2b3865a154b55554669259635e9ac654a5aecb))
+* few typos grammar ([9288594](https://github.com/Loop3D/map2loop/commit/9288594184250b619f80299d4144d42e6bda19f4))
+* tests should be with pytest ([62a4706](https://github.com/Loop3D/map2loop/commit/62a4706171ed96c0625626e7709e7ecacf8b9bc4))
+
 ## [3.1.3](https://github.com/Loop3D/map2loop/compare/v3.1.2...v3.1.3) (2024-05-14)
 
 

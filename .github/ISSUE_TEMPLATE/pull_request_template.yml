@@ -1,0 +1,18 @@
+version: 2
+
+pull_request_templates:
+  - name: Bug Fix Template
+    description: Use this template for bug fixes.
+    file: pull_request_template/bug_fix_template.md
+    
+  - name: Feature Template
+    description: Use this template for adding new features.
+    file: pull_request_template/feature_template.md
+
+  - name: Documentation Update Template
+    description: Use this template for documentation updates.
+    file: pull_request_template/docs_update_template.md
+
+  - name: Test Improvement Template
+    description: Use this template for adding a new test.
+    file: pull_request_template/tests_improvement_template.md

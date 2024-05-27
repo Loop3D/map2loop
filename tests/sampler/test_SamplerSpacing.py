@@ -50,7 +50,7 @@ def test_sample_function_incorrect_data(sampler_spacing, incorrect_geodata):
         sampler_spacing.sample(spatial_data=incorrect_geodata)
 
 
-# for a specific >2 case
+# for a specific >2 case 
 def test_sample_function_target_less_than_or_equal_to_2():
     sampler_spacing = SamplerSpacing(spacing=1.0)
     data = {

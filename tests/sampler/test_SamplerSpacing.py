@@ -64,21 +64,24 @@ def test_sample_function_target_less_than_or_equal_to_2():
 
 # Test if the extracted points are correct
 def test_sample_function_extracted_points(sampler_spacing, correct_geodata):
-    
+
     result = sampler_spacing.sample(correct_geodata)
 
     expected_points = [
-    (0.0, 0.0), 
-    (0.707107, 0.707107),
-    (0.0, 0.0), 
-    (0.707107, 0.707107),
-    (1.0, 0.414214), 
-    (0.0, 0.0), 
-    [2.0, 2.0]
+        (0.0, 0.0),
+        (0.707107, 0.707107),
+        (0.0, 0.0),
+        (0.707107, 0.707107),
+        (1.0, 0.414214),
+        (0.0, 0.0),
+        [2.0, 2.0],
     ]
-    
+
     sampled_points = list(zip(result['X'], result['Y']))
-    
-    distances = [shapely.geometry.Point(xy).distance(shapely.geometry.Point(ex)) for xy, ex in zip(sampled_points, expected_points)]
-    
+
+    distances = [
+        shapely.geometry.Point(xy).distance(shapely.geometry.Point(ex))
+        for xy, ex in zip(sampled_points, expected_points)
+    ]
+
     assert numpy.absolute(distances).all() == 0.0

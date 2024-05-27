@@ -88,6 +88,7 @@ class SamplerDecimator(Sampler):
             data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
         )['index_right']
         data.reset_index(drop=True, inplace=True)
+        
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
 
 

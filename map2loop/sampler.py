@@ -149,7 +149,7 @@ class SamplerSpacing(Sampler):
                 # # account for holes//rings in polygons
                 df2["featureId"] = str(a)
                 # 1. check if line is "closed"
-                if target.is_ring:  
+                if target.is_ring:
                     target_polygon = shapely.geometry.Polygon(target)
                     if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
                         for j, target2 in enumerate(targets):

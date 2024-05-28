@@ -24,4 +24,5 @@ Provide branch name so we can reproduce.
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+- [ ] My tests run with pytest from the map2loop folder
+- [ ] New and existing tests pass locally with my changes

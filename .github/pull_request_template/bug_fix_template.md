@@ -21,4 +21,4 @@ Provide branch name so we can reproduce.
 - [ ] My code follows the style guidelines of this project
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
-- [ ] New and existing unit tests pass locally with my changes
+- [ ] New and existing tests pass locally with my changes and pytest

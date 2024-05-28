@@ -7,9 +7,7 @@ body:
     attributes:
       value: |
         ## Feature Request
-
         Please use this template to submit your feature request. Provide as much detail as possible to help us understand and implement your request efficiently.
-
   - type: input
     id: feature_title
     attributes:
@@ -62,16 +60,10 @@ body:
       description: "Select the areas of the project that this feature request impacts."
       options:
         - label: "input data"
-          value: "input data"
         - label: "project creation"
-          value: "project creation"
         - label: "samplers"
-          value: "samplers"
         - label: "sorters"
-          value: "sorters"
         - label: "stratigraphic column"
-          value: "stratigraphic column"
         - label: "data types"
-          value: "data types"
+        - label: "faults"
         - label: "Other"
-          value: "other"

@@ -7,10 +7,8 @@ body:
     attributes:
       value: |
         ## Documentation Request
-
         Please use this template to suggest an improvement or addition to map2loop documentation. 
         Provide as much detail as possible to help us understand and implement your request efficiently.
-
   - type: input
     id: doc_title
     attributes:

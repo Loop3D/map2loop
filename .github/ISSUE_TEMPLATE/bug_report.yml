@@ -9,7 +9,7 @@ body:
         ## Bug Report
         Thanks for submitting a bug report to map2loop!
         Please use this template to report a bug. Please provide as much detail as possible to help us reproduce and fix the issue efficiently.
-
+        
   - type: input
     id: bug_title
     attributes:
@@ -80,12 +80,8 @@ body:
       description: "Select the severity level of the bug."
       options:
         - label: "Low"
-          value: "low"
         - label: "Medium"
-          value: "medium"
         - label: "High"
-          value: "high"
         - label: "Critical"
-          value: "critical"
     validations:
       required: true

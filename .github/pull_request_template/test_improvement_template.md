@@ -13,10 +13,10 @@ Fixes #(issue)
 Please describe the tests that you ran to verify your changes. 
 Provide branch name so we can reproduce. 
 
-## Checklist:
+## Checklist: 
 
-- [ ] This branch is up-to-date with master
-- [ ] All gh-action checks are passing
+- [ ] This branch is up-to-date with the master branch
+- [ ] All github-action checks are passing
 - [ ] My tests run with pytest from the map2loop folder
 - [ ] I have performed a self-review of my own tests
 - [ ] My tests follow the style guidelines of this project

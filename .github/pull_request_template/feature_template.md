@@ -17,8 +17,8 @@ Provide branch name so we can reproduce.
 
 ## Checklist:
 
-- [ ] This branch is up-to-date with master
-- [ ] All gh-action checks are passing
+- [ ] This branch is up-to-date with the master branch
+- [ ] All github-action checks are passing
 - [ ] I have performed a self-review of my own code
 - [ ] My code follows the style guidelines of this project
 - [ ] I have commented my code, particularly in hard-to-understand areas

@@ -1,0 +1,69 @@
+name: "Feature Request"
+description: "Suggest a new feature or enhancement for map2loop"
+title: "[Feature Request] - "
+labels: ["enhancement", "feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Please use this template to submit your feature request. Provide as much detail as possible to help us understand and implement your request efficiently.
+  - type: input
+    id: feature_title
+    attributes:
+      label: "Feature Title"
+      description: "Provide a concise and descriptive title for the feature request."
+      placeholder: "Enter the title of the feature"
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: "Feature Description"
+      description: "Describe the feature you would like to see. Include details on why it is needed and how it should work."
+      placeholder: "Enter a detailed description of the feature"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_situation
+    attributes:
+      label: "Current Situation"
+      description: "Describe the current situation and how the absence of this feature affects you."
+      placeholder: "Explain the current situation and its drawbacks"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Solution"
+      description: "Describe how you envision the feature working. Include any specific requirements or details."
+      placeholder: "Explain how the feature should work"
+    validations:
+      required: true
+
+  - type: input
+    id: additional_context
+    attributes:
+      label: "Additional Context"
+      description: "Provide any other context or information that may be helpful in understanding the feature request."
+      placeholder: "Enter any additional context"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: affected_areas
+    attributes:
+      label: "Affected Areas"
+      description: "Select the areas of the project that this feature request impacts."
+      options:
+        - label: "input data"
+        - label: "project creation"
+        - label: "samplers"
+        - label: "sorters"
+        - label: "stratigraphic column"
+        - label: "data types"
+        - label: "faults"
+        - label: "Other"

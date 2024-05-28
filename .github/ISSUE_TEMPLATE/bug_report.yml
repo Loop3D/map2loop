@@ -1,4 +1,4 @@
-name: "Bug Report"
+name: "🐛 Bug Report"
 description: "Report a bug or an issue in map2loop"
 title: "[Bug] - "
 labels: ["bug"]

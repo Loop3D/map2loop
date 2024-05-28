@@ -41,7 +41,7 @@ body:
     id: proposed_solution
     attributes:
       label: "Proposed Solution"
-      description: "Describe how you envision the feature working. Include any specific requirements or details."
+      description: "Describe how you envision the feature working. Include any specific requirements or details"
       placeholder: "Explain how the feature should work"
     validations:
       required: true

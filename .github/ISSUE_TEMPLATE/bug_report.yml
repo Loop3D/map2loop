@@ -1,4 +1,4 @@
-name: "Bug Report"
+name: "🐛 Bug Report"
 description: "Report a bug or an issue in map2loop"
 title: "[Bug] - "
 labels: ["bug"]
@@ -80,12 +80,8 @@ body:
       description: "Select the severity level of the bug."
       options:
         - label: "Low"
-          value: "low"
         - label: "Medium"
-          value: "medium"
         - label: "High"
-          value: "high"
         - label: "Critical"
-          value: "critical"
     validations:
       required: true

@@ -1,4 +1,4 @@
-name: "Feature Request"
+name: "🚀 Feature Request"
 description: "Suggest a new feature or enhancement for map2loop"
 title: "[Feature Request] - "
 labels: ["enhancement", "feature request"]
@@ -9,6 +9,16 @@ body:
         ## Feature Request
 
         Please use this template to submit your feature request. Provide as much detail as possible to help us understand and implement your request efficiently.
+
+  - type: checkboxes
+    id: input1
+    attributes:
+      label: "💻"
+      description: |
+        Check this if you would like to try and implement your vision in a PR. 
+        The map2loop team will help you go through the process
+      options:
+        - label: Would you like to work on this feature?
 
   - type: input
     id: feature_title
@@ -41,7 +51,7 @@ body:
     id: proposed_solution
     attributes:
       label: "Proposed Solution"
-      description: "Describe how you envision the feature working. Include any specific requirements or details."
+      description: "Describe how you envision the feature working. Include any specific requirements or details"
       placeholder: "Explain how the feature should work"
     validations:
       required: true
@@ -62,16 +72,9 @@ body:
       description: "Select the areas of the project that this feature request impacts."
       options:
         - label: "input data"
-          value: "input data"
         - label: "project creation"
-          value: "project creation"
         - label: "samplers"
-          value: "samplers"
         - label: "sorters"
-          value: "sorters"
         - label: "stratigraphic column"
-          value: "stratigraphic column"
         - label: "data types"
-          value: "data types"
         - label: "Other"
-          value: "other"

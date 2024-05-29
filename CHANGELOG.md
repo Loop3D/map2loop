@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.1.4](https://github.com/Loop3D/map2loop/compare/v3.1.3...v3.1.4) (2024-05-29)
+
+
+### Bug Fixes
+
+* actions updated to prevent linting issues ([9a3e86a](https://github.com/Loop3D/map2loop/commit/9a3e86a4e5c7e89f93e627081cc51df21c75ba5b))
+* add pull request template ([f8ccac7](https://github.com/Loop3D/map2loop/commit/f8ccac74d5d778be0f675c683bf4e29d59027001))
+* added issue_templates ([06413ad](https://github.com/Loop3D/map2loop/commit/06413ade7660f33da5245b00493119d77649a681))
+* few typos grammar ([97bfe16](https://github.com/Loop3D/map2loop/commit/97bfe16cdf2653e957946e8366a1dc801bbc4b2f))
+* fix for issue [#73](https://github.com/Loop3D/map2loop/issues/73) ([39c65a7](https://github.com/Loop3D/map2loop/commit/39c65a721af57038e73a26c0522b303c5a40c16b))
+* keep things light ([50751a9](https://github.com/Loop3D/map2loop/commit/50751a940c78a981ec4c423e3c914615cede962f))
+* merge PR templates into one single PR template ([dcbad85](https://github.com/Loop3D/map2loop/commit/dcbad8503174c9700651bb5c491323336d10c8b8))
+* remove tini from docker ([fc86b89](https://github.com/Loop3D/map2loop/commit/fc86b89994b578b6d603a514ec1c889623092df7))
+* remove value from issue templates ([11a005d](https://github.com/Loop3D/map2loop/commit/11a005db964bcf4d82749b5c334dea9a8e394cad))
+* revert back to having strike allowance as discussed ([48a19e0](https://github.com/Loop3D/map2loop/commit/48a19e091e22bb0772c22bfa4ebc2b9ff2f0bffe))
+* StructuralPoint actually prints warnings ([ab6f276](https://github.com/Loop3D/map2loop/commit/ab6f276a991f538dd25bca467e3869b283a2df10))
+* tests should be with pytest ([a04fb2a](https://github.com/Loop3D/map2loop/commit/a04fb2a569ba756e5ab2317782fd96bc8d15fd0c))
+* update wording in templates for clarity ([ecb1092](https://github.com/Loop3D/map2loop/commit/ecb10926b25472672d7929d94aec0fec222ad09f))
+
+
+### Documentation
+
+* remove lavavu; no need for 3D vis for the examples ([6b42cdc](https://github.com/Loop3D/map2loop/commit/6b42cdcbc9ca7fd9e10ceee31444196f8088ee4f))
+
 ## [3.1.3](https://github.com/Loop3D/map2loop/compare/v3.1.2...v3.1.3) (2024-05-14)
 
 

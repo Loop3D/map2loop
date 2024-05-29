@@ -16,7 +16,6 @@ from .utils import (
     find_segment_strike_from_pt,
 )
 from .m2l_enums import Datatype
-from shapely.geometry import Point
 import shapely
 import math
 
@@ -244,7 +243,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # get the sampled contacts
         contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
         # build points from x and y coordinates
-        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        geometry2 = contacts.apply(lambda row: shapely.Point(row.X, row.Y), axis=1)
         contacts.set_geometry(geometry2, inplace=True)
 
         # set the crs of the contacts to the crs of the units
@@ -253,7 +252,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = map_data.get_value_from_raster_df(Datatype.DTM, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
@@ -279,7 +278,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated = map_data.get_value_from_raster_df(Datatype.DTM, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # for each interpolated point, assign name of unit using spatial join
         units = map_data.get_map_data(Datatype.GEOLOGY)

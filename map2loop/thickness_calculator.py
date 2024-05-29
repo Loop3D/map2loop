@@ -254,7 +254,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = map_data.get_value_from_raster_df(Datatype.DTM, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
@@ -281,7 +281,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated = map_data.get_value_from_raster_df(Datatype.DTM, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # for each interpolated point, assign name of unit using spatial join
         units = map_data.get_map_data(Datatype.GEOLOGY)

@@ -723,7 +723,10 @@ class MapData:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
         else:
             print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
-
+                    
+        # Ensure all DIPDIR values are within [0, 360]
+        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
+        
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
         else:

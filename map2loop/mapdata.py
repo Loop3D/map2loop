@@ -1,3 +1,10 @@
+#internal imports
+from .m2l_enums import Datatype, Datastate, VerboseLevel
+from .config import Config
+from .aus_state_urls import AustraliaStateUrls
+from .utils import generate_random_hex_colors
+
+#external imports
 import geopandas
 import pandas
 import numpy
@@ -11,13 +18,7 @@ from uuid import uuid4
 import beartype
 import os
 from io import BytesIO
-from .m2l_enums import Datatype, Datastate
-from .m2l_enums import VerboseLevel
-from .config import Config
-from .aus_state_urls import AustraliaStateUrls
-from .random_colour import random_colours_hex
 from typing import Union
-
 
 class MapData:
     """
@@ -290,7 +291,7 @@ class MapData:
     @beartype.beartype
     def get_ignore_codes(self) -> list:
         """
-        Get the list of codes to ingnore
+        Get the list of codes to ignore
 
         Returns:
             list: The list of strings to ignore
@@ -1442,7 +1443,7 @@ class MapData:
         return basal_contacts
 
     @beartype.beartype
-    def colour_units(self, stratigraphic_units: pandas.DataFrame, random: bool = False):
+    def colour_units(self, stratigraphic_units: pandas.DataFrame, random: bool = False) -> pandas.DataFrame:
         """
         Add a colour column to the units in the stratigraphic units structure
 
@@ -1457,10 +1458,20 @@ class MapData:
         """
 
         colour_lookup = pandas.DataFrame(columns=["UNITNAME", "colour"])
-        try:
-            colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
-        except FileNotFoundError:
-            print(f"Colour Lookup file {self.colour_filename} not found")
+
+        if self.colour_filename is not None:
+            try:
+                colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
+            except FileNotFoundError:
+                print(f"Colour Lookup file {self.colour_filename} not found. Assigning random colors to units")
+                self.colour_filename = None
+
+        if self.colour_filename is None:
+            print("No colour configuration file found. Assigning random colors to units")
+            missing_colour_n = len(stratigraphic_units["colour"])
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
+                generate_random_hex_colors(missing_colour_n)
+            )
 
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
         if "UNITNAME" in colour_lookup.columns and "colour" in colour_lookup.columns:
@@ -1472,7 +1483,7 @@ class MapData:
                 how="left",
             )
             stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
-                random_colours_hex(stratigraphic_units["colour"].isna().sum())
+                generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
             )
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:

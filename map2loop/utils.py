@@ -5,7 +5,7 @@ import geopandas
 import beartype
 from typing import Union
 import pandas
-
+import random
 
 @beartype.beartype
 def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
@@ -116,7 +116,7 @@ def normal_vector_to_dipdirection_dip(normal_vector: numpy.ndarray) -> numpy.nda
 
 
 @beartype.beartype
-def create_points(xy: Union[list, tuple, numpy.ndarray]):
+def create_points(xy: Union[list, tuple, numpy.ndarray])-> shapely.points:
     """
     Creates a list of shapely Point objects from a list, tuple, or numpy array of coordinates.
 
@@ -300,3 +300,44 @@ def rebuild_sampled_basal_contacts(
     )
 
     return sampled_basal_contacts
+
+@beartype.beartype
+def generate_random_hex_colors(n: int) -> list:
+    """
+    Generate a list of random hex color codes.
+
+    Args:
+        n (int): The number of random hex color codes to generate.
+
+    Returns:
+        list: A list of randomly generated hex color codes as strings.
+
+    Example:
+        >>> generate_random_hex_colors(3)
+        ['#1a2b3c', '#4d5e6f', '#7f8e9d']
+    """
+    return ["#{:06x}".format(random.randint(0, 0xFFFFFF)) for _ in range(n)]
+
+@beartype.beartype
+def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
+    """
+    Convert a hex color code to an RGBA tuple.
+
+    Args:
+        hex_color (str): The hex color code (e.g., "#RRGGBB" or "#RGB").
+        alpha (float, optional): The alpha value (opacity) for the color. Defaults to 1.0.
+
+    Returns:
+        tuple: A tuple (r, g, b, a) where r, g, b are in the range 0-1 and a is in the range 0-1.
+    """
+    hex_color = hex_color.lstrip('#')
+
+    # Handle short hex code (e.g., "#RGB")
+    if len(hex_color) == 3:
+        hex_color = ''.join([c*2 for c in hex_color])
+
+    r = int(hex_color[0:2], 16) / 255.0
+    g = int(hex_color[2:4], 16) / 255.0
+    b = int(hex_color[4:6], 16) / 255.0
+
+    return (r, g, b, alpha)

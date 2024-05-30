@@ -1,13 +1,5 @@
-from abc import ABC, abstractmethod
-import beartype
-import numpy
-from scipy.spatial.distance import euclidean
-import pandas
-import geopandas
-from statistics import mean
-from .mapdata import MapData
-from scipy.interpolate import Rbf
-from .interpolators import DipDipDirectionInterpolator
+# internal imports
+import scipy.interpolate
 from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
@@ -16,7 +8,17 @@ from .utils import (
     find_segment_strike_from_pt,
 )
 from .m2l_enums import Datatype
-from shapely.geometry import Point
+from .interpolators import DipDipDirectionInterpolator
+from .mapdata import MapData
+
+#external imports
+from abc import ABC, abstractmethod
+import beartype
+import numpy
+import scipy
+import pandas
+import geopandas
+from statistics import mean
 import shapely
 import math
 
@@ -244,7 +246,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # get the sampled contacts
         contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
         # build points from x and y coordinates
-        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        geometry2 = contacts.apply(lambda row: shapely.Point(row.X, row.Y), axis=1)
         contacts.set_geometry(geometry2, inplace=True)
 
         # set the crs of the contacts to the crs of the units
@@ -253,7 +255,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = map_data.get_value_from_raster_df(Datatype.DTM, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
@@ -261,7 +263,7 @@ class InterpolatedStructure(ThicknessCalculator):
         bounding_box = map_data.get_bounding_box()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator(bounding_box, structure_data, interpolator=Rbf)
+        dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame
@@ -279,7 +281,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated = map_data.get_value_from_raster_df(Datatype.DTM, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # for each interpolated point, assign name of unit using spatial join
         units = map_data.get_map_data(Datatype.GEOLOGY)
@@ -337,7 +339,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
-                        line_length = euclidean(p1, p2)
+                        line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
                         indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within

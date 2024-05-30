@@ -1,6 +1,6 @@
-import beartype
-import pathlib
+# internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
+from .utils import hex_to_rgba
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
@@ -11,17 +11,18 @@ from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, Sort
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
+
+#external imports
 import LoopProjectFile as LPF
 from typing import Union
+from osgeo import gdal
+import geopandas
+import beartype
+import pathlib
 import numpy
 import pandas
-import geopandas
 import os
 import re
-
-from matplotlib.colors import to_rgba
-from osgeo import gdal
-
 
 class Project(object):
     """
@@ -747,7 +748,7 @@ class Project(object):
         )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol["colour"] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
-        geol["colour_rgba"] = geol.apply(lambda row: to_rgba(row["colour"], 1.0), axis=1)
+        geol["colour_rgba"] = geol.apply(lambda row: hex_to_rgba(row["colour"], 1.0), axis=1)
         if points is None and overlay == "":
             geol.plot(color=geol["colour_rgba"])
             return

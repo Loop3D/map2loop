@@ -719,7 +719,7 @@ class Project(object):
         observations["layerId"] = self.sample_supervisor(SampleType.STRUCTURE)["layerID"]
         observations["easting"] = self.sample_supervisor(SampleType.STRUCTURE)["X"]
         observations["northing"] = self.sample_supervisor(SampleType.STRUCTURE)["Y"]
-        # observations["altitude"] = self.structure_samples["Z"]
+        observations["altitude"] = self.sample_supervisor(SampleType.STRUCTURE)["Z"]
         observations["dipDir"] = self.sample_supervisor(SampleType.STRUCTURE)["DIPDIR"]
         observations["dip"] = self.sample_supervisor(SampleType.STRUCTURE)["DIP"]
         observations["dipPolarity"] = self.sample_supervisor(SampleType.STRUCTURE)["OVERTURNED"]

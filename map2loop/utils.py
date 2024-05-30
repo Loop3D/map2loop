@@ -7,6 +7,7 @@ from typing import Union
 import pandas
 import random
 
+
 @beartype.beartype
 def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
     """
@@ -116,7 +117,7 @@ def normal_vector_to_dipdirection_dip(normal_vector: numpy.ndarray) -> numpy.nda
 
 
 @beartype.beartype
-def create_points(xy: Union[list, tuple, numpy.ndarray])-> shapely.points:
+def create_points(xy: Union[list, tuple, numpy.ndarray]) -> shapely.points:
     """
     Creates a list of shapely Point objects from a list, tuple, or numpy array of coordinates.
 
@@ -301,6 +302,7 @@ def rebuild_sampled_basal_contacts(
 
     return sampled_basal_contacts
 
+
 @beartype.beartype
 def generate_random_hex_colors(n: int) -> list:
     """
@@ -318,6 +320,7 @@ def generate_random_hex_colors(n: int) -> list:
     """
     return ["#{:06x}".format(random.randint(0, 0xFFFFFF)) for _ in range(n)]
 
+
 @beartype.beartype
 def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
     """
@@ -334,7 +337,7 @@ def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
 
     # Handle short hex code (e.g., "#RGB")
     if len(hex_color) == 3:
-        hex_color = ''.join([c*2 for c in hex_color])
+        hex_color = ''.join([c * 2 for c in hex_color])
 
     r = int(hex_color[0:2], 16) / 255.0
     g = int(hex_color[2:4], 16) / 255.0

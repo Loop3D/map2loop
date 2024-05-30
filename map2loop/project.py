@@ -12,7 +12,7 @@ from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
 
-#external imports
+# external imports
 import LoopProjectFile as LPF
 from typing import Union
 from osgeo import gdal
@@ -23,6 +23,7 @@ import numpy
 import pandas
 import os
 import re
+
 
 class Project(object):
     """

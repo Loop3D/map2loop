@@ -21,7 +21,7 @@ from .m2l_enums import Datatype, SampleType
 from .interpolators import DipDipDirectionInterpolator
 from .mapdata import MapData
 
-#external imports
+# external imports
 from abc import ABC, abstractmethod
 import beartype
 import numpy

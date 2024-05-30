@@ -1,10 +1,10 @@
-#internal imports
+# internal imports
 from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .utils import generate_random_hex_colors
 
-#external imports
+# external imports
 import geopandas
 import pandas
 import numpy
@@ -21,6 +21,7 @@ from io import BytesIO
 from typing import Union
 import requests
 import requests
+
 
 class MapData:
     """
@@ -1458,7 +1459,9 @@ class MapData:
         return basal_contacts
 
     @beartype.beartype
-    def colour_units(self, stratigraphic_units: pandas.DataFrame, random: bool = False) -> pandas.DataFrame:
+    def colour_units(
+        self, stratigraphic_units: pandas.DataFrame, random: bool = False
+    ) -> pandas.DataFrame:
         """
         Add a colour column to the units in the stratigraphic units structure
 
@@ -1478,7 +1481,9 @@ class MapData:
             try:
                 colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
             except FileNotFoundError:
-                print(f"Colour Lookup file {self.colour_filename} not found. Assigning random colors to units")
+                print(
+                    f"Colour Lookup file {self.colour_filename} not found. Assigning random colors to units"
+                )
                 self.colour_filename = None
 
         if self.colour_filename is None:

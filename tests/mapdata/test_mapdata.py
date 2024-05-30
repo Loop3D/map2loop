@@ -5,8 +5,11 @@ from map2loop.mapdata import MapData
 from map2loop.m2l_enums import Datatype
 
 def test_structures_less_than_360():
+
+    # call the class
     md = MapData()
 
+    # add config definition
     md.config.structure_config = {
             "dipdir_column": "DIPDIR",
             "dip_column": "DIP",
@@ -18,6 +21,7 @@ def test_structures_less_than_360():
             "orientation_type": "strike"  
         }
 
+    # create mock data
     data = {
         'geometry': [shapely.Point(1, 1), shapely.Point(2, 2), shapely.Point(3, 3),],
         'DIPDIR': [45.0, 370.0, 420.0], 
@@ -27,9 +31,18 @@ def test_structures_less_than_360():
         'ID': [1, 2, 3]
     }
 
+    #build geodataframe to hold the data
     data = geopandas.GeoDataFrame(data)
 
+    # set it as the raw_data
     md.raw_data[Datatype.STRUCTURE] = data
-    md.parse_structure_map()
 
+    # make it parse the structure map and raise exception if error in parse_structure_map
+
+    try:
+        md.parse_structure_map()
+    except Exception as e:
+        pytest.fail(f"parse_structure_map raised an exception: {e}")
+
+    # check if all values below 360
     assert md.data[Datatype.STRUCTURE]['DIPDIR'].all() < 360, "MapData.STRUCTURE is producing DIPDIRs > 360 degrees"

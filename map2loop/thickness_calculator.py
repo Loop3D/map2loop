@@ -581,20 +581,18 @@ class StructuralPoint(ThicknessCalculator):
 
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
-
         # assign the thicknesses to the each unit
         for _, unit in result.iterrows():
             idx = units.index[units['name'] == unit['unit']].tolist()[0]
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
-
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
             if (
                 # not a top//bottom unit
-                (output_units[output_units['name'] == unit]['ThicknessMedian'].isna().all())
+                (output_units[output_units['name'] == unit]['ThicknessMedian'].all() == 0)
                 and (unit != stratigraphic_order[-1])
                 and (unit != stratigraphic_order[0])
             ):

@@ -43,10 +43,7 @@ def test_project_execution():
     proj.run_all(take_best=True)
     assert proj is not None, "Plot Hamersley Basin failed to execute"
 
-
-def test_file_creation():
-    expected_file = loop_project_filename
-    assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
+    assert os.path.exists(loop_project_filename), f"Expected file {loop_project_filename} was not created"
 
 
 ###################################################################

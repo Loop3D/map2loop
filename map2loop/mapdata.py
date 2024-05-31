@@ -20,7 +20,6 @@ import os
 from io import BytesIO
 from typing import Union
 import requests
-import requests
 
 
 class MapData:
@@ -487,7 +486,39 @@ class MapData:
             os.mkdir(self.tmp_path)
 
 
- 
+    @beartype.beartype
+    def get_coverage(self, url: str, bb_ll:tuple):
+        """
+        Retrieves coverage from GA WCS and save it as a GeoTIFF file.
+
+        This method retrieves a coverage from the specified WCS GA URL using the project's bounding box.
+        The retrieved coverage is saved to a temporary file --> StudidGDALLocalFile.tif
+
+        Args:
+            url (str): The GA WCS URL from which to retrieve the coverage.
+            bb_ll (tuple): A tuple containing the bounding box coordinates (minX, minY, maxX, maxY).
+
+        Returns:
+            gdal.Dataset: The GDAL dataset of the retrieved GeoTIFF file.
+        """
+        
+        self.__check_and_create_tmp_path()
+        
+        wcs = WebCoverageService(url, version="1.0.0")
+        
+        coverage = wcs.getCoverage(
+            identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
+        )
+        # This is stupid that gdal cannot read a byte stream and has to have a
+        # file on the local system to open or otherwise create a gdal file
+        # from scratch with Create
+        tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
+
+        with open(tmp_file, "wb") as fh:
+            fh.write(coverage.read())
+
+        return gdal.Open(tmp_file)
+    
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """

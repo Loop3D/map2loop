@@ -18,6 +18,7 @@ from .aus_state_urls import AustraliaStateUrls
 from .random_colour import random_colours_hex
 from typing import Union
 import requests
+import requests
 
 class MapData:
     """
@@ -483,7 +484,39 @@ class MapData:
             os.mkdir(self.tmp_path)
 
 
- 
+    @beartype.beartype
+    def get_coverage(self, url: str, bb_ll:tuple):
+        """
+        Retrieves coverage from GA WCS and save it as a GeoTIFF file.
+
+        This method retrieves a coverage from the specified WCS GA URL using the project's bounding box.
+        The retrieved coverage is saved to a temporary file --> StudidGDALLocalFile.tif
+
+        Args:
+            url (str): The GA WCS URL from which to retrieve the coverage.
+            bb_ll (tuple): A tuple containing the bounding box coordinates (minX, minY, maxX, maxY).
+
+        Returns:
+            gdal.Dataset: The GDAL dataset of the retrieved GeoTIFF file.
+        """
+        
+        self.__check_and_create_tmp_path()
+        
+        wcs = WebCoverageService(url, version="1.0.0")
+        
+        coverage = wcs.getCoverage(
+            identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
+        )
+        # This is stupid that gdal cannot read a byte stream and has to have a
+        # file on the local system to open or otherwise create a gdal file
+        # from scratch with Create
+        tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
+
+        with open(tmp_file, "wb") as fh:
+            fh.write(coverage.read())
+
+        return gdal.Open(tmp_file)
+    
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -496,30 +529,29 @@ class MapData:
         Returns:
             _type_: The open geotiff in a gdal handler
         """
-        self.__check_and_create_tmp_path()
 
         # For gdal debugging use exceptions
         gdal.UseExceptions()
         bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
         
         if filename.lower() == "aus" or filename.lower() == "au":
-            url = "http://gaservices.ga.gov.au/site_9/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
-            # previous link version: "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
-            wcs = WebCoverageService(url, version="1.0.0")
+            urls = [
+            "http://services.ga.gov.au/gis/se33rvices/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?", # DEM with land and sea!
+            "http://services.ga.gov.au/gis/ser333ices/DEM_SRTM_1Second/MapServer/WCSServer?", # DEM with land only
+            "http://services.ga.gov.au/gis/serv33ices/DEM_SRTM_1Second_Hydro_Enforced/MapServer/WCSServer?"] # dem that accounts for lakes
 
-            coverage = wcs.getCoverage(
-                identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
-            )
-            # This is stupid that gdal cannot read a byte stream and has to have a
-            # file on the local system to open or otherwise create a gdal file
-            # from scratch with Create
+            for url in urls:
+                try:
+                    tif = self.get_coverage(url, bb_ll)
+                    if tif is not None:
+                        print("DEM loaded from {}".format(url))
+                        return tif
+                        
+                except Exception:
+                    pass
 
-            tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
-
-            with open(tmp_file, "wb") as fh:
-                fh.write(coverage.read())
-            tif = gdal.Open(tmp_file)
-
+            raise Exception("All GA URLs failed to retrieve the DEM coverage.")
+        
         elif filename == "hawaii":
             import netCDF4
 

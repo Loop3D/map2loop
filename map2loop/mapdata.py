@@ -466,7 +466,7 @@ class MapData:
         """
         try:
             request = urllib.Request(url, headers={"Accept-Encoding": "gzip"})
-            response = urllib.request.urlopen(request, timeout=30)
+            response = urllib.request.urlopen(request, timeout=120)
             if response.info().get("Content-Encoding") == "gzip":
                 return GzipFile(fileobj=BytesIO(response.read()))
             else:
@@ -497,14 +497,14 @@ class MapData:
             _type_: The open geotiff in a gdal handler
         """
         self.__check_and_create_tmp_path()
-        
+
         # For gdal debugging use exceptions
         gdal.UseExceptions()
         bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
-    
+        
         if filename.lower() == "aus" or filename.lower() == "au":
-
-            url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
+            url = "http://gaservices.ga.gov.au/site_9/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
+            # previous link version: "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
             coverage = wcs.getCoverage(
@@ -519,13 +519,14 @@ class MapData:
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
             tif = gdal.Open(tmp_file)
-        
+
         elif filename == "hawaii":
             import netCDF4
 
             bbox_str = (
                 f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
             )
+            
             
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
             f = urllib.request.urlopen(filename)

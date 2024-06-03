@@ -1,7 +1,7 @@
 import beartype
 import pathlib
 from map2loop.fault_orientation import FaultOrientationNearest
-from .m2l_enums import VerboseLevel, ErrorState, Datatype
+from .m2l_enums import VerboseLevel, ErrorState, Datatype, SampleType
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
@@ -11,6 +11,7 @@ from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, Sort
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
+from .sample_storage import SampleSupervisor
 import LoopProjectFile as LPF
 from typing import Union
 import numpy
@@ -134,6 +135,7 @@ class Project(object):
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
 
+        self.sample_supervisor = SampleSupervisor(self)
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
         )
@@ -370,34 +372,16 @@ class Project(object):
         """
         return self.deformation_history.get_minimum_fault_length()
 
-    # Processing functions
-    def sample_map_data(self):
-        """
-        Use the samplers to extract points along polylines or unit boundaries
-        """
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
-        )
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
-        )
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT), self.map_data
-        )
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD), self.map_data
-        )
-
     def extract_geology_contacts(self):
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.basal_contacts
+        self.sample_supervisor.process(SampleType.CONTACT)
+        self.map_data.get_value_from_raster_df(
+            Datatype.DTM, self.sample_supervisor(SampleType.CONTACT)
         )
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -453,7 +437,7 @@ class Project(object):
             self.stratigraphic_column.stratigraphicUnits,
             self.stratigraphic_column.column,
             self.map_data.basal_contacts,
-            self.structure_samples,
+            self.sample_supervisor,
             self.map_data,
         )
 
@@ -484,9 +468,11 @@ class Project(object):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
 
-        self.deformation_history.summarise_data(self.fault_samples)
+        self.map_data.get_value_from_raster_df(
+            Datatype.DTM, self.sample_supervisor(SampleType.FAULT)
+        )
+        self.deformation_history.summarise_data(self.sample_supervisor(SampleType.FAULT))
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
@@ -518,7 +504,6 @@ class Project(object):
 
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
-        self.sample_map_data()
         self.calculate_unit_thicknesses()
         self.calculate_fault_orientations()
         self.summarise_fault_data()
@@ -642,41 +627,61 @@ class Project(object):
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.map_data.sampled_contacts["ID"]
-        contacts_data["easting"] = self.map_data.sampled_contacts["X"]
-        contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
-        contacts_data["featureId"] = self.map_data.sampled_contacts["featureId"]
-        LPF.Set(self.loop_filename, "contacts", data=contacts_data)
+        contacts_data = numpy.zeros(
+            len(self.sample_supervisor(SampleType.CONTACT)), LPF.contactObservationType
+        )
+        contacts_data["layerId"] = self.sample_supervisor(SampleType.CONTACT)["ID"]
+        contacts_data["easting"] = self.sample_supervisor(SampleType.CONTACT)["X"]
+        contacts_data["northing"] = self.sample_supervisor(SampleType.CONTACT)["Y"]
+        contacts_data["altitude"] = self.sample_supervisor(SampleType.CONTACT)["Z"]
+        LPF.Set(self.loop_filename, "contacts", data=contacts_data, verbose=True)
 
         # Save fault trace information
         faults_obs_data = numpy.zeros(
-            len(self.fault_samples) + len(self.fault_orientations), LPF.faultObservationType
+            len(self.sample_supervisor(SampleType.FAULT)) + len(self.fault_orientations),
+            LPF.faultObservationType,
         )
         faults_obs_data["val"] = numpy.nan
-        faults_obs_data["eventId"][0 : len(self.fault_samples)] = self.fault_samples["ID"]
-        faults_obs_data["easting"][0 : len(self.fault_samples)] = self.fault_samples["X"]
-        faults_obs_data["northing"][0 : len(self.fault_samples)] = self.fault_samples["Y"]
-        faults_obs_data["altitude"][0 : len(self.fault_samples)] = self.fault_samples["Z"]
-        faults_obs_data["featureId"][0 : len(self.fault_samples)] = self.fault_samples["featureId"]
-        faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
-        faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
-        faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
+        faults_obs_data["eventId"][0 : len(self.sample_supervisor(SampleType.FAULT))] = (
+            self.sample_supervisor(SampleType.FAULT)["ID"]
+        )
+        faults_obs_data["easting"][0 : len(self.sample_supervisor(SampleType.FAULT))] = (
+            self.sample_supervisor(SampleType.FAULT)["X"]
+        )
+        faults_obs_data["northing"][0 : len(self.sample_supervisor(SampleType.FAULT))] = (
+            self.sample_supervisor(SampleType.FAULT)["Y"]
+        )
+        faults_obs_data["altitude"][0 : len(self.sample_supervisor(SampleType.FAULT))] = (
+            self.sample_supervisor(SampleType.FAULT)["Z"]
+        )
+        faults_obs_data["type"][0 : len(self.sample_supervisor(SampleType.FAULT))] = 0
+        faults_obs_data["dipDir"][0 : len(self.sample_supervisor(SampleType.FAULT))] = numpy.nan
+        faults_obs_data["dip"][0 : len(self.sample_supervisor(SampleType.FAULT))] = numpy.nan
+        faults_obs_data["posOnly"][0 : len(self.sample_supervisor(SampleType.FAULT))] = 1
         faults_obs_data["displacement"] = (
             100  # self.fault_samples["DISPLACEMENT"] #TODO remove note needed
         )
 
-        faults_obs_data["eventId"][len(self.fault_samples) :] = self.fault_orientations["ID"]
-        faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
-        faults_obs_data["northing"][len(self.fault_samples) :] = self.fault_orientations["Y"]
-        faults_obs_data["altitude"][len(self.fault_samples) :] = self.fault_orientations["Z"]
-        faults_obs_data["featureId"][len(self.fault_samples) :] = self.fault_orientations[
-            "featureId"
-        ]
-        faults_obs_data["dipDir"][len(self.fault_samples) :] = self.fault_orientations["DIPDIR"]
-        faults_obs_data["dip"][len(self.fault_samples) :] = self.fault_orientations["DIP"]
-        faults_obs_data["posOnly"][len(self.fault_samples) :] = 0
+        faults_obs_data["eventId"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["ID"]
+        )
+        faults_obs_data["easting"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["X"]
+        )
+        faults_obs_data["northing"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["Y"]
+        )
+        faults_obs_data["altitude"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["Z"]
+        )
+        faults_obs_data["type"][len(self.sample_supervisor(SampleType.FAULT)) :] = 0
+        faults_obs_data["dipDir"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["DIPDIR"]
+        )
+        faults_obs_data["dip"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
+            self.fault_orientations["DIP"]
+        )
+        faults_obs_data["posOnly"][len(self.sample_supervisor(SampleType.FAULT)) :] = 0
         LPF.Set(self.loop_filename, "faultObservations", data=faults_obs_data)
 
         faults = self.deformation_history.get_faults_for_export()
@@ -705,15 +710,17 @@ class Project(object):
         LPF.Set(self.loop_filename, "faultLog", data=faults_data)
 
         # Save structural information
-        observations = numpy.zeros(len(self.structure_samples), LPF.stratigraphicObservationType)
+        observations = numpy.zeros(
+            len(self.sample_supervisor(SampleType.STRUCTURE)), LPF.stratigraphicObservationType
+        )
         observations["layer"] = "s0"
-        observations["layerId"] = self.structure_samples["layerID"]
-        observations["easting"] = self.structure_samples["X"]
-        observations["northing"] = self.structure_samples["Y"]
+        observations["layerId"] = self.sample_supervisor(SampleType.STRUCTURE)["layerID"]
+        observations["easting"] = self.sample_supervisor(SampleType.STRUCTURE)["X"]
+        observations["northing"] = self.sample_supervisor(SampleType.STRUCTURE)["Y"]
         # observations["altitude"] = self.structure_samples["Z"]
-        observations["dipDir"] = self.structure_samples["DIPDIR"]
-        observations["dip"] = self.structure_samples["DIP"]
-        observations["dipPolarity"] = self.structure_samples["OVERTURNED"]
+        observations["dipDir"] = self.sample_supervisor(SampleType.STRUCTURE)["DIPDIR"]
+        observations["dip"] = self.sample_supervisor(SampleType.STRUCTURE)["DIP"]
+        observations["dipPolarity"] = self.sample_supervisor(SampleType.STRUCTURE)["OVERTURNED"]
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations)
 
         if self.map2model.fault_fault_relationships is not None:

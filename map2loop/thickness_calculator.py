@@ -13,6 +13,8 @@ from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
     calculate_endpoints,
+    multiline_to_line,
+    find_segment_strike_from_pt
 )
 from .m2l_enums import Datatype, SampleType
 from shapely.geometry import Point

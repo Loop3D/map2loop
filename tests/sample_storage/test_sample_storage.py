@@ -142,8 +142,8 @@ loop_project_filename = os.path.join(f_path, "local_source.loop3d")
 config = {
     "structure": {
         "orientation_type": "strike",
-        "dipdir_column": "strike2",
-        "dip_column": "dip_2",
+        "dipdir_column": "STRIKE",
+        "dip_column": "DIP",
         "description_column": "DESCRIPTION",
         "bedding_text": "Bed",
         "overturned_column": "structypei",

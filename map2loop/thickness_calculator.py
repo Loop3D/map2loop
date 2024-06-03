@@ -245,8 +245,8 @@ class InterpolatedStructure(ThicknessCalculator):
         # get the sampled contacts
         contacts = geopandas.GeoDataFrame(samples(SampleType.CONTACT)) 
         # build points from x and y coordinates
-        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
-        contacts = contacts.set_geometry(geometry2, inplace=False)
+        geometry2 = geopandas.points_from_xy(contacts['X'], contacts['Y'])
+        contacts.set_geometry(geometry2, inplace=True)
 
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)

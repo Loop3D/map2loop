@@ -22,6 +22,7 @@ import os
 import re
 from matplotlib.colors import to_rgba
 from osgeo import gdal
+import pathlib
 
 
 class Project(object):
@@ -66,7 +67,7 @@ class Project(object):
         dtm_filename: str = "",
         config_filename: str = "",
         config_dictionary: dict = {},
-        clut_filename: str = "",
+        clut_filename: pathlib.PosixPath = "",
         clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",

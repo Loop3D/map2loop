@@ -11,7 +11,8 @@ RUN apt-get update -qq && \
     make\
     libgl1\
     libtinfo5\
-    libtiff5\
+    # libtiff5\
+    libtiff-dev\
     libgl1-mesa-glx
     
 

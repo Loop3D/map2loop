@@ -252,7 +252,6 @@ def test_get_sampler(sample_supervisor):
     assert sample_supervisor.get_sampler(SampleType.STRUCTURE) == sampler.sampler_label
 
 
-# TODO: test_store to be completed
 def test_store(sample_supervisor):
     data = pandas.DataFrame()
     sample_supervisor.store(SampleType.STRUCTURE, data)

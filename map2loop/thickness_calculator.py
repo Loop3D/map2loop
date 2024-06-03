@@ -246,7 +246,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = samples(SampleType.CONTACT) 
         # build points from x and y coordinates
         geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
-        contacts.set_geometry(geometry2, inplace=True)
+        contacts.set_geometry(geometry2, inplace=False)
 
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)

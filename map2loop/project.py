@@ -654,7 +654,7 @@ class Project(object):
         faults_obs_data["altitude"][0 : len(self.sample_supervisor(SampleType.FAULT))] = (
             self.sample_supervisor(SampleType.FAULT)["Z"]
         )
-        faults_obs_data["type"][0 : len(self.sample_supervisor(SampleType.FAULT))] = 0
+        faults_obs_data["featureId"][0 : len(self.sample_supervisor(SampleType.FAULT))] = self.sample_supervisor(SampleType.FAULT)["featureId"]
         faults_obs_data["dipDir"][0 : len(self.sample_supervisor(SampleType.FAULT))] = numpy.nan
         faults_obs_data["dip"][0 : len(self.sample_supervisor(SampleType.FAULT))] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.sample_supervisor(SampleType.FAULT))] = 1
@@ -674,7 +674,9 @@ class Project(object):
         faults_obs_data["altitude"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
             self.fault_orientations["Z"]
         )
-        faults_obs_data["type"][len(self.sample_supervisor(SampleType.FAULT)) :] = 0
+        faults_obs_data["featureId"][len(self.sample_supervisor(SampleType.FAULT)) :] = self.fault_orientations[
+            "featureId"
+        ]
         faults_obs_data["dipDir"][len(self.sample_supervisor(SampleType.FAULT)) :] = (
             self.fault_orientations["DIPDIR"]
         )

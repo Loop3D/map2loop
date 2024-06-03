@@ -4,7 +4,7 @@ import shapely
 from map2loop.mapdata import MapData 
 from map2loop.m2l_enums import Datatype
 
-def test_structures_less_than_360():
+def test_if_m2l_returns_all_sampled_structures_with_DIPDIR_lower_than_360():
 
     # call the class
     md = MapData()

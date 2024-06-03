@@ -457,7 +457,7 @@ class StructuralPoint(ThicknessCalculator):
 
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
-            basal_contacts, map_data.sampled_contacts
+            basal_contacts, samples(SampleType.CONTACT)
         )
 
         # calculate map dimensions

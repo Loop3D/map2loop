@@ -11,8 +11,8 @@ from osgeo import gdal, osr
 import tempfile
 import shapely
 import pathlib
+import map2loop
 
-# os.system('gdown --folder https://drive.google.com/drive/folders/1ZEJvPN4lpGpvoepjGMZgzYPGaY3mT46p')
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
     minx, miny, maxx, maxy = bbox

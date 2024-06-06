@@ -17,7 +17,7 @@ from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .random_colour import random_colours_hex
 from typing import Union
-
+import requests
 
 class MapData:
     """
@@ -482,6 +482,8 @@ class MapData:
         if not os.path.isdir(self.tmp_path):
             os.mkdir(self.tmp_path)
 
+
+ 
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -495,29 +497,36 @@ class MapData:
             _type_: The open geotiff in a gdal handler
         """
         self.__check_and_create_tmp_path()
+        
         # For gdal debugging use exceptions
         gdal.UseExceptions()
         bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
-        # try:
+    
         if filename.lower() == "aus" or filename.lower() == "au":
+
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
+
             coverage = wcs.getCoverage(
                 identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
             )
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create
+
             tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
+
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
             tif = gdal.Open(tmp_file)
+        
         elif filename == "hawaii":
             import netCDF4
 
             bbox_str = (
                 f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
             )
+            
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
             f = urllib.request.urlopen(filename)
             ds = netCDF4.Dataset("in-mem-file", mode="r", memory=f.read())
@@ -723,7 +732,10 @@ class MapData:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
         else:
             print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
-
+                    
+        # Ensure all DIPDIR values are within [0, 360]
+        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
+        
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
         else:

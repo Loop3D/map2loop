@@ -466,7 +466,7 @@ class MapData:
         """
         try:
             request = urllib.Request(url, headers={"Accept-Encoding": "gzip"})
-            response = urllib.request.urlopen(request, timeout=120)
+            response = urllib.request.urlopen(request, timeout=30)
             if response.info().get("Content-Encoding") == "gzip":
                 return GzipFile(fileobj=BytesIO(response.read()))
             else:

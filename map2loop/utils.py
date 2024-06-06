@@ -331,11 +331,14 @@ def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
     Returns:
         tuple: A tuple (r, g, b, a) where r, g, b are in the range 0-1 and a is in the range 0-1.
     """
+    # if input not string or starts with '#', raise error
     if not isinstance(hex_color, str) or not hex_color.startswith('#'):
         raise ValueError("Invalid hex color code. Must start with '#'.")
 
+    # Remove '#' from the hex color code
     hex_color = hex_color.lstrip('#')
 
+    # check if hex color code is the right length
     if len(hex_color) not in [3, 6]:
         raise ValueError("Invalid hex color code. Must be 3 or 6 characters long after '#'.")
 
@@ -343,6 +346,7 @@ def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
     if len(hex_color) == 3:
         hex_color = ''.join([c * 2 for c in hex_color])
 
+    # Convert the hex color code to an RGBA tuple// if it fails, return error
     try:
         r = int(hex_color[0:2], 16) / 255.0
         g = int(hex_color[2:4], 16) / 255.0

@@ -1,5 +1,34 @@
 # Changelog
 
+## [3.1.5](https://github.com/Loop3D/map2loop/compare/v3.1.4...v3.1.5) (2024-06-06)
+
+
+### Bug Fixes
+
+* add 2 more links to try from GA WCS if timing out & prints out where the DEM was downloaded from ([92f73a5](https://github.com/Loop3D/map2loop/commit/92f73a55ad998af76fe02fd09702d98492c6e431))
+* add catchall exception to mapdata_parse_structure & comment code ([59c677c](https://github.com/Loop3D/map2loop/commit/59c677c5988c1e411723c61f3482dbd792ed19a7))
+* add test for all structures less than 360 ([f08c42a](https://github.com/Loop3D/map2loop/commit/f08c42a7e455657c0d042e1346fa5ce5fdb98775))
+* allow 2 minutes for server connection & add add available ga server link ([900a50d](https://github.com/Loop3D/map2loop/commit/900a50d34f44e50c508466d617e4ce8d85c0c316))
+* avoid double imports ([3347751](https://github.com/Loop3D/map2loop/commit/334775120d8db88a82e70980f68940d024524687))
+* create the tmp file function missing ([55688fe](https://github.com/Loop3D/map2loop/commit/55688fe85f7aca2678a15160a73a972427a3bf34))
+* ensure all dipdir vals &lt; 360 ([cf21a6b](https://github.com/Loop3D/map2loop/commit/cf21a6ba8cc0c48dfb7cc442d59a6cd63678ab83))
+* fix for altitude not being saved properly in LPF ([b2c6638](https://github.com/Loop3D/map2loop/commit/b2c663866f478752670aca41a188aa195df9c90f))
+* make the templates a bit easier to fill out ([81f54fe](https://github.com/Loop3D/map2loop/commit/81f54fe9f7163dc997219b4fe092c81b6c7b3ca3))
+* move location of the PR template ([9209c25](https://github.com/Loop3D/map2loop/commit/9209c251520bfd993a51b04124ad62a831a58922))
+* return just column with new vals instead of inplace modification ([722b98c](https://github.com/Loop3D/map2loop/commit/722b98cdbcf1f820b9d1a480f09ac59d287f1a04))
+* revert back to original ([6ed00c9](https://github.com/Loop3D/map2loop/commit/6ed00c999901c3236e53fc039930510be9d38570))
+* revert back to original timeout ([301242f](https://github.com/Loop3D/map2loop/commit/301242f931b92ac01c4251ecf9039119d9da49d5))
+* revert back to original url ([26e4971](https://github.com/Loop3D/map2loop/commit/26e497198744c591879fea96c10935d6b79b7d9d))
+* update question template ([8182e50](https://github.com/Loop3D/map2loop/commit/8182e50361852de817e1440adcb278b5f46f4796))
+* update tests that depend on server to skip in case server is unavailable ([646be9e](https://github.com/Loop3D/map2loop/commit/646be9ea06dade92f16208da7e681d6d2b0e6c65))
+* use gpd.points_from_xy ([2f931c5](https://github.com/Loop3D/map2loop/commit/2f931c59025997133aeea9c10f725858613b7f6b))
+* verbose dipdir 360 test name ([6ffe6bf](https://github.com/Loop3D/map2loop/commit/6ffe6bf31ab860ee054bb175a63c00fee7b8a7ff))
+
+
+### Documentation
+
+* update libtiff version ([0a99ac8](https://github.com/Loop3D/map2loop/commit/0a99ac8aaf6980196216137f15060c44b2f77cd9))
+
 ## [3.1.4](https://github.com/Loop3D/map2loop/compare/v3.1.3...v3.1.4) (2024-05-29)
 
 

@@ -46,3 +46,5 @@ def test_if_m2l_returns_all_sampled_structures_with_DIPDIR_lower_than_360():
 
     # check if all values below 360
     assert md.data[Datatype.STRUCTURE]['DIPDIR'].all() < 360, "MapData.STRUCTURE is producing DIPDIRs > 360 degrees"
+    
+# 

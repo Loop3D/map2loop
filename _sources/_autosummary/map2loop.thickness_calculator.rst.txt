@@ -40,7 +40,6 @@ map2loop.thickness\_calculator
       DipDipDirectionInterpolator
       InterpolatedStructure
       MapData
-      Point
       Rbf
       StructuralPoint
       ThicknessCalculator

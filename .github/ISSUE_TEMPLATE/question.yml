@@ -11,15 +11,6 @@ body:
         Please use this template to ask a question about applying map2loop to your data. 
         Provide as much detail as possible to help us understand and answer your question efficiently.
 
-  - type: input
-    id: question_title
-    attributes:
-      label: "Question Title"
-      description: "Provide a concise and descriptive title for your question."
-      placeholder: "Enter the title of your question"
-    validations:
-      required: true
-
   - type: textarea
     id: question_details
     attributes:

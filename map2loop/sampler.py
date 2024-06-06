@@ -87,6 +87,7 @@ class SamplerDecimator(Sampler):
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
+        data["Z"] = map_data.get_value_from_raster_df(Datatype.DTM, data)["Z"]
         data["layerID"] = geopandas.sjoin(
             data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
         )['index_right']

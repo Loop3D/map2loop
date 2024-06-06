@@ -325,22 +325,33 @@ def generate_random_hex_colors(n: int) -> list:
 def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
     """
     Convert a hex color code to an RGBA tuple.
-
     Args:
         hex_color (str): The hex color code (e.g., "#RRGGBB" or "#RGB").
         alpha (float, optional): The alpha value (opacity) for the color. Defaults to 1.0.
-
     Returns:
         tuple: A tuple (r, g, b, a) where r, g, b are in the range 0-1 and a is in the range 0-1.
     """
+    if not isinstance(hex_color, str) or not hex_color.startswith('#'):
+        raise ValueError("Invalid hex color code. Must start with '#'.")
+
     hex_color = hex_color.lstrip('#')
+
+    if len(hex_color) not in [3, 6]:
+        raise ValueError("Invalid hex color code. Must be 3 or 6 characters long after '#'.")
 
     # Handle short hex code (e.g., "#RGB")
     if len(hex_color) == 3:
         hex_color = ''.join([c * 2 for c in hex_color])
 
-    r = int(hex_color[0:2], 16) / 255.0
-    g = int(hex_color[2:4], 16) / 255.0
-    b = int(hex_color[4:6], 16) / 255.0
+    try:
+        r = int(hex_color[0:2], 16) / 255.0
+        g = int(hex_color[2:4], 16) / 255.0
+        b = int(hex_color[4:6], 16) / 255.0
+        
+    except ValueError as e:
+        raise ValueError(
+            "Invalid hex color code. Contains non-hexadecimal characters."
+        ) from e
 
     return (r, g, b, alpha)
+

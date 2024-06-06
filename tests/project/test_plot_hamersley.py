@@ -1,8 +1,12 @@
-import pytest
+#internal imports
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
+
+#external imports
+import pytest
 from pyproj.exceptions import CRSError
 import os
+import requests
 
 bbox_3d = {
     "minx": 515687.31005864,
@@ -23,22 +27,23 @@ def remove_LPF():
 
 
 def test_project_execution():
-    proj = Project(
-        use_australian_state_data="WA",
-        working_projection="EPSG:28350",
-        bounding_box=bbox_3d,
-        clut_file_legacy=False,
-        verbose_level=VerboseLevel.NONE,
-        loop_project_filename=loop_project_filename,
-        overwrite_loopprojectfile=True,
-    )
+    try:
+        proj = Project(
+            use_australian_state_data="WA",
+            working_projection="EPSG:28350",
+            bounding_box=bbox_3d,
+            clut_file_legacy=False,
+            verbose_level=VerboseLevel.NONE,
+            loop_project_filename=loop_project_filename,
+            overwrite_loopprojectfile=True,
+        )
+    except requests.exceptions.ReadTimeout:
+        pytest.skip("Connection to the server timed out, skipping test")
+    
     proj.run_all(take_best=True)
     assert proj is not None, "Plot Hamersley Basin failed to execute"
 
-
-def test_file_creation():
-    expected_file = loop_project_filename
-    assert os.path.exists(expected_file), f"Expected file {expected_file} was not created"
+    assert os.path.exists(loop_project_filename), f"Expected file {loop_project_filename} was not created"
 
 
 ###################################################################

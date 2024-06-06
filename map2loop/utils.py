@@ -306,7 +306,7 @@ def rebuild_sampled_basal_contacts(
 @beartype.beartype
 def generate_random_hex_colors(n: int) -> list:
     """
-    Generate a list of random hex color codes.
+    Generate a list of unique random hex color codes.
 
     Args:
         n (int): The number of random hex color codes to generate.
@@ -318,7 +318,11 @@ def generate_random_hex_colors(n: int) -> list:
         >>> generate_random_hex_colors(3)
         ['#1a2b3c', '#4d5e6f', '#7f8e9d']
     """
-    return ["#{:06x}".format(random.randint(0, 0xFFFFFF)) for _ in range(n)]
+    colors = set() # set prevents duplicates
+    while len(colors) < n:
+        color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+        colors.add(color)
+    return list(colors)
 
 
 @beartype.beartype

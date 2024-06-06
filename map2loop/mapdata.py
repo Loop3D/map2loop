@@ -1489,7 +1489,7 @@ class MapData:
         if self.colour_filename is None:
             print("No colour configuration file found. Assigning random colors to units")
             missing_colour_n = len(stratigraphic_units["colour"])
-            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
                 generate_random_hex_colors(missing_colour_n)
             )
 
@@ -1502,7 +1502,7 @@ class MapData:
                 suffixes=("_old", ""),
                 how="left",
             )
-            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
                 generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
             )
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)

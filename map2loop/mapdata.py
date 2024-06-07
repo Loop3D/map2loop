@@ -1494,6 +1494,9 @@ class MapData:
             )
 
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
+        # if there are duplicates in the clut file, drop. 
+        colour_lookup = colour_lookup.drop_duplicates(subset=["UNITNAME"])
+        
         if "UNITNAME" in colour_lookup.columns and "colour" in colour_lookup.columns:
             stratigraphic_units = stratigraphic_units.merge(
                 colour_lookup,

@@ -12,7 +12,7 @@ import tempfile
 import pathlib
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.project import Project
-from map2loop.m2l_enums import Datatype
+from map2loop.m2l_enums import SampleType, Datatype
 import map2loop
 
 
@@ -215,8 +215,8 @@ proj = Project(
 proj.set_thickness_calculator(StructuralPoint())
 
 column = ['Litho_G', 'Litho_F', 'Litho_E']
-proj.sample_supervisor.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
-proj.sample_supervisor.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
+proj.sample_supervisor.set_sampler(SampleType.GEOLOGY, SamplerSpacing(100.0))
+proj.sample_supervisor.set_sampler(SampleType.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
 
 

@@ -217,8 +217,8 @@ def project():
 
     column = ['Litho_G', 'Litho_F', 'Litho_E']
 
-    proj.sample_supervisor.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
-    proj.sample_supervisor.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
+    proj.sample_supervisor.set_sampler(SampleType.GEOLOGY, SamplerSpacing(100.0))
+    proj.sample_supervisor.set_sampler(SampleType.STRUCTURE, SamplerDecimator(0))
     proj.run_all(user_defined_stratigraphic_column=column)
 
     return proj.sample_supervisor

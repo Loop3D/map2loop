@@ -215,8 +215,8 @@ proj = Project(
 proj.set_thickness_calculator(StructuralPoint())
 
 column = ['Litho_G', 'Litho_F', 'Litho_E']
-proj.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
-proj.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
+proj.sample_supervisor.set_sampler(Datatype.GEOLOGY, SamplerSpacing(100.0))
+proj.sample_supervisor.set_sampler(Datatype.STRUCTURE, SamplerDecimator(0))
 proj.run_all(user_defined_stratigraphic_column=column)
 
 

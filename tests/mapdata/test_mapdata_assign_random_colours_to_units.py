@@ -20,6 +20,9 @@ def test_colour_units_no_clut_file():
     md.colour_filename = None  # Ensure no file is used
     result = md.colour_units(stratigraphic_units)
 
+    # check that there are no duplicates in the 'unit' column
+    assert result['name'].duplicated().all() is False, "colour_units() in mapdata.py producing duplicate units"
+    
     # Check that the 'colour' column has been assigned random colors
     assert len(result["colour"].dropna()) == 3, "function MapData.colour_units not assigning the right len of random colours"
     

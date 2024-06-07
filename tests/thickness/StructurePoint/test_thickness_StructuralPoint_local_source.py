@@ -3,6 +3,8 @@
 # this creates a temp folder in Appdata to store the data to run the proj, checks the thickness, and then deletes the temp folder
 # this was done to avoid overflow of file creation in the tests folder
 
+# this tests the thickness calculator Structural Point from local source
+
 from map2loop.thickness_calculator import StructuralPoint
 from osgeo import gdal, osr
 import os

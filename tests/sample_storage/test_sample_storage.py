@@ -194,7 +194,7 @@ module_path = os.path.dirname(map2loop.__file__).replace("__init__.py", "")
 
 
 @pytest.fixture
-def project():
+def sample_supervisor():
     proj = Project(
         geology_filename=os.path.join(f_path, "geology.shp"),
         fault_filename=os.path.join(f_path, "faults.shp"),

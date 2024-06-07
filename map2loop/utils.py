@@ -318,6 +318,9 @@ def generate_random_hex_colors(n: int) -> list:
         >>> generate_random_hex_colors(3)
         ['#1a2b3c', '#4d5e6f', '#7f8e9d']
     """
+    if not isinstance(n, int):
+        raise TypeError("n of colours must be an integer") ## not sure if necessary as beartype should handle this 
+    
     colors = set() # set prevents duplicates
     while len(colors) < n:
         color = "#{:06x}".format(random.randint(0, 0xFFFFFF))

@@ -1,3 +1,5 @@
+### This file tests the overall behavior of project.py. Runs from LoopServer.
+
 #internal imports
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel

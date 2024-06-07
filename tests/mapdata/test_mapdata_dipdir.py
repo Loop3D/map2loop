@@ -1,3 +1,7 @@
+### This file tests the function parse_structure_map() in map2loop/mapdata.py
+### at the moment only tests for DIPDIR values lower than 360 degrees
+### TODO: add more tests for this function
+
 import pytest
 import geopandas
 import shapely

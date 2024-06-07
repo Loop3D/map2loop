@@ -1,6 +1,10 @@
+### This file tests the function colour_units() in map2loop/mapdata.py
+### Two main test cases are considered: cases in which there is clut file and cases in which there is no clut file
+
 import pytest
 import pandas as pd
 from map2loop.mapdata import MapData
+
 
 # are random colours being assigned to stratigraphic units in cases where no clut file is provided?
 def test_colour_units_no_clut_file():

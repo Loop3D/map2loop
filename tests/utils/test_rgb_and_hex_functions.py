@@ -1,6 +1,8 @@
+### This file tests the function generate_random_hex_colors() and hex_to_rgba() in map2loop/utils.py
+
 import pytest
 import re
-from map2loop.utils import generate_random_hex_colors, hex_to_rgba  # Replace 'your_module' with the actual module name
+from map2loop.utils import generate_random_hex_colors, hex_to_rgba  
 
 #does it return the right number of colors?
 def test_generate_random_hex_colors_length():

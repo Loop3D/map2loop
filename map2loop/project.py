@@ -121,8 +121,6 @@ class Project(object):
         self._error_state = ErrorState.NONE
         self._error_state_msg = ""
         self.verbose_level = verbose_level
-        self.samplers = [SamplerDecimator()] * len(Datatype)
-        self.set_default_samplers()
         self.sorter = SorterUseHint()
         self.thickness_calculator = ThicknessCalculatorAlpha()
         self.throw_calculator = ThrowCalculatorAlpha()
@@ -314,42 +312,6 @@ class Project(object):
             str: The name of the throw calculator used
         """
         return self.throw_calculator.throw_calculator_label
-
-    def set_default_samplers(self):
-        """
-        Initialisation function to set or reset the point samplers
-        """
-        self.samplers[Datatype.STRUCTURE] = SamplerDecimator(1)
-        self.samplers[Datatype.GEOLOGY] = SamplerSpacing(50.0)
-        self.samplers[Datatype.FAULT] = SamplerSpacing(50.0)
-        self.samplers[Datatype.FOLD] = SamplerSpacing(50.0)
-        self.samplers[Datatype.DTM] = SamplerSpacing(50.0)
-
-    @beartype.beartype
-    def set_sampler(self, datatype: Datatype, sampler: Sampler):
-        """
-        Set the point sampler for a specific datatype
-
-        Args:
-            datatype (Datatype):
-                The datatype to use this sampler on
-            sampler (Sampler):
-                The sampler to use
-        """
-        self.samplers[datatype] = sampler
-
-    @beartype.beartype
-    def get_sampler(self, datatype: Datatype):
-        """
-        Get the sampler name being used for a datatype
-
-        Args:
-            datatype (Datatype): The datatype of the sampler
-
-        Returns:
-            str: The name of the sampler being used on the specified datatype
-        """
-        return self.samplers[datatype].sampler_label
 
     @beartype.beartype
     def set_minimum_fault_length(self, length: float):

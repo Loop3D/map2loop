@@ -21,7 +21,7 @@ def test_colour_units_no_clut_file():
     result = md.colour_units(stratigraphic_units)
 
     # check that there are no duplicates in the 'unit' column
-    assert result['name'].duplicated().all() is False, "colour_units() in mapdata.py producing duplicate units"
+    assert result['name'].is_unique, "colour_units() in mapdata.py producing duplicate units"
     
     # Check that the 'colour' column has been assigned random colors
     assert len(result["colour"].dropna()) == 3, "function MapData.colour_units not assigning the right len of random colours"
@@ -55,6 +55,9 @@ def test_colour_units_with_colour_file(tmp_path):
     md = MapData()
     md.colour_filename = str(colour_filename)
     result = md.colour_units(stratigraphic_units)
+
+    # check that there are no duplicates in the 'unit' column
+    assert result['name'].is_unique, "colour_units() in mapdata.py producing duplicate units"
 
     # Check that the 'colour' column has been merged correctly and missing colors are assigned
     expected_colors = ["#112233", "#445566"]

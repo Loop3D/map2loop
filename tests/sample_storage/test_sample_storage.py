@@ -42,8 +42,8 @@ def sample_supervisor():
     )
 
     # Set the distance between sample points for arial and linestring geometry
-    proj.sample_supervisor.set_sampler(Datatype.GEOLOGY, SamplerSpacing(200.0))
-    proj.sample_supervisor.set_sampler(Datatype.FAULT, SamplerSpacing(200.0))
+    proj.sample_supervisor.set_sampler(SampleType.GEOLOGY, SamplerSpacing(200.0))
+    proj.sample_supervisor.set_sampler(SampleType.FAULT, SamplerSpacing(200.0))
 
     # Choose which stratigraphic sorter to use or run_all with "take_best" flag to run them all
     proj.set_sorter(SorterAlpha())

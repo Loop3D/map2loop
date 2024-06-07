@@ -5,7 +5,7 @@ Hamersley, Western Australia
 """
 
 from map2loop.project import Project
-from map2loop.m2l_enums import VerboseLevel, Datatype
+from map2loop.m2l_enums import VerboseLevel, Datatype, SampleType
 from map2loop.sorter import SorterAlpha
 from map2loop.sampler import SamplerSpacing
 
@@ -36,8 +36,8 @@ proj = Project(
 )
 
 # Set the distance between sample points for arial and linestring geometry
-proj.sample_supervisor.set_sampler(Datatype.GEOLOGY, SamplerSpacing(200.0))
-proj.sample_supervisor.set_sampler(Datatype.FAULT, SamplerSpacing(200.0))
+proj.sample_supervisor.set_sampler(SampleType.GEOLOGY, SamplerSpacing(200.0))
+proj.sample_supervisor.set_sampler(SampleType.FAULT, SamplerSpacing(200.0))
 
 # Choose which stratigraphic sorter to use or run_all with "take_best" flag to run them all
 proj.set_sorter(SorterAlpha())

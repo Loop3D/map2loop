@@ -61,56 +61,56 @@ structures = [
     {
         'x': 2775.287768202244933,
         'y': 4330.15,
-        'DIPDIR': 45.00,
-        'DIP': 45.70,
+        'strike2': 45.00,
+        'dip_2': 45.70,
         'id': 147.00,
         'sf': 's0',
     },
     {
         'x': 3529.794754080061011,
         'y': 3091.192011237949828,
-        'DIPDIR': 288.50,
-        'DIP': 41.70,
+        'strike2': 288.50,
+        'dip_2': 41.70,
         'id': 204.00,
         'sf': 's0',
     },
     {
         'x': 7928.315269200518742,
         'y': 7234.561058065713951,
-        'DIPDIR': 48.80,
-        'DIP': 41.10,
+        'strike2': 48.80,
+        'dip_2': 41.10,
         'id': 229.00,
         'sf': 's0',
     },
     {
         'x': 8003.966104268994968,
         'y': 7421.634268009857806,
-        'DIPDIR': 48.80,
-        'DIP': 41.10,
+        'strike2': 48.80,
+        'dip_2': 41.10,
         'id': 235.00,
         'sf': 's0',
     },
     {
         'x': 6881.165236574942355,
         'y': 1213.128646564158771,
-        'DIPDIR': 299.10,
-        'DIP': 44.70,
+        'strike2': 299.10,
+        'dip_2': 44.70,
         'id': 252.00,
         'sf': 's0',
     },
     {
         'x': 3674.015651128655009,
         'y': 5266.677487068354822,
-        'DIPDIR': 41.20,
-        'DIP': 40.10,
+        'strike2': 41.20,
+        'dip_2': 40.10,
         'id': 347.00,
         'sf': 's0',
     },
     {
         'x': 3970.895076049027921,
         'y': 2944.223069901633608,
-        'DIPDIR': 273.00,
-        'DIP': 46.00,
+        'strike2': 273.00,
+        'dip_2': 46.00,
         'id': 408.00,
         'sf': 's0',
     },
@@ -142,8 +142,8 @@ loop_project_filename = os.path.join(f_path, "local_source.loop3d")
 config = {
     "structure": {
         "orientation_type": "strike",
-        "dipdir_column": "DIPDIR",
-        "dip_column": "DIP",
+        "dipdir_column": "strike2",
+        "dip_column": "dip_2",
         "description_column": "DESCRIPTION",
         "bedding_text": "Bed",
         "overturned_column": "structypei",
@@ -194,7 +194,7 @@ module_path = os.path.dirname(map2loop.__file__).replace("__init__.py", "")
 
 
 @pytest.fixture
-def sample_supervisor():
+def project():
     proj = Project(
         geology_filename=os.path.join(f_path, "geology.shp"),
         fault_filename=os.path.join(f_path, "faults.shp"),

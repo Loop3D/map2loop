@@ -245,7 +245,7 @@ def basal_contacts(project):
 
 @pytest.fixture
 def samples(project):
-    return project.structure_samples
+    return project.sample_supervisor
 
 
 @pytest.fixture

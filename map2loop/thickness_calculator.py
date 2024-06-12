@@ -7,6 +7,7 @@ import geopandas
 from statistics import mean
 from .mapdata import MapData
 from scipy.interpolate import Rbf
+from .sample_storage import SampleSupervisor
 from .interpolators import DipDipDirectionInterpolator
 from .utils import (
     create_points,
@@ -15,7 +16,7 @@ from .utils import (
     multiline_to_line,
     find_segment_strike_from_pt,
 )
-from .m2l_enums import Datatype
+from .m2l_enums import Datatype, SampleType
 from shapely.geometry import Point
 import shapely
 import math
@@ -51,7 +52,7 @@ class ThicknessCalculator(ABC):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -93,7 +94,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -200,7 +201,7 @@ class InterpolatedStructure(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -242,9 +243,9 @@ class InterpolatedStructure(ThicknessCalculator):
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
         # get the sampled contacts
-        contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
+        contacts = geopandas.GeoDataFrame(samples(SampleType.CONTACT)) 
         # build points from x and y coordinates
-        geometry2 = contacts.apply(lambda row: Point(row.X, row.Y), axis=1)
+        geometry2 = geopandas.points_from_xy(contacts['X'], contacts['Y'])
         contacts.set_geometry(geometry2, inplace=True)
 
         # set the crs of the contacts to the crs of the units
@@ -253,15 +254,16 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = map_data.get_value_from_raster_df(Datatype.DTM, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
         contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
         bounding_box = map_data.get_bounding_box()
+        structural_data = samples(SampleType.STRUCTURE)
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator(bounding_box, structure_data, interpolator=Rbf)
+        dip = interpolator(bounding_box, structural_data, interpolator=Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame
@@ -279,7 +281,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated = map_data.get_value_from_raster_df(Datatype.DTM, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
-            lambda row: Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # for each interpolated point, assign name of unit using spatial join
         units = map_data.get_map_data(Datatype.GEOLOGY)
@@ -399,7 +401,7 @@ class StructuralPoint(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        structure_data: pandas.DataFrame,
+        samples: SampleSupervisor,
         map_data: MapData,
     ) -> pandas.DataFrame:
         """
@@ -437,7 +439,7 @@ class StructuralPoint(ThicknessCalculator):
             For the bottom and top units of the stratigraphic sequence, the assigned thickness will also be -1.
         """
         # input sampled data
-        sampled_structures = structure_data
+        sampled_structures = samples(SampleType.STRUCTURE)
         basal_contacts = basal_contacts.copy()
 
         # grab geology polygons and calculate bounding boxes for each lithology
@@ -455,7 +457,7 @@ class StructuralPoint(ThicknessCalculator):
 
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
-            basal_contacts, map_data.sampled_contacts
+            basal_contacts, samples(SampleType.CONTACT)
         )
 
         # calculate map dimensions

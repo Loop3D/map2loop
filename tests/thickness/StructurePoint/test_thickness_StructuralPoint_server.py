@@ -1,8 +1,12 @@
+#internal imports
 from map2loop.thickness_calculator import StructuralPoint
 from map2loop.project import Project
 from map2loop.m2l_enums import VerboseLevel
-import pathlib
 
+#external imports
+import pathlib
+import pytest
+import requests
 import map2loop
 
 
@@ -19,23 +23,26 @@ def test_from_aus_state():
     loop_project_filename = "wa_output.loop3d"
     module_path = map2loop.__file__.replace("__init__.py", "")
 
-    proj = Project(
-        use_australian_state_data="WA",
-        working_projection="EPSG:28350",
-        bounding_box=bbox_3d,
-        config_filename=pathlib.Path(module_path)
-        / pathlib.Path('_datasets')
-        / pathlib.Path('config_files')
-        / pathlib.Path('WA.json'),
-        clut_filename=pathlib.Path(module_path)
-        / pathlib.Path('_datasets')
-        / pathlib.Path('clut_files')
-        / pathlib.Path('WA_clut.csv'),
-        # clut_file_legacy=False,
-        verbose_level=VerboseLevel.NONE,
-        loop_project_filename=loop_project_filename,
-        overwrite_loopprojectfile=True,
-    )
+    try:
+        proj = Project(
+            use_australian_state_data="WA",
+            working_projection="EPSG:28350",
+            bounding_box=bbox_3d,
+            config_filename=pathlib.Path(module_path)
+            / pathlib.Path('_datasets')
+            / pathlib.Path('config_files')
+            / pathlib.Path('WA.json'),
+            clut_filename=pathlib.Path(module_path)
+            / pathlib.Path('_datasets')
+            / pathlib.Path('clut_files')
+            / pathlib.Path('WA_clut.csv'),
+            # clut_file_legacy=False,
+            verbose_level=VerboseLevel.NONE,
+            loop_project_filename=loop_project_filename,
+            overwrite_loopprojectfile=True,
+        )
+    except requests.exceptions.ReadTimeout:
+        pytest.skip("Connection to the server timed out, skipping test")
 
     proj.set_thickness_calculator(StructuralPoint())
     proj.run_all()

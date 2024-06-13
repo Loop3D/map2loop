@@ -1,3 +1,7 @@
+### This file tests the function parse_structure_map() in map2loop/mapdata.py
+### at the moment only tests for DIPDIR values lower than 360 degrees
+### TODO: add more tests for this function
+
 import pytest
 import geopandas
 import shapely
@@ -46,3 +50,5 @@ def test_if_m2l_returns_all_sampled_structures_with_DIPDIR_lower_than_360():
 
     # check if all values below 360
     assert md.data[Datatype.STRUCTURE]['DIPDIR'].all() < 360, "MapData.STRUCTURE is producing DIPDIRs > 360 degrees"
+    
+# 

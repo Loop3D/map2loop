@@ -710,7 +710,7 @@ class Project(object):
         observations["layerId"] = self.structure_samples["layerID"]
         observations["easting"] = self.structure_samples["X"]
         observations["northing"] = self.structure_samples["Y"]
-        # observations["altitude"] = self.structure_samples["Z"]
+        observations["altitude"] = self.structure_samples["Z"]
         observations["dipDir"] = self.structure_samples["DIPDIR"]
         observations["dip"] = self.structure_samples["DIP"]
         observations["dipPolarity"] = self.structure_samples["OVERTURNED"]

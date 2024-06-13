@@ -8,14 +8,16 @@ body:
       value: |
         ## Feature Request
         Please use this template to submit your feature request. Provide as much detail as possible to help us understand and implement your request efficiently.
-  - type: input
-    id: feature_title
+
+  - type: checkboxes
+    id: input1
     attributes:
-      label: "Feature Title"
-      description: "Provide a concise and descriptive title for the feature request."
-      placeholder: "Enter the title of the feature"
-    validations:
-      required: true
+      label: "💻"
+      description: |
+        Check this if you would like to try and implement your vision in a PR. 
+        The map2loop team will help you go through the process
+      options:
+        - label: Would you like to work on this feature?
 
   - type: textarea
     id: feature_description
@@ -34,6 +36,13 @@ body:
       placeholder: "Explain the current situation and its drawbacks"
     validations:
       required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: Version
+      description: What version of map2loop and LoopProjectFile are you running that doesn't have this feature? You can find this information by running `import map2loop` and `map2loop.__version__` in your python terminal or jupyter notebook. 
+      placeholder: "Enter map2loop and LoopProjectFile versions"
 
   - type: textarea
     id: proposed_solution

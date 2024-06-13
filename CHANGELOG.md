@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.1.6](https://github.com/Loop3D/map2loop/compare/v3.1.5...v3.1.6) (2024-06-13)
+
+
+### Bug Fixes
+
+* add invalid hex input handling ([40028a8](https://github.com/Loop3D/map2loop/commit/40028a87b06c7610095edb0b78ec451838ff85a6))
+* add the suggestions ([dc85b2e](https://github.com/Loop3D/map2loop/commit/dc85b2e5d89475511904275fc482d3bfd3f33fd8))
+* comment the code ([6e064b1](https://github.com/Loop3D/map2loop/commit/6e064b1a3cb53af1fa92ea51faa4917d2c50663c))
+* fix for duplicate units ([4052eca](https://github.com/Loop3D/map2loop/commit/4052eca85825a8ddd9d3c2f6c57c3f838ae2dd3e))
+* make sure all colours are unique ([f90159a](https://github.com/Loop3D/map2loop/commit/f90159a83691278ee7cfca07c3aba64a144816c8))
+* small fixes - double check for integer & add test information at the beginning of the test scripts ([a916343](https://github.com/Loop3D/map2loop/commit/a916343fba5ec59602fab9892b7d67f86702723b))
+* update the tests for new function names (hex_to_rgb) ([e1778b7](https://github.com/Loop3D/map2loop/commit/e1778b734ca13d4c422daacd29de41c505f92fea))
+
 ## [3.1.5](https://github.com/Loop3D/map2loop/compare/v3.1.4...v3.1.5) (2024-06-06)
 
 

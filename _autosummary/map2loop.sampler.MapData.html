@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>map2loop.sampler.MapData &#8212; map2loop 3.1.5 documentation</title>
+    <title>map2loop.sampler.MapData &#8212; map2loop 3.1.6 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
-    <script src="../_static/documentation_options.js?v=851b9b12"></script>
+    <script src="../_static/documentation_options.js?v=b2e31178"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.sampler.MapData';</script>
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.1.5 documentation</p>
+    <p class="title logo__title">map2loop 3.1.6 documentation</p>
   
 </a></div>
     
@@ -372,8 +372,6 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="map2loop.sampler.abstractmethod.html">map2loop.sampler.abstractmethod</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map2loop.sampler.ABC.html">map2loop.sampler.ABC</a></li>
@@ -702,7 +700,7 @@ document.write(`
 <td><p>Get a filename of a specified datatype</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#map2loop.sampler.MapData.get_ignore_codes" title="map2loop.sampler.MapData.get_ignore_codes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ignore_codes</span></code></a>()</p></td>
-<td><p>Get the list of codes to ingnore</p></td>
+<td><p>Get the list of codes to ignore</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#map2loop.sampler.MapData.get_map_data" title="map2loop.sampler.MapData.get_map_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_map_data</span></code></a>(datatype)</p></td>
 <td><p>Get the data geopanda of the specified datatype</p></td>
@@ -837,7 +835,7 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="map2loop.sampler.MapData.colour_units">
-<span class="sig-name descname"><span class="pre">colour_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stratigraphic_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.sampler.MapData.colour_units" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">colour_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stratigraphic_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#map2loop.sampler.MapData.colour_units" title="Link to this definition">#</a></dt>
 <dd><p>Add a colour column to the units in the stratigraphic units structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -943,7 +941,7 @@ This is used by map2model</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="map2loop.sampler.MapData.get_ignore_codes">
 <span class="sig-name descname"><span class="pre">get_ignore_codes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#map2loop.sampler.MapData.get_ignore_codes" title="Link to this definition">#</a></dt>
-<dd><p>Get the list of codes to ingnore</p>
+<dd><p>Get the list of codes to ignore</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>list</em> – The list of strings to ignore</p>

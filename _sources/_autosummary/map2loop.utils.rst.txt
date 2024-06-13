@@ -19,6 +19,8 @@ map2loop.utils
       create_points
       find_segment_strike_from_pt
       generate_grid
+      generate_random_hex_colors
+      hex_to_rgb
       multiline_to_line
       normal_vector_to_dipdirection_dip
       rebuild_sampled_basal_contacts

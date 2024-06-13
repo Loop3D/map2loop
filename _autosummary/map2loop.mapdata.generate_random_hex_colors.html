@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>map2loop.project.to_rgba &#8212; map2loop 3.1.5 documentation</title>
+    <title>map2loop.mapdata.generate_random_hex_colors &#8212; map2loop 3.1.6 documentation</title>
   
   
   
@@ -39,14 +39,14 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
-    <script src="../_static/documentation_options.js?v=851b9b12"></script>
+    <script src="../_static/documentation_options.js?v=b2e31178"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.project.to_rgba';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.mapdata.generate_random_hex_colors';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="map2loop.project.Datatype" href="map2loop.project.Datatype.html" />
-    <link rel="prev" title="map2loop.project" href="map2loop.project.html" />
+    <link rel="next" title="map2loop.mapdata.uuid4" href="map2loop.mapdata.uuid4.html" />
+    <link rel="prev" title="map2loop.mapdata.WebCoverageService" href="map2loop.mapdata.WebCoverageService.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.1.5 documentation</p>
+    <p class="title logo__title">map2loop 3.1.6 documentation</p>
   
 </a></div>
     
@@ -370,35 +370,21 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="map2loop.interpolators.html">map2loop.interpolators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.m2l_enums.html">map2loop.m2l_enums</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.project.html">map2loop.project</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.project.to_rgba</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Datatype.html">map2loop.project.Datatype</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.DeformationHistory.html">map2loop.project.DeformationHistory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ErrorState.html">map2loop.project.ErrorState</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.FaultOrientation.html">map2loop.project.FaultOrientation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.FaultOrientationNearest.html">map2loop.project.FaultOrientationNearest</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Map2ModelWrapper.html">map2loop.project.Map2ModelWrapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.MapData.html">map2loop.project.MapData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Project.html">map2loop.project.Project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Sampler.html">map2loop.project.Sampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SamplerDecimator.html">map2loop.project.SamplerDecimator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SamplerSpacing.html">map2loop.project.SamplerSpacing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.Sorter.html">map2loop.project.Sorter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterAgeBased.html">map2loop.project.SorterAgeBased</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterAlpha.html">map2loop.project.SorterAlpha</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterUseHint.html">map2loop.project.SorterUseHint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.SorterUseNetworkX.html">map2loop.project.SorterUseNetworkX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.StratigraphicColumn.html">map2loop.project.StratigraphicColumn</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThicknessCalculator.html">map2loop.project.ThicknessCalculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThicknessCalculatorAlpha.html">map2loop.project.ThicknessCalculatorAlpha</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThrowCalculator.html">map2loop.project.ThrowCalculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.ThrowCalculatorAlpha.html">map2loop.project.ThrowCalculatorAlpha</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.VerboseLevel.html">map2loop.project.VerboseLevel</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.WebCoverageService.html">map2loop.mapdata.WebCoverageService</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.mapdata.generate_random_hex_colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.uuid4.html">map2loop.mapdata.uuid4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.AustraliaStateUrls.html">map2loop.mapdata.AustraliaStateUrls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.BytesIO.html">map2loop.mapdata.BytesIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Config.html">map2loop.mapdata.Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datastate.html">map2loop.mapdata.Datastate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.Datatype.html">map2loop.mapdata.Datatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.GzipFile.html">map2loop.mapdata.GzipFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.MapData.html">map2loop.mapdata.MapData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.mapdata.VerboseLevel.html">map2loop.mapdata.VerboseLevel</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
@@ -447,9 +433,9 @@ document.write(`
     <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
     
     
-    <li class="breadcrumb-item"><a href="map2loop.project.html" class="nav-link">map2loop.project</a></li>
+    <li class="breadcrumb-item"><a href="map2loop.mapdata.html" class="nav-link">map2loop.mapdata</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">map2loop.pro...</li>
+    <li class="breadcrumb-item active" aria-current="page">map2loop.map...</li>
   </ul>
 </nav>
 </div>
@@ -466,30 +452,25 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="map2loop-project-to-rgba">
-<h1>map2loop.project.to_rgba<a class="headerlink" href="#map2loop-project-to-rgba" title="Link to this heading">#</a></h1>
+  <section id="map2loop-mapdata-generate-random-hex-colors">
+<h1>map2loop.mapdata.generate_random_hex_colors<a class="headerlink" href="#map2loop-mapdata-generate-random-hex-colors" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="map2loop.project.to_rgba">
-<span class="sig-prename descclassname"><span class="pre">map2loop.project.</span></span><span class="sig-name descname"><span class="pre">to_rgba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.project.to_rgba" title="Link to this definition">#</a></dt>
-<dd><p>Convert <em>c</em> to an RGBA color.</p>
+<dt class="sig sig-object py" id="map2loop.mapdata.generate_random_hex_colors">
+<span class="sig-prename descclassname"><span class="pre">map2loop.mapdata.</span></span><span class="sig-name descname"><span class="pre">generate_random_hex_colors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#map2loop.mapdata.generate_random_hex_colors" title="Link to this definition">#</a></dt>
+<dd><p>Generate a list of unique random hex color codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>c</strong> (Matplotlib color or <code class="docutils literal notranslate"><span class="pre">np.ma.masked</span></code>)</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>If <em>alpha</em> is given, force the alpha value of the returned RGBA tuple
-to <em>alpha</em>.</p>
-<p>If None, the alpha value from <em>c</em> is used. If <em>c</em> does not have an
-alpha channel, then alpha defaults to 1.</p>
-<p><em>alpha</em> is ignored for the color value <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> (case-insensitive),
-which always maps to <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0)</span></code>.</p>
-</p></li>
-</ul>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The number of random hex color codes to generate.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>tuple</em> – Tuple of floats <code class="docutils literal notranslate"><span class="pre">(r,</span> <span class="pre">g,</span> <span class="pre">b,</span> <span class="pre">a)</span></code>, where each channel (red, green, blue,
-alpha) can assume values between 0 and 1.</p>
+<dd class="field-even"><p><em>list</em> – A list of randomly generated hex color codes as strings.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_hex_colors</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">[&#39;#1a2b3c&#39;, &#39;#4d5e6f&#39;, &#39;#7f8e9d&#39;]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -505,20 +486,20 @@ alpha) can assume values between 0 and 1.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="map2loop.project.html"
+       href="map2loop.mapdata.WebCoverageService.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">map2loop.project</p>
+        <p class="prev-next-title">map2loop.mapdata.WebCoverageService</p>
       </div>
     </a>
     <a class="right-next"
-       href="map2loop.project.Datatype.html"
+       href="map2loop.mapdata.uuid4.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">map2loop.project.Datatype</p>
+        <p class="prev-next-title">map2loop.mapdata.uuid4</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -540,14 +521,14 @@ alpha) can assume values between 0 and 1.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.project.to_rgba"><code class="docutils literal notranslate"><span class="pre">to_rgba()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.mapdata.generate_random_hex_colors"><code class="docutils literal notranslate"><span class="pre">generate_random_hex_colors()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/_autosummary/map2loop.project.to_rgba.rst.txt">
+    <a href="../_sources/_autosummary/map2loop.mapdata.generate_random_hex_colors.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

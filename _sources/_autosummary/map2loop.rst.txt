@@ -46,8 +46,6 @@
    map2loop.map2model_wrapper
    map2loop.mapdata
    map2loop.project
-   map2loop.random
-   map2loop.random_colour
    map2loop.sampler
    map2loop.sorter
    map2loop.stratigraphic_column

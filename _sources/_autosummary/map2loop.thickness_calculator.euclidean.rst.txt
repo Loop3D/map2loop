@@ -1,6 +1,0 @@
-map2loop.thickness\_calculator.euclidean
-========================================
-
-.. currentmodule:: map2loop.thickness_calculator
-
-.. autofunction:: euclidean

@@ -1,6 +1,0 @@
-map2loop.random\_colour.rgb\_to\_hex
-====================================
-
-.. currentmodule:: map2loop.random_colour
-
-.. autofunction:: rgb_to_hex

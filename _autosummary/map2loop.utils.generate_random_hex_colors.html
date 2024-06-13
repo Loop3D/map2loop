@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>map2loop.thickness_calculator.euclidean &#8212; map2loop 3.1.5 documentation</title>
+    <title>map2loop.utils.generate_random_hex_colors &#8212; map2loop 3.1.6 documentation</title>
   
   
   
@@ -39,15 +39,14 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
-    <script src="../_static/documentation_options.js?v=851b9b12"></script>
+    <script src="../_static/documentation_options.js?v=b2e31178"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.thickness_calculator.euclidean';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.utils.generate_random_hex_colors';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="map2loop.thickness_calculator.find_segment_strike_from_pt" href="map2loop.thickness_calculator.find_segment_strike_from_pt.html" />
-    <link rel="prev" title="map2loop.thickness_calculator.create_points" href="map2loop.thickness_calculator.create_points.html" />
+    <link rel="next" title="map2loop.utils.hex_to_rgb" href="map2loop.utils.hex_to_rgb.html" />
+    <link rel="prev" title="map2loop.utils.generate_grid" href="map2loop.utils.generate_grid.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,7 +120,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.1.5 documentation</p>
+    <p class="title logo__title">map2loop 3.1.6 documentation</p>
   
 </a></div>
     
@@ -373,33 +372,24 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.project.html">map2loop.project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.abstractmethod.html">map2loop.thickness_calculator.abstractmethod</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.calculate_endpoints.html">map2loop.thickness_calculator.calculate_endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.create_points.html">map2loop.thickness_calculator.create_points</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.thickness_calculator.euclidean</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.find_segment_strike_from_pt.html">map2loop.thickness_calculator.find_segment_strike_from_pt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.mean.html">map2loop.thickness_calculator.mean</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.multiline_to_line.html">map2loop.thickness_calculator.multiline_to_line</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.rebuild_sampled_basal_contacts.html">map2loop.thickness_calculator.rebuild_sampled_basal_contacts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.ABC.html">map2loop.thickness_calculator.ABC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.Datatype.html">map2loop.thickness_calculator.Datatype</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.DipDipDirectionInterpolator.html">map2loop.thickness_calculator.DipDipDirectionInterpolator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.InterpolatedStructure.html">map2loop.thickness_calculator.InterpolatedStructure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.MapData.html">map2loop.thickness_calculator.MapData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.Rbf.html">map2loop.thickness_calculator.Rbf</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.StructuralPoint.html">map2loop.thickness_calculator.StructuralPoint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.ThicknessCalculator.html">map2loop.thickness_calculator.ThicknessCalculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.thickness_calculator.ThicknessCalculatorAlpha.html">map2loop.thickness_calculator.ThicknessCalculatorAlpha</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.thickness_calculator.html">map2loop.thickness_calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.calculate_endpoints.html">map2loop.utils.calculate_endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.create_points.html">map2loop.utils.create_points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.find_segment_strike_from_pt.html">map2loop.utils.find_segment_strike_from_pt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.generate_grid.html">map2loop.utils.generate_grid</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">map2loop.utils.generate_random_hex_colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.hex_to_rgb.html">map2loop.utils.hex_to_rgb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.multiline_to_line.html">map2loop.utils.multiline_to_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.normal_vector_to_dipdirection_dip.html">map2loop.utils.normal_vector_to_dipdirection_dip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.rebuild_sampled_basal_contacts.html">map2loop.utils.rebuild_sampled_basal_contacts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.utils.strike_dip_vector.html">map2loop.utils.strike_dip_vector</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.throw_calculator.html">map2loop.throw_calculator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.utils.html">map2loop.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.version.html">map2loop.version</a></li>
 </ul>
 </div>
@@ -442,9 +432,9 @@ document.write(`
     <li class="breadcrumb-item"><a href="map2loop.html" class="nav-link">map2loop</a></li>
     
     
-    <li class="breadcrumb-item"><a href="map2loop.thickness_calculator.html" class="nav-link">map2loop.thickness_calculator</a></li>
+    <li class="breadcrumb-item"><a href="map2loop.utils.html" class="nav-link">map2loop.utils</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">map2loop.thi...</li>
+    <li class="breadcrumb-item active" aria-current="page">map2loop.uti...</li>
   </ul>
 </nav>
 </div>
@@ -461,34 +451,23 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="map2loop-thickness-calculator-euclidean">
-<h1>map2loop.thickness_calculator.euclidean<a class="headerlink" href="#map2loop-thickness-calculator-euclidean" title="Link to this heading">#</a></h1>
+  <section id="map2loop-utils-generate-random-hex-colors">
+<h1>map2loop.utils.generate_random_hex_colors<a class="headerlink" href="#map2loop-utils-generate-random-hex-colors" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="map2loop.thickness_calculator.euclidean">
-<span class="sig-prename descclassname"><span class="pre">map2loop.thickness_calculator.</span></span><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#map2loop.thickness_calculator.euclidean" title="Link to this definition">#</a></dt>
-<dd><p>Computes the Euclidean distance between two 1-D arrays.</p>
-<p>The Euclidean distance between 1-D arrays <cite>u</cite> and <cite>v</cite>, is defined as</p>
-<div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}{\|u-v\|}_2\\\left(\sum{(w_i |(u_i - v_i)|^2)}\right)^{1/2}\end{aligned}\end{align} \]</div>
+<dt class="sig sig-object py" id="map2loop.utils.generate_random_hex_colors">
+<span class="sig-prename descclassname"><span class="pre">map2loop.utils.</span></span><span class="sig-name descname"><span class="pre">generate_random_hex_colors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#map2loop.utils.generate_random_hex_colors" title="Link to this definition">#</a></dt>
+<dd><p>Generate a list of unique random hex color codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>(</em><em>N</em><em>,</em><em>) </em><em>array_like</em>) – Input array.</p></li>
-<li><p><strong>v</strong> (<em>(</em><em>N</em><em>,</em><em>) </em><em>array_like</em>) – Input array.</p></li>
-<li><p><strong>w</strong> (<em>(</em><em>N</em><em>,</em><em>) </em><em>array_like</em><em>, </em><em>optional</em>) – The weights for each value in <cite>u</cite> and <cite>v</cite>. Default is None,
-which gives each value a weight of 1.0</p></li>
-</ul>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The number of random hex color codes to generate.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>euclidean</strong> (<em>double</em>) – The Euclidean distance between vectors <cite>u</cite> and <cite>v</cite>.</p>
+<dd class="field-even"><p><em>list</em> – A list of randomly generated hex color codes as strings.</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">distance</span><span class="o">.</span><span class="n">euclidean</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="go">1.4142135623730951</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">distance</span><span class="o">.</span><span class="n">euclidean</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="go">1.0</span>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_hex_colors</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">[&#39;#1a2b3c&#39;, &#39;#4d5e6f&#39;, &#39;#7f8e9d&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -506,20 +485,20 @@ which gives each value a weight of 1.0</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="map2loop.thickness_calculator.create_points.html"
+       href="map2loop.utils.generate_grid.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">map2loop.thickness_calculator.create_points</p>
+        <p class="prev-next-title">map2loop.utils.generate_grid</p>
       </div>
     </a>
     <a class="right-next"
-       href="map2loop.thickness_calculator.find_segment_strike_from_pt.html"
+       href="map2loop.utils.hex_to_rgb.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">map2loop.thickness_calculator.find_segment_strike_from_pt</p>
+        <p class="prev-next-title">map2loop.utils.hex_to_rgb</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -541,14 +520,14 @@ which gives each value a weight of 1.0</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.thickness_calculator.euclidean"><code class="docutils literal notranslate"><span class="pre">euclidean()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop.utils.generate_random_hex_colors"><code class="docutils literal notranslate"><span class="pre">generate_random_hex_colors()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/_autosummary/map2loop.thickness_calculator.euclidean.rst.txt">
+    <a href="../_sources/_autosummary/map2loop.utils.generate_random_hex_colors.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

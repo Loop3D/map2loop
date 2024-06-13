@@ -1,0 +1,6 @@
+map2loop.project.hex\_to\_rgb
+=============================
+
+.. currentmodule:: map2loop.project
+
+.. autofunction:: hex_to_rgb

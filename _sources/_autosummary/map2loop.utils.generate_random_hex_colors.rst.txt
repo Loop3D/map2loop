@@ -1,0 +1,6 @@
+map2loop.utils.generate\_random\_hex\_colors
+============================================
+
+.. currentmodule:: map2loop.utils
+
+.. autofunction:: generate_random_hex_colors

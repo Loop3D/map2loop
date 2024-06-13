@@ -18,7 +18,6 @@ map2loop.thickness\_calculator
       abstractmethod
       calculate_endpoints
       create_points
-      euclidean
       find_segment_strike_from_pt
       mean
       multiline_to_line
@@ -40,7 +39,6 @@ map2loop.thickness\_calculator
       DipDipDirectionInterpolator
       InterpolatedStructure
       MapData
-      Rbf
       StructuralPoint
       ThicknessCalculator
       ThicknessCalculatorAlpha

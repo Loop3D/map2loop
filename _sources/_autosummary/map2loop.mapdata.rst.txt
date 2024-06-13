@@ -16,7 +16,7 @@ map2loop.mapdata
       :recursive:
    
       WebCoverageService
-      random_colours_hex
+      generate_random_hex_colors
       uuid4
    
    

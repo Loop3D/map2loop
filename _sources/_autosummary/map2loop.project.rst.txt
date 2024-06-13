@@ -15,7 +15,7 @@ map2loop.project
       :toctree:
       :recursive:
    
-      to_rgba
+      hex_to_rgb
    
    
 

@@ -1,6 +1,0 @@
-map2loop.mapdata.random\_colours\_hex
-=====================================
-
-.. currentmodule:: map2loop.mapdata
-
-.. autofunction:: random_colours_hex

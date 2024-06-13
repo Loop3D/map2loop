@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>map2loop.project &#8212; map2loop 3.1.5 documentation</title>
+    <title>map2loop.project &#8212; map2loop 3.1.6 documentation</title>
   
   
   
@@ -39,13 +39,13 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
-    <script src="../_static/documentation_options.js?v=851b9b12"></script>
+    <script src="../_static/documentation_options.js?v=b2e31178"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/map2loop.project';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="map2loop.project.to_rgba" href="map2loop.project.to_rgba.html" />
+    <link rel="next" title="map2loop.project.hex_to_rgb" href="map2loop.project.hex_to_rgb.html" />
     <link rel="prev" title="map2loop.mapdata.VerboseLevel" href="map2loop.mapdata.VerboseLevel.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.1.5 documentation</p>
+    <p class="title logo__title">map2loop 3.1.6 documentation</p>
   
 </a></div>
     
@@ -372,7 +372,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="map2loop.map2model_wrapper.html">map2loop.map2model_wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.mapdata.html">map2loop.mapdata</a></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">map2loop.project</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="map2loop.project.to_rgba.html">map2loop.project.to_rgba</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map2loop.project.hex_to_rgb.html">map2loop.project.hex_to_rgb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map2loop.project.Datatype.html">map2loop.project.Datatype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map2loop.project.DeformationHistory.html">map2loop.project.DeformationHistory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map2loop.project.ErrorState.html">map2loop.project.ErrorState</a></li>
@@ -397,8 +397,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="map2loop.project.VerboseLevel.html">map2loop.project.VerboseLevel</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random.html">map2loop.random</a></li>
-<li class="toctree-l1"><a class="reference internal" href="map2loop.random_colour.html">map2loop.random_colour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sampler.html">map2loop.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.sorter.html">map2loop.sorter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="map2loop.stratigraphic_column.html">map2loop.stratigraphic_column</a></li>
@@ -468,8 +466,8 @@ document.write(`
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.to_rgba.html#map2loop.project.to_rgba" title="map2loop.project.to_rgba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_rgba</span></code></a>(c[, alpha])</p></td>
-<td><p>Convert <em>c</em> to an RGBA color.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="map2loop.project.hex_to_rgb.html#map2loop.project.hex_to_rgb" title="map2loop.project.hex_to_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hex_to_rgb</span></code></a>(hex_color)</p></td>
+<td><p>Convert a hex color code to an RGBA tuple.</p></td>
 </tr>
 </tbody>
 </table>
@@ -568,11 +566,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="map2loop.project.to_rgba.html"
+       href="map2loop.project.hex_to_rgb.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">map2loop.project.to_rgba</p>
+        <p class="prev-next-title">map2loop.project.hex_to_rgb</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

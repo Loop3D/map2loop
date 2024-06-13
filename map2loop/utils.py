@@ -304,7 +304,7 @@ def rebuild_sampled_basal_contacts(
 
 
 @beartype.beartype
-def generate_random_hex_colors(n: int) -> list:
+def generate_random_hex_colors(n: int, seed: int = None) -> list:
     """
     Generate a list of unique random hex color codes.
 
@@ -321,15 +321,21 @@ def generate_random_hex_colors(n: int) -> list:
     if not isinstance(n, int):
         raise TypeError("n of colours must be an integer") ## not sure if necessary as beartype should handle this 
     
+    if seed is not None:
+        rng = numpy.random.default_rng(seed)
+    else:
+        rng = numpy.random.default_rng(123456)
+        
     colors = set() # set prevents duplicates
+    
     while len(colors) < n:
-        color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+        color = "#{:06x}".format(rng.integers(0, 0xFFFFFF))
         colors.add(color)
     return list(colors)
 
 
 @beartype.beartype
-def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
+def hex_to_rgb(hex_color: str) -> tuple:
     """
     Convert a hex color code to an RGBA tuple.
     Args:
@@ -352,7 +358,8 @@ def hex_to_rgba(hex_color: str, alpha: float = 1.0) -> tuple:
     # Handle short hex code (e.g., "#RGB")
     if len(hex_color) == 3:
         hex_color = ''.join([c * 2 for c in hex_color])
-
+        
+    alpha = 1.0
     # Convert the hex color code to an RGBA tuple// if it fails, return error
     try:
         r = int(hex_color[0:2], 16) / 255.0

@@ -1,13 +1,5 @@
-from abc import ABC, abstractmethod
-import beartype
-import numpy
-from scipy.spatial.distance import euclidean
-import pandas
-import geopandas
-from statistics import mean
-from .mapdata import MapData
-from scipy.interpolate import Rbf
-from .interpolators import DipDipDirectionInterpolator
+# internal imports
+import scipy.interpolate
 from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
@@ -16,6 +8,17 @@ from .utils import (
     find_segment_strike_from_pt,
 )
 from .m2l_enums import Datatype
+from .interpolators import DipDipDirectionInterpolator
+from .mapdata import MapData
+
+# external imports
+from abc import ABC, abstractmethod
+import beartype
+import numpy
+import scipy
+import pandas
+import geopandas
+from statistics import mean
 import shapely
 import math
 
@@ -260,7 +263,7 @@ class InterpolatedStructure(ThicknessCalculator):
         bounding_box = map_data.get_bounding_box()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator(bounding_box, structure_data, interpolator=Rbf)
+        dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame
@@ -336,7 +339,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
-                        line_length = euclidean(p1, p2)
+                        line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
                         indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within

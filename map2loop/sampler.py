@@ -1,11 +1,14 @@
+# internal imports
+from .m2l_enums import Datatype
+from .mapdata import MapData
+
+# external imports
 from abc import ABC, abstractmethod
 import beartype
 import geopandas
 import pandas
 import shapely
 import numpy
-from .m2l_enums import Datatype
-from .mapdata import MapData
 from typing import Optional
 
 

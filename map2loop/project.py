@@ -1,6 +1,6 @@
 # internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
-from .utils import hex_to_rgba
+from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
@@ -749,7 +749,7 @@ class Project(object):
         )
         geol = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol["colour"] = geol.apply(lambda row: colour_lookup[row.UNITNAME], axis=1)
-        geol["colour_rgba"] = geol.apply(lambda row: hex_to_rgba(row["colour"], 1.0), axis=1)
+        geol["colour_rgba"] = geol.apply(lambda row: hex_to_rgb(row["colour"]), axis=1)
         if points is None and overlay == "":
             geol.plot(color=geol["colour_rgba"])
             return

@@ -103,5 +103,6 @@ __json__ = [
     {
         'classname': "ThrowCalculatorAlpha",
         'description': "ThrowCalculator class which estimates fault throw values based on units, basal_contacts and stratigraphic order",
+        'parameters': [],
     }
 ]

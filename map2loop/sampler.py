@@ -6,7 +6,7 @@ import shapely
 import numpy
 from .m2l_enums import Datatype
 from .mapdata import MapData
-from typing import Optional
+from typing import Optional, Union
 
 
 class Sampler(ABC):
@@ -101,7 +101,7 @@ class SamplerSpacing(Sampler):
     """
 
     @beartype.beartype
-    def __init__(self, spacing: float = 50.0):
+    def __init__(self, spacing: Union[float, int] = 50.0):
         """
         Initialiser for spacing sampler
 

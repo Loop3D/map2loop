@@ -1,11 +1,14 @@
+# internal imports
+from .m2l_enums import Datatype
+from .mapdata import MapData
+
+# external imports
 from abc import ABC, abstractmethod
 import beartype
 import geopandas
 import pandas
 import shapely
 import numpy
-from .m2l_enums import Datatype
-from .mapdata import MapData
 from typing import Optional
 
 
@@ -84,10 +87,12 @@ class SamplerDecimator(Sampler):
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
+        data["Z"] = map_data.get_value_from_raster_df(Datatype.DTM, data)["Z"]
         data["layerID"] = geopandas.sjoin(
             data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
         )['index_right']
         data.reset_index(drop=True, inplace=True)
+
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
 
 
@@ -148,12 +153,15 @@ class SamplerSpacing(Sampler):
 
                 # # account for holes//rings in polygons
                 df2["featureId"] = str(a)
-                if target.is_ring:  # 1. check if line is "closed"
+                # 1. check if line is "closed"
+                if target.is_ring:
                     target_polygon = shapely.geometry.Polygon(target)
                     if target_polygon.exterior.is_ccw:  # if counterclockwise --> hole
-                        for j, target2 in enumerate(
-                            targets
-                        ):  # which poly is the hole in? assign featureId of the same poly
+                        for j, target2 in enumerate(targets):
+                            # skip if line or point
+                            if len(target2.coords) >= 2:
+                                continue
+                            # which poly is the hole in? assign featureId of the same poly
                             t2_polygon = shapely.geometry.Polygon(target2)
                             if target.within(t2_polygon):  #
                                 df2['featureId'] = str(j)

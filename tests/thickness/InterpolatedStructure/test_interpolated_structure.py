@@ -1,3 +1,10 @@
+# This test runs on a portion of the dataset in https://github.com/Loop3D/m2l3_examples/tree/main/Laurent2016_V2_variable_thicknesses (only for lithologies E, F, and G)
+# structures are confined to litho_F, and the test confirms if the StructuralPoint thickness is calculated, for all lithologies, if the thickness is correct for F (~90 m), and top/bottom units are assigned -1
+# this creates a temp folder in Appdata to store the data to run the proj, checks the thickness, and then deletes the temp folder
+# this was done to avoid overflow of file creation in the tests folder
+
+### This file tests the function InterpolatedStructure thickness calculator
+
 import pytest
 import pandas as pd
 from map2loop.thickness_calculator import InterpolatedStructure

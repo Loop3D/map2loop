@@ -5,6 +5,7 @@ import geopandas
 import beartype
 from typing import Union
 import pandas
+import random
 
 
 @beartype.beartype
@@ -116,7 +117,7 @@ def normal_vector_to_dipdirection_dip(normal_vector: numpy.ndarray) -> numpy.nda
 
 
 @beartype.beartype
-def create_points(xy: Union[list, tuple, numpy.ndarray]):
+def create_points(xy: Union[list, tuple, numpy.ndarray]) -> numpy.ndarray:
     """
     Creates a list of shapely Point objects from a list, tuple, or numpy array of coordinates.
 
@@ -300,3 +301,75 @@ def rebuild_sampled_basal_contacts(
     )
 
     return sampled_basal_contacts
+
+
+@beartype.beartype
+def generate_random_hex_colors(n: int, seed: int = None) -> list:
+    """
+    Generate a list of unique random hex color codes.
+
+    Args:
+        n (int): The number of random hex color codes to generate.
+
+    Returns:
+        list: A list of randomly generated hex color codes as strings.
+
+    Example:
+        >>> generate_random_hex_colors(3)
+        ['#1a2b3c', '#4d5e6f', '#7f8e9d']
+    """
+    if not isinstance(n, int):
+        raise TypeError("n of colours must be an integer") ## not sure if necessary as beartype should handle this 
+    
+    if seed is not None:
+        rng = numpy.random.default_rng(seed)
+    else:
+        rng = numpy.random.default_rng(123456)
+        
+    colors = set() # set prevents duplicates
+    
+    while len(colors) < n:
+        color = "#{:06x}".format(rng.integers(0, 0xFFFFFF))
+        colors.add(color)
+    return list(colors)
+
+
+@beartype.beartype
+def hex_to_rgb(hex_color: str) -> tuple:
+    """
+    Convert a hex color code to an RGBA tuple.
+    Args:
+        hex_color (str): The hex color code (e.g., "#RRGGBB" or "#RGB").
+        alpha (float, optional): The alpha value (opacity) for the color. Defaults to 1.0.
+    Returns:
+        tuple: A tuple (r, g, b, a) where r, g, b are in the range 0-1 and a is in the range 0-1.
+    """
+    # if input not string or starts with '#', raise error
+    if not isinstance(hex_color, str) or not hex_color.startswith('#'):
+        raise ValueError("Invalid hex color code. Must start with '#'.")
+
+    # Remove '#' from the hex color code
+    hex_color = hex_color.lstrip('#')
+
+    # check if hex color code is the right length
+    if len(hex_color) not in [3, 6]:
+        raise ValueError("Invalid hex color code. Must be 3 or 6 characters long after '#'.")
+
+    # Handle short hex code (e.g., "#RGB")
+    if len(hex_color) == 3:
+        hex_color = ''.join([c * 2 for c in hex_color])
+        
+    alpha = 1.0
+    # Convert the hex color code to an RGBA tuple// if it fails, return error
+    try:
+        r = int(hex_color[0:2], 16) / 255.0
+        g = int(hex_color[2:4], 16) / 255.0
+        b = int(hex_color[4:6], 16) / 255.0
+        
+    except ValueError as e:
+        raise ValueError(
+            "Invalid hex color code. Contains non-hexadecimal characters."
+        ) from e
+
+    return (r, g, b, alpha)
+

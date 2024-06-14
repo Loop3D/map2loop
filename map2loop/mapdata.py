@@ -1,3 +1,10 @@
+# internal imports
+from .m2l_enums import Datatype, Datastate, VerboseLevel
+from .config import Config
+from .aus_state_urls import AustraliaStateUrls
+from .utils import generate_random_hex_colors
+
+# external imports
 import geopandas
 import pandas
 import numpy
@@ -11,13 +18,7 @@ from uuid import uuid4
 import beartype
 import os
 from io import BytesIO
-from .m2l_enums import Datatype, Datastate
-from .m2l_enums import VerboseLevel
-from .config import Config
-from .aus_state_urls import AustraliaStateUrls
-from .random_colour import random_colours_hex
 from typing import Union
-
 
 class MapData:
     """
@@ -290,7 +291,7 @@ class MapData:
     @beartype.beartype
     def get_ignore_codes(self) -> list:
         """
-        Get the list of codes to ingnore
+        Get the list of codes to ignore
 
         Returns:
             list: The list of strings to ignore
@@ -482,6 +483,8 @@ class MapData:
         if not os.path.isdir(self.tmp_path):
             os.mkdir(self.tmp_path)
 
+
+ 
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -495,29 +498,36 @@ class MapData:
             _type_: The open geotiff in a gdal handler
         """
         self.__check_and_create_tmp_path()
+        
         # For gdal debugging use exceptions
         gdal.UseExceptions()
         bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
-        # try:
+    
         if filename.lower() == "aus" or filename.lower() == "au":
+
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
+
             coverage = wcs.getCoverage(
                 identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
             )
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create
+
             tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
+
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
             tif = gdal.Open(tmp_file)
+        
         elif filename == "hawaii":
             import netCDF4
 
             bbox_str = (
                 f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
             )
+            
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
             f = urllib.request.urlopen(filename)
             ds = netCDF4.Dataset("in-mem-file", mode="r", memory=f.read())
@@ -723,7 +733,10 @@ class MapData:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
         else:
             print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
-
+                    
+        # Ensure all DIPDIR values are within [0, 360]
+        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
+        
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
         else:
@@ -1442,7 +1455,9 @@ class MapData:
         return basal_contacts
 
     @beartype.beartype
-    def colour_units(self, stratigraphic_units: pandas.DataFrame, random: bool = False):
+    def colour_units(
+        self, stratigraphic_units: pandas.DataFrame, random: bool = False
+    ) -> pandas.DataFrame:
         """
         Add a colour column to the units in the stratigraphic units structure
 
@@ -1457,12 +1472,27 @@ class MapData:
         """
 
         colour_lookup = pandas.DataFrame(columns=["UNITNAME", "colour"])
-        try:
-            colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
-        except FileNotFoundError:
-            print(f"Colour Lookup file {self.colour_filename} not found")
+
+        if self.colour_filename is not None:
+            try:
+                colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
+            except FileNotFoundError:
+                print(
+                    f"Colour Lookup file {self.colour_filename} not found. Assigning random colors to units"
+                )
+                self.colour_filename = None
+
+        if self.colour_filename is None:
+            print("No colour configuration file found. Assigning random colors to units")
+            missing_colour_n = len(stratigraphic_units["colour"])
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
+                generate_random_hex_colors(missing_colour_n)
+            )
 
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
+        # if there are duplicates in the clut file, drop. 
+        colour_lookup = colour_lookup.drop_duplicates(subset=["UNITNAME"])
+        
         if "UNITNAME" in colour_lookup.columns and "colour" in colour_lookup.columns:
             stratigraphic_units = stratigraphic_units.merge(
                 colour_lookup,
@@ -1471,8 +1501,8 @@ class MapData:
                 suffixes=("_old", ""),
                 how="left",
             )
-            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), ["colour"]] = (
-                random_colours_hex(stratigraphic_units["colour"].isna().sum())
+            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
+                generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
             )
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:

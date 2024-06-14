@@ -170,8 +170,17 @@ class Project(object):
         # Assign filenames
         if use_australian_state_data != "":
             # Sanity check on state string
-            if use_australian_state_data in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
-                self.map_data.set_filenames_from_australian_state(use_australian_state_data)
+            if use_australian_state_data.upper() in [
+                "WA",
+                "SA",
+                "QLD",
+                "NSW",
+                "TAS",
+                "VIC",
+                "ACT",
+                "NT",
+            ]:
+                self.map_data.set_filenames_from_australian_state(use_australian_state_data.upper())
             else:
                 raise ValueError(
                     f"Australian state {use_australian_state_data} not in state url database"

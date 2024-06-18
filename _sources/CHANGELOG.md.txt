@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.7](https://github.com/Loop3D/map2loop/compare/v3.1.6...v3.1.7) (2024-06-18)
+
+
+### Bug Fixes
+
+* adapt floats to new np & unpin ([1a08401](https://github.com/Loop3D/map2loop/commit/1a08401ad65d3897452b223de8717db8b4e5b4ab))
+* pin numpy version ([16130c6](https://github.com/Loop3D/map2loop/commit/16130c68b5c5a25c78f44ba8d11242c97b0cd8c4))
+* update np version ([615985c](https://github.com/Loop3D/map2loop/commit/615985ce2fab530354585a1715e0edea55f2ba27))
+* update numpy version ([0479ea1](https://github.com/Loop3D/map2loop/commit/0479ea1789380895789fca6d25334fe6a1638f12))
+
 ## [3.1.6](https://github.com/Loop3D/map2loop/compare/v3.1.5...v3.1.6) (2024-06-13)
 
 

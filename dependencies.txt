@@ -1,5 +1,4 @@
 geopandas
-numpy<2.0.0
 shapely
 networkx
 owslib

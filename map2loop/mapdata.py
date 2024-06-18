@@ -501,8 +501,8 @@ class MapData:
         
         # For gdal debugging use exceptions
         gdal.UseExceptions()
-        bb_ll = tuple(self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
-    
+        bb_ll = tuple(float(coord) for coord in self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
+
         if filename.lower() == "aus" or filename.lower() == "au":
 
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
@@ -511,6 +511,7 @@ class MapData:
             coverage = wcs.getCoverage(
                 identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
             )
+            
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create

@@ -5,7 +5,7 @@ from .utils import (
     rebuild_sampled_basal_contacts,
     calculate_endpoints,
     multiline_to_line,
-    find_segment_strike_from_pt,
+    find_segment_strike_from_pt
 )
 from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
@@ -75,7 +75,12 @@ class ThicknessCalculator(ABC):
         If the thickness is not calculated for a given unit, the assigned thickness is -1.
         For the bottom and top units of the stratigraphic sequence, the assigned thickness is -1.
         """
-        pass
+        
+        if len(stratigraphic_order) < 3:
+            print(
+                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
+            )
+            return units
 
 
 class ThicknessCalculatorAlpha(ThicknessCalculator):
@@ -117,9 +122,17 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         no_distance = -1.0
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
-        # Set default value
+        
+        # Set default values
+        thicknesses["ThicknessMean"] = no_distance
         thicknesses["ThicknessMedian"] = no_distance
+        thicknesses["ThicknessStdDev"] = no_distance
+        
         basal_unit_list = basal_contacts["basal_unit"].to_list()
+        
+        sampled_basal_contacts = rebuild_sampled_basal_contacts(basal_contacts=basal_contacts, sampled_contacts=map_data.sampled_contacts)
+
+
         if len(stratigraphic_order) < 3:
             print(
                 f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
@@ -131,11 +144,11 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 stratigraphic_order[i] in basal_unit_list
                 and stratigraphic_order[i + 1] in basal_unit_list
             ):
-                contact1 = basal_contacts[basal_contacts["basal_unit"] == stratigraphic_order[i]][
+                contact1 = sampled_basal_contacts[sampled_basal_contacts["basal_unit"] == stratigraphic_order[i]][
                     "geometry"
                 ].to_list()[0]
-                contact2 = basal_contacts[
-                    basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
+                contact2 = sampled_basal_contacts[
+                    sampled_basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
                 ]["geometry"].to_list()[0]
                 if contact1 is not None and contact2 is not None:
                     distance = contact1.distance(contact2)
@@ -154,26 +167,13 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
             idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
-            if thicknesses.loc[idx, "ThicknessMedian"] == -1:
+            if thicknesses.loc[idx, "ThicknessMean"] == -1:
                 val = distance
             else:
-                val = min(distance, thicknesses.at[idx, "ThicknessMedian"])
-            thicknesses.loc[idx, "ThicknessMedian"] = val
+                val = min(distance, thicknesses.at[idx, "ThicknessMean"])
+            thicknesses.loc[idx, "ThicknessMean"] = val
 
-        # If no thickness calculations can be made with current stratigraphic column set all units
-        # to a uniform thickness value
-        if len(thicknesses[thicknesses["ThicknessMedian"] > 0]) < 1:
-            thicknesses["ThicknessMedian"] = 100.0
-        mean_thickness = mean(thicknesses[thicknesses["ThicknessMedian"] > 0]["ThicknessMedian"])
-
-        # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
-        # the mean thickness of the other units
-        thicknesses["ThicknessMedian"] = thicknesses.apply(
-            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"],
-            axis=1,
-        )
         return thicknesses
-
 
 class InterpolatedStructure(ThicknessCalculator):
     """
@@ -291,12 +291,6 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations[
             ["geometry", "dip", "UNITNAME"]
         ].copy()
-
-        if len(stratigraphic_order) < 3:
-            print(
-                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
-            )
-            return thicknesses
 
         for i in range(0, len(stratigraphic_order) - 1):
             if (
@@ -459,6 +453,7 @@ class StructuralPoint(ThicknessCalculator):
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
             basal_contacts, map_data.sampled_contacts
         )
+        sampled_basal_contacts.plot()
 
         # calculate map dimensions
         map_dx = geology.total_bounds[2] - geology.total_bounds[0]

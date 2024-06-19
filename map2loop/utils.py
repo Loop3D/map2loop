@@ -262,7 +262,7 @@ def rebuild_sampled_basal_contacts(
         crs=basal_contacts.crs,
     )
 
-    basal_contacts['geometry'] = basal_contacts.buffer(1)
+    basal_contacts.loc[:, 'geometry'] = basal_contacts.buffer(1)
     sampled_basal_contacts = sampled_geology.sjoin(
         basal_contacts, how='left', predicate='intersects'
     ).dropna()
@@ -299,6 +299,8 @@ def rebuild_sampled_basal_contacts(
         crs=basal_contacts.crs,
         columns=['basal_unit'],
     )
+    
+    # 
 
     return sampled_basal_contacts
 
@@ -372,4 +374,3 @@ def hex_to_rgb(hex_color: str) -> tuple:
         ) from e
 
     return (r, g, b, alpha)
-

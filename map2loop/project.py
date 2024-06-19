@@ -14,6 +14,7 @@ from .map2model_wrapper import Map2ModelWrapper
 
 # external imports
 import LoopProjectFile as LPF
+import tempfile
 from typing import Union
 from osgeo import gdal
 import geopandas
@@ -55,7 +56,7 @@ class Project(object):
     def __init__(
         self,
         verbose_level: VerboseLevel = VerboseLevel.ALL,
-        tmp_path: str = "m2l_data_tmp",
+        # tmp_path: str = "m2l_data_tmp",
         working_projection=None,
         bounding_box=None,
         use_australian_state_data: str = "",
@@ -128,20 +129,22 @@ class Project(object):
         self.thickness_calculator = ThicknessCalculatorAlpha()
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
-        self.loop_filename = loop_project_filename
-        self.overwrite_lpf = overwrite_loopprojectfile
-
-        self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
+        self.map_data = MapData(verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
+        self.loop_filename = loop_project_filename
+        self.overwrite_lpf = overwrite_loopprojectfile
 
+        # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
         )
         self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+
+
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -158,7 +161,6 @@ class Project(object):
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
-
         if issubclass(type(bounding_box), dict) or issubclass(type(bounding_box), tuple):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
@@ -172,12 +174,22 @@ class Project(object):
         # Assign filenames
         if use_australian_state_data != "":
             # Sanity check on state string
-            if use_australian_state_data in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
+            if use_australian_state_data in {
+                "WA",
+                "SA",
+                "QLD",
+                "NSW",
+                "TAS",
+                "VIC",
+                "ACT",
+                "NT",
+            }:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
                 raise ValueError(
                     f"Australian state {use_australian_state_data} not in state url database"
                 )
+        # set the data filenames
         if geology_filename != "":
             self.map_data.set_filename(Datatype.GEOLOGY, geology_filename)
         if structure_filename != "":
@@ -190,14 +202,18 @@ class Project(object):
             self.map_data.set_filename(Datatype.DTM, dtm_filename)
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
+        
+        
         if config_filename != "":
             if clut_file_legacy:
                 print(
                     "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
                 )
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
+        
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
+        
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
 
@@ -205,20 +221,16 @@ class Project(object):
         self.map_data.load_all_map_data()
 
         # If flag to save out data is check do so
+        tmp_path = pathlib.Path(tempfile.mkdtemp())
+
         if save_pre_checked_map_data:
             self.map_data.save_all_map_data(tmp_path)
 
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
-
-        # Set default minimum fault length to 5% of the longest bounding box dimension
-        bounding_box = self.map_data.get_bounding_box()
-        largest_dimension = max(
-            bounding_box["maxx"] - bounding_box["minx"], bounding_box["maxy"] - bounding_box["miny"]
-        )
-        self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
-
+        self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
+        
         if len(kwargs):
             print(f"These keywords were not used in initialising the Loop project ({kwargs})")
 
@@ -351,18 +363,6 @@ class Project(object):
         """
         return self.samplers[datatype].sampler_label
 
-    @beartype.beartype
-    def set_minimum_fault_length(self, length: float):
-        """
-        Set the cutoff length for faults to ignore
-
-        Args:
-            length (float):
-                The cutoff length
-        """
-        self.deformation_history.set_minimum_fault_length(length)
-
-    @beartype.beartype
     def get_minimum_fault_length(self) -> float:
         """
         Get the cutoff length for faults
@@ -370,8 +370,8 @@ class Project(object):
         Returns:
             float: The cutoff length
         """
-        return self.deformation_history.get_minimum_fault_length()
-
+        return self.map_data.minimum_fault_length
+    
     # Processing functions
     def sample_map_data(self):
         """

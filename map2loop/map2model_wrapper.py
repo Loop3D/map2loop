@@ -133,9 +133,9 @@ class Map2ModelWrapper:
         }
         # TODO: Simplify. Note: this is external so have to match fix to map2model module
         run_log = map2model.run(
-            os.path.join(self.map_data.tmp_path, "map2model_data"),
-            os.path.join(self.map_data.tmp_path, "map2model_data", "geology_wkt.csv"),
-            os.path.join(self.map_data.tmp_path, "map2model_data", "faults_wkt.csv"),
+            os.path.join(self.map_data.map2model_tmp_path),
+            os.path.join(self.map_data.map2model_tmp_path, "geology_wkt.csv"),
+            os.path.join(self.map_data.map2model_tmp_path, "faults_wkt.csv"),
             "",
             self.map_data.get_bounding_box(),
             map2model_code_map,
@@ -150,7 +150,7 @@ class Map2ModelWrapper:
 
         # Parse units sorted
         units_sorted = pandas.read_csv(
-            os.path.join(self.map_data.tmp_path, "map2model_data", "units_sorted.txt"),
+            os.path.join(self.map_data.map2model_tmp_path, "units_sorted.txt"),
             header=None,
             sep=' ',
         )
@@ -162,7 +162,7 @@ class Map2ModelWrapper:
         # Parse fault intersections
         out = []
         fault_fault_intersection_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt"
+            self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
         )
         if (
             os.path.isfile(fault_fault_intersection_filename)
@@ -189,7 +189,7 @@ class Map2ModelWrapper:
         # Parse unit fault relationships
         out = []
         unit_fault_intersection_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt"
+            self.map_data.map2model_tmp_path, "unit-fault-intersection.txt"
         )
         if (
             os.path.isfile(unit_fault_intersection_filename)
@@ -212,11 +212,11 @@ class Map2ModelWrapper:
         units = []
         links = []
         graph_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt"
+            self.map_data.map2model_tmp_path, "graph_all_None.gml.txt"
         )
         if os.path.isfile(graph_filename) and os.path.getsize(graph_filename) > 0:
             with open(
-                os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")
+                os.path.join(self.map_data.map2model_tmp_path, "graph_all_None.gml.txt")
             ) as file:
                 contents = file.read()
                 segments = contents.split("\n\n")

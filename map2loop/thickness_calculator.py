@@ -135,7 +135,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
 
         if len(stratigraphic_order) < 3:
             print(
-                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
+                f"ThicknessCalculatorAlpha: Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
             )
             return thicknesses
         for i in range(1, len(stratigraphic_order) - 1):
@@ -154,12 +154,12 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                     distance = contact1.distance(contact2)
                 else:
                     print(
-                        f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                        f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                     )
                     distance = no_distance
             else:
                 print(
-                    f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                    f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                 )
 
                 distance = no_distance
@@ -364,7 +364,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
             else:
                 print(
-                    f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                    f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
 
         return thicknesses
@@ -557,6 +557,7 @@ class StructuralPoint(ThicknessCalculator):
 
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+            
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))
 
@@ -582,6 +583,8 @@ class StructuralPoint(ThicknessCalculator):
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
+        
+        output_units = output_units.fillna(-1)
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
@@ -594,11 +597,10 @@ class StructuralPoint(ThicknessCalculator):
                 idx = stratigraphic_order.index(unit)
                 # throw warning to user
                 print(
-                    'It was not possible to calculate thickness between unit ',
+                    'Thickness Calculator StructuralPoint: Cannot calculate thickness between',
                     unit,
                     "and ",
-                    stratigraphic_order[idx + 1],
-                    'Assigning thickness of -1',
+                    stratigraphic_order[idx + 1], "\n"
                 )
                 # assign -1 as thickness
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
@@ -606,7 +608,7 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
             # if top//bottom unit assign -1
-            if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
+            if unit in [stratigraphic_order[-1], stratigraphic_order[0]]:
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1

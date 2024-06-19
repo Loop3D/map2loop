@@ -4,7 +4,7 @@ from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
+from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
@@ -38,8 +38,6 @@ class Project(object):
         A list of samplers used to extract point samples from polyonal or line segments. Indexed by m2l_enum.Dataype
     sorter: Sorter
         The sorting algorithm to use for calculating the stratigraphic column
-    thickness_calculator: ThicknessCalulator
-        The algorithm to use for making unit thickness estimations
     loop_filename: str
         The name of the loop project file used in this project
     map_data: MapData
@@ -126,7 +124,6 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.sorter = SorterUseHint()
-        self.thickness_calculator = ThicknessCalculatorAlpha()
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
@@ -267,25 +264,6 @@ class Project(object):
         """
         return self.sorter.sorter_label
 
-    @beartype.beartype
-    def set_thickness_calculator(self, thickness_calculator: ThicknessCalculator):
-        """
-        Set the thickness calculator that estimates unit thickness of all units
-
-        Args:
-            thickness_calculator (ThicknessCalculator):
-                The calculator to use. Must be of base class ThicknessCalculator
-        """
-        self.thickness_calculator = thickness_calculator
-
-    def get_thickness_calculator(self):
-        """
-        Get the name of the thickness calculator being used
-
-        Returns:
-            str: The name of the thickness calculator used
-        """
-        return self.thickness_calculator.thickness_calculator_label
 
     @beartype.beartype
     def set_fault_orientation(self, fault_orientation: FaultOrientation):
@@ -446,18 +424,47 @@ class Project(object):
                 self.map_data.contacts,
                 self.map_data,
             )
-
+    
+    
     def calculate_unit_thicknesses(self):
         """
         Use the stratigraphic column, and fault and contact data to estimate unit thicknesses
         """
-        self.stratigraphic_column.stratigraphicUnits = self.thickness_calculator.compute(
-            self.stratigraphic_column.stratigraphicUnits,
-            self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
-            self.structure_samples,
-            self.map_data,
+        thickness_calculator_labels = ['ThicknessCalculatorAlpha', 'InterpolatedStructure', 'StructuralPoint', ]
+
+        thickness_calculation_results = []
+        
+        for label in thickness_calculator_labels:
+            if label == 'InterpolatedStructure':
+                calculator = InterpolatedStructure()
+            elif label == 'StructuralPoint':
+                calculator = StructuralPoint()
+            elif label == 'ThicknessCalculatorAlpha':
+                calculator = ThicknessCalculatorAlpha()
+                
+            result = calculator.compute(
+                self.stratigraphic_column.stratigraphicUnits,
+                self.stratigraphic_column.column,
+                self.map_data.basal_contacts,
+                self.structure_samples,
+                self.map_data,
+            )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']]
+            
+            # Rename the columns
+            result = result.rename(columns={
+                'ThicknessMean': f'ThicknessMean_{label}',
+                'ThicknessMedian': f'ThicknessMedian_{label}',
+                'ThicknessStdDev': f'ThicknessStdDev_{label}'
+            })
+            
+            thickness_calculation_results.append(result)
+            
+        thickness_combined_results = pandas.concat(thickness_calculation_results, axis=1)
+        
+        self.stratigraphic_column.stratigraphicUnits = pandas.concat(
+            [self.stratigraphic_column.stratigraphicUnits, thickness_combined_results], axis=1
         )
+
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -614,6 +621,7 @@ class Project(object):
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
 
+        
         stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
             'ThicknessMean'
         ]
@@ -623,7 +631,22 @@ class Project(object):
         stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
             'ThicknessStdDev'
         ]
+        
+        # column_len = len(self.stratigraphic_column.stratigraphicUnits)
+        # # thickness means by calculator
+        
+        # combined_thickness_means = [
+        #     numpy.array(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_ThicknessCalculatorAlpha'])[0],
+        #     numpy.array(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_InterpolatedStructure'])[0],
+        #     self.stratigraphic_column.stratigraphicUnits['ThicknessMean_StructuralPoint'],
+        #     [0] * column_len, 
+        #     [0] * column_len
+        # ]
+        # print(combined_thickness_means)
 
+        # Assign to stratigraphic_data DataFrame
+        # stratigraphic_data["ThicknessMean"] = numpy.array(combined_thickness_means).reshape(1, -1)
+        
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
         ]

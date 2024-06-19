@@ -48,8 +48,12 @@ def test_from_aus_state():
             loop_project_filename=loop_project_filename,
             overwrite_loopprojectfile=True,
         )
-    except requests.exceptions.ReadTimeout:
-        pytest.skip("Connection to the server timed out, skipping test")
+        
+    except (requests.exceptions.RequestException, requests.exceptions.ReadTimeout) as e:
+        if "HTTPConnectionPool" in str(e) or isinstance(e, requests.exceptions.ReadTimeout): 
+            pytest.skip("Connection to the server timed out, skipping test")
+        else:
+            raise  # Re-raise the exception if it's not server unavailable
 
     proj.set_thickness_calculator(StructuralPoint())
     proj.run_all()

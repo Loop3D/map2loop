@@ -460,11 +460,18 @@ class Project(object):
             thickness_calculation_results.append(result)
             
         thickness_combined_results = pandas.concat(thickness_calculation_results, axis=1)
-        
-        self.stratigraphic_column.stratigraphicUnits = pandas.concat(
-            [self.stratigraphic_column.stratigraphicUnits, thickness_combined_results], axis=1
-        )
 
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMean_ThicknessCalculatorAlpha']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMedian_ThicknessCalculatorAlpha']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessStdDev_ThicknessCalculatorAlpha']
+        
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_InterpolatedStructure'] = thickness_combined_results['ThicknessMean_InterpolatedStructure']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_InterpolatedStructure'] = thickness_combined_results['ThicknessMedian_InterpolatedStructure']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_InterpolatedStructure'] = thickness_combined_results['ThicknessStdDev_InterpolatedStructure']
+        
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_StructuralPoint'] = thickness_combined_results['ThicknessMean_StructuralPoint']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_StructuralPoint'] = thickness_combined_results['ThicknessMedian_StructuralPoint']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_StructuralPoint'] = thickness_combined_results['ThicknessStdDev_StructuralPoint']
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -622,31 +629,43 @@ class Project(object):
         stratigraphic_data["enabled"] = 1
 
         
-        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessMean'
-        ]
-        stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessMedian'
-        ]
-        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessStdDev'
-        ]
-        
-        # column_len = len(self.stratigraphic_column.stratigraphicUnits)
-        # # thickness means by calculator
-        
-        # combined_thickness_means = [
-        #     numpy.array(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_ThicknessCalculatorAlpha'])[0],
-        #     numpy.array(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_InterpolatedStructure'])[0],
-        #     self.stratigraphic_column.stratigraphicUnits['ThicknessMean_StructuralPoint'],
-        #     [0] * column_len, 
-        #     [0] * column_len
+        # stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessMean'
         # ]
-        # print(combined_thickness_means)
-
-        # Assign to stratigraphic_data DataFrame
-        # stratigraphic_data["ThicknessMean"] = numpy.array(combined_thickness_means).reshape(1, -1)
+        # stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessMedian'
+        # ]
+        # stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessStdDev'
+        # ]
         
+        column_len = len(self.stratigraphic_column.stratigraphicUnits)
+        
+        # thickness means by calculator
+        stratigraphic_data["ThicknessMean"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
+
+        # thickness medians by calculator
+        stratigraphic_data["ThicknessMedian"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
+        
+        # thickness medians by calculator
+        stratigraphic_data["ThicknessStdDev"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
+        
+        # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
         ]

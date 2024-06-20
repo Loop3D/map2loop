@@ -261,9 +261,18 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
         contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
         bounding_box = map_data.get_bounding_box()
+        
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
+        
+        ### TODO: RC - fix the Linalg error at some stage. 
+        # for now, if error is raised, return thicknesses with -1
+        try:
+            dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
+        except scipy.linalg.LinAlgError:
+            print("Thickness Calculator InterpolatedStructure: Could not interpolate dip")
+            return thicknesses
+        
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame

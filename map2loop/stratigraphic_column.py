@@ -40,9 +40,15 @@ class StratigraphicColumn:
                 ("maxAge", float),
                 ("group", str),
                 ("supergroup", str),
-                ("ThicknessMean", float),
-                ("ThicknessMedian", float),
-                ("ThicknessStdDev", float),
+                ("ThicknessMean_ThicknessCalculatorAlpha", float),
+                ("ThicknessMedian_ThicknessCalculatorAlpha", float),
+                ("ThicknessStdDev_ThicknessCalculatorAlpha", float),
+                ("ThicknessMean_InterpolatedStructure", float),
+                ("ThicknessMedian_InterpolatedStructure", float),
+                ("ThicknessStdDev_InterpolatedStructure", float),
+                ("ThicknessMean_StructuralPoint", float),
+                ("ThicknessMedian_StructuralPoint", float),
+                ("ThicknessStdDev_StructuralPoint", float),
                 ("colour", str),
                 # ("indexInGroup", int),
                 # ("groupNum", int),
@@ -61,7 +67,6 @@ class StratigraphicColumn:
                 ("minAge", float),
                 ("maxAge", float),
                 ("group", str),
-                ("ThicknessMedian", float),
                 ("colour", str),
             ]
         )
@@ -164,7 +169,6 @@ class StratigraphicColumn:
         self.stratigraphicUnits["maxAge"] = geology_data["MAX_AGE"]
         self.stratigraphicUnits["group"] = geology_data["GROUP"]
         self.stratigraphicUnits["supergroup"] = geology_data["SUPERGROUP"]
-        self.stratigraphicUnits["ThicknessMedian"] = -1.0
         self.stratigraphicUnits["colour"] = "#000000"
         # self.stratigraphicUnits["indexInGroup"] = -1
 

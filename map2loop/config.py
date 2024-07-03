@@ -1,5 +1,5 @@
 import beartype
-import hjson
+import json
 import urllib
 import time
 import pathlib
@@ -205,7 +205,7 @@ class Config:
                 while try_count >= 0 and not success:
                     try:
                         with urllib.request.urlopen(filename) as url_data:
-                            data = hjson.load(url_data)
+                            data = json.load(url_data)
                             func(data, lower)
                         success = True
                     except Exception as e:
@@ -217,7 +217,7 @@ class Config:
                             raise e
             else:
                 with open(filename) as url_data:
-                    data = hjson.load(url_data)
+                    data = json.load(url_data)
                     func(data, lower)
         except Exception:
             err_string = f"There is a problem parsing the config file ({filename}).\n"

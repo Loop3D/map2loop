@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.8](https://github.com/Loop3D/map2loop/compare/v3.1.7...v3.1.8) (2024-06-20)
+
+
+### Bug Fixes
+
+* pin LPF to 0.1.3 ([f3766a8](https://github.com/Loop3D/map2loop/commit/f3766a83d0f09f293429cc975933cbf79b01c5a2))
+
 ## [3.1.7](https://github.com/Loop3D/map2loop/compare/v3.1.6...v3.1.7) (2024-06-18)
 
 

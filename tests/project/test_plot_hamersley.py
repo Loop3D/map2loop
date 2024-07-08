@@ -22,12 +22,6 @@ bbox_3d = {
 loop_project_filename = "wa_output.loop3d"
 
 
-def remove_LPF():
-    lpf_exists = os.path.exists(loop_project_filename)
-    if lpf_exists:
-        os.remove(loop_project_filename)
-
-
 def test_project_execution():
     try:
         proj = Project(

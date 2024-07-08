@@ -4,9 +4,13 @@ import pytest
 import numpy
 
 from map2loop.mapdata import MapData
-from map2loop.thickness_calculator import ThicknessCalculatorAlpha
+from map2loop.thickness_calculator import StructuralPoint
+from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology
+from map2loop.m2l_enums import Datatype
 
-### Define the test data for ThicknessCalculatorAlpha
+####################################################################
+### Define the test data for ThicknessCalculator StructuralPoint ###
+####################################################################
 
 # Sample stratigraphic units data
 st_units = pandas.DataFrame({
@@ -73,8 +77,6 @@ structures = pandas.DataFrame({
     'layerID': [3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2]
 })
 
-md = MapData()
-
 # sampled contacts
 
 IDS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
@@ -86,22 +88,34 @@ featureid = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0
 s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 
 
-#####################################
-### TEST ThicknessCalculatorAlpha ###
-#####################################
+############################
+### TEST StructuralPoint ###
+############################
+
+geology = load_hamersley_geology()
+geology.rename(columns={'unitname': 'UNITNAME', 'code': 'CODE'}, inplace=True)
+
 
 def check_thickness_values(result, column, description):
     for order, position in [(max(st_units['stratigraphic_Order']), 'bottom'), 
                             (min(st_units['stratigraphic_Order']), 'top')]:
         assert (
             result[result['stratigraphic_Order'] == order][column].values == -1
-        ), f"ThicknessCalculatorAlpha: {position} unit not assigned as -1 ({description})"
+        ), f"StructuralPoint: {position} unit not assigned as -1 ({description})"
         
 
-def test_calculate_thickness():
+def test_calculate_thickness_structural_point():
     # Run the calculation
-    thickness_calculator = ThicknessCalculatorAlpha()
+    thickness_calculator = StructuralPoint()
+    
+    md = MapData()
     md.sampled_contacts = s_c
+    md.sampled_contacts = s_c
+    md.raw_data[Datatype.GEOLOGY] = geology
+    md.load_map_data(Datatype.GEOLOGY)
+    md.check_map(Datatype.GEOLOGY)
+    md.parse_geology_map()
+    
     result = thickness_calculator.compute(
         units=st_units, 
         stratigraphic_order=st_column, 
@@ -111,28 +125,28 @@ def test_calculate_thickness():
     )
     
     # is thickness calc alpha the label?
-    assert thickness_calculator.thickness_calculator_label == 'ThicknessCalculatorAlpha', 'name not set correctly'
+    assert thickness_calculator.thickness_calculator_label == 'StructuralPoint', 'StructuralPoint: thickness calculator name not set correctly'
     
     #is the result a pandas dataframe?
-    assert isinstance(result, pandas.DataFrame), 'ThicknessCalcAlpha result not a pandas DataFrame'
+    assert isinstance(result, pandas.DataFrame), 'StructuralPoint result not a pandas DataFrame'
     
     # Check if there is mean, std, and median in results 
     required_columns = ['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']
     for column in required_columns:
-        assert column in result.columns, f'{column} not in ThicknessCalcAlpha result'
+        assert column in result.columns, f'{column} not in StructuralPoint result'
         
     # check if all units are in the results
-    assert 'name' in result.columns, 'unit_name not in ThicknessCalcAlpha result'
-    assert all(name in result['name'].values for name in st_units['name'].values), 'units missing from in ThicknessCalcAlpha result'
+    assert 'name' in result.columns, 'unit_name not in StructuralPoint result'
+    assert all(name in result['name'].values for name in st_units['name'].values), 'units missing from in StructuralPoint result'
     
     # are bottom and top units being assigned -1
-    for column, description in [('ThicknessMean', 'mean'), ('ThicknessMedian', 'median'), ('ThicknessStdDev', 'median')]:
+    for column, description in [('ThicknessMean', 'mean'), ('ThicknessMedian', 'median'), ('ThicknessStdDev', 'std dev')]:
         check_thickness_values(result, column, description)
     
     # are the dtypes numpy.float?
     for column in required_columns:
-        assert result[column].dtype == numpy.float64, f'{column} not numpy.float64'
+        assert result[column].dtype == numpy.float64, f'StructuralPoint: result column {column} not numpy.float64'
     
     # check for nans in the results
     for column in required_columns:
-        assert not result[column].isnull().values.any(), f'{column} has NaN values'
+        assert not result[column].isnull().values.any(), f'StructuralPoint: result column {column} has NaN values'

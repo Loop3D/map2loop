@@ -24,14 +24,14 @@ from map2loop.mapdata import MapData
     ]
 )
 def test_set_working_projection(projection, expected_projection, bounding_box, expected_warning, capsys):
-    # Arrange
+
     map_data = MapData()
     map_data.bounding_box = bounding_box
 
-    # Act
+
     map_data.set_working_projection(projection)
 
-    # Assert
+
     assert map_data.working_projection == expected_projection, "Map.data set_working_projection() not attributing the correct projection"
 
     if expected_warning:

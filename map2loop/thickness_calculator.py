@@ -237,7 +237,7 @@ class InterpolatedStructure(ThicknessCalculator):
         thicknesses["ThicknessMedian"] = -1.0
         thicknesses['ThicknessMean'] = -1.0
         # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
-        thicknesses["ThicknessStdDev"] = 0
+        thicknesses["ThicknessStdDev"] = -1.0
         thicknesses['ThicknessStdDev'] = thicknesses['ThicknessStdDev'].astype('float64')
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
@@ -393,7 +393,7 @@ class StructuralPoint(ThicknessCalculator):
     '''
 
     def __init__(self):
-        self.sorter_label = "StructuralPoint"
+        self.thickness_calculator_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
 

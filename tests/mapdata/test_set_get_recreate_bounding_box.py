@@ -1,5 +1,5 @@
 import pytest
-from map2loop.mapdata import MapData # Replace with the actual module and class name
+from map2loop.mapdata import MapData 
 import geopandas
 import shapely
 

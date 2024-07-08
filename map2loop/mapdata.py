@@ -908,7 +908,7 @@ class MapData:
         # Create new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
 
-        # crop by minimum fault lenght
+        # crop by minimum fault length
         self.minimum_fault_length = 0.0
 
         try:

@@ -461,7 +461,6 @@ class StructuralPoint(ThicknessCalculator):
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
             basal_contacts, map_data.sampled_contacts
         )
-        sampled_basal_contacts.plot()
 
         # calculate map dimensions
         map_dx = geology.total_bounds[2] - geology.total_bounds[0]

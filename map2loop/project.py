@@ -226,7 +226,8 @@ class Project(object):
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
-        # only 
+        
+        # only define the minimum fault length if there are faults
         if len(self.map_data.get_map_data(Datatype.FAULT))!=0:
             self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
         

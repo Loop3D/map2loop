@@ -299,8 +299,6 @@ def rebuild_sampled_basal_contacts(
         crs=basal_contacts.crs,
         columns=['basal_unit'],
     )
-    
-    # 
 
     return sampled_basal_contacts
 

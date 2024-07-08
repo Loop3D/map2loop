@@ -30,7 +30,6 @@ class DeformationHistory:
         """
         The initialiser for the deformation history. All attributes are defaulted
         """
-        # I want to get the minimum fault length to export from the config dictionary in proj
         
         self.minimum_fault_length_to_export = 0.0
         self.history = []

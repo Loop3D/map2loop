@@ -226,7 +226,9 @@ class Project(object):
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
-        self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
+        # only 
+        if len(self.map_data.get_map_data(Datatype.FAULT))!=0:
+            self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
         
         if len(kwargs):
             print(f"These keywords were not used in initialising the Loop project ({kwargs})")
@@ -374,6 +376,10 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        
+        ##### TODO - AR - add check here for basal contacts 'abnormal'
+        
+        # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.basal_contacts
         )

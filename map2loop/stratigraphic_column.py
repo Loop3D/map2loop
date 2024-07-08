@@ -194,5 +194,5 @@ class StratigraphicColumn:
                 The order of the units by name
         """
         sorter = dict(zip(relationshipList, range(len(relationshipList))))
-        self.stratigraphicUnits["Order"] = self.stratigraphicUnits["name"].map(sorter)
-        self.stratigraphicUnits.sort_values(["Order"], inplace=True)
+        self.stratigraphicUnits["stratigraphic_Order"] = self.stratigraphicUnits["name"].map(sorter)
+        self.stratigraphicUnits.sort_values(["stratigraphic_Order"], inplace=True)

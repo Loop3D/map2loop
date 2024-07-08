@@ -128,16 +128,15 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         thicknesses["ThicknessMedian"] = no_distance
         thicknesses["ThicknessStdDev"] = no_distance
         
-        basal_unit_list = basal_contacts["basal_unit"].to_list()
-        
+        basal_unit_list = basal_contacts["basal_unit"].to_list() 
         sampled_basal_contacts = rebuild_sampled_basal_contacts(basal_contacts=basal_contacts, sampled_contacts=map_data.sampled_contacts)
-
 
         if len(stratigraphic_order) < 3:
             print(
                 f"ThicknessCalculatorAlpha: Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
             )
             return thicknesses
+        
         for i in range(1, len(stratigraphic_order) - 1):
             # Compare basal contacts of adjacent units
             if (
@@ -487,10 +486,14 @@ class StructuralPoint(ThicknessCalculator):
             bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]
 
             # make a subset of the geology polygon & find neighbour units
+            if litho_in is numpy.nan: # unless the structure is not within a lithology, this should be a rare case
+                continue
+            
             GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
             neighbor_list = list(
                 basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
             )
+            
             # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
             B = calculate_endpoints(measurement_pt, strike, self.line_length, bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
@@ -593,7 +596,9 @@ class StructuralPoint(ThicknessCalculator):
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
         
-        output_units = output_units.fillna(-1)
+        output_units["ThicknessMean"]=output_units["ThicknessMean"].fillna(-1)
+        output_units["ThicknessMedian"]=output_units["ThicknessMedian"].fillna(-1)
+        output_units["ThicknessStdDev"]=output_units["ThicknessStdDev"].fillna(-1)
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit

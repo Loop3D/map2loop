@@ -4,5 +4,5 @@ networkx
 owslib
 map2model
 hjson
-loopprojectfile>=0.1.3
+loopprojectfile==0.1.4
 beartype

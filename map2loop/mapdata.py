@@ -21,7 +21,6 @@ from io import BytesIO
 from typing import Union
 import tempfile
 
-
 class MapData:
     """
     A data structure containing all the map data loaded from map files
@@ -1126,15 +1125,15 @@ class MapData:
                 The extension to use for the data. Defaults to ".csv".
         """
         try:
-            filename = os.path.join(output_dir, datatype.name + extension)
+            filename = pathlib.Path(output_dir) / f"{datatype.name}{extension}"
+            
             if extension == ".csv":
-                # TODO: Add geopandas to pandas converter and then write csv
-                # self.raw_data[datatype].write_csv(filename)
-                print("GeoDataFrame to CSV conversion not implimented")
+                df = self.raw_data[datatype]
+                df.to_csv(filename, index=False)
             else:
                 self.raw_data[datatype].to_file(filename)
-        except Exception:
-            print(f"Failed to save {datatype.name} to file named {filename}\n")
+        except Exception as e:
+            print(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
 
     @beartype.beartype
     def get_raw_map_data(self, datatype: Datatype):
@@ -1473,13 +1472,16 @@ class MapData:
         
         basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
         
-        if save_contacts:
-            self.basal_contacts = basal_contacts
-
         # added code to make sure that multi-line that touch each other are snapped and merged. 
         # necessary for the reconstruction based on featureId
         basal_contacts["geometry"] = [shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]]
-
+        
+        if save_contacts:
+            #keep abnormal contacts as all_basal_contacts
+            self.all_basal_contacts = basal_contacts
+            #remove the abnormal contacts from basal contacts
+            self.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
+            
         return basal_contacts
 
     @beartype.beartype

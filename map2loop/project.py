@@ -378,12 +378,11 @@ class Project(object):
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
         
-        ##### TODO - AR - add check here for basal contacts 'abnormal'
-        
         # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.basal_contacts
         )
+        
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):

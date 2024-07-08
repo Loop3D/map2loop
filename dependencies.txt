@@ -3,5 +3,6 @@ shapely
 networkx
 owslib
 map2model
-loopprojectfile>=0.1.3
+hjson
+loopprojectfile==0.1.3
 beartype

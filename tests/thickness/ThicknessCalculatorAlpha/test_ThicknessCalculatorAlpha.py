@@ -6,6 +6,8 @@ import numpy
 from map2loop.mapdata import MapData
 from map2loop.m2l_enums import Datatype
 from map2loop.thickness_calculator import ThicknessCalculatorAlpha
+from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology
+
 
 #########################################################
 ### Define the test data for ThicknessCalculatorAlpha ###
@@ -100,10 +102,7 @@ def check_thickness_values(result, column, description):
             result[result['stratigraphic_Order'] == order][column].values == -1
         ), f"ThicknessCalculatorAlpha: {position} unit not assigned as -1 ({description})"
 
-geology = geopandas.read_file(r"C:\Users\angel\Documents\GitHub\map2loop\map2loop\_datasets\geodata_files\hamersley\geology.geojson")
-
-from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology
-from map2loop.m2l_enums import Datastate#, datatype
+geology = load_hamersley_geology()
 def test_calculate_thickness_thickness_calculator_alpha():
     # Run the calculation
     md = MapData()

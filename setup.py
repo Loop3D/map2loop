@@ -34,7 +34,6 @@ setuptools.setup(
         "pandas",
         "geopandas",
         "shapely",
-        "tqdm",
         "networkx",
         "owslib",
         "loopprojectfile",

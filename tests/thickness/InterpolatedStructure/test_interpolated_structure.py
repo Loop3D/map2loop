@@ -18,6 +18,7 @@ import pathlib
 from map2loop.sampler import SamplerSpacing, SamplerDecimator
 from map2loop.m2l_enums import Datatype
 import map2loop
+import numpy
 
 
 def create_raster(output_path, bbox, epsg, pixel_size, value=100):
@@ -272,6 +273,7 @@ def test_compute(
     result = interpolated_structure_thickness.compute(
         units, stratigraphic_order, basal_contacts, samples, map_data
     )
+    
     assert (
         interpolated_structure_thickness.thickness_calculator_label == "InterpolatedStructure"
     ), 'Thickness_calc interpolated structure not being set properly'
@@ -284,11 +286,11 @@ def test_compute(
     assert (
         'ThicknessMean' in result.columns
     ), 'Thickness not being calculated in InterpolatedStructure calculator'
-    assert result['ThicknessMedian'].dtypes == float, 'ThicknessMedian column is not float'
+    assert result['ThicknessMedian'].dtypes == numpy.float64, 'ThicknessMedian column is not float'
     assert (
         'ThicknessStdDev' in result.columns
     ), 'Thickness std not being calculated in InterpolatedStructure calculator'
-    assert result['ThicknessStdDev'].dtypes == float, 'ThicknessStdDev column is not float'
+    assert result['ThicknessStdDev'].dtypes  == numpy.float64, 'ThicknessStdDev column is not float'
 
     # check for nas in thickness
     assert result['ThicknessMedian'].isna().sum() == 0, 'ThicknessMedian column has NaNs'

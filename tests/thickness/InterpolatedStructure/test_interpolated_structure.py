@@ -273,7 +273,6 @@ def test_compute(
     result = interpolated_structure_thickness.compute(
         units, stratigraphic_order, basal_contacts, samples, map_data
     )
-    print('HERE', result.dtypes)
     
     assert (
         interpolated_structure_thickness.thickness_calculator_label == "InterpolatedStructure"

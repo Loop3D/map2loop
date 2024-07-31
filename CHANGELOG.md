@@ -51,7 +51,7 @@
 * revert back to original url ([26e4971](https://github.com/Loop3D/map2loop/commit/26e497198744c591879fea96c10935d6b79b7d9d))
 * update question template ([8182e50](https://github.com/Loop3D/map2loop/commit/8182e50361852de817e1440adcb278b5f46f4796))
 * update tests that depend on server to skip in case server is unavailable ([646be9e](https://github.com/Loop3D/map2loop/commit/646be9ea06dade92f16208da7e681d6d2b0e6c65))
-* use gpd.points_from_xy ([2f931c5](https://github.com/Loop3D/map2loop/commit/2f931c59025997133aeea9c10f725858613b7f6b))
+* use geopandas.points_from_xy ([2f931c5](https://github.com/Loop3D/map2loop/commit/2f931c59025997133aeea9c10f725858613b7f6b))
 * verbose dipdir 360 test name ([6ffe6bf](https://github.com/Loop3D/map2loop/commit/6ffe6bf31ab860ee054bb175a63c00fee7b8a7ff))
 
 

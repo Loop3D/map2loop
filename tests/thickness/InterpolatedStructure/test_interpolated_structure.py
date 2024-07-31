@@ -295,5 +295,5 @@ def test_compute(
         result['ThicknessStdDev'].dtypes, np.floating
     ), 'ThicknessStdDev column is not float'
 
-    # check for nans in thickness
-    assert result['ThicknessMedian'].isna().sum() == 0., 'ThicknessMedian column has NaNs'
+    # check for nas in thickness
+    assert result['ThicknessMedian'].isna().sum() == 0, 'ThicknessMedian column has NaNs'

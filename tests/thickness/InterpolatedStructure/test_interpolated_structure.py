@@ -7,6 +7,7 @@
 
 import pytest
 import pandas as pd
+import numpy as np
 from map2loop.thickness_calculator import InterpolatedStructure
 from map2loop.project import Project
 from osgeo import gdal, osr
@@ -284,11 +285,15 @@ def test_compute(
     assert (
         'ThicknessMean' in result.columns
     ), 'Thickness not being calculated in InterpolatedStructure calculator'
-    assert result['ThicknessMedian'].dtypes is float, 'ThicknessMedian column is not float'
+    assert np.issubdtype(
+        result['ThicknessMedian'].dtypes, np.floating
+    ), 'ThicknessMedian column is not float'
     assert (
         'ThicknessStdDev' in result.columns
     ), 'Thickness std not being calculated in InterpolatedStructure calculator'
-    assert result['ThicknessStdDev'].dtypes is float, 'ThicknessStdDev column is not float'
+    assert np.issubdtype(
+        result['ThicknessStdDev'].dtypes, np.floating
+    ), 'ThicknessStdDev column is not float'
 
     # check for nas in thickness
     assert result['ThicknessMedian'].isna().sum() == 0, 'ThicknessMedian column has NaNs'

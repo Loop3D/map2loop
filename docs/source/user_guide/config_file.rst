@@ -17,7 +17,7 @@ Explanations of the JSON file elements:
 
 For more information on the variables and map2loop requirements please see the documentation.
                                                                        
-Legacy Variable Names (map2loop-2) Template
+Variable Names (map2loop-3) Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
 Note, there is an inbuilt converter within map2loop so you can use either of the config files with the most recent version of map2loop. 
 `This <../_static/HJSON_TEMPLATE.hjson>`_ is an example of the legacy variables.

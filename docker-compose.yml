@@ -9,4 +9,4 @@ services:
       - ../:/map2loop
       - ../../LoopStructural:/LoopStructural
     tty: true
-    command: sh map2loop/docs/build_docs.sh
+    # command: sh map2loop/docs/build_docs.sh

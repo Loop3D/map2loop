@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Mapping attributes to variables using an HJSON file &#8212; map2loop 3.1.8 documentation</title>
+    <title>Mapping attributes to variables using a JSON file &#8212; map2loop 3.1.9 documentation</title>
   
   
   
@@ -18,28 +18,28 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=fe8136a3"></script>
+    <script src="../_static/documentation_options.js?v=5af9b2ba"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/config_file';</script>
@@ -102,7 +102,7 @@
   
     <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -112,6 +112,8 @@
       <div class="navbar-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../index.html">
   
@@ -120,7 +122,7 @@
   
   
   
-    <p class="title logo__title">map2loop 3.1.8 documentation</p>
+    <p class="title logo__title">map2loop 3.1.9 documentation</p>
   
 </a></div>
     
@@ -131,31 +133,31 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item pst-header-nav-item current active">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../_auto_examples/index.html">
     Examples
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../_autosummary/map2loop.html">
     map2loop
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-external" href="https://www.loop3d.org">
     Loop3d
   </a>
@@ -174,7 +176,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -188,15 +190,15 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -207,7 +209,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
         <li class="nav-item">
@@ -219,7 +221,7 @@ document.write(`
           
           
           
-          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i>
             <span class="sr-only">Twitter</span></a>
         </li>
 </ul></div>
@@ -233,7 +235,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -244,7 +246,7 @@ document.write(`
   
 
   
-    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -270,31 +272,31 @@ document.write(`
           
           
             <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item pst-header-nav-item current active">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../_auto_examples/index.html">
     Examples
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../_autosummary/map2loop.html">
     map2loop
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-external" href="https://www.loop3d.org">
     Loop3d
   </a>
@@ -314,15 +316,15 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -333,7 +335,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/loop3d/map2loop" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
         <li class="nav-item">
@@ -345,7 +347,7 @@ document.write(`
           
           
           
-          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://twitter.com/loop3d" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-twitter-square fa-lg" aria-hidden="true"></i>
             <span class="sr-only">Twitter</span></a>
         </li>
 </ul></div>
@@ -364,7 +366,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installing map2loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geomodelling.html">Creating a 3D geological model</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Mapping attributes to variables using an HJSON file</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Mapping attributes to variables using a JSON file</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup_jupyter.html">Setting up your Jupyter Notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changing_colours.html">Changing Colours</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stratigraphic_thickness.html">Calculating stratigraphic thicknesses</a></li>
@@ -429,15 +431,15 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="mapping-attributes-to-variables-using-an-hjson-file">
-<h1>Mapping attributes to variables using an HJSON file<a class="headerlink" href="#mapping-attributes-to-variables-using-an-hjson-file" title="Link to this heading">#</a></h1>
+  <section id="mapping-attributes-to-variables-using-a-json-file">
+<h1>Mapping attributes to variables using a JSON file<a class="headerlink" href="#mapping-attributes-to-variables-using-a-json-file" title="Link to this heading">#</a></h1>
 <p>Once you’ve completed your map in QGIS, you’ll need to map the attributes (with whatever names you’ve given them) to the variable names used in map2loop. You can map the attributes to the variable names used in version 2 or 3 of map2loop, as specified in the tables in the Setting up your Shapefiles section.
-An example hjson file is shown below, using map2loop-2 variable names (also known as Legacy code. If you decide to use map2loop-2 variable names, you will have to set the legacy flag to true in the map2loop calling code later on. If you use map2loop-3 variable names you’ll need to set the legacy flag to false.</p>
+An example json file is shown below, using map2loop-2 variable names (also known as Legacy code. If you decide to use map2loop-2 variable names, you will have to set the legacy flag to true in the map2loop calling code later on. If you use map2loop-3 variable names you’ll need to set the legacy flag to false.</p>
 <p>Feel free to copy the attached template and fill in the required variables with the attribute names specific to your project.</p>
 <section id="config-file-template">
 <h2>Config File Template<a class="headerlink" href="#config-file-template" title="Link to this heading">#</a></h2>
 <p>The templates below demonstrate how to setup a config file for map2loop.
-Explanations of the HJSON file elements:</p>
+Explanations of the JSON file elements:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The left most ‘term’ is the map2loop variable name</p></li>
@@ -451,47 +453,108 @@ Explanations of the HJSON file elements:</p>
 <h3>Legacy Variable Names (map2loop-2) Template<a class="headerlink" href="#legacy-variable-names-map2loop-2-template" title="Link to this heading">#</a></h3>
 <p>Note, there is an inbuilt converter within map2loop so you can use either of the config files with the most recent version of map2loop.
 <a class="reference external" href="../_static/HJSON_TEMPLATE.hjson">This</a> is an example of the legacy variables.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
 <span class="c1">#ORIENTATION SHAPEFILE ATTRIBUTES</span>
-    <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP&quot;</span><span class="p">,</span>                        <span class="c1">#attribute containing dip information</span>
-    <span class="s2">&quot;dd&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP_DIRECTION&quot;</span><span class="p">,</span>             <span class="c1">#attribute containing dip direction information</span>
-    <span class="s2">&quot;otype&quot;</span><span class="p">:</span> <span class="s1">&#39;dip direction&#39;</span><span class="p">,</span>                 <span class="c1">#Set the measurement convention used (either &#39;strike&#39; or &#39;dip direction&#39;)</span>
-    <span class="s2">&quot;sf&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_STRUCTURE_DESCRIPTION&#39;</span><span class="p">,</span>     <span class="c1">#*opt attribute containing type of structure (eg. S0, S1)</span>
-    <span class="s2">&quot;bedding&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_BEDDING_TEXT&#39;</span><span class="p">,</span>         <span class="c1">#*opt text defining bedding measurements in the &quot;sf&quot; field (eg &quot;Bedding&quot; or &quot;S0&quot;)</span>
-    <span class="s2">&quot;bo&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_FOLIATION_DESCRIPTION&#39;</span><span class="p">,</span>     <span class="c1">#*opt attribute containing type of foliation</span>
-    <span class="s2">&quot;btype&quot;</span><span class="p">:</span> <span class="s1">&#39;OVERTURNED_BEDDING_TEXT&#39;</span><span class="p">,</span>       <span class="c1">#*opt text defining overturned bedding measurements in the &quot;bo&quot; field (eg. &#39;overturned&#39;)</span>
+    <span class="s2">&quot;orientation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dip direction&quot;</span><span class="p">,</span>      <span class="c1">#attribute containing dip information</span>
+    <span class="s2">&quot;dipdir_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP_DIRECTION&quot;</span><span class="p">,</span>  <span class="c1">#attribute containing dip direction information</span>
+    <span class="s2">&quot;dip_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP&quot;</span><span class="p">,</span>               <span class="c1">#attribute containing dip information</span>
+    <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_STRUCTURE_DESCRIPTION&quot;</span><span class="p">,</span>  <span class="c1">#*opt attribute containing type of structure (eg. S0, S1)</span>
+    <span class="s2">&quot;bedding_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_BEDDING_TEXT&quot;</span><span class="p">,</span>    <span class="c1">#*opt text defining bedding measurements in the &quot;sf&quot; field (eg &quot;Bedding&quot; or &quot;S0&quot;)</span>
+    <span class="s2">&quot;overturned_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_OVERTURNED&quot;</span><span class="p">,</span> <span class="c1">#*opt attribute containing type of foliation</span>
+    <span class="s2">&quot;overturned_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_OVERTURNED_DESCRIPTION&quot;</span><span class="p">,</span>  <span class="c1">#*opt text defining overturned bedding measurements (eg. &#39;overturned&#39;)</span>
+    <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ID&quot;</span><span class="p">,</span>           <span class="c1">#*opt attribute containing unique id of structural points</span>
 <span class="c1">#LITHOLOGY SHAPEFILE ATTRIBUTES</span>
-    <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_UNIT_NAME&#39;</span><span class="p">,</span>                  <span class="c1">#attribute containing stratigraphic unit name (most specific)</span>
-    <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_ALT_UNIT_NAME&#39;</span><span class="p">,</span>              <span class="c1">#attribute containing alternative stratigraphic unit name (eg unit code). Can be the same as &#39;c&#39;</span>
-    <span class="s2">&quot;g&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_GROUP&#39;</span><span class="p">,</span>                      <span class="c1">#*opt attribute containing stratigraphic group</span>
-    <span class="s2">&quot;g2&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_SUPERGROUP&#39;</span><span class="p">,</span>                <span class="c1">#*opt attribute containing stratigraphic supergroup (most coarse classification)</span>
-    <span class="s2">&quot;ds&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_DESCRIPTION&#39;</span><span class="p">,</span>               <span class="c1">#*opt general description field</span>
-    <span class="s2">&quot;r1&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_ROCKTYPE&#39;</span><span class="p">,</span>                  <span class="c1">#*opt attribute containing extra lithology information (can indicate intrusions)</span>
-    <span class="s2">&quot;r2&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_ROCKTYPE2&#39;</span><span class="p">,</span>                 <span class="c1">#*opt attribute containing secondary rocktype information</span>
-    <span class="s2">&quot;sill&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_SILL_TEXT&#39;</span><span class="p">,</span>               <span class="c1">#*opt text defining a sill in the &quot;ds&quot; field (eg &#39;sill&#39;)</span>
-    <span class="s2">&quot;intrusive&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_INTRUSIVE_TEXT&#39;</span><span class="p">,</span>     <span class="c1">#*opt text defining an intrusion in the &quot;r1&quot; field (eg &#39;intrusion&#39;)</span>
-    <span class="s2">&quot;volcanic&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_VOLCANIC_TEXT&#39;</span><span class="p">,</span>       <span class="c1">#*opt text defining volcanics in the &quot;ds&quot; field (eg &#39;volcanic&#39;)</span>
-    <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_MIN_AGE&#39;</span><span class="p">,</span>                  <span class="c1">#*opt attribute containing minimum unit age</span>
-    <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_MAX_AGE&#39;</span><span class="p">,</span>                  <span class="c1">#*opt attribute containing maximum unit age</span>
-  <span class="c1">#LINEAR FEATURES SHAPEFILE ATTRIBUTES</span>
-    <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_STRUCT_TYPE&#39;</span><span class="p">,</span>                <span class="c1">#attribute containing linear structure type (e.g. fault)</span>
-    <span class="s2">&quot;fault&quot;</span><span class="p">:</span> <span class="s1">&#39;fault&#39;</span><span class="p">,</span>                         <span class="c1">#text defining faults in the &quot;f&quot; field (eg. &#39;fault&#39;)</span>
-    <span class="s2">&quot;fdip&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_FAULT_DIP&#39;</span><span class="p">,</span>               <span class="c1">#*opt attribute containing numeric fault dip value (defaults to fdipnull)</span>
-    <span class="s2">&quot;fdipnull&quot;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>                          <span class="c1">#Default fault dip value, if &#39;fdip&#39; field is empty</span>
-    <span class="s2">&quot;fdipdir&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_FAULT_DIP_DIRECTION&#39;</span><span class="p">,</span>  <span class="c1">#*opt attribute containing the fault dip direction (defaults to -999)</span>
-    <span class="s2">&quot;fdipdir_flag&quot;</span><span class="p">:</span> <span class="s1">&#39;num&#39;</span><span class="p">,</span>                    <span class="c1">#*opt specifies whether fdipdir is &quot;num&quot;:numeric or other (&quot;alpha&quot;)</span>
-    <span class="s2">&quot;fdipest&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_DIP_EST_TEXT&#39;</span><span class="p">,</span>         <span class="c1">#*opt field for text fault dip estimate value (defaults to none)</span>
-    <span class="s2">&quot;fdipest_vals&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_DIP_EST_TERMS&#39;</span><span class="p">,</span>   <span class="c1">#*opt text used to estimate dip in increasing steepness, in &quot;fdipest&quot; field</span>
-    <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_FAULT_NAME&#39;</span><span class="p">,</span>                 <span class="c1">#*opt attribute containing the fault name</span>
-  <span class="c1">#GENERAL IDS</span>
-    <span class="s2">&quot;o&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_OBJ_ID&#39;</span><span class="p">,</span>                     <span class="c1">#*opt attribute containing unique object id (used in polygon and lineString shapefiles</span>
-    <span class="s2">&quot;gi&quot;</span><span class="p">:</span> <span class="s1">&#39;INSERT_ORI_ID&#39;</span><span class="p">,</span>                    <span class="c1">#*opt attribute containing unique id of structural points</span>
-  <span class="p">}</span>
+    <span class="s2">&quot;unitname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_UNITNAME&quot;</span><span class="p">,</span>     <span class="c1">#attribute containing stratigraphic unit name (most specific)</span>
+    <span class="s2">&quot;alt_unitname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ALTERNATIVE_UNITNAME_CODE&quot;</span><span class="p">,</span>  <span class="c1">#attribute containing alternative stratigraphic unit name (eg unit code). Can be the same as &quot;unitname_column&quot;</span>
+    <span class="s2">&quot;group_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_GROUP&quot;</span><span class="p">,</span>           <span class="c1">#*opt attribute containing stratigraphic group</span>
+    <span class="s2">&quot;supergroup_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_SUPERGROUP&quot;</span><span class="p">,</span> <span class="c1">#*opt attribute containing stratigraphic supergroup (most coarse classification)</span>
+    <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DESCRIPTION&quot;</span><span class="p">,</span>  <span class="c1">#*opt general description field</span>
+    <span class="s2">&quot;minage_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_MIN_AGE&quot;</span><span class="p">,</span>        <span class="c1">#*opt attribute containing minimum unit age</span>
+    <span class="s2">&quot;maxage_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_MAX_AGE&quot;</span><span class="p">,</span>        <span class="c1">#*opt attribute containing maximum unit age</span>
+    <span class="s2">&quot;rocktype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ROCKTYPE1&quot;</span><span class="p">,</span>    <span class="c1">#*opt attribute containing extra lithology information (can indicate intrusions)</span>
+    <span class="s2">&quot;alt_rocktype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ALTERNATIVE_ROCKTYPE&quot;</span><span class="p">,</span>  <span class="c1">#*opt attribute containing secondary rocktype information</span>
+    <span class="s2">&quot;sill_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_SILL_TEXT&quot;</span><span class="p">,</span>          <span class="c1">#*opt text defining a sill in the &quot;ds&quot; field (eg &#39;sill&#39;)</span>
+    <span class="s2">&quot;intrusive_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_INTRUSIVE_TEXT&quot;</span><span class="p">,</span>  <span class="c1">#*opt text defining an intrusion in the &quot;r1&quot; field (eg &#39;intrusion&#39;)</span>
+    <span class="s2">&quot;volcanic_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_VOLCANIC_TEXT&quot;</span><span class="p">,</span>  <span class="c1">#*opt text defining volcanics in the &quot;ds&quot; field (eg &#39;volcanic&#39;)</span>
+    <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ID&quot;</span><span class="p">,</span>           <span class="c1">#*opt attribute containing unique object id (used in polygon and lineString shapefiles)</span>
+    <span class="s2">&quot;ignore_codes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;INSERT_COVER_UNIT_CODES_TO_IGNORE&quot;</span><span class="p">],</span>  <span class="c1">#*opt attribute containing codes to ignore</span>
+<span class="c1">#LINEAR FEATURES SHAPEFILE ATTRIBUTES</span>
+    <span class="s2">&quot;structtype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FEATURE_TYPE&quot;</span><span class="p">,</span>  <span class="c1">#attribute containing linear structure type (e.g. fault)</span>
+    <span class="s2">&quot;fault_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FAULT_TEXT&quot;</span><span class="p">,</span>        <span class="c1">#text defining faults in the &quot;f&quot; field (eg. &#39;fault&#39;)</span>
+    <span class="s2">&quot;dip_null_value&quot;</span><span class="p">:</span> <span class="s2">&quot;-999&quot;</span><span class="p">,</span>                 <span class="c1">#Default fault dip value, if &#39;fdip&#39; field is empty</span>
+    <span class="s2">&quot;dipdir_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;num&quot;</span><span class="p">,</span>                     <span class="c1">#*opt specifies whether fdipdir is &quot;num&quot;:numeric or other (&quot;alpha&quot;)</span>
+    <span class="s2">&quot;dipdir_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP_DIRECTION&quot;</span><span class="p">,</span>  <span class="c1">#*opt attribute containing the fault dip direction (defaults to -999)</span>
+    <span class="s2">&quot;dip_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP&quot;</span><span class="p">,</span>               <span class="c1">#*opt attribute containing numeric fault dip value (defaults to fdipnull)</span>
+    <span class="s2">&quot;orientation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dip direction&quot;</span><span class="p">,</span>      <span class="c1">#Set the measurement convention used (either &#39;strike&#39; or &#39;dip direction&#39;)</span>
+    <span class="s2">&quot;dipestimate_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_DIP_ESTIMATE&quot;</span><span class="p">,</span>  <span class="c1">#*opt field for text fault dip estimate value (defaults to none)</span>
+    <span class="s2">&quot;dipestimate_text&quot;</span><span class="p">:</span> <span class="s2">&quot;&#39;NORTH_EAST&#39;,&#39;NORTH&#39;,&lt;rest of cardinals&gt;,&#39;NOT ACCESSED&#39;&quot;</span><span class="p">,</span>  <span class="c1">#*opt text used to estimate dip in increasing steepness, in &quot;fdipest&quot; field</span>
+    <span class="s2">&quot;name_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FAULT_NAME&quot;</span><span class="p">,</span>       <span class="c1">#*opt attribute containing the fault name</span>
+    <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ID&quot;</span><span class="p">,</span>           <span class="c1">#*opt attribute containing unique object id (used in polygon and lineString shapefiles)</span>
+<span class="c1">#FOLD FEATURES SHAPEFILE ATTRIBUTES</span>
+    <span class="s2">&quot;structtype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FEATURE_TYPE&quot;</span><span class="p">,</span>  <span class="c1">#attribute containing linear structure type (e.g. fault)</span>
+    <span class="s2">&quot;fold_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FOLD_TEXT&quot;</span><span class="p">,</span>          <span class="c1">#text defining folds in the &quot;f&quot; field (eg. &#39;fold&#39;)</span>
+    <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FOLD_DESCRIPTION&quot;</span><span class="p">,</span>  <span class="c1">#*opt attribute containing type of fold</span>
+    <span class="s2">&quot;synform_text&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_SYNCLINE_TEXT&quot;</span><span class="p">,</span>   <span class="c1">#*opt text defining synclines in the &quot;f&quot; field (eg. &#39;syncline&#39;)</span>
+    <span class="s2">&quot;foldname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_FOLD_NAME&quot;</span><span class="p">,</span>    <span class="c1">#*opt attribute containing the fold name</span>
+    <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;INSERT_ID&quot;</span><span class="p">,</span>           <span class="c1">#*opt attribute containing unique object id (used in polygon and lineString shapefiles)</span>
+<span class="p">}</span>
 </pre></div>
 </div>
+<p>The following is an example filled out of a JSON config file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;structure&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;orientation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;strike&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dipdir_column&quot;</span><span class="p">:</span> <span class="s2">&quot;strike&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dip_column&quot;</span><span class="p">:</span> <span class="s2">&quot;dip&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;bedding_text&quot;</span><span class="p">:</span> <span class="s2">&quot;Bed&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;overturned_column&quot;</span><span class="p">:</span> <span class="s2">&quot;structypei&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;overturned_text&quot;</span><span class="p">:</span> <span class="s2">&quot;BEOI&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;geopnt_id&quot;</span><span class="p">,</span>
+<span class="p">},</span>
+<span class="s2">&quot;geology&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;unitname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;unitname&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;alt_unitname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;code&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;group_column&quot;</span><span class="p">:</span> <span class="s2">&quot;group_&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;supergroup_column&quot;</span><span class="p">:</span> <span class="s2">&quot;supersuite&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;descriptn&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;minage_column&quot;</span><span class="p">:</span> <span class="s2">&quot;min_age_ma&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;maxage_column&quot;</span><span class="p">:</span> <span class="s2">&quot;max_age_ma&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;rocktype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;rocktype1&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;alt_rocktype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;rocktype2&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;sill_text&quot;</span><span class="p">:</span> <span class="s2">&quot;is a sill&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;intrusive_text&quot;</span><span class="p">:</span> <span class="s2">&quot;intrusive&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;volcanic_text&quot;</span><span class="p">:</span> <span class="s2">&quot;volcanic&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;objectid&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;ignore_codes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cover&quot;</span><span class="p">],</span>
+<span class="p">},</span>
+<span class="s2">&quot;fault&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;structtype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;fault_text&quot;</span><span class="p">:</span> <span class="s2">&quot;Fault&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dip_null_value&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dipdir_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;num&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dipdir_column&quot;</span><span class="p">:</span> <span class="s2">&quot;dip_dir&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dip_column&quot;</span><span class="p">:</span> <span class="s2">&quot;dip&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;orientation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dip direction&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dipestimate_column&quot;</span><span class="p">:</span> <span class="s2">&quot;dip_est&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dipestimate_text&quot;</span><span class="p">:</span> <span class="s2">&quot;gentle,moderate,steep&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name_column&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;objectid&quot;</span><span class="p">,</span>
+<span class="p">},</span>
+<span class="s2">&quot;fold&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;structtype_column&quot;</span><span class="p">:</span> <span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;fold_text&quot;</span><span class="p">:</span> <span class="s2">&quot;Fold axial trace&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;description_column&quot;</span><span class="p">:</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synform_text&quot;</span><span class="p">:</span> <span class="s2">&quot;syncline&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;foldname_column&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;objectid_column&quot;</span><span class="p">:</span> <span class="s2">&quot;objectid&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>}</p>
 </section>
-<section id="map2loop-3-variable-names-hjson-file-template">
-<h3>map2loop-3 variable names HJSON File Template<a class="headerlink" href="#map2loop-3-variable-names-hjson-file-template" title="Link to this heading">#</a></h3>
+<section id="map2loop-3-variable-names-json-file-template">
+<h3>map2loop-3 variable names JSON File Template<a class="headerlink" href="#map2loop-3-variable-names-json-file-template" title="Link to this heading">#</a></h3>
 <p>This is a template with the most up-to date variable names.</p>
 </section>
 </section>
@@ -545,7 +608,7 @@ Explanations of the HJSON file elements:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#config-file-template">Config File Template</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-variable-names-map2loop-2-template">Legacy Variable Names (map2loop-2) Template</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop-3-variable-names-hjson-file-template">map2loop-3 variable names HJSON File Template</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map2loop-3-variable-names-json-file-template">map2loop-3 variable names JSON File Template</a></li>
 </ul>
 </li>
 </ul>
@@ -573,8 +636,8 @@ Explanations of the HJSON file elements:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
 <script type="text/javascript">
   $(document).ready(function () {

@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.1.9](https://github.com/Loop3D/map2loop/compare/v3.1.8...v3.1.9) (2024-08-02)
+
+
+### Bug Fixes
+
+* adapt floats to new np & unpin ([7bdd346](https://github.com/Loop3D/map2loop/commit/7bdd346fc8a565f107ce6bcfe8ec687701baa028))
+* adapt floats to new np & unpin ([eac8ab2](https://github.com/Loop3D/map2loop/commit/eac8ab2e49142dd85e3bb4e9a09fb98d03482bab))
+* adding poppler dependency for gdal.... why? ([a716933](https://github.com/Loop3D/map2loop/commit/a71693380a72bc71445295ac392171a0727ebe08))
+* linting issues ([b743de4](https://github.com/Loop3D/map2loop/commit/b743de4ab1a8765cea703d041a65b1248abad1fc))
+* linting issues ([1bf6600](https://github.com/Loop3D/map2loop/commit/1bf6600a5fe12a65eb8b866376f01b5f87c8d710))
+* pin numpy version ([8a55469](https://github.com/Loop3D/map2loop/commit/8a554693b0a968e578560735f5bbb02db13d8b36))
+* pin numpy version ([7dfd91c](https://github.com/Loop3D/map2loop/commit/7dfd91cbf20d1022b00bf007e87a8b99cb3836b3))
+* update np version ([4acb184](https://github.com/Loop3D/map2loop/commit/4acb1849e7d51b3e878e59661e98d14e58187291))
+* update np version ([5614446](https://github.com/Loop3D/map2loop/commit/5614446c616479ab753b72ca1132fcd99344c94f))
+* update numpy version ([0fa6537](https://github.com/Loop3D/map2loop/commit/0fa6537841f1fa464adddae663351795e3158db1))
+* update numpy version ([b312176](https://github.com/Loop3D/map2loop/commit/b31217681d4f21ca557c9aabd5f1756b9e8e57ed))
+* use numpy type checker to catch new numpy typing ([48ac7cb](https://github.com/Loop3D/map2loop/commit/48ac7cb06d69f8549c484af6222ca6a96ab849d3))
+* use numpy type checker to catch new numpy typing ([678f25e](https://github.com/Loop3D/map2loop/commit/678f25ec77e6d8ab207b98e7cd32be706a191c35))
+
 ## [3.1.8](https://github.com/Loop3D/map2loop/compare/v3.1.7...v3.1.8) (2024-06-20)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.10](https://github.com/Loop3D/map2loop/compare/v3.1.9...v3.1.10) (2024-08-02)
+
+
+### Documentation
+
+* corrected title ([86148a5](https://github.com/Loop3D/map2loop/commit/86148a59de1b96cddcae22c4d470c096c5fdbd5b))
+
 ## [3.1.9](https://github.com/Loop3D/map2loop/compare/v3.1.8...v3.1.9) (2024-08-02)
 
 

@@ -18,12 +18,12 @@ jobs:
           ruff check . --fix
       - name: Check for local changes
         run: |
-              if [ -n "$(git status --porcelain)" ]; then
-                git config --global user.name "github-actions[bot]"
-                git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                git add .
-                git commit -m "style: style fixes by ruff and autoformatting by black"
-              fi
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "style: style fixes by ruff and autoformatting by black"
+          fi
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
@@ -56,7 +56,7 @@ jobs:
         shell: bash -l {0}
         run: |
           pytest
-          
+
   documentation-test:
     runs-on: ubuntu-latest
     steps:
@@ -70,6 +70,43 @@ jobs:
         with:
           name: docs
           path: docs/build/html
+
+  conda-build:
+    conda-build:
+    name: Building conda package for python
+    needs: ["linting"]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+    steps:
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/checkout@v4
+      - name: update submodules
+        #       shell: bash -l {0}
+        run: |
+          git submodule update --init --recursive
+      - name: Conda build
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
+        shell: bash -l {0}
+        run: |
+          conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
+          conda build -c conda-forge -c loop3d --output-folder conda conda 
+          conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: conda-${{ matrix.os }}-${{ matrix.python-version }}
+          path: conda
+
   release-please:
     runs-on: ubuntu-latest
     needs: continuous-integration

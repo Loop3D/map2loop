@@ -212,8 +212,9 @@ A simple example of the QGIS attribute table for lithology data is shown in the 
 Tips and Trouble Shooting for QGIS map 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* 	Ensure that there are no gaps between your polygons. You may find it helpful to use the ‘snapping tool’ in QGIS. 
-*  Map2loop sometimes glitches with white spaces. You may need to replace spaces in names with underscores (for example: Emu Egg Fault becomes Emu_Egg_Fault)
+* Ensure that there are no gaps between your polygons. You may find it helpful to use the ‘snapping tool’ in QGIS. 
+* Ensure there are no holes in your polygons.
+* Map2loop sometimes glitches with white spaces. You may need to replace spaces in names with underscores (for example: Emu Egg Fault becomes Emu_Egg_Fault)
 *	If you want to force a stratigraphic sequence but don’t want to but in absolute unit ages, you can number the units with relative ‘age’ values in order (eg, 1, 2, 3, 4). To do this set the min and max ages to the relevant sequence number. This is demonstrated in the image above.
 
 Adding Data 

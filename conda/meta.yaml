@@ -16,34 +16,27 @@ requirements:
   host:
     - pip
     - python
-    - setuptools
-    - numpy
-    - geopandas
-    - map2model
-    - hjson
-    - loopprojectfile
-    - beartype
-    - owslib
   run:
     - python
     - numpy
     - pandas
     - geopandas
-    - map2model
+    - shapely
+    - tqdm
+    - networkx
+    - owslib
     - hjson
     - loopprojectfile
+    - map2model
     - beartype
-    - owslib
 
 test:
   imports:
     - map2loop
-    - geopandas
-    - map2model
-    - hjson
-    - loopprojectfile
-    - beartype
-    - owslib
+  commands:
+    - pip check
+  requires:
+    - pip
 
 about:
   home: "https://github.com/Loop3D/map2loop"
@@ -54,4 +47,4 @@ about:
 
 extra:
   recipe-maintainers:
-    - roythomson
+    - lachlangrose

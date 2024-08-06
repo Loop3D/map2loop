@@ -5,7 +5,8 @@ import geopandas
 import beartype
 from typing import Union
 import pandas
-import random
+
+# import random
 
 
 @beartype.beartype
@@ -319,15 +320,17 @@ def generate_random_hex_colors(n: int, seed: int = None) -> list:
         ['#1a2b3c', '#4d5e6f', '#7f8e9d']
     """
     if not isinstance(n, int):
-        raise TypeError("n of colours must be an integer") ## not sure if necessary as beartype should handle this 
-    
+        raise TypeError(
+            "n of colours must be an integer"
+        )  ## not sure if necessary as beartype should handle this
+
     if seed is not None:
         rng = numpy.random.default_rng(seed)
     else:
         rng = numpy.random.default_rng(123456)
-        
-    colors = set() # set prevents duplicates
-    
+
+    colors = set()  # set prevents duplicates
+
     while len(colors) < n:
         color = "#{:06x}".format(rng.integers(0, 0xFFFFFF))
         colors.add(color)
@@ -358,18 +361,15 @@ def hex_to_rgb(hex_color: str) -> tuple:
     # Handle short hex code (e.g., "#RGB")
     if len(hex_color) == 3:
         hex_color = ''.join([c * 2 for c in hex_color])
-        
+
     alpha = 1.0
     # Convert the hex color code to an RGBA tuple// if it fails, return error
     try:
         r = int(hex_color[0:2], 16) / 255.0
         g = int(hex_color[2:4], 16) / 255.0
         b = int(hex_color[4:6], 16) / 255.0
-        
+
     except ValueError as e:
-        raise ValueError(
-            "Invalid hex color code. Contains non-hexadecimal characters."
-        ) from e
+        raise ValueError("Invalid hex color code. Contains non-hexadecimal characters.") from e
 
     return (r, g, b, alpha)
-

@@ -4,3 +4,5 @@ sphinx-gallery
 pydata-sphinx-theme 
 myst-parser 
 sphinxcontrib-bibtex
+conda-forge::poppler
+LoopStructural

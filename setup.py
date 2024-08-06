@@ -38,7 +38,7 @@ setuptools.setup(
         "networkx",
         "owslib",
         "hjson",
-        "loopprojectfile==0.1.3",
+        "loopprojectfile",
         "map2model",
         "beartype",
     ],

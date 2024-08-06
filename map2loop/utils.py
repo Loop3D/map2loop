@@ -3,14 +3,12 @@ import math
 import shapely
 import geopandas
 import beartype
-from typing import Union
+from typing import Union, Optional
 import pandas
-
-# import random
 
 
 @beartype.beartype
-def generate_grid(bounding_box: dict, grid_resolution: int = None) -> tuple:
+def generate_grid(bounding_box: dict, grid_resolution: Optional[int] = None) -> tuple:
     """
     Setup the grid for interpolation
 

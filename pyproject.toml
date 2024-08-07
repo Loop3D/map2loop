@@ -1,3 +1,46 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+[project]
+name = 'map2loop'
+description = 'Generate 3D model data from 2D maps.'
+authors = [{name = 'Loop team'}]
+readme = 'README.md'
+requires-python = '>=3.8'
+keywords = [ "earth sciences",
+    "geology",
+    "3-D modelling",
+    "structural geology",
+    "uncertainty",]
+license = {text = 'MIT'}
+classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "Natural Language :: English",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: GIS",
+    ]
+dynamic = ['version','dependencies']
+
+[project.urls]
+Documentation = 'https://Loop3d.org/map2loop/'
+"Bug Tracker" = 'https://github.com/Loop3D/map2loop/issues'
+"Source Code" = 'https://github.com/Loop3D/map2loop'
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["dependencies.txt"]}
+version = { attr = 'map2loop.version.__version__' }
+
+[tool.setuptools.packages.find]
+include = ['map2loop', 'map2loop.*']
+
+
+
+
 [tool.black]
 line-length = 100
 skip-string-normalization = true
@@ -12,7 +55,6 @@ skip-magic-trailing-comma = true
 # it look like an unfinished thought or an incomplete
 [tool.blackdoc]
 # From https://numpydoc.readthedocs.io/en/latest/format.html
-# Extended discussion: https://github.com/pyvista/pyvista/pull/4129
 # The length of docstring lines should be kept to 75 characters to facilitate
 # reading the docstrings in text terminals.
 line-length = 75

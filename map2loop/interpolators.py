@@ -331,6 +331,8 @@ class DipDipDirectionInterpolator(Interpolator):
         Args:
             structure_data (pandas.DataFrame): sampled structural data
         """
+         # Check for collocated points and remove them
+        structure_data = structure_data.drop_duplicates(subset=['X', 'Y'])
 
         self.x = structure_data["X"].to_numpy()
         self.y = structure_data["Y"].to_numpy()

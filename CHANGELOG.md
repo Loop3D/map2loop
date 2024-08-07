@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.11](https://github.com/Loop3D/map2loop/compare/v3.1.10...v3.1.11) (2024-08-07)
+
+
+### Bug Fixes
+
+* linting issues ([94af4d9](https://github.com/Loop3D/map2loop/commit/94af4d9fe1bf689ddf269dfafa07a40bc5df545f))
+* remove pip pin for LPF because LPF has incorrect version tags ([dd99e15](https://github.com/Loop3D/map2loop/commit/dd99e15d167154bd902c005e012360b5005f20cf))
+
 ## [3.1.10](https://github.com/Loop3D/map2loop/compare/v3.1.9...v3.1.10) (2024-08-02)
 
 

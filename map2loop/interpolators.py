@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Union
-
+import logging
 from .utils import strike_dip_vector, generate_grid
 
 import beartype
@@ -336,10 +336,19 @@ class DipDipDirectionInterpolator(Interpolator):
         Args:
             structure_data (pandas.DataFrame): sampled structural data
         """
+        # Check for collocated points and remove them
+        structure_data = structure_data.drop_duplicates(subset=['X', 'Y']).copy()
         # Check for collocated point clusters and average them
         coords = structure_data[["X", "Y"]].values
         db = DBSCAN(eps=self.cell_size, min_samples=1).fit(coords)
         structure_data["cluster"] = db.labels_
+        # Check if there are any clusters with more than one point (indicating collocated points)
+        collocated_clusters = structure_data['cluster'].value_counts()
+        collocated_clusters = collocated_clusters[collocated_clusters > 1]
+    
+        if not collocated_clusters.empty:
+            # Log a warning if collocated points are detected
+            logging.warning(f"Detected {len(collocated_clusters)} collocated point clusters. Aggregating these points.")
 
         # Aggregate data for collocated points by taking the mean of X, Y, DIP, and DIPDIR within each cluster
         aggregated_data = (

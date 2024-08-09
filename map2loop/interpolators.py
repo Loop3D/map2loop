@@ -338,7 +338,7 @@ class DipDipDirectionInterpolator(Interpolator):
         """
         # Check for collocated point clusters and average them
         coords = structure_data[["X", "Y"]].values
-        db = DBSCAN(eps=self.cell_size+0.02, min_samples=1).fit(coords)
+        db = DBSCAN(eps=self.cell_size, min_samples=1).fit(coords)
         structure_data["cluster"] = db.labels_
 
         # Aggregate data for collocated points by taking the mean of X, Y, DIP, and DIPDIR within each cluster

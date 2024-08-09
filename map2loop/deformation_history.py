@@ -30,7 +30,8 @@ class DeformationHistory:
         """
         The initialiser for the deformation history. All attributes are defaulted
         """
-        self.minimum_fault_length_to_export = 500.0
+        
+        self.minimum_fault_length_to_export = 0.0
         self.history = []
         self.fault_fault_relationships = []
 

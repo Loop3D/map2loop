@@ -32,6 +32,7 @@ map2loop.interpolators
    
       ABC
       Any
+      DBSCAN
       DipDipDirectionInterpolator
       Interpolator
       LinearNDInterpolator

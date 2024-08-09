@@ -1,0 +1,31 @@
+map2loop.interpolators.DBSCAN
+=============================
+
+.. currentmodule:: map2loop.interpolators
+
+.. autoclass:: DBSCAN
+   :members:                                   
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DBSCAN.__init__
+      ~DBSCAN.fit
+      ~DBSCAN.fit_predict
+      ~DBSCAN.get_metadata_routing
+      ~DBSCAN.get_params
+      ~DBSCAN.set_fit_request
+      ~DBSCAN.set_params
+   
+   
+
+   
+   
+   

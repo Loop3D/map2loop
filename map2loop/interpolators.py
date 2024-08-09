@@ -1,10 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Any, Union
+
+from .utils import strike_dip_vector, generate_grid
+
 import beartype
 import numpy
 from numpy import ndarray
 from scipy.interpolate import Rbf, LinearNDInterpolator
-from .utils import strike_dip_vector, generate_grid
+from sklearn.cluster import DBSCAN
+
 import pandas
 
 
@@ -312,6 +316,7 @@ class DipDipDirectionInterpolator(Interpolator):
         self.yi = None
         self.dip = None
         self.dipdir = None
+        self.cell_size = None
         self.interpolator_label = "DipDipDirectionInterpolator"
 
     def type(self):
@@ -331,15 +336,25 @@ class DipDipDirectionInterpolator(Interpolator):
         Args:
             structure_data (pandas.DataFrame): sampled structural data
         """
-         # Check for collocated points and remove them
-        structure_data = structure_data.drop_duplicates(subset=['X', 'Y'])
+        # Check for collocated point clusters and average them
+        coords = structure_data[["X", "Y"]].values
+        db = DBSCAN(eps=self.cell_size+0.02, min_samples=1).fit(coords)
+        structure_data["cluster"] = db.labels_
 
-        self.x = structure_data["X"].to_numpy()
-        self.y = structure_data["Y"].to_numpy()
+        # Aggregate data for collocated points by taking the mean of X, Y, DIP, and DIPDIR within each cluster
+        aggregated_data = (
+            structure_data.groupby("cluster")
+            .agg({"X": "mean", "Y": "mean", "DIP": "mean", "DIPDIR": "mean"})
+            .reset_index(drop=True)
+        )
+
+        # setup variables for interpolation
+        self.x = aggregated_data["X"].to_numpy()
+        self.y = aggregated_data["Y"].to_numpy()
         if "dip" in self.data_type:
-            self.dip = structure_data["DIP"].to_numpy()
+            self.dip = aggregated_data["DIP"].to_numpy()
         if "dipdir" in self.data_type:
-            self.dipdir = structure_data["DIPDIR"].to_numpy()
+            self.dipdir = aggregated_data["DIPDIR"].to_numpy()
 
     @beartype.beartype
     def setup_grid(self, bounding_box: dict):
@@ -355,7 +370,7 @@ class DipDipDirectionInterpolator(Interpolator):
                 "maxy": value,
             }
         """
-        self.xi, self.yi = generate_grid(bounding_box)
+        self.xi, self.yi, self.cell_size = generate_grid(bounding_box)
 
     @beartype.beartype
     def interpolate(self, ni: Union[ndarray, list], interpolator: Any = Rbf):
@@ -394,9 +409,8 @@ class DipDipDirectionInterpolator(Interpolator):
             numpy.ndarray: interpolated dip and dip direction values
 
         """
-
-        self.setup_interpolation(structure_data)
         self.setup_grid(bounding_box)
+        self.setup_interpolation(structure_data)
 
         # interpolate dip and dip direction
         if self.dip is not None and self.dipdir is not None:

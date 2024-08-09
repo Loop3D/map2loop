@@ -457,7 +457,7 @@ class StructuralPoint(ThicknessCalculator):
         
         # remove nans from sampled structures 
         # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
-        print('skipping row(s) ', sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy(), 'in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n') 
+        print(f"skipping row(s) {sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy()} in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n")
         sampled_structures = sampled_structures.dropna(subset=['unit_name'])
                 
         
@@ -491,7 +491,7 @@ class StructuralPoint(ThicknessCalculator):
             # check if litho_in is in geology
             # for a special case when the litho_in is not in the geology
             if len(geology[geology['UNITNAME'] == litho_in]) == 0: 
-                print('There are structural measurements in unit - ', litho_in,  ' - that is not in the geology shapefile. Skipping this structural measurement')
+                print(f"There are structural measurements in unit - {litho_in} - that are not in the geology shapefile. Skipping this structural measurement")
                 continue
             else:          
                 # make a subset of the geology polygon & find neighbour units

@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.1.11](https://github.com/Loop3D/map2loop/compare/v3.1.10...v3.1.11) (2024-08-09)
+
+
+### Bug Fixes
+
+* added check for collocated points ([#125](https://github.com/Loop3D/map2loop/issues/125)) ([2bef09f](https://github.com/Loop3D/map2loop/commit/2bef09fa3dbfecbbb012a1e393c6851e6c3bbced))
+* issue 122 ([c643721](https://github.com/Loop3D/map2loop/commit/c6437215125aea4d3a33b4150611ecc55eeb97c8))
+* linting issues ([94af4d9](https://github.com/Loop3D/map2loop/commit/94af4d9fe1bf689ddf269dfafa07a40bc5df545f))
+* remove pip pin for LPF because LPF has incorrect version tags ([dd99e15](https://github.com/Loop3D/map2loop/commit/dd99e15d167154bd902c005e012360b5005f20cf))
+* update str format ([c3339a6](https://github.com/Loop3D/map2loop/commit/c3339a63161e7945140f55e5adf394e585fa590a))
+
 ## [3.1.10](https://github.com/Loop3D/map2loop/compare/v3.1.9...v3.1.10) (2024-08-02)
 
 

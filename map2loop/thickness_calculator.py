@@ -454,7 +454,13 @@ class StructuralPoint(ThicknessCalculator):
         )
         # add unitname to the sampled structures
         sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
-
+        
+        # remove nans from sampled structures 
+        # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
+        print(f"skipping row(s) {sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy()} in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n")
+        sampled_structures = sampled_structures.dropna(subset=['unit_name'])
+                
+        
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
             basal_contacts, map_data.sampled_contacts
@@ -482,8 +488,15 @@ class StructuralPoint(ThicknessCalculator):
             # find bounding box of the lithology
             bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]
 
-            # make a subset of the geology polygon & find neighbour units
-            GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+            # check if litho_in is in geology
+            # for a special case when the litho_in is not in the geology
+            if len(geology[geology['UNITNAME'] == litho_in]) == 0: 
+                print(f"There are structural measurements in unit - {litho_in} - that are not in the geology shapefile. Skipping this structural measurement")
+                continue
+            else:          
+                # make a subset of the geology polygon & find neighbour units
+                GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+
             neighbor_list = list(
                 basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
             )

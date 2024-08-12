@@ -508,7 +508,7 @@ class MapData:
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
                 
-            tif = gdal.Open(tmp_file)
+            tif = gdal.Open(str(tmp_file))
 
         elif filename == "hawaii":
             import netCDF4
@@ -547,7 +547,7 @@ class MapData:
             gdal.FileFromMemBuffer(mmap_name, image_data.read())
             tif = gdal.Open(mmap_name)
         else:
-            tif = gdal.Open(filename, gdal.GA_ReadOnly)
+            tif = gdal.Open(str(filename), gdal.GA_ReadOnly)
         # except Exception:
         #     print(
         #         f"Failed to open geoTIFF file from '{filename}'\n"

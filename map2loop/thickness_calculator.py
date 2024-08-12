@@ -456,7 +456,13 @@ class StructuralPoint(ThicknessCalculator):
         )
         # add unitname to the sampled structures
         sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
-
+        
+        # remove nans from sampled structures 
+        # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
+        print(f"skipping row(s) {sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy()} in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n")
+        sampled_structures = sampled_structures.dropna(subset=['unit_name'])
+                
+        
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
             basal_contacts, map_data.sampled_contacts

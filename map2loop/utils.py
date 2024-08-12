@@ -41,7 +41,7 @@ def generate_grid(bounding_box: dict, grid_resolution: Optional[int] = None) -> 
     xi = xi.flatten()
     yi = yi.flatten()
 
-    return xi, yi
+    return xi, yi, cell_size
 
 
 def strike_dip_vector(

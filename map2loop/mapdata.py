@@ -19,6 +19,8 @@ import beartype
 import os
 from io import BytesIO
 from typing import Union
+import logging
+logging.basicConfig(level=logging.ERROR)
 
 class MapData:
     """
@@ -732,16 +734,16 @@ class MapData:
                 )
             else:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
+                # Ensure all DIPDIR values are within [0, 360]
+                structure["DIPDIR"] = structure["DIPDIR"] % 360.0
         else:
-            print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
+            logging.error(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
                     
-        # Ensure all DIPDIR values are within [0, 360]
-        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
         
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
         else:
-            print(f"Structure map does not contain dip_column '{config['dip_column']}'")
+            logging.error(f"Structure map does not contain dip_column '{config['dip_column']}'")
 
         # Add bedding and overturned booleans
         if config["overturned_column"] in self.raw_data[Datatype.STRUCTURE]:
@@ -799,6 +801,9 @@ class MapData:
             msg = f"Geology map does not contain unitname_column {config['unitname_column']}"
             print(msg)
             return (True, msg)
+        
+        # This piece of code creates bug when the column is not present 
+        # resulting the geology geodataframe is not loaded
         if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
             geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
                 str

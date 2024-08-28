@@ -1,7 +1,10 @@
+import logging
 import pandas
 import numpy
 import geopandas
 
+# set level to logging.DEBUG 
+logging.basicConfig(level=logging.ERROR)
 
 class StratigraphicColumn:
     """
@@ -148,27 +151,31 @@ class StratigraphicColumn:
             geology_map_data (geopandas.GeoDataFrame):
                 The geodataframe with the unit data
         """
-        if geology_map_data.shape[0] == 0:
-            return
-        geology_data = geology_map_data.copy()
-        geology_data = geology_data.drop_duplicates(subset=["UNITNAME"])
-        geology_data = geology_data.reset_index(drop=True)
-        # geology_data = geology_data.dropna(subset=["UNITNAME"])
+        if isinstance(geology_map_data, geopandas.GeoDataFrame):
+            if geology_map_data.shape[0] == 0:
+                return 
+            
+            geology_data = geology_map_data.copy()
+            geology_data = geology_data.drop_duplicates(subset=["UNITNAME"])
+            geology_data = geology_data.reset_index(drop=True)
+            # geology_data = geology_data.dropna(subset=["UNITNAME"])
 
-        self.stratigraphicUnits = pandas.DataFrame(
-            numpy.empty(geology_data.shape[0], dtype=self.stratigraphicUnitColumns)
-        )
-        self.stratigraphicUnits["layerId"] = numpy.arange(geology_data.shape[0])
-        self.stratigraphicUnits["name"] = geology_data["UNITNAME"]
-        self.stratigraphicUnits["minAge"] = geology_data["MIN_AGE"]
-        self.stratigraphicUnits["maxAge"] = geology_data["MAX_AGE"]
-        self.stratigraphicUnits["group"] = geology_data["GROUP"]
-        self.stratigraphicUnits["supergroup"] = geology_data["SUPERGROUP"]
-        self.stratigraphicUnits["ThicknessMedian"] = -1.0
-        self.stratigraphicUnits["colour"] = "#000000"
-        # self.stratigraphicUnits["indexInGroup"] = -1
+            self.stratigraphicUnits = pandas.DataFrame(
+                numpy.empty(geology_data.shape[0], dtype=self.stratigraphicUnitColumns)
+            )
+            self.stratigraphicUnits["layerId"] = numpy.arange(geology_data.shape[0])
+            self.stratigraphicUnits["name"] = geology_data["UNITNAME"]
+            self.stratigraphicUnits["minAge"] = geology_data["MIN_AGE"]
+            self.stratigraphicUnits["maxAge"] = geology_data["MAX_AGE"]
+            self.stratigraphicUnits["group"] = geology_data["GROUP"]
+            self.stratigraphicUnits["supergroup"] = geology_data["SUPERGROUP"]
+            self.stratigraphicUnits["ThicknessMedian"] = -1.0
+            self.stratigraphicUnits["colour"] = "#000000"
+            # self.stratigraphicUnits["indexInGroup"] = -1
 
-        self.groups = list(self.stratigraphicUnits['group'].unique())
+            self.groups = list(self.stratigraphicUnits['group'].unique())
+        else: 
+            logging.error("No geology data found, geology data should be a geopandas.GeoDataFrame")    
 
     def set_stratigraphic_unit_parameter_by_name(self, name: str, parameter: str, value):
         """

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.12](https://github.com/Loop3D/map2loop/compare/v3.1.11...v3.1.12) (2024-09-11)
+
+
+### Bug Fixes
+
+* removing additional indents ([cdd3eab](https://github.com/Loop3D/map2loop/commit/cdd3eabecf6c22fb88cdf64a9f2bad72b324eba1))
+
 ## [3.1.11](https://github.com/Loop3D/map2loop/compare/v3.1.10...v3.1.11) (2024-08-09)
 
 

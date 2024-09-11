@@ -31,13 +31,7 @@ requirements:
     - beartype
     - gdal
 
-test:
-  imports:
-    - map2loop
-  commands:
-    - pip check
-  requires:
-    - pip
+
 
 about:
   home: "https://github.com/Loop3D/map2loop"

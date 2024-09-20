@@ -40,11 +40,6 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-      - name: Updating dependencies in pyproject.toml and meta.yaml 
-        shell: bash -l {0}
-        run: |
-            pip install toml 
-            python /map2loop/dependencies_autosync.py
 
       - name: Installing dependencies
         shell: bash -l {0}
@@ -56,6 +51,12 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install .
+          
+      - name: Updating dependencies in pyproject.toml and meta.yaml 
+        shell: bash -l {0}
+        run: |
+            pip install toml 
+            python /map2loop/dependencies_autosync.py
 
       - name: Testing
         shell: bash -l {0}

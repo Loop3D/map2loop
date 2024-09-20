@@ -51,6 +51,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           conda install -c conda-forge gdal==3.6.2 libgdal==3.6.2
+          pip install .
 
       - name: Installing dependencies
         shell: bash -l {0}
@@ -62,22 +63,6 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install .
-
-      - name: Updating dependencies in pyproject.toml and meta.yaml 
-        shell: bash -l {0}
-        run: |
-            pip install toml 
-            # Locate the installed path of map2loop package and run dependencies_autosync.py
-            MAP2LOOP_DIR=$(python -c "import os, map2loop; print(os.path.dirname(map2loop.__file__))")
-            
-            echo "Running dependencies_autosync.py from $MAP2LOOP_DIR"
-            
-            if [ -f "$MAP2LOOP_DIR/dependencies_autosync.py" ]; then
-              python "$MAP2LOOP_DIR/dependencies_autosync.py"
-            else
-              echo "Error: dependencies_autosync.py not found in $MAP2LOOP_DIR"
-              exit 1
-            fi
 
       - name: Testing
         shell: bash -l {0}

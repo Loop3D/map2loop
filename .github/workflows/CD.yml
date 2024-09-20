@@ -50,7 +50,7 @@ jobs:
       - name: Install GDAL for Windows
         if: runner.os == 'Windows'
         run: |
-          conda install -c conda-forge gdal=<3.6.2 libgdal<=3.6.2
+          conda install -c conda-forge gdal==3.6.2 libgdal==3.6.2
 
       - name: Installing dependencies
         shell: bash -l {0}

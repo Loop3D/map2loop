@@ -62,7 +62,7 @@ jobs:
           echo "GDAL_INCLUDE_DIR=$gdalPath\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "GDAL_LIBRARY_DIR=$gdalPath\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "PATH=$gdalPath\bin;$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          pip insttall gdal==3.6.2 
+          pip install gdal==3.6.2 
 
 
       - name: Installing dependencies

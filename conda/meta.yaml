@@ -17,6 +17,7 @@ requirements:
     - pip
     - python
   run:
+    - libgdal==3.9.2
     - geopandas
     - pandas
     - shapely
@@ -26,7 +27,6 @@ requirements:
     - hjson
     - loopprojectfile==0.1.3
     - beartype
-    - gdal<=3.7
     - numpy
 
 about:  

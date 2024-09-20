@@ -41,10 +41,16 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install GDAL
+        if: runner.os == 'Linux'
         run: |
             sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
             sudo apt-get update
             sudo apt-get install gdal-bin libgdal-dev
+            
+      - name: Install GDAL for Windows
+        if: runner.os == 'Windows'
+        run: |
+          conda install -c conda-forge gdal=3.9.2 libgdal=3.9.2
 
       - name: Installing dependencies
         shell: bash -l {0}

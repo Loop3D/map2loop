@@ -51,10 +51,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $gdalUrl = 'https://www.gisinternals.com/sdk/downloads/release-2023-10-07-gdal-3-7-2-mapserver-7.6.4/gdal-372-1930-x64-core.msi'
-          $gdalDevUrl = 'https://www.gisinternals.com/sdk/downloads/release-2023-10-07-gdal-3-7-2-mapserver-7.6.4/gdal-372-1930-x64-dev.msi'
-          Invoke-WebRequest $gdalUrl -OutFile gdal-core.msi
-          Invoke-WebRequest $gdalDevUrl -OutFile gdal-dev.msi
+          $gdalUrl = 'https://download.gisinternals.com/sdk/downloads/release-1928-gdal-3-9-1-mapserver-8-2-0/gdal-3.9.1-1928-core.msi'
+          $gdalDevUrl = 'https://download.gisinternals.com/sdk/downloads/release-1928-x64-gdal-mapserver/GDAL-3.10.0.win-amd64-py3.8.msi'
+          Invoke-WebRequest $gdalUrl -OutFile gdal-3.9.1-1928-core.msi
+          Invoke-WebRequest $gdalDevUrl -OutFile GDAL-3.10.0.win-amd64-py3.8.msi
           msiexec /i gdal-core.msi /qn /log install-core.log
           msiexec /i gdal-dev.msi /qn /log install-dev.log
           $gdalPath = 'C:\Program Files\GDAL'

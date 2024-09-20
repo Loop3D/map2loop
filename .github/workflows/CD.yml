@@ -46,11 +46,11 @@ jobs:
             sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
             sudo apt-get update
             sudo apt-get install gdal-bin libgdal-dev
-            
+
       - name: Install GDAL for Windows
         if: runner.os == 'Windows'
         run: |
-          conda install -c conda-forge gdal=3.9.2 libgdal=3.9.2
+          conda install -c conda-forge gdal=<3.7 libgdal<=3.7
 
       - name: Installing dependencies
         shell: bash -l {0}

@@ -1,6 +1,5 @@
 numpy
-libgdal-dev
-gdal<=3.7
+libgdal<=3.7
 geopandas
 pandas
 shapely

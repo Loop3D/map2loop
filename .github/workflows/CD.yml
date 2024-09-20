@@ -52,7 +52,17 @@ jobs:
         shell: pwsh
         run: |
           conda install -c conda-forge gdal=3.6.2 -y
-          pip install .
+          # Set environment variables
+          $gdalVersion = "3.6.2" # Update this to match the installed version
+          $gdalDir = "C:\Miniconda\envs\test" # Path to the conda environment
+          $gdalIncludeDir = "$gdalDir\include"
+          $gdalLibraryDir = "$gdalDir\lib"
+
+          # Export environment variables to GITHUB_ENV
+          "GDAL_VERSION=$gdalVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "GDAL_INCLUDE_DIR=$gdalIncludeDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "GDAL_LIBRARY_DIR=$gdalLibraryDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          
 
 
 

@@ -119,6 +119,23 @@ jobs:
         with:
           name: conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
+  
+  make_sdist:
+    needs: "continuous-integration"
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SDist
+        run: |
+          pip install build
+          python -m build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
   conda-deploy:
     #runs all the same as the build stage but need to rerun after release created to get updated

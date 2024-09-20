@@ -17,7 +17,7 @@ requirements:
     - pip
     - python
   run:
-    - libgdal<=3.7
+    - libgdal==3.6.2
     - geopandas
     - pandas
     - shapely

@@ -67,7 +67,17 @@ jobs:
         shell: bash -l {0}
         run: |
             pip install toml 
-            python /map2loop/dependencies_autosync.py
+            # Locate the installed path of map2loop package and run dependencies_autosync.py
+            MAP2LOOP_DIR=$(python -c "import os, map2loop; print(os.path.dirname(map2loop.__file__))")
+            
+            echo "Running dependencies_autosync.py from $MAP2LOOP_DIR"
+            
+            if [ -f "$MAP2LOOP_DIR/dependencies_autosync.py" ]; then
+              python "$MAP2LOOP_DIR/dependencies_autosync.py"
+            else
+              echo "Error: dependencies_autosync.py not found in $MAP2LOOP_DIR"
+              exit 1
+            fi
 
       - name: Testing
         shell: bash -l {0}

@@ -51,15 +51,15 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $gdalUrl = 'https://download.gisinternals.com/sdk/downloads/release-1928-gdal-3-9-1-mapserver-8-2-0/gdal-3.9.1-1928-core.msi'
+          # $gdalUrl = 'https://download.gisinternals.com/sdk/downloads/release-1928-gdal-3-9-1-mapserver-8-2-0/gdal-3.9.1-1928-core.msi'
           $gdalDevUrl = 'https://download.gisinternals.com/sdk/downloads/release-1928-x64-gdal-mapserver/GDAL-3.10.0.win-amd64-py3.8.msi'
-          Invoke-WebRequest $gdalUrl -OutFile gdal-3.9.1-1928-core.msi
+          # Invoke-WebRequest $gdalUrl -OutFile gdal-3.9.1-1928-core.msi
           Invoke-WebRequest $gdalDevUrl -OutFile GDAL-3.10.0.win-amd64-py3.8.msi
-          msiexec /i gdal-3.9.1-1928-core.msi /qn /log install-core.log
+          # msiexec /i gdal-3.9.1-1928-core.msi /qn /log install-core.log
           msiexec /i GDAL-3.10.0.win-amd64-py3.8.msi /qn /log install-dev.log
           $gdalPath = 'C:\Program Files\GDAL'
-          echo "GDAL_HOME=$gdalPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "GDAL_INCLUDE_DIR=$gdalPath\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          # echo "GDAL_HOME=$gdalPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          # echo "GDAL_INCLUDE_DIR=$gdalPath\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "GDAL_LIBRARY_DIR=$gdalPath\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "PATH=$gdalPath\bin;$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           pip install gdal==3.9.1 

@@ -1,129 +1,77 @@
 [build-system]
-requires = ['setuptools', 
-        "gdal==3.7",
-        "loopprojectfile==0.1.3",
-        "geopandas",
-        "shapely",
-        "networkx",
-        "owslib",
-        "hjson",
-        "beartype",
-    ]
-build-backend = 'setuptools.build_meta'
+requires = [ "setuptools", "beartype", "gdal<=3.7", "geopandas", "hjson", "loopprojectfile==0.1.3", "map2model", "networkx", "numpy", "owslib", "pandas", "shapely",]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = 'map2loop'
-description = 'Generate 3D model data from 2D maps.'
-authors = [{name = 'Loop team'}]
-readme = 'README.md'
-requires-python = '>=3.8'
-keywords = [ "earth sciences",
-    "geology",
-    "3-D modelling",
-    "structural geology",
-    "uncertainty",]
-license = {text = 'MIT'}
-classifiers = [
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Science/Research",
-        "Natural Language :: English",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: GIS",
-    ]
-dynamic = ['version','dependencies']
+name = "map2loop"
+description = "Generate 3D model data from 2D maps."
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = [ "earth sciences", "geology", "3-D modelling", "structural geology", "uncertainty",]
+classifiers = [ "Development Status :: 4 - Beta", "Intended Audience :: Science/Research", "Natural Language :: English", "Programming Language :: Python", "Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Topic :: Scientific/Engineering", "Topic :: Scientific/Engineering :: GIS",]
+dynamic = [ "version", "dependencies",]
+[[project.authors]]
+name = "Loop team"
+
+[project.license]
+text = "MIT"
 
 [project.urls]
-Documentation = 'https://Loop3d.org/map2loop/'
-"Bug Tracker" = 'https://github.com/Loop3D/map2loop/issues'
-"Source Code" = 'https://github.com/Loop3D/map2loop'
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["dependencies.txt"]}
-version = { attr = 'map2loop.version.__version__' }
-
-[tool.setuptools.packages.find]
-include = ['map2loop', 'map2loop.*']
-
-
-
+Documentation = "https://Loop3d.org/map2loop/"
+"Bug Tracker" = "https://github.com/Loop3D/map2loop/issues"
+"Source Code" = "https://github.com/Loop3D/map2loop"
 
 [tool.black]
 line-length = 100
 skip-string-normalization = true
-target-version = ['py39']
-exclude = '\.eggs|\.git|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|node_modules'
+target-version = [ "py39",]
+exclude = "\\.eggs|\\.git|\\.mypy_cache|\\.tox|\\.venv|_build|buck-out|build|dist|node_modules"
 skip-magic-trailing-comma = true
 
-# Add an option to remove the trailing comma of separated lists
-# but it doesn't exist because python devs don't like beautiful code.
-# black specifically adds trailing commas due to git diff lengths
-# which is an insufficient reason to destroy beautiful code making
-# it look like an unfinished thought or an incomplete
 [tool.blackdoc]
-# From https://numpydoc.readthedocs.io/en/latest/format.html
-# The length of docstring lines should be kept to 75 characters to facilitate
-# reading the docstrings in text terminals.
 line-length = 75
 
 [tool.build_sphinx]
-source-dir = 'doc'
-build-dir = './doc/build'
+source-dir = "doc"
+build-dir = "./doc/build"
 all_files = 1
 
 [tool.upload_sphinx]
-upload-dir = 'doc/build/html'
+upload-dir = "doc/build/html"
 
 [tool.pydocstyle]
-match = '(?!coverage).*.py'
+match = "(?!coverage).*.py"
 convention = "numpy"
-add-ignore = ["D404"]
+add-ignore = [ "D404",]
 
 [tool.codespell]
-skip = '*.pyc,*.txt,*.gif,*.png,*.jpg,*.ply,*.vtk,*.vti,*.vtu,*.js,*.html,*.doctree,*.ttf,*.woff,*.woff2,*.eot,*.mp4,*.inv,*.pickle,*.ipynb,flycheck*,./.git/*,./.hypothesis/*,*.yml,doc/_build/*,./doc/images/*,./dist/*,*~,.hypothesis*,./doc/examples/*,*.mypy_cache/*,*cover,./tests/tinypages/_build/*,*/_autosummary/*'
+skip = "*.pyc,*.txt,*.gif,*.png,*.jpg,*.ply,*.vtk,*.vti,*.vtu,*.js,*.html,*.doctree,*.ttf,*.woff,*.woff2,*.eot,*.mp4,*.inv,*.pickle,*.ipynb,flycheck*,./.git/*,./.hypothesis/*,*.yml,doc/_build/*,./doc/images/*,./dist/*,*~,.hypothesis*,./doc/examples/*,*.mypy_cache/*,*cover,./tests/tinypages/_build/*,*/_autosummary/*"
 quiet-level = 3
 
-
 [tool.ruff]
-exclude = ['.git', 'pycache__', 'build', 'dist', 'doc/examples', 'doc/_build']
+exclude = [ ".git", "pycache__", "build", "dist", "doc/examples", "doc/_build",]
 line-length = 100
 indent-width = 4
-target-version = 'py39'
+target-version = "py39"
 
 [tool.ruff.lint]
-external = ["E131", "D102", "D105"]
-ignore = [
-    # whitespace before ':'
-    "E203",
-    # line break before binary operator
-    # "W503",
-    # line length too long
-    "E501",
-    # do not assign a lambda expression, use a def
-    "E731",
-    # too many leading '#' for block comment
-    "E266",
-    # ambiguous variable name
-    "E741",
-    # module level import not at top of file
-    "E402",
-    # Quotes (temporary)
-    "Q0",
-    # bare excepts (temporary)
-    # "B001", "E722",
-    "E722",
-    # we already check black
-    # "BLK100",
-    # 'from module import *' used; unable to detect undefined names
-    "F403",
-]
-fixable = ["ALL"]
+external = [ "E131", "D102", "D105",]
+ignore = [ "E203", "E501", "E731", "E266", "E741", "E402", "Q0", "E722", "F403",]
+fixable = [ "ALL",]
 unfixable = []
-extend-select = ["B007", "B010", "C4", "F", "NPY", "PGH004", "RSE", "RUF100"]
+extend-select = [ "B007", "B010", "C4", "F", "NPY", "PGH004", "RSE", "RUF100",]
 
 [tool.ruff.lint.flake8-comprehensions]
 allow-dict-calls-with-keyword-arguments = true
+
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = [ "F401",]
+
+[tool.setuptools.dynamic.dependencies]
+file = [ "dependencies.txt",]
+
+[tool.setuptools.dynamic.version]
+attr = "map2loop.version.__version__"
+
+[tool.setuptools.packages.find]
+include = [ "map2loop", "map2loop.*",]

@@ -1,4 +1,8 @@
+numpy
+libgdal-dev
+gdal<=3.7
 geopandas
+pandas
 shapely
 networkx
 owslib
@@ -6,4 +10,3 @@ map2model
 hjson
 loopprojectfile==0.1.3
 beartype
-gdal<=3.7

@@ -40,32 +40,16 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-      - name: Install GDAL
-        if: runner.os == 'Linux'
+      # Build the Docker image with GDAL and Python installed
+      - name: Build Docker image with GDAL
         run: |
-            sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
-            sudo apt-get update
-            sudo apt-get install gdal-bin libgdal-dev
+          docker build -t gdal-python-image .
 
-      - name: Install GDAL for Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
+      # Run tests inside the Docker container
+      - name: Run tests in GDAL Docker container
         run: |
-          conda install -c conda-forge gdal=3.6.2 -y
-          # Set environment variables
-          $gdalVersion = "3.6.2" # Update this to match the installed version
-          $gdalDir = "C:\Miniconda\envs\test" # Path to the conda environment
-          $gdalIncludeDir = "$gdalDir\include"
-          $gdalLibraryDir = "$gdalDir\lib"
-
-          # Export environment variables to GITHUB_ENV
-          "GDAL_VERSION=$gdalVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "GDAL_INCLUDE_DIR=$gdalIncludeDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "GDAL_LIBRARY_DIR=$gdalLibraryDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          docker run gdal-python-image pytest
           
-
-
-
       - name: Installing dependencies
         shell: bash -l {0}
         run: |

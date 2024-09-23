@@ -68,7 +68,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\vcpkg\vcpkg install gdal
+          .\vcpkg\vcpkg install gdal=3.7
 
       # Set up GDAL (Linux/macOS)
       - name: Set up GDAL (Linux/macOS)

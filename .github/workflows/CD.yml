@@ -40,15 +40,39 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-      # Build the Docker image with GDAL and Python installed
-      - name: Build Docker image with GDAL
+           # Set up vcpkg and install GDAL
+      - name: Install vcpkg
         run: |
-          docker build -t gdal-python-image .
-
-      # Run tests inside the Docker container
-      - name: Run tests in GDAL Docker container
+             if [[ "${{ runner.os }}" == "Linux" ]]; then
+               git clone https://github.com/microsoft/vcpkg.git
+               ./vcpkg/bootstrap-vcpkg.sh
+             elif [[ "${{ runner.os }}" == "Windows" ]]; then
+               git clone https://github.com/microsoft/vcpkg.git
+               ./vcpkg/bootstrap-vcpkg.bat
+             elif [[ "${{ runner.os }}" == "macOS" ]]; then
+               git clone https://github.com/microsoft/vcpkg.git
+               ./vcpkg/bootstrap-vcpkg.sh
+             fi
+   
+      - name: Install GDAL with vcpkg
         run: |
-          docker run gdal-python-image pytest
+             if [[ "${{ runner.os }}" == "Linux" ]]; then
+               ./vcpkg/vcpkg install gdal
+             elif [[ "${{ runner.os }}" == "Windows" ]]; then
+               ./vcpkg/vcpkg install gdal
+             elif [[ "${{ runner.os }}" == "macOS" ]]; then
+               ./vcpkg/vcpkg install gdal
+             fi
+   
+      - name: Set up GDAL
+        run: |
+             if [[ "${{ runner.os }}" == "Linux" ]]; then
+               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-linux/bin
+             elif [[ "${{ runner.os }}" == "Windows" ]]; then
+               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-windows/bin
+             elif [[ "${{ runner.os }}" == "macOS" ]]; then
+               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-osx/bin
+             fi
           
       - name: Installing dependencies
         shell: bash -l {0}

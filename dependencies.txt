@@ -1,4 +1,5 @@
 numpy
+pybind11
 gdal
 geopandas
 pandas

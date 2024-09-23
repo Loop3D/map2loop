@@ -27,7 +27,8 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 
 # Upgrade pip and install GDAL Python bindings
 RUN pip3 install --upgrade pip && \
-    pip3 install GDAL==$(gdal-config --version)
+    pip3 install GDAL==$(gdal-config --version) && \
+    pip3 install pytest
 
 # Set the working directory
 WORKDIR /app

@@ -40,40 +40,51 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-           # Set up vcpkg and install GDAL
-      - name: Install vcpkg
+      # Set up vcpkg and install GDAL (Unix-based systems)
+      - name: Install vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
         run: |
-             if [[ "${{ runner.os }}" == "Linux" ]]; then
-               git clone https://github.com/microsoft/vcpkg.git
-               ./vcpkg/bootstrap-vcpkg.sh
-             elif [[ "${{ runner.os }}" == "Windows" ]]; then
-               git clone https://github.com/microsoft/vcpkg.git
-               ./vcpkg/bootstrap-vcpkg.bat
-             elif [[ "${{ runner.os }}" == "macOS" ]]; then
-               git clone https://github.com/microsoft/vcpkg.git
-               ./vcpkg/bootstrap-vcpkg.sh
-             fi
-   
-      - name: Install GDAL with vcpkg
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+
+      # Set up vcpkg and install GDAL (Windows)
+      - name: Install vcpkg (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-             if [[ "${{ runner.os }}" == "Linux" ]]; then
-               ./vcpkg/vcpkg install gdal
-             elif [[ "${{ runner.os }}" == "Windows" ]]; then
-               ./vcpkg/vcpkg install gdal
-             elif [[ "${{ runner.os }}" == "macOS" ]]; then
-               ./vcpkg/vcpkg install gdal
-             fi
-   
-      - name: Set up GDAL
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+
+      # Install GDAL with vcpkg (Unix-based systems)
+      - name: Install GDAL with vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
         run: |
-             if [[ "${{ runner.os }}" == "Linux" ]]; then
-               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-linux/bin
-             elif [[ "${{ runner.os }}" == "Windows" ]]; then
-               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-windows/bin
-             elif [[ "${{ runner.os }}" == "macOS" ]]; then
-               export PATH=$PATH:$(pwd)/vcpkg/installed/x64-osx/bin
-             fi
-          
+          ./vcpkg/vcpkg install gdal
+
+      # Install GDAL with vcpkg (Windows)
+      - name: Install GDAL with vcpkg (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          .\vcpkg\vcpkg install gdal
+
+      # Set up GDAL (Linux/macOS)
+      - name: Set up GDAL (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          export PATH=$PATH:$(pwd)/vcpkg/installed/x64-linux/bin
+          export PATH=$PATH:$(pwd)/vcpkg/installed/x64-osx/bin
+
+      # Set up GDAL (Windows)
+      - name: Set up GDAL (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:Path += ";$(pwd)\vcpkg\installed\x64-windows\bin"
+
       - name: Installing dependencies
         shell: bash -l {0}
         run: |

@@ -61,14 +61,14 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
-          ./vcpkg/vcpkg install gdal==3.7
+          ./vcpkg/vcpkg install gdal
 
       # Install GDAL with vcpkg (Windows)
       - name: Install GDAL with vcpkg (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\vcpkg\vcpkg install gdal==3.7
+          .\vcpkg\vcpkg install gdal
 
       # Set up GDAL (Linux/macOS)
       - name: Set up GDAL (Linux/macOS)

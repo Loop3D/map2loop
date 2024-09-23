@@ -1,5 +1,5 @@
 numpy
-gdal==3.6.2
+gdal
 geopandas
 pandas
 shapely

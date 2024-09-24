@@ -4,6 +4,7 @@ shapely
 networkx
 owslib
 hjson
+map2model
 loopprojectfile==0.1.3
 beartype
 gdal

@@ -7,4 +7,4 @@ hjson
 map2model
 loopprojectfile==0.1.3
 beartype
-gdal
+gdal<=3.7

@@ -27,6 +27,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
+
   continuous-integration:
     name: Continuous integration ${{ matrix.os }} python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
@@ -97,6 +98,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
+          python conda/genereate-meta.py
           conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }}
           conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
 
@@ -151,6 +153,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
+          python conda/genereate-meta.py
           conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }}
           conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
           anaconda upload --label main conda/*/*.tar.bz2
@@ -173,3 +176,20 @@ jobs:
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.
+
+  upload_to_pypi:
+    needs: ["release-please", "conda-deploy"]
+    runs-on: "ubuntu-latest"
+
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip_existing: true
+          verbose: true
+          user: ${{ secrets.PYPI_USERNAME }}
+          password: ${{ secrets.PYPI_PASSWORD }}

@@ -1,5 +1,12 @@
-on: [push, pull_request]
 name: release-please
+on: [push, pull_request]
+workflow_dispatch:
+
+# cancel running jobs on new commit to PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   linting:
     name: Linting
@@ -27,63 +34,25 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
+          
   continuous-integration:
     name: Continuous integration ${{ matrix.os }} python ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    runs-on: [ windows-latest, ubuntu-latest, macos-latest ]
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(vars.BUILD_OS)}}
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        triplet: [
+          ci/custom-triplets/x64-osx-dynamic-release.cmake, 
+          ci/custom-triplets/x64-linux-dynamic-release.cmake, 
+          ci/custom-triplets/x64-windows-dynamic-release.cmake
+          ]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
-      # Set up vcpkg and install GDAL (Unix-based systems)
-      - name: Install vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh
-
-      # Set up vcpkg and install GDAL (Windows)
-      - name: Install vcpkg (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          .\vcpkg\bootstrap-vcpkg.bat
-
-      # Install GDAL with vcpkg (Unix-based systems)
-      - name: Install GDAL with vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/vcpkg install gdal
-
-      # Install GDAL with vcpkg (Windows)
-      - name: Install GDAL with vcpkg (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\vcpkg\vcpkg install gdal
-
-      # Set up GDAL (Linux/macOS)
-      - name: Set up GDAL (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          export PATH=$PATH:$(pwd)/vcpkg/installed/x64-linux/bin
-          export PATH=$PATH:$(pwd)/vcpkg/installed/x64-osx/bin
-
-      # Set up GDAL (Windows)
-      - name: Set up GDAL (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $env:Path += ";$(pwd)\vcpkg\installed\x64-windows\bin"
 
       - name: Installing dependencies
         shell: bash -l {0}
@@ -164,7 +133,7 @@ jobs:
           name: conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
   
-  make_sdist:
+  build-sdist:
     needs: "continuous-integration"
     name: Make SDist
     runs-on: ubuntu-latest
@@ -173,13 +142,182 @@ jobs:
 
       - name: Build SDist
         run: |
-          pip install build
-          python -m build
+          pip install -m build setuptools
+          python -m build --sdist
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
+          name: map2loop-dist
+          path: dist/*.tar.gz
+          compression-level: 0
+
+  test-sdist:
+    name: Test sdist
+    needs: [build-sdist]
+    runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"
+
+    steps:
+      - name: Install packages
+        run: |
+          apt-get update && apt-get install -y build-essential python3-dev
+          pip install venv
+
+      - name: Create virtual environment
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          . $HOME/.cargo/env
+          uv venv .venv
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Download sdist from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pyogrio-sdist
+          path: wheelhouse
+
+      - name: Build from sdist and install test dependencies
+        shell: bash
+        run: |
+          uv pip install --no-cache wheelhouse/*.tar.gz
+          uv pip install -r dependencies.txt
+          uv pip list
+
+      - name: Run tests
+        shell: bash
+        # virtual environment is automatically activated
+        run: |
+          cd ..
+          uv run python -c "import map2loop; print(f'GDAL version: {map2loop.__gdal_version__}\nGEOS version: {map2loop.__gdal_geos_version__}')"
+  
+  build-wheels-linux:
+    name: Build wheels on Linux
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # use manylinux_2_28 for any platforms with glibc>=2.28
+          - wheel_name: "pyogrio-wheel-linux-manylinux_2_28_x86_64"
+            container: "ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+          buildkitd-flags: --debug
+
+      - name: Build Docker image with vcpkg and gdal
+        # using build-push-action (without push) to make use of cache arguments
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: /ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile
+          tags: manylinux-vcpkg-gdal:latest
+          push: false
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+        env:
+          BUILDKIT_PROGRESS: plain
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.wheel_name }}
+          path: ./wheelhouse/*.whl
+          compression-level: 0
+
+  build-wheels-mac-windows:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "macos-latest"
+            triplet: "x64-osx-dynamic-release"
+            arch: x86_64
+            vcpkg_cache: "/Users/runner/.cache/vcpkg/archives"
+            vcpkg_logs: "/usr/local/share/vcpkg/buildtrees/**/*.log"
+
+          - os: "windows-latest"
+            triplet: "x64-windows-dynamic-release"
+            arch: AMD64
+            # windows requires windows-specific paths
+            vcpkg_cache: "c:\\vcpkg\\installed"
+            vcpkg_logs: "c:\\vcpkg\\buildtrees\\**\\*.log"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        id: vcpkgcache
+        with:
+          path: |
+            ${{ matrix.vcpkg_cache }}
+          # bump the last digit to avoid using previous build cache
+          key: ${{ matrix.os }}-vcpkg-gdal3.9.2-cache0
+
+      # MacOS build requires aclocal, which is part of automake, but appears
+      # to be missing in default image
+      - name: Reinstall automake
+        if: runner.os == 'macOS'
+        run: |
+          brew reinstall automake
+          echo $(which aclocal)
+
+      - name: Checkout specific version of vcpkg
+        shell: bash
+        run: |
+          cd $VCPKG_INSTALLATION_ROOT
+          # on mac the clone is not clean, otherwise git pull fails
+          git reset --hard
+          # pull specific commit with desired GDAL version
+          git pull
+          git checkout 73794ce5f63fd138fab999a22959ca7c6305d93c
+
+      - name: Install GDAL
+        env:
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+        shell: bash
+        run: |
+          vcpkg install --overlay-triplets=./ci/custom-triplets --feature-flags="versions,manifests" --x-manifest-root=./ci --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          vcpkg list
+
+      - name: Upload vcpkg build logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyogrio-vcpkg-logs-${{ matrix.triplet }}
+          path: ${{ matrix.vcpkg_logs }}
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.1
+        env:
+          # CIBW needs to know triplet for the correct install path
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pyogrio-wheel-${{ matrix.triplet }}
+          path: ./wheelhouse/*.whl
+          compression-level: 0
 
   conda-deploy:
     #runs all the same as the build stage but need to rerun after release created to get updated

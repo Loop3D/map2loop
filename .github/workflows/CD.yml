@@ -12,7 +12,7 @@ on:
       - "MANIFEST.in"
       - "pyproject.toml"
       - "setup.py"
-  workflow_dispatch:
+  # workflow_dispatch:
 
 # cancel running jobs on new commit to PR
 concurrency:

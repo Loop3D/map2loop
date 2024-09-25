@@ -1,50 +1,27 @@
 """See pyproject.toml for project metadata."""
-
-from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
+from setuptools import setup, Extension
+from Cython.Build import cythonize
 import os
-import sys
-import pybind11
 
-class get_gdal_include_dirs:
-    """Helper class to determine the GDAL include directories from vcpkg."""
-    def __str__(self):
-        vcpkg_root = os.getenv('VCPKG_ROOT', '/vcpkg/installed/vcpkg/')  # Replace with actual path or set VCPKG_ROOT
-        if sys.platform == 'win32':
-            return os.path.join(vcpkg_root, 'installed', 'x64-windows', 'include')
-        elif sys.platform == 'darwin':
-            return os.path.join(vcpkg_root, 'installed', 'x64-osx', 'include')
-        else:
-            return os.path.join(vcpkg_root, 'installed', 'x64-linux', 'include')
 
-class get_gdal_library_dirs:
-    """Helper class to determine the GDAL library directories from vcpkg."""
-    def __str__(self):
-        vcpkg_root = os.getenv('VCPKG_ROOT', '/vcpkg/installed/vcpkg/')  # Replace with actual path or set VCPKG_ROOT
-        if sys.platform == 'win32':
-            return os.path.join(vcpkg_root, 'installed', 'x64-windows', 'lib')
-        elif sys.platform == 'darwin':
-            return os.path.join(vcpkg_root, 'installed', 'x64-osx', 'lib')
-        else:
-            return os.path.join(vcpkg_root, 'installed', 'x64-linux', 'lib')
+# Get GDAL include path
+gdal_config_cmd = os.popen("gdal-config --cflags").read().strip()
+gdal_include_dir = gdal_config_cmd.replace("-I", "")
 
-ext_modules = [
+# Get GDAL library path
+gdal_lib_cmd = os.popen("gdal-config --libs").read().strip()
+gdal_library_dirs = [gdal_lib_cmd.split("-L")[1].split()[0]]
+
+# Define the extension module
+extensions = [
     Extension(
-        'your_module',  # Name of the module
-        sources=['map2loop/gdal_extension.cpp'],  # Source file
-        include_dirs=[
-            pybind11.get_include(),
-            get_gdal_include_dirs()
-        ],
-        library_dirs=[
-            get_gdal_library_dirs()
-        ],
-        libraries=[
-            'gdal'  # Link against GDAL
-        ],
-        language='c++',
-        extra_compile_args=['-std=c++14'] if not sys.platform == 'win32' else ['/std:c++14'],
-    ),
+        name="gdal_wrapper",
+        sources=["./map2loop/gdal_wrapper.pyx"],
+        include_dirs=[gdal_include_dir],
+        library_dirs=gdal_library_dirs,
+        libraries=["gdal"],
+        extra_compile_args=["-std=c++11"]
+    )
 ]
 
 package_root = os.path.abspath(os.path.dirname(__file__))
@@ -54,4 +31,6 @@ with open(os.path.join(package_root, "map2loop/version.py")) as fp:
     exec(fp.read(), version)
 version = version["__version__"]
 
-setup()
+setup(
+    ext_modules=cythonize(extensions)
+    )

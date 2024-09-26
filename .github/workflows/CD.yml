@@ -145,11 +145,6 @@ jobs:
       image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
       
       - name: Install packages
         run: |
@@ -168,7 +163,7 @@ jobs:
 
   test-sdist:
     name: Test sdist
-    needs: [build-sdist]
+    needs: build-sdist
     runs-on: ubuntu-latest
     container:
       image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"

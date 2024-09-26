@@ -43,9 +43,9 @@ jobs:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
         triplet: [
-          ci/custom-triplets/x64-osx-dynamic-release.cmake, 
-          ci/custom-triplets/x64-linux-dynamic-release.cmake, 
-          ci/custom-triplets/x64-windows-dynamic-release.cmake
+          ./ci/custom-triplets/x64-osx-dynamic-release.cmake, 
+          ./ci/custom-triplets/x64-linux-dynamic-release.cmake, 
+          ./ci/custom-triplets/x64-windows-dynamic-release.cmake
           ]
     steps:
       - uses: actions/checkout@v4
@@ -142,7 +142,7 @@ jobs:
           path: conda
   
   build-sdist:
-    name: Make SDist
+    name: Build SDist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -208,7 +208,7 @@ jobs:
         include:
           # use manylinux_2_28 for any platforms with glibc>=2.28
           - wheel_name: "map2loop-wheel-linux-manylinux_2_28_x86_64"
-            container: "ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile"
+            container: "./ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile"
 
     steps:
       - name: Checkout
@@ -228,7 +228,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: /ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile
+          file: ${{ matrix.container }}
           tags: manylinux-vcpkg-gdal:latest
           push: false
           load: true
@@ -311,7 +311,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: pyogrio-vcpkg-logs-${{ matrix.triplet }}
+          name: map2loop-vcpkg-logs-${{ matrix.triplet }}
           path: ${{ matrix.vcpkg_logs }}
 
       - name: Build wheels

@@ -263,15 +263,8 @@ class InterpolatedStructure(ThicknessCalculator):
         
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
-        
-        ### TODO: RC - fix the Linalg error at some stage. 
-        # for now, if error is raised, return thicknesses with -1
-        try:
-            dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
-        except scipy.linalg.LinAlgError:
-            print("Thickness Calculator InterpolatedStructure: Could not interpolate dip")
-            return thicknesses
-        
+        # Interpolate the dip of the contacts
+        dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
         # add the dip and dip direction to the GeoDataFrame
@@ -490,11 +483,15 @@ class StructuralPoint(ThicknessCalculator):
             # find bounding box of the lithology
             bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]
 
-            # make a subset of the geology polygon & find neighbour units
-            if litho_in is numpy.nan: # unless the structure is not within a lithology, this should be a rare case
+            # check if litho_in is in geology
+            # for a special case when the litho_in is not in the geology
+            if len(geology[geology['UNITNAME'] == litho_in]) == 0: 
+                print(f"There are structural measurements in unit - {litho_in} - that are not in the geology shapefile. Skipping this structural measurement")
                 continue
-            
-            GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+            else:          
+                # make a subset of the geology polygon & find neighbour units
+                GEO_SUB = geology[geology['UNITNAME'] == litho_in]['geometry'].values[0]
+
             neighbor_list = list(
                 basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]['basal_unit']
             )

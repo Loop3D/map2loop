@@ -1,5 +1,5 @@
 [build-system]
-requires = [ "setuptools", "cython", "beartype", "geopandas", "hjson", "loopprojectfile==0.1.3", "networkx", "numpy", "owslib", "pandas", "shapely",]
+requires = [ "setuptools", "cython", "beartype", "geopandas", "hjson", "loopprojectfile==0.1.3", "networkx", "numpy", "owslib", "pandas", "shapely", "gdal==3.9.2"]
 build-backend = "setuptools.build_meta"
 
 [project]

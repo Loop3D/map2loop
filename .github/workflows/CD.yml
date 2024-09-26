@@ -139,13 +139,21 @@ jobs:
           path: conda
   
   build-sdist:
-    name: Build SDist
+    name: Build Map2loop sdist
     runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
       - name: Build SDist
         run: |
+          apt-get update && apt-get install -y build-essential python3-dev
           pip install build setuptools
           python -m build --sdist
 
@@ -166,7 +174,7 @@ jobs:
       - name: Install packages
         run: |
           apt-get update && apt-get install -y build-essential python3-dev
-          pip install venv
+          
 
       - name: Create virtual environment
         run: |

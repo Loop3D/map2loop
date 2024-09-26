@@ -141,8 +141,6 @@ jobs:
   build-sdist:
     name: Build Map2loop sdist
     runs-on: ubuntu-latest
-    container:
-      image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"
     steps:
       - uses: actions/checkout@v4
       

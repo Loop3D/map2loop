@@ -1,9 +1,6 @@
 name: release-please
 on: [push, pull_request]
 
-# Define a centralized matrix for OS and Python versions
-env:
-  PYTHON_VERSIONS: '["3.8", "3.9", "3.10", "3.11", "3.12"]'
 # cancel running jobs on new commit to PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -43,9 +40,9 @@ jobs:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
         triplet: [
-          ./ci/custom-triplets/x64-osx-dynamic-release.cmake, 
-          ./ci/custom-triplets/x64-linux-dynamic-release.cmake, 
-          ./ci/custom-triplets/x64-windows-dynamic-release.cmake
+          ../ci/custom-triplets/x64-osx-dynamic-release.cmake, 
+          ../ci/custom-triplets/x64-linux-dynamic-release.cmake, 
+          ../ci/custom-triplets/x64-windows-dynamic-release.cmake
           ]
     steps:
       - uses: actions/checkout@v4
@@ -208,7 +205,7 @@ jobs:
         include:
           # use manylinux_2_28 for any platforms with glibc>=2.28
           - wheel_name: "map2loop-wheel-linux-manylinux_2_28_x86_64"
-            container: "./ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile"
+            container: "../ci/manylinux_2_28_x86_64-vcpkg-gdal.Dockerfile"
 
     steps:
       - name: Checkout

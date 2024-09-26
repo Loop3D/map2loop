@@ -1,9 +1,13 @@
+# internal imports
+from .m2l_enums import VerboseLevel
+
+# external imports
 import map2model
 import pandas
 import numpy
 import os
-from .m2l_enums import VerboseLevel
 import re
+import pathlib
 
 
 class Map2ModelWrapper:
@@ -133,9 +137,9 @@ class Map2ModelWrapper:
         }
         # TODO: Simplify. Note: this is external so have to match fix to map2model module
         run_log = map2model.run(
-            os.path.join(self.map_data.map2model_tmp_path),
-            os.path.join(self.map_data.map2model_tmp_path, "geology_wkt.csv"),
-            os.path.join(self.map_data.map2model_tmp_path, "faults_wkt.csv"),
+            pathlib.Path(self.map_data.map2model_tmp_path),
+            pathlib.Path(self.map_data.map2model_tmp_path) / "geology_wkt.csv",
+            pathlib.Path(self.map_data.map2model_tmp_path) / "faults_wkt.csv",
             "",
             self.map_data.get_bounding_box(),
             map2model_code_map,
@@ -150,7 +154,7 @@ class Map2ModelWrapper:
 
         # Parse units sorted
         units_sorted = pandas.read_csv(
-            os.path.join(self.map_data.map2model_tmp_path, "units_sorted.txt"),
+            pathlib.Path(self.map_data.map2model_tmp_path) / "units_sorted.txt",
             header=None,
             sep=' ',
         )
@@ -161,9 +165,7 @@ class Map2ModelWrapper:
 
         # Parse fault intersections
         out = []
-        fault_fault_intersection_filename = os.path.join(
-            self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
-        )
+        fault_fault_intersection_filename = pathlib.Path(self.map_data.map2model_tmp_path) / "fault-fault-intersection.txt"
         if (
             os.path.isfile(fault_fault_intersection_filename)
             and os.path.getsize(fault_fault_intersection_filename) > 0
@@ -188,9 +190,7 @@ class Map2ModelWrapper:
 
         # Parse unit fault relationships
         out = []
-        unit_fault_intersection_filename = os.path.join(
-            self.map_data.map2model_tmp_path, "unit-fault-intersection.txt"
-        )
+        unit_fault_intersection_filename = pathlib.Path(self.map_data.map2model_tmp_path) / "unit-fault-intersection.txt"
         if (
             os.path.isfile(unit_fault_intersection_filename)
             and os.path.getsize(unit_fault_intersection_filename) > 0
@@ -211,12 +211,11 @@ class Map2ModelWrapper:
         # Parse unit unit relationships
         units = []
         links = []
-        graph_filename = os.path.join(
-            self.map_data.map2model_tmp_path, "graph_all_None.gml.txt"
-        )
+        graph_filename = pathlib.Path(self.map_data.map2model_tmp_path) / "graph_all_None.gml.txt"
+
         if os.path.isfile(graph_filename) and os.path.getsize(graph_filename) > 0:
             with open(
-                os.path.join(self.map_data.map2model_tmp_path, "graph_all_None.gml.txt")
+                pathlib.Path(self.map_data.map2model_tmp_path) / "graph_all_None.gml.txt"
             ) as file:
                 contents = file.read()
                 segments = contents.split("\n\n")

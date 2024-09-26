@@ -4,7 +4,7 @@ import beartype
 import geopandas
 import math
 
-from .config import Config as config
+from .config import Config
 
 
 class DeformationHistory:
@@ -32,8 +32,6 @@ class DeformationHistory:
         """
         The initialiser for the deformation history. All attributes are defaulted
         """
-        
-        self.minimum_fault_length_to_export = config().fault_config["minimum_fault_length"]
         self.history = []
         self.fault_fault_relationships = []
 
@@ -84,25 +82,6 @@ class DeformationHistory:
         )
         self.folds = pandas.DataFrame(numpy.empty(0, dtype=self.foldColumns))
         # self.folds = self.folds.set_index("name")
-
-    def set_minimum_fault_length(self, length):
-        """
-        Sets the minimum fault length to export
-
-        Args:
-            length (float or int):
-                The fault length cutoff
-        """
-        self.minimum_fault_length_to_export = length
-
-    def get_minimum_fault_length(self):
-        """
-        Getter for the fault length cutoff
-
-        Returns:
-            float: The fault length cutoff
-        """
-        return self.minimum_fault_length_to_export
 
     def findfault(self, id):
         """
@@ -275,7 +254,8 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
-        return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
+        mfl = Config().fault_config["minimum_fault_length"]
+        return self.faults[self.faults["length"] >= mfl].copy()
 
     @beartype.beartype
     def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):

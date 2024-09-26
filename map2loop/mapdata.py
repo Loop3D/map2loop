@@ -1278,7 +1278,7 @@ class MapData:
             geology["ROCKTYPE1"] = geology["ROCKTYPE1"].replace("", "None")
             geology["ROCKTYPE2"] = geology["ROCKTYPE2"].replace("", "None")
             geology.to_csv(
-                os.path.join(self.map2model_tmp_path, "geology_wkt.csv"),
+                pathlib.Path(self.map2model_tmp_path) / "geology_wkt.csv",
                 sep="\t",
                 index=False,
             )
@@ -1295,7 +1295,7 @@ class MapData:
             faults = self.get_map_data(Datatype.FAULT).copy()
             faults.rename(columns={"geometry": "WKT"}, inplace=True)
             faults.to_csv(
-                os.path.join(self.map2model_tmp_path, "faults_wkt.csv"),
+                pathlib.Path(self.map2model_tmp_path) / "faults_wkt.csv",
                 sep="\t",
                 index=False,
             )

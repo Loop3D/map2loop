@@ -1097,7 +1097,7 @@ class MapData:
             )
 
     @beartype.beartype
-    def save_all_map_data(self, output_dir: str, extension: str = ".csv"):
+    def save_all_map_data(self, output_dir: pathlib.Path, extension: str = ".csv"):
         """
         Save all the map data to file
 
@@ -1111,7 +1111,7 @@ class MapData:
             self.save_raw_map_data(output_dir, i, extension)
 
     @beartype.beartype
-    def save_raw_map_data(self, output_dir: str, datatype: Datatype, extension: str = ".shp.zip"):
+    def save_raw_map_data(self, output_dir: pathlib.Path, datatype: Datatype, extension: str = ".shp.zip"):
         """
         Save the map data from datatype to file
 

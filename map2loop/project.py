@@ -54,7 +54,7 @@ class Project(object):
     def __init__(
         self,
         verbose_level: VerboseLevel = VerboseLevel.ALL,
-        # tmp_path: str = "m2l_data_tmp",
+        tmp_path: str = "m2l_data_tmp",
         working_projection=None,
         bounding_box=None,
         use_australian_state_data: str = "",
@@ -218,9 +218,12 @@ class Project(object):
         self.map_data.load_all_map_data()
 
         # If flag to save out data is check do so
-        tmp_path = pathlib.Path(tempfile.mkdtemp())
+        tmp_path = pathlib.Path(tmp_path)
 
         if save_pre_checked_map_data:
+            # check if the path exists, and if not, create
+            if not tmp_path.exists():
+                tmp_path.mkdir()
             self.map_data.save_all_map_data(tmp_path)
 
         # Populate the stratigraphic column and deformation history from map data

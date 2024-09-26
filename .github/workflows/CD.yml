@@ -148,7 +148,7 @@ jobs:
       
       - name: Install packages
         run: |
-            apt-get update && apt-get install -y build-essential python3-dev python3-pip
+            apt-get update && apt-get install -y build-essential python3-dev
   
       - name: Build SDist
         run: |

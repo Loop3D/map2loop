@@ -907,20 +907,19 @@ class MapData:
         # Create new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
 
+        # Get fault configuration
+        config = self.config.fault_config
+        
         # crop by minimum fault length
-        self.minimum_fault_length = 0.0
-
-        try:
-            self.minimum_fault_length = self.config.fault_config["minimum_fault_length"]
-        except KeyError: ### if argument missing from config dictionary
-            print("Minimum fault length not defined in config dictionary; including all faults in map2loop project\n") ## TODO: pass this warning to logger
+        if config['minimum_fault_length'] is None:
+            self.minimum_fault_length = round(min(faults.geometry.length), 3)
+        else:
+            self.minimum_fault_length = config['minimum_fault_length']
 
             
         # Filter faults based on the minimum fault length
-        faults = faults.loc[faults.geometry.length > self.minimum_fault_length]
+        faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
         
-        
-        config = self.config.fault_config
 
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]

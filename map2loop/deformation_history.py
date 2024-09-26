@@ -4,6 +4,8 @@ import beartype
 import geopandas
 import math
 
+from .config import Config as config
+
 
 class DeformationHistory:
     """
@@ -31,7 +33,7 @@ class DeformationHistory:
         The initialiser for the deformation history. All attributes are defaulted
         """
         
-        self.minimum_fault_length_to_export = 0.0
+        self.minimum_fault_length_to_export = config().fault_config["minimum_fault_length"]
         self.history = []
         self.fault_fault_relationships = []
 

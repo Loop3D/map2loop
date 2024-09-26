@@ -11,6 +11,7 @@ from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, Sort
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
+from .config import Config
 
 # external imports
 import LoopProjectFile as LPF
@@ -132,7 +133,8 @@ class Project(object):
         self.deformation_history = DeformationHistory()
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
-
+        self.Config = Config()
+        
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
@@ -231,8 +233,8 @@ class Project(object):
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
         
         # only define the minimum fault length if there are faults
-        if len(self.map_data.get_map_data(Datatype.FAULT))!=0:
-            self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
+        # if len(self.map_data.get_map_data(Datatype.FAULT))!=0:
+        #     self.deformation_history.set_minimum_fault_length(self.map_data.minimum_fault_length)
         
         if len(kwargs):
             print(f"These keywords were not used in initialising the Loop project ({kwargs})")
@@ -347,14 +349,6 @@ class Project(object):
         """
         return self.samplers[datatype].sampler_label
 
-    def get_minimum_fault_length(self) -> float:
-        """
-        Get the cutoff length for faults
-
-        Returns:
-            float: The cutoff length
-        """
-        return self.map_data.minimum_fault_length
     
     # Processing functions
     def sample_map_data(self):

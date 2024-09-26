@@ -84,7 +84,6 @@ class MapData:
         self.config_filename = None
         self.colour_filename = None
         self.verbose_level = verbose_level
-
         self.config = Config()
 
     def set_working_projection(self, projection):
@@ -648,8 +647,9 @@ class MapData:
         fault_orientations = geopandas.GeoDataFrame(
             self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
         )
-        config = self.config.fault_config
-
+        
+        config = self.config.fault_config        
+        
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
             if config["orientation_type"] == "strike":
@@ -887,7 +887,30 @@ class MapData:
         # Note: alt_rocktype_column and volcanic_text columns not used
         self.data[Datatype.GEOLOGY] = geology
         return (False, "")
+    
+    @beartype.beartype
+    def update_minimum_fault_length(self, map_mfl: float) -> None:
+        """
+        Update the minimum fault length in the conf dictionary from map data. 
+        length calculated from the map data in meters, rounded to 3 decimal places.
 
+        Args:
+            map_mfl (float): The minimum fault length calculated from the map data.
+        """
+        
+        if self.config.fault_config['minimum_fault_length'] is None:
+            self.config.fault_config['minimum_fault_length'] = round(map_mfl, 3)
+    
+    @beartype.beartype
+    def get_minimum_fault_length(self) -> float:
+        """
+        Retrieve the minimum fault length from the config.
+
+        Returns:
+            float: The minimum fault length from the config dictionary.
+        """
+        return self.config.fault_config['minimum_fault_length']
+    
     @beartype.beartype
     def parse_fault_map(self) -> tuple:
         """
@@ -907,19 +930,13 @@ class MapData:
         # Create new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
 
+        # update the minimum fault length in the config dictionary before cropping the faults
+        self.update_minimum_fault_length(map_mfl=faults.geometry.length.min())
+        
         # Get fault configuration
-        config = self.config.fault_config
-        
-        # crop by minimum fault length
-        if config['minimum_fault_length'] is None:
-            self.minimum_fault_length = round(min(faults.geometry.length), 3)
-        else:
-            self.minimum_fault_length = config['minimum_fault_length']
-
-            
+        config = self.config.fault_config            
         # Filter faults based on the minimum fault length
-        faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
-        
+        faults = faults.loc[faults.geometry.length >= config['minimum_fault_length']]
 
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
@@ -1010,8 +1027,9 @@ class MapData:
                 axis=1,
             )
             faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
-
+        print(f"Faults: {faults}")
         self.data[Datatype.FAULT] = faults
+        
         return (False, "")
 
     

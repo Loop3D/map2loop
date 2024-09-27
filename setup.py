@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import platform
 import sys
+import subprocess
 logger = logging.getLogger(__name__)
 
 def copy_data_tree(datadir, destdir):

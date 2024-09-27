@@ -7,6 +7,13 @@ cdef extern from "gdal.h":
     ctypedef void* GDALDriverH
     ctypedef void* CPLErr
 
+    # GDAL Data Types
+    cdef const int GDT_Float32  # Data type for 32-bit floating-point values
+
+    # GDAL Access Modes
+    cdef const int GA_ReadOnly  # Access mode for read-only datasets
+    cdef const int GA_Update    # Access mode for read-write datasets
+
     GDALDatasetH GDALOpen(const char *filename, int access)
     void GDALTranslate(const char *dest, GDALDatasetH srcDataset, void *options)
     GDALDatasetH GDALWarp(const char *dest, GDALDatasetH srcDataset, void *options)

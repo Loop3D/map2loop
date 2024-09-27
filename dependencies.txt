@@ -1,6 +1,6 @@
 numpy
 pybind11
-gdal==3.9.2
+gdal==3.8.4
 geopandas
 pandas
 shapely

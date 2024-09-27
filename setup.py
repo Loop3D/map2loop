@@ -14,8 +14,6 @@ def copy_data_tree(datadir, destdir):
         shutil.rmtree(destdir)
     shutil.copytree(datadir, destdir)
 
-
-
 def read_response(cmd):
     return subprocess.check_output(cmd).decode("utf").strip()
 
@@ -110,7 +108,7 @@ def get_gdal_config():
             raise e
         
 MIN_PYTHON_VERSION = (3, 8, 0)
-MIN_GDAL_VERSION = (3, 7, 0)
+MIN_GDAL_VERSION = (3, 1, 0)
 ext_options, gdal_version_str = get_gdal_config()
 gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
 if not gdal_version >= MIN_GDAL_VERSION:
@@ -120,9 +118,9 @@ extensions = [
     Extension(
         name="gdal_wrapper",
         sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
-        include_dirs=[ext_options["include_dirs"]],
-        library_dirs=[ext_options["library_dirs"]],
-        libraries=[ext_options["libraries"]],
+        include_dirs=ext_options["include_dirs"],
+        library_dirs=ext_options["library_dirs"],
+        libraries=ext_options["libraries"],
         extra_compile_args=["-std=c++11"]
     )
 ]

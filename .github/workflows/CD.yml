@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        python-version: [3.8, 3.9, 3.10, 3.11, 3.12]
         triplet: [
           ./ci/custom-triplets/x64-osx-dynamic-release.cmake, 
           ./ci/custom-triplets/x64-linux-dynamic-release.cmake, 
@@ -148,6 +148,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+          
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
   
       - name: Build SDist
         run: |

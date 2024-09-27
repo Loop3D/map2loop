@@ -173,6 +173,7 @@ jobs:
 
     steps:
       - name: Install packages
+        shell: bash
         run: |
           sudo apt-get update && apt-get install -y build-essential python3-dev
           

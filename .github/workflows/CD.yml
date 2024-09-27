@@ -189,7 +189,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: map2loop-sdist
-          path: dist/*.tar.gz
+          path: wheelhouse
 
       - name: Build from sdist and install test dependencies
         shell: bash

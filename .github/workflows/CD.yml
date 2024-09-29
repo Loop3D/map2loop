@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest, ubuntu-latest, macos-12 ]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
         triplet: [
           ./ci/custom-triplets/x64-osx-dynamic-release.cmake, 
@@ -264,7 +264,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-latest"
+          - os: "macos-12"
             triplet: "x64-osx-dynamic-release"
             arch: x86_64
             vcpkg_cache: "/Users/runner/.cache/vcpkg/archives"

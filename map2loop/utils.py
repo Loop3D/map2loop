@@ -374,7 +374,7 @@ def hex_to_rgb(hex_color: str) -> tuple:
 
 
 @beartype.beartype
-def calculate_minimum_fault_length(self, bbox: Dict[str, Union[int, float]], area_percentage: float) -> float:
+def calculate_minimum_fault_length(bbox: Dict[str, Union[int, float]], area_percentage: float) -> float:
     
     """
     Calculate the minimum fault length based on the map bounding box and a given area percentage.

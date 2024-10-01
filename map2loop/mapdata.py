@@ -2,7 +2,7 @@
 from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
-from .utils import generate_random_hex_colors
+from .utils import generate_random_hex_colors, calculate_minimum_fault_length
 
 # external imports
 import geopandas
@@ -85,6 +85,7 @@ class MapData:
         self.colour_filename = None
         self.verbose_level = verbose_level
         self.config = Config()
+        self.minimum_fault_length = None
 
     def set_working_projection(self, projection):
         """
@@ -162,7 +163,7 @@ class MapData:
             geometry=[shapely.Polygon(zip(lon_point_list, lat_point_list))],
         )
         self.recreate_bounding_box_str()
-
+    
     def recreate_bounding_box_str(self):
         """
         Creates the bounding box string from the bounding box dict
@@ -887,57 +888,46 @@ class MapData:
         # Note: alt_rocktype_column and volcanic_text columns not used
         self.data[Datatype.GEOLOGY] = geology
         return (False, "")
-    
-    @beartype.beartype
-    def update_minimum_fault_length(self, map_mfl: float) -> None:
-        """
-        Update the minimum fault length in the conf dictionary from map data. 
-        length calculated from the map data in meters, rounded to 3 decimal places.
 
-        Args:
-            map_mfl (float): The minimum fault length calculated from the map data.
-        """
-        
-        if self.config.fault_config['minimum_fault_length'] is None:
-            self.config.fault_config['minimum_fault_length'] = round(map_mfl, 3)
-    
     @beartype.beartype
-    def get_minimum_fault_length(self) -> float:
+    def get_minimum_fault_length(self) -> Union[float, int, None]:
         """
-        Retrieve the minimum fault length from the config.
+        Get the minimum fault length
+        """
 
-        Returns:
-            float: The minimum fault length from the config dictionary.
-        """
-        return self.config.fault_config['minimum_fault_length']
+        return self.minimum_fault_length
     
     @beartype.beartype
     def parse_fault_map(self) -> tuple:
         """
-        Parse the fault shapefile data into a consistent format
+        Parse the fault shapefile data into a consistent format.
 
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
         # Check type of loaded fault map
-        
         if (
             self.raw_data[Datatype.FAULT] is None
             or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame
         ):
             return (True, "Fault map is not loaded or valid")
 
-        # Create new geodataframe
+        # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
-
-        # update the minimum fault length in the config dictionary before cropping the faults
-        self.update_minimum_fault_length(map_mfl=faults.geometry.length.min())
-        
+      
         # Get fault configuration
-        config = self.config.fault_config            
-        # Filter faults based on the minimum fault length
-        faults = faults.loc[faults.geometry.length >= config['minimum_fault_length']]
-
+        config = self.config.fault_config
+        
+        # update minimum fault length either with the value from the config or calculate it
+        if config["minimum_fault_length"] is None:
+            self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, 
+                                                                            area_percentage = 0.05)
+        else:
+            self.minimum_fault_length = config["minimum_fault_length"]
+        print(f'Minimum fault length: {self.minimum_fault_length}')
+        # crop 
+        faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
+        
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
             faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
@@ -1027,11 +1017,9 @@ class MapData:
                 axis=1,
             )
             faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
-        print(f"Faults: {faults}")
         self.data[Datatype.FAULT] = faults
         
         return (False, "")
-
     
     @beartype.beartype
     def parse_fold_map(self) -> tuple:
@@ -1134,7 +1122,7 @@ class MapData:
         Save the map data from datatype to file
 
         Args:
-            output_dir (str):
+            output_dir (pathlib.Path):
                 The directory to save to
             datatype (Datatype):
                 The datatype of the geopanda to save
@@ -1143,12 +1131,18 @@ class MapData:
         """
         try:
             filename = pathlib.Path(output_dir) / f"{datatype.name}{extension}"
+            raw_data = self.raw_data[datatype]
+            
+            if raw_data is None:
+                ## Leaving this print statement in for now, as it will be useful for logging, but repetitive as a warning message
+                # print(f"No data available for {datatype.name}. Skipping saving to file {filename}.")
+                return
             
             if extension == ".csv":
-                df = self.raw_data[datatype]
-                df.to_csv(filename, index=False)
+                raw_data.to_csv(filename, index=False)  # Save as CSV
             else:
                 self.raw_data[datatype].to_file(filename)
+                
         except Exception as e:
             print(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
 

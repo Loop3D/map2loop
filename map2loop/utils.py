@@ -3,7 +3,7 @@ import math
 import shapely
 import geopandas
 import beartype
-from typing import Union, Optional
+from typing import Union, Optional, Dict
 import pandas
 
 
@@ -371,3 +371,31 @@ def hex_to_rgb(hex_color: str) -> tuple:
         raise ValueError("Invalid hex color code. Contains non-hexadecimal characters.") from e
 
     return (r, g, b, alpha)
+
+
+@beartype.beartype
+def calculate_minimum_fault_length(self, bbox: Dict[str, Union[int, float]], area_percentage: float) -> float:
+    
+    """
+    Calculate the minimum fault length based on the map bounding box and a given area percentage.
+
+    Args:
+        bbox (dict): A dictionary with keys 'minx', 'miny', 'maxx', 'maxy' representing the bounding box in meters.
+        area_percentage (float): The percentage of the bounding box area to use for calculating the threshold length.
+
+    Returns:
+        float: The calculated minimum fault length as the square root of the threshold area.
+    """
+    
+    # Calculate the width and height of the bounding box in meters
+    width = bbox['maxx'] - bbox['minx']
+    height = bbox['maxy'] - bbox['miny']
+
+    # Calculate the total bounding box area
+    bbox_area = width * height
+
+    # Calculate the threshold area based on the given percentage
+    threshold_area = area_percentage * bbox_area
+
+    # Return the square root of the threshold area as the minimum fault length
+    return (threshold_area ** 0.5)

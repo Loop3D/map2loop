@@ -4,7 +4,7 @@ from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
+from .thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
@@ -14,7 +14,6 @@ from .map2model_wrapper import Map2ModelWrapper
 
 # external imports
 import LoopProjectFile as LPF
-import tempfile
 from typing import Union
 from osgeo import gdal
 import geopandas
@@ -210,10 +209,8 @@ class Project(object):
         
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
-        
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
-
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()
 
@@ -265,8 +262,7 @@ class Project(object):
             str: The name of the sorter used
         """
         return self.sorter.sorter_label
-
-
+    
     @beartype.beartype
     def set_fault_orientation(self, fault_orientation: FaultOrientation):
         """

@@ -1,6 +1,5 @@
 import pandas
 import geopandas
-import pytest
 import numpy
 
 from map2loop.mapdata import MapData

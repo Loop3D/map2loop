@@ -7,7 +7,6 @@ import pandas
 import numpy
 import os
 import re
-import pathlib
 
 
 class Map2ModelWrapper:

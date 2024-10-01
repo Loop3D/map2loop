@@ -18,7 +18,6 @@ import numpy
 import scipy
 import pandas
 import geopandas
-from statistics import mean
 import shapely
 import math
 

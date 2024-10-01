@@ -1,7 +1,6 @@
 # imports
 import pandas
 import geopandas
-import pytest
 import numpy
 
 from map2loop._datasets.geodata_files import load_map2loop_data

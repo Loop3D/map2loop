@@ -1,17 +1,13 @@
+# imports
 import pandas
 import geopandas
 import numpy
 
-from map2loop.mapdata import MapData
-from map2loop.thickness_calculator import InterpolatedStructure
-from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology, load_hamersley_dtm
-from map2loop.m2l_enums import Datatype
+from map2loop._datasets.geodata_files import load_map2loop_data
+from map2loop import Project
 
-##########################################################################
-### Define the test data for ThicknessCalculator InterpolatedStructure ###
-##########################################################################
 
-# Sample stratigraphic units data
+# 1. self.stratigraphic_column.stratigraphicUnits,
 st_units = pandas.DataFrame({
     'Unnamed: 0': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     'layerId': [7, 0, 10, 8, 1, 5, 9, 4, 3, 2, 6],
@@ -23,6 +19,12 @@ st_units = pandas.DataFrame({
     'ThicknessMean_ThicknessCalculatorAlpha': [0.0] * 11,
     'ThicknessMedian_ThicknessCalculatorAlpha': [0.0] * 11,
     'ThicknessStdDev_ThicknessCalculatorAlpha': [0.0] * 11,
+    'ThicknessMean_InterpolatedStructure': [0.0] * 11,
+    'ThicknessMedian_InterpolatedStructure': [0.0] * 11,
+    'ThicknessStdDev_InterpolatedStructure': [0.0] * 11,
+    'ThicknessMean_StructuralPoint': [0.0] * 11,
+    'ThicknessMedian_StructuralPoint': [0.0] * 11,
+    'ThicknessStdDev_StructuralPoint': [0.0] * 11,
     'stratigraphic_Order': list(range(11)),
     'colour': [
         '#5d7e60', '#387866', '#628304', '#a2f290', '#0c2562',
@@ -30,6 +32,7 @@ st_units = pandas.DataFrame({
     ]
 })
 
+# 2. self.stratigraphic_column.column
 st_column = ['Turee_Creek_Group', 'Boolgeeda_Iron_Formation', 'Woongarra_Rhyolite', 'Weeli_Wolli_Formation', 'Brockman_Iron_Formation', 'Mount_McRae_Shale_and_Mount_Sylvia_Formation', 
              'Wittenoom_Formation', 'Marra_Mamba_Iron_Formation', 'Jeerinah_Formation', 'Bunjinah_Formation', 'Pyradie_Formation', 'Fortescue_Group']
 
@@ -64,6 +67,7 @@ bc_geoms = geopandas.GeoSeries.from_wkt([
 ])
 bc_gdf = geopandas.GeoDataFrame(basal_c, geometry=bc_geoms, crs='EPSG:28350')
 
+# Structure samples
 structures = pandas.DataFrame({
     'ID': [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
     'DIPDIR': [190.0, 190.0, 0.0, 330.0, 165.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0],
@@ -76,6 +80,13 @@ structures = pandas.DataFrame({
     'layerID': [3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2]
 })
 
+# geology
+geology_map_data = load_map2loop_data.load_hamersley_geology()
+
+
+#DTM
+dtm = load_map2loop_data.load_hamersley_dtm()
+
 # sampled contacts
 
 IDS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
@@ -86,70 +97,60 @@ featureid = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0
 
 s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 
+############################################
+##### test calculate_unit_thicknesses ######
+############################################
 
-##################################
-### TEST InterpolatedStructure ###
-##################################
+import map2loop
+import pathlib
 
-geology = load_hamersley_geology()
-geology.rename(columns={'unitname': 'UNITNAME', 'code': 'CODE'}, inplace=True)
+def test_calculate_unit_thicknesses():
 
+    units = st_units
+    stratigraphic_order = st_column
+    structure_data = structures
+    
+    # units, stratigraphic_order, basal_contacts, structure_data, map_data = sample_data
+    config_dictionary = {"structure" : {"dipdir_column": "azimuth2", "dip_column": "dip",}, "geology" : {"unitname_column": "unitname", "alt_unitname_column": "code",  },}
+    bbox_3d = { "minx": 515687.31005864, "miny": 7493446.76593407, "maxx": 562666.860106543, "maxy": 7521273.57407786, "base": -3200, "top": 3000, }
+    project = Project(working_projection='EPSG:28350', bounding_box=bbox_3d, 
+                      geology_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/geology.geojson',)), 
+                      structure_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/structures.geojson',)),
+                      dtm_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/dtm_rp.tif',)),
+                      config_dictionary= config_dictionary
+                      )
+    
+    project.structure_samples = structure_data
+    project.map_data.basal_contacts = bc_gdf
+    
+    # Create sample map data
 
-def check_thickness_values(result, column, description):
-    for order, position in [(max(st_units['stratigraphic_Order']), 'bottom'), 
-                            (min(st_units['stratigraphic_Order']), 'top')]:
-        assert (
-            result[result['stratigraphic_Order'] == order][column].values == -1
-        ), f"InterpolatedStructure: {position} unit not assigned as -1 ({description})"
+    project.map_data.sampled_contacts = s_c
+    
+    # Inject the sample data into the project's stratigraphic column
+    project.stratigraphic_column.stratigraphicUnits = units
+    project.stratigraphic_column.column = stratigraphic_order
+    
+    # Run the calculate_unit_thicknesses method
+    project.calculate_unit_thicknesses()
+    
+    # Check if thicknesses have been calculated
+    columns_to_check = [
+        'ThicknessMean_ThicknessCalculatorAlpha',
+        'ThicknessMedian_ThicknessCalculatorAlpha',
+        'ThicknessStdDev_ThicknessCalculatorAlpha',
+        'ThicknessMean_InterpolatedStructure',
+        'ThicknessMedian_InterpolatedStructure',
+        'ThicknessStdDev_InterpolatedStructure',
+        'ThicknessMean_StructuralPoint',
+        'ThicknessMedian_StructuralPoint',
+        'ThicknessStdDev_StructuralPoint'
+    ]
+    
+    for column in columns_to_check:
+        assert column in project.stratigraphic_column.stratigraphicUnits.columns, f"project::calculate_unit_thicknesses: column {column} not in thickness results"
+        assert project.stratigraphic_column.stratigraphicUnits[column].dtype == numpy.float64, f"project::calculate_unit_thicknesses: column {column} is not of type numpy.float64"
+        assert not project.stratigraphic_column.stratigraphicUnits[column].isna().any(), f"project::calculate_unit_thicknesses: column {column} contains NaNs"
         
-
-def test_calculate_thickness_InterpolatedStructure():
-    # Run the calculation
-    thickness_calculator = InterpolatedStructure()
-    
-    md = MapData()
-    md.sampled_contacts = s_c
-    md.raw_data[Datatype.GEOLOGY] = geology
-    md.load_map_data(Datatype.GEOLOGY)
-    md.check_map(Datatype.GEOLOGY)
-    md.parse_geology_map()
-    
-    md.raw_data[Datatype.DTM] = load_hamersley_dtm()
-    md.data[Datatype.DTM] = md.get_raw_map_data(Datatype.DTM)
-    
-    md.bounding_box = { "minx": 515687.31005864, "miny": 7493446.76593407, "maxx": 562666.860106543, "maxy": 7521273.57407786, "base": -3200, "top": 3000, }
-    
-    result = thickness_calculator.compute(
-        units=st_units, 
-        stratigraphic_order=st_column, 
-        basal_contacts= bc_gdf, 
-        structure_data=structures, 
-        map_data=md
-    )
-    
-    # is thickness calc alpha the label?
-    assert thickness_calculator.thickness_calculator_label == 'InterpolatedStructure', 'InterpolatedStructure: thickness calculator name not set correctly'
-    
-    #is the result a pandas dataframe?
-    assert isinstance(result, pandas.DataFrame), 'InterpolatedStructure result not a pandas DataFrame'
-    
-    # Check if there is mean, std, and median in results 
-    required_columns = ['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']
-    for column in required_columns:
-        assert column in result.columns, f'{column} not in InterpolatedStructure result'
-        
-    # check if all units are in the results
-    assert 'name' in result.columns, 'unit_name not in InterpolatedStructure result'
-    assert all(name in result['name'].values for name in st_units['name'].values), 'units missing from in InterpolatedStructure result'
-    
-    # are bottom and top units being assigned -1
-    for column, description in [('ThicknessMean', 'mean'), ('ThicknessMedian', 'median'), ('ThicknessStdDev', 'std dev')]:
-        check_thickness_values(result, column, description)
-    
-    # are the dtypes numpy.float?
-    for column in required_columns:
-        assert result[column].dtype == numpy.float64, f'InterpolatedStructure: result column {column} not numpy.float64'
-    
-    # check for nans in the results
-    for column in required_columns:
-        assert not result[column].isnull().values.any(), f'InterpolatedStructure: result column {column} has NaN values'
+    assert 'name' in project.stratigraphic_column.stratigraphicUnits.columns, 'project::calculate_unit_thicknesses: unitname not in result'
+    assert all(name in project.stratigraphic_column.stratigraphicUnits['name'].values for name in st_units['name'].values), 'project::calculate_unit_thicknesses: units missing in results'

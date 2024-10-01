@@ -1,4 +1,4 @@
-# Map2Loop 3.0
+# Map2Loop 3.1
 
 Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 

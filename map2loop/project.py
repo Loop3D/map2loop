@@ -4,7 +4,7 @@ from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculator, ThicknessCalculatorAlpha
+from .thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
@@ -37,8 +37,6 @@ class Project(object):
         A list of samplers used to extract point samples from polyonal or line segments. Indexed by m2l_enum.Dataype
     sorter: Sorter
         The sorting algorithm to use for calculating the stratigraphic column
-    thickness_calculator: ThicknessCalulator
-        The algorithm to use for making unit thickness estimations
     loop_filename: str
         The name of the loop project file used in this project
     map_data: MapData
@@ -125,23 +123,24 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.sorter = SorterUseHint()
-        self.thickness_calculator = ThicknessCalculatorAlpha()
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
-        self.loop_filename = loop_project_filename
-        self.overwrite_lpf = overwrite_loopprojectfile
-
-        self.map_data = MapData(tmp_path=tmp_path, verbose_level=verbose_level)
+        self.map_data = MapData(verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory()
-
+        self.loop_filename = loop_project_filename
+        self.overwrite_lpf = overwrite_loopprojectfile
+        
+        # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
         )
         self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+
+
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -158,7 +157,6 @@ class Project(object):
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
-
         if issubclass(type(bounding_box), dict) or issubclass(type(bounding_box), tuple):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
@@ -172,12 +170,22 @@ class Project(object):
         # Assign filenames
         if use_australian_state_data != "":
             # Sanity check on state string
-            if use_australian_state_data in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
+            if use_australian_state_data in {
+                "WA",
+                "SA",
+                "QLD",
+                "NSW",
+                "TAS",
+                "VIC",
+                "ACT",
+                "NT",
+            }:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
                 raise ValueError(
                     f"Australian state {use_australian_state_data} not in state url database"
                 )
+        # set the data filenames
         if geology_filename != "":
             self.map_data.set_filename(Datatype.GEOLOGY, geology_filename)
         if structure_filename != "":
@@ -190,35 +198,35 @@ class Project(object):
             self.map_data.set_filename(Datatype.DTM, dtm_filename)
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
+        
+        
         if config_filename != "":
             if clut_file_legacy:
                 print(
                     "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
                 )
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
+        
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
-
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()
 
         # If flag to save out data is check do so
+        tmp_path = pathlib.Path(tmp_path)
+
         if save_pre_checked_map_data:
+            # check if the path exists, and if not, create
+            if not tmp_path.exists():
+                tmp_path.mkdir()
             self.map_data.save_all_map_data(tmp_path)
 
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
-
-        # Set default minimum fault length to 5% of the longest bounding box dimension
-        bounding_box = self.map_data.get_bounding_box()
-        largest_dimension = max(
-            bounding_box["maxx"] - bounding_box["minx"], bounding_box["maxy"] - bounding_box["miny"]
-        )
-        self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
-
+        
         if len(kwargs):
             print(f"These keywords were not used in initialising the Loop project ({kwargs})")
 
@@ -254,27 +262,7 @@ class Project(object):
             str: The name of the sorter used
         """
         return self.sorter.sorter_label
-
-    @beartype.beartype
-    def set_thickness_calculator(self, thickness_calculator: ThicknessCalculator):
-        """
-        Set the thickness calculator that estimates unit thickness of all units
-
-        Args:
-            thickness_calculator (ThicknessCalculator):
-                The calculator to use. Must be of base class ThicknessCalculator
-        """
-        self.thickness_calculator = thickness_calculator
-
-    def get_thickness_calculator(self):
-        """
-        Get the name of the thickness calculator being used
-
-        Returns:
-            str: The name of the thickness calculator used
-        """
-        return self.thickness_calculator.thickness_calculator_label
-
+    
     @beartype.beartype
     def set_fault_orientation(self, fault_orientation: FaultOrientation):
         """
@@ -351,27 +339,7 @@ class Project(object):
         """
         return self.samplers[datatype].sampler_label
 
-    @beartype.beartype
-    def set_minimum_fault_length(self, length: float):
-        """
-        Set the cutoff length for faults to ignore
-
-        Args:
-            length (float):
-                The cutoff length
-        """
-        self.deformation_history.set_minimum_fault_length(length)
-
-    @beartype.beartype
-    def get_minimum_fault_length(self) -> float:
-        """
-        Get the cutoff length for faults
-
-        Returns:
-            float: The cutoff length
-        """
-        return self.deformation_history.get_minimum_fault_length()
-
+    
     # Processing functions
     def sample_map_data(self):
         """
@@ -396,9 +364,12 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        
+        # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.basal_contacts
         )
+        
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
@@ -446,18 +417,54 @@ class Project(object):
                 self.map_data.contacts,
                 self.map_data,
             )
-
+    
+    
     def calculate_unit_thicknesses(self):
         """
         Use the stratigraphic column, and fault and contact data to estimate unit thicknesses
         """
-        self.stratigraphic_column.stratigraphicUnits = self.thickness_calculator.compute(
-            self.stratigraphic_column.stratigraphicUnits,
-            self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
-            self.structure_samples,
-            self.map_data,
-        )
+        thickness_calculator_labels = ['ThicknessCalculatorAlpha', 'InterpolatedStructure', 'StructuralPoint', ]
+
+        thickness_calculation_results = []
+        
+        for label in thickness_calculator_labels:
+            if label == 'InterpolatedStructure':
+                calculator = InterpolatedStructure()
+            elif label == 'StructuralPoint':
+                calculator = StructuralPoint()
+            elif label == 'ThicknessCalculatorAlpha':
+                calculator = ThicknessCalculatorAlpha()
+                
+            result = calculator.compute(
+                self.stratigraphic_column.stratigraphicUnits,
+                self.stratigraphic_column.column,
+                self.map_data.basal_contacts,
+                self.structure_samples,
+                self.map_data,
+            )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']]
+            
+            # Rename the columns
+            result = result.rename(columns={
+                'ThicknessMean': f'ThicknessMean_{label}',
+                'ThicknessMedian': f'ThicknessMedian_{label}',
+                'ThicknessStdDev': f'ThicknessStdDev_{label}'
+            })
+            
+            thickness_calculation_results.append(result)
+            
+        thickness_combined_results = pandas.concat(thickness_calculation_results, axis=1)
+
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMean_ThicknessCalculatorAlpha']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMedian_ThicknessCalculatorAlpha']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessStdDev_ThicknessCalculatorAlpha']
+        
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_InterpolatedStructure'] = thickness_combined_results['ThicknessMean_InterpolatedStructure']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_InterpolatedStructure'] = thickness_combined_results['ThicknessMedian_InterpolatedStructure']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_InterpolatedStructure'] = thickness_combined_results['ThicknessStdDev_InterpolatedStructure']
+        
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_StructuralPoint'] = thickness_combined_results['ThicknessMean_StructuralPoint']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_StructuralPoint'] = thickness_combined_results['ThicknessMedian_StructuralPoint']
+        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_StructuralPoint'] = thickness_combined_results['ThicknessStdDev_StructuralPoint']
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -614,16 +621,44 @@ class Project(object):
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
 
-        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessMean'
-        ]
-        stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessMedian'
-        ]
-        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
-            'ThicknessStdDev'
-        ]
+        
+        # stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessMean'
+        # ]
+        # stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessMedian'
+        # ]
+        # stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
+        #     'ThicknessStdDev'
+        # ]
+        
+        column_len = len(self.stratigraphic_column.stratigraphicUnits)
+        
+        # thickness means by calculator
+        stratigraphic_data["ThicknessMean"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
 
+        # thickness medians by calculator
+        stratigraphic_data["ThicknessMedian"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
+        
+        # thickness medians by calculator
+        stratigraphic_data["ThicknessStdDev"] = list(zip(
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_ThicknessCalculatorAlpha']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_InterpolatedStructure']),
+            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_StructuralPoint']),
+            [0] * column_len, 
+            [0] * column_len))
+        
+        # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
         ]

@@ -80,7 +80,10 @@ class FaultOrientationNearest(FaultOrientation):
         Returns:
             pandas.DataFrame: fault orientations assigned to a fault label
         """
+        logger.info("Assigning fault orientations to fault traces from nearest orientation")
         orientations = fault_orientations.copy()
+        logger.info(f'There are {len(orientations)} fault orientations to assign')
+        
         orientations["ID"] = -1
 
         for i in orientations.index:

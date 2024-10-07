@@ -24,6 +24,9 @@ import pandas
 import os
 import re
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 class Project(object):
     """
@@ -151,10 +154,11 @@ class Project(object):
             self.map_data.set_working_projection(working_projection)
         elif type(working_projection) is None:
             if verbose_level != VerboseLevel.NONE:
-                print(
+                logger.warning(
                     "No working projection set, will attempt to use the projection of the geology map"
                 )
         else:
+            logger.error(f"Invalid type for working_projection {type(working_projection)}")
             raise TypeError(f"Invalid type for working_projection {type(working_projection)}")
 
         # Sanity check bounding box
@@ -163,10 +167,14 @@ class Project(object):
             if len(bounding_box) == 4 or len(bounding_box) == 6:
                 self.map_data.set_bounding_box(bounding_box)
             else:
+                logger.error(
+                    f"Length of bounding_box {len(bounding_box)} is neither 4 (map boundary) nor 6 (volumetric boundary)"
+                )
                 raise ValueError(
                     f"Length of bounding_box {len(bounding_box)} is neither 4 (map boundary) nor 6 (volumetric boundary)"
                 )
         else:
+            logger.error(f"Invalid type for bounding_box {type(bounding_box)}")
             raise TypeError(f"Invalid type for bounding_box {type(bounding_box)}")
 
         # Assign filenames
@@ -175,6 +183,9 @@ class Project(object):
             if use_australian_state_data in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
+                logger.error(
+                    f"Australian state {use_australian_state_data} not in state url database"
+                )
                 raise ValueError(
                     f"Australian state {use_australian_state_data} not in state url database"
                 )
@@ -192,9 +203,8 @@ class Project(object):
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
         if config_filename != "":
             if clut_file_legacy:
-                print(
-                    "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
-                )
+                logger.warning("DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2")
+
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
@@ -220,7 +230,7 @@ class Project(object):
         self.deformation_history.set_minimum_fault_length(largest_dimension * 0.05)
 
         if len(kwargs):
-            print(f"These keywords were not used in initialising the Loop project ({kwargs})")
+            logger.warning(f"Unused keyword arguments: {kwargs}")
 
     # Getters and Setters
     @beartype.beartype
@@ -244,6 +254,7 @@ class Project(object):
             sorter (Sorter):
                 The sorter to use.  Must be of base class Sorter
         """
+        logger.info(f"Setting sorter to {sorter.sorter_label}")
         self.sorter = sorter
 
     def get_sorter(self):
@@ -264,6 +275,7 @@ class Project(object):
             thickness_calculator (ThicknessCalculator):
                 The calculator to use. Must be of base class ThicknessCalculator
         """
+        logger.info(f"Setting thickness calculator to {thickness_calculator.thickness_calculator_label}")
         self.thickness_calculator = thickness_calculator
 
     def get_thickness_calculator(self):
@@ -284,6 +296,7 @@ class Project(object):
             fault_orientation (FaultOrientation):
                 The calculator to use. Must be of base class FaultOrientation
         """
+        logger.info(f"Setting fault orientation calculator to {fault_orientation.label}")
         self.fault_orientation = fault_orientation
 
     def get_fault_orientation(self):
@@ -304,6 +317,7 @@ class Project(object):
             throw_calculator (ThrowCalculator):
                 The calculator to use. Must be of base class ThrowCalculator
         """
+        logger.info(f"Setting throw calculator to {throw_calculator.throw_calculator_label}")
         self.throw_calculator = throw_calculator
 
     def get_throw_calculator(self):
@@ -319,6 +333,7 @@ class Project(object):
         """
         Initialisation function to set or reset the point samplers
         """
+        logger.info("Setting default samplers")
         self.samplers[Datatype.STRUCTURE] = SamplerDecimator(1)
         self.samplers[Datatype.GEOLOGY] = SamplerSpacing(50.0)
         self.samplers[Datatype.FAULT] = SamplerSpacing(50.0)
@@ -336,6 +351,8 @@ class Project(object):
             sampler (Sampler):
                 The sampler to use
         """
+        ## does the enum print the number or the label?
+        logger.info(f"Setting sampler for {datatype} to {sampler.sampler_label}")
         self.samplers[datatype] = sampler
 
     @beartype.beartype
@@ -360,6 +377,7 @@ class Project(object):
             length (float):
                 The cutoff length
         """
+        logger.info(f"Setting minimum fault length to {length}")    
         self.deformation_history.set_minimum_fault_length(length)
 
     @beartype.beartype
@@ -377,15 +395,19 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
+        logger.info(f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}")
         self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
         )
+        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
         self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
             self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
         )
+        logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
         self.fault_samples = self.samplers[Datatype.FAULT].sample(
             self.map_data.get_map_data(Datatype.FAULT), self.map_data
         )
+        logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
         self.fold_samples = self.samplers[Datatype.FOLD].sample(
             self.map_data.get_map_data(Datatype.FOLD), self.map_data
         )
@@ -407,6 +429,7 @@ class Project(object):
         """
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
+            logger.info(f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}")
 
             columns = [
                 sorter.sort(
@@ -434,11 +457,12 @@ class Project(object):
                     max_length = basal_lengths[i]
                     column = columns[i]
                     best_sorter = sorters[i]
-            print(
+            logger.info(
                 f"Best sorter {best_sorter.sorter_label} calculated contact length of {max_length}"
             )
             self.stratigraphic_column.column = column
         else:
+            logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.map2model.get_unit_unit_relationships(),
@@ -451,6 +475,7 @@ class Project(object):
         """
         Use the stratigraphic column, and fault and contact data to estimate unit thicknesses
         """
+        logger.info(f"Calculating unit thicknesses using {self.thickness_calculator.thickness_calculator_label}")
         self.stratigraphic_column.stratigraphicUnits = self.thickness_calculator.compute(
             self.stratigraphic_column.stratigraphicUnits,
             self.stratigraphic_column.column,
@@ -461,13 +486,15 @@ class Project(object):
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
+            logger.info(f"Calculating fault orientations using {self.fault_orientation.label}")
             self.fault_orientations = self.fault_orientation.calculate(
                 self.map_data.get_map_data(Datatype.FAULT),
                 self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
                 self.map_data,
             )
             self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
-
+        else:
+            logger.warning("No fault orientation data found, skipping fault orientation calculation")
     def apply_colour_to_units(self):
         """
         Apply the clut file to the units in the stratigraphic column
@@ -480,6 +507,7 @@ class Project(object):
         """
         Sort the units in the stratigraphic column data structure to match the column order
         """
+        logger.info('Sorting stratigraphic column')
         self.stratigraphic_column.sort_from_relationship_list(self.stratigraphic_column.column)
 
     def summarise_fault_data(self):
@@ -495,6 +523,8 @@ class Project(object):
             self.map_data.basal_contacts,
             self.map_data,
         )
+        logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')  
+
 
     def run_all(self, user_defined_stratigraphic_column=None, take_best=False):
         """
@@ -504,6 +534,10 @@ class Project(object):
             user_defined_stratigraphic_column (None or list, optional):
                 A user fed list that overrides the stratigraphic column sorter. Defaults to None.
         """
+        logger.info('Running all map2loop processes')
+        if user_defined_stratigraphic_column is not None:
+            logger.info(f'User defined stratigraphic column: {user_defined_stratigraphic_column}')
+
         # Calculate contacts before stratigraphic column
         self.map_data.extract_all_contacts()
 
@@ -512,9 +546,9 @@ class Project(object):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
         else:
             if user_defined_stratigraphic_column is not None:
-                print(
-                    "user_defined_stratigraphic_column is not of type list. Attempting to calculate column"
-                )
+                logger.warning(
+                    f"user_defined_stratigraphic_column is not of type list and is {type(user_defined_stratigraphic_column)}. Attempting to calculate column"
+                ) #why not try casting to a list?
             self.calculate_stratigraphic_order(take_best)
         self.sort_stratigraphic_column()
 
@@ -532,7 +566,9 @@ class Project(object):
         Creates or updates a loop project file with all the data extracted from the map2loop process
         """
         # Open project file
+        logger.info('Saving data into loop project file')
         if not self.loop_filename:
+            logger.info('No loop project file specified, creating a new one')
             self.loop_filename = os.path.join(
                 self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
             )
@@ -541,15 +577,16 @@ class Project(object):
 
         if file_exists:
             if self.overwrite_lpf:
+                logger.info('Overwriting existing loop project file')
                 try:
                     os.remove(self.loop_filename)
                     file_exists = False
-                    print(f"\nExisting file '{self.loop_filename}' was successfully deleted.")
+                    logger.info(f"\nExisting file '{self.loop_filename}' was successfully deleted.")
                 except Exception as e:
-                    print(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
+                    logger.errow(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
                     raise e
             else:
-                print(
+                logger.error(
                     f"\nThere is an existing '{self.loop_filename}' with the same name as specified in project. map2loop process may fail. Set 'overwrite_loopprojectfile' to True to avoid this"
                 )
                 return
@@ -564,15 +601,18 @@ class Project(object):
         if file_exists:
             file_version = LPF.Get(self.loop_filename, "version", verbose=False)
             if file_version["errorFlag"] is True:
-                print(f"Error: {file_version['errorString']}")
-                print(
+                logger.error(f"Error: {file_version['errorString']}")
+                logger.error(
                     f"       Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file"
                 )
-                return
+                raise FileTypeError(
+                    f"Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file"
+                )
+
             else:
                 version_mismatch = file_version["value"] != LPF.LoopVersion()
                 if version_mismatch:
-                    print(
+                    logger.warning(
                         f"Mismatched loop project file versions {LPF.LoopVersion()} and {file_version}, old version will be replaced"
                     )
             resp = LPF.Get(self.loop_filename, "extents")
@@ -729,6 +769,8 @@ class Project(object):
             relationships["bidirectional"] = True
             relationships["angle"] = ff_relationships["Angle"]
             relationships["type"] = LPF.EventRelationshipType.FAULT_FAULT_ABUT
+            logger.info(f"Adding fault relationships to projectfile")
+            logger.info(f"Fault relationships: {relationships}")    
             LPF.Set(self.loop_filename, "eventRelationships", data=relationships)
 
     @beartype.beartype

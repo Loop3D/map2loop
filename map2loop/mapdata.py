@@ -1394,6 +1394,7 @@ class MapData:
         """
         Extract the contacts between units in the geology GeoDataFrame
         """
+        # print('extracting contacts')
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove intrusions
@@ -1412,6 +1413,7 @@ class MapData:
             units = units[1:]
             for unit2 in units:
                 if unit1 != unit2:
+                    # print(f'contact: {unit1} and {unit2}')
                     join = geopandas.overlay(
                         geology[geology["UNITNAME"] == unit1],
                         geology[geology["UNITNAME"] == unit2],
@@ -1425,6 +1427,7 @@ class MapData:
                         contacts = pandas.concat([contacts, end], ignore_index=True)
         # contacts["TYPE"] = "UNKNOWN"
         contacts["length"] = [row.length for row in contacts["geometry"]]
+        # print('finished extracting contacts')
         if save_contacts:
             self.contacts = contacts
         return contacts

@@ -36,6 +36,7 @@ class Map2ModelWrapper:
             verbose_level (VerboseLevel, optional):
                 How much console output is sent. Defaults to VerboseLevel.ALL.
         """
+        logger
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None
@@ -47,6 +48,7 @@ class Map2ModelWrapper:
         """
         Reset the wrapper to before the map2model process
         """
+        logger.info("Resetting map2model wrapper")
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None
@@ -173,7 +175,7 @@ class Map2ModelWrapper:
             df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
-            df[0] = "Fault_" + df[0]
+            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in 
             relations = df[1]
             for j in range(len(relations)):
                 relations[j] = [i.strip("()").replace(" ", "").split(",") for i in relations[j]]

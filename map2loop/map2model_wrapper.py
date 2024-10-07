@@ -36,7 +36,6 @@ class Map2ModelWrapper:
             verbose_level (VerboseLevel, optional):
                 How much console output is sent. Defaults to VerboseLevel.ALL.
         """
-        logger
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None
@@ -48,7 +47,6 @@ class Map2ModelWrapper:
         """
         Reset the wrapper to before the map2model process
         """
-        logger.info("Resetting map2model wrapper")
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None

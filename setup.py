@@ -7,6 +7,7 @@ from pathlib import Path
 import platform
 import sys
 import subprocess
+import shutil
 logger = logging.getLogger(__name__)
 
 def copy_data_tree(datadir, destdir):
@@ -113,17 +114,53 @@ ext_options, gdal_version_str = get_gdal_config()
 gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
 if not gdal_version >= MIN_GDAL_VERSION:
     sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
-# Define the extension module
-extensions = [
-    Extension(
-        name="gdal_wrapper",
-        sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
-        include_dirs=ext_options["include_dirs"],
-        library_dirs=ext_options["library_dirs"],
-        libraries=ext_options["libraries"],
-        extra_compile_args=["-std=c++11"]
-    )
-]
+    
+ext_modules = []
+package_data = {}
+
+# setuptools clean does not cleanup Cython artifacts
+if "clean" in sys.argv:
+    for directory in ["build"]:
+        if os.path.exists(directory):
+            shutil.rmtree(directory)
+
+    root = Path(".")
+    for ext in ["*.so", "*.pyc", "*.c", "*.cpp"]:
+        for entry in root.rglob(ext):
+            entry.unlink()
+
+elif "sdist" in sys.argv or "egg_info" in sys.argv:
+    # don't cythonize for the sdist
+    pass
+
+else:
+    if cythonize is None:
+        raise ImportError("Cython is required to build from source")
+
+    ext_options, gdal_version_str = get_gdal_config()
+
+    gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
+    if not gdal_version >= MIN_GDAL_VERSION:
+        sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
+
+    compile_time_env = {
+        "CTE_GDAL_VERSION": gdal_version,
+    }
+
+
+    # Define the extension module
+    extensions = [
+        Extension(
+            name="gdal_wrapper",
+            sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
+            include_dirs=ext_options["include_dirs"],
+            library_dirs=ext_options["library_dirs"],
+            libraries=ext_options["libraries"],
+            extra_compile_args=["-std=c++11"], 
+            compiler_directives={"language_level": "3"},
+            compile_time_env=compile_time_env
+        )
+    ]
 
 package_root = os.path.abspath(os.path.dirname(__file__))
 

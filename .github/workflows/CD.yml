@@ -48,36 +48,57 @@ jobs:
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-12 ] 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        vcpkg_triplet: ["x64-windows-release", "x64-linux-release", "x64-osx-release"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
       
-      - name: vcpkg build
-        uses: johnwason/vcpkg-action@v6
-        id: vcpkg
-        with:
-          pkgs: boost-date-time
-          triplet: ${{ matrix.vcpkg_triplet }}
-          cache-key: ${{ matrix.os }}
-          revision: master
-          token: ${{ github.token }}
-          github-binarycache: true
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+
+      - name: Install vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/bootstrap-vcpkg.sh
+      
+      - name: Install vcpkg on Windows
+        if: runner.os == 'Windows'
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+      
+      - name: Install GDAL - Linux/macOs
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/vcpkg install gdal
+      
+      - name: Install GDAL - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./vcpkg/vcpkg install gdal
+
+      - name: Copy GDAL library - Linux
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p ./map2loop/gdal_lib
+          cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
       
 
       - name: Copy GDAL library - macOS
         if: runner.os == 'macos-12'
         run: |
-          mkdir -p map2loop/gdal_lib
+          mkdir -p ./map2loop/gdal_lib
           cp ./vcpkg/installed/x64-osx/lib/libgdal.a ./map2loop/gdal_lib/
         
 
       - name: Copy GDAL library - Windows
         if: runner.os == 'Windows'
         run: |
-          mkdir map2loop\map2loop\gdal_lib
+          mkdir .\map2loop\gdal_lib
           copy .\vcpkg\installed\x64-windows\bin\gdal.dll .\map2loop\gdal_lib\
         
 
@@ -182,20 +203,35 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-12 ]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        vcpkg_triplet: ["x64-windows-release", "x64-linux-release", "x64-osx-release"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: vcpkg build
-        uses: johnwason/vcpkg-action@v6
-        id: vcpkg
-        with:
-          pkgs: boost-date-time
-          triplet: ${{ matrix.vcpkg_triplet }}
-          cache-key: ${{ matrix.os }}
-          revision: master
-          token: ${{ github.token }}
-          github-binarycache: true
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+
+      - name: Install vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/bootstrap-vcpkg.sh
+      
+      - name: Install vcpkg on Windows
+        if: runner.os == 'Windows'
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+      
+      - name: Install GDAL - Linux/macOs
+        if: runner.os != 'Linux'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/vcpkg install gdal
+      
+      - name: Install GDAL - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./vcpkg/vcpkg install gdal
 
       - name: Copy GDAL library - Linux
         if: runner.os == 'Linux'
@@ -511,7 +547,7 @@ jobs:
           conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ fromJSON(vars.PYTHON_VERSIONS)}}
           anaconda upload --label main conda/*/*.tar.bz2
-
+          
   pypi-upload:
       runs-on: "ubuntu-latest"
       needs: ["release-please", pip-test-wheels]

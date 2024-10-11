@@ -178,9 +178,6 @@ jobs:
           name: conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
   
-
-
- 
   pip-build-sdist:
     name: Build Map2loop sdist
     runs-on: ${{ matrix.os }}
@@ -208,7 +205,7 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat
       
       - name: Install GDAL - Linux/macOs
-        if: runner.os != 'Linux'
+        if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
           ./vcpkg/vcpkg install gdal

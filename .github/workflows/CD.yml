@@ -179,7 +179,7 @@ jobs:
           path: conda
   
   pip-build-sdist:
-    name: Build Map2loop sdist
+    name: pip Build SDist
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -252,7 +252,7 @@ jobs:
           compression-level: 0
 
   pip-test-sdist:
-    name: Test sdist
+    name: pip Test sdist
     needs: pip-build-sdist
     runs-on: ubuntu-latest
     container:

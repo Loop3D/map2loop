@@ -237,7 +237,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir map2loop\map2loop\gdal_lib
-          copy .\vcpkg\installed\x64-windows\bin\gdal.lib .\map2loop\gdal_lib\
+          copy .\vcpkg\installed\x64-windows\bin\gdal.dll .\map2loop\gdal_lib\
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev

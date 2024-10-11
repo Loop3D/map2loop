@@ -148,19 +148,19 @@ else:
     }
 
 
-    # Define the extension module
-    extensions = [
-        Extension(
-            name="gdal_wrapper",
-            sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
-            include_dirs=ext_options["include_dirs"],
-            library_dirs=ext_options["library_dirs"],
-            libraries=ext_options["libraries"],
-            extra_compile_args=["-std=c++11"], 
-            compiler_directives={"language_level": "3"},
-            compile_time_env=compile_time_env
-        )
-    ]
+# Define the extension module
+ext_modules = [
+    Extension(
+        name="gdal_wrapper",
+        sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
+        include_dirs=ext_options["include_dirs"],
+        library_dirs=ext_options["library_dirs"],
+        libraries=ext_options["libraries"],
+        extra_compile_args=["-std=c++11"], 
+        compiler_directives={"language_level": "3"},
+        compile_time_env=compile_time_env
+    )
+]
 
 package_root = os.path.abspath(os.path.dirname(__file__))
 
@@ -170,5 +170,5 @@ with open(os.path.join(package_root, "map2loop/version.py")) as fp:
 version = version["__version__"]
 
 setup(
-    ext_modules=cythonize(extensions)
+    ext_modules=cythonize(ext_modules)
     )

@@ -48,44 +48,23 @@ jobs:
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-12 ] 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        vcpkg_triplet: ["x64-windows-release", "x64-linux-release", "x64-osx-release"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
       
-      - name: Clone vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Install vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/bootstrap-vcpkg.sh
-      
-      - name: Install vcpkg on Windows
-        if: runner.os == 'Windows'
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
-      
-      - name: Install GDAL - Linux/macOs
-        if: runner.os != 'Linux'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/vcpkg install gdal
-      
-      - name: Install GDAL - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          ./vcpkg/vcpkg install gdal
-
-      - name: Copy GDAL library - Linux
-        if: runner.os == 'Linux'
-        run: |
-          mkdir -p map2loop/gdal_lib
-          cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
+      - name: vcpkg build
+        uses: johnwason/vcpkg-action@v6
+        id: vcpkg
+        with:
+          pkgs: boost-date-time
+          triplet: ${{ matrix.vcpkg_triplet }}
+          cache-key: ${{ matrix.os }}
+          revision: master
+          token: ${{ github.token }}
+          github-binarycache: true
       
 
       - name: Copy GDAL library - macOS
@@ -195,7 +174,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
 
  
-  build-sdist:
+  pip-build-sdist:
     name: Build Map2loop sdist
     runs-on: ${{ matrix.os }}
     strategy:
@@ -203,35 +182,20 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-12 ]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        vcpkg_triplet: ["x64-windows-release", "x64-linux-release", "x64-osx-release"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Install vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/bootstrap-vcpkg.sh
-      
-      - name: Install vcpkg on Windows
-        if: runner.os == 'Windows'
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
-      
-      - name: Install GDAL - Linux/macOs
-        if: runner.os != 'Linux'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/vcpkg install gdal
-      
-      - name: Install GDAL - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          ./vcpkg/vcpkg install gdal
+      - name: vcpkg build
+        uses: johnwason/vcpkg-action@v6
+        id: vcpkg
+        with:
+          pkgs: boost-date-time
+          triplet: ${{ matrix.vcpkg_triplet }}
+          cache-key: ${{ matrix.os }}
+          revision: master
+          token: ${{ github.token }}
+          github-binarycache: true
 
       - name: Copy GDAL library - Linux
         if: runner.os == 'Linux'
@@ -268,9 +232,9 @@ jobs:
           path: dist/*.tar.gz
           compression-level: 0
 
-  test-sdist:
+  pip-test-sdist:
     name: Test sdist
-    needs: build-sdist
+    needs: pip-build-sdist
     runs-on: ubuntu-latest
     container:
       image: "ghcr.io/osgeo/gdal:ubuntu-small-3.9.2"
@@ -309,9 +273,9 @@ jobs:
           cd ..
           uv run python -c "import map2loop; print(f'GDAL version: {map2loop.__gdal_version__}\nGEOS version: {map2loop.__gdal_geos_version__}')"
   
-  build-wheels-linux:
+  pip-build-wheels-linux:
     name: Build wheels on Linux
-    needs: test-sdist
+    needs: pip-test-sdist
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -362,7 +326,7 @@ jobs:
           path: ./wheelhouse/*.whl
           compression-level: 0
 
-  build-wheels-mac-windows:
+  pip-build-wheels-mac-windows:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -447,9 +411,9 @@ jobs:
           path: ./wheelhouse/*.whl
           compression-level: 0
   #TODO: Continure from here        
-  test-wheels:
+  pip-test-wheels:
     name: Test wheels on ${{ matrix.os }} (Python ${{ matrix.python-version }}}})
-    needs: [build-wheels-linux, build-wheels-mac-windows]
+    needs: [pip-build-wheels-linux, pip-build-wheels-mac-windows]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -519,14 +483,14 @@ jobs:
     #runs all the same as the build stage but need to rerun after release created to get updated
     #tag
     name: Building conda package for python
-    needs: ["release-please", conda-build]
+    needs: [release-please, conda-build]
     if: ${{ needs.release-please.outputs.release_created }}
 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
+        os: [ windows-latest, ubuntu-latest, macos-12 ]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
     steps:
       - uses: conda-incubator/setup-miniconda@v3
@@ -544,13 +508,13 @@ jobs:
           ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
         shell: bash -l {0}
         run: |
-          conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
+          conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ fromJSON(vars.PYTHON_VERSIONS)}}
-          conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
           anaconda upload --label main conda/*/*.tar.bz2
-  upload_to_pypi:
+
+  pypi-upload:
       runs-on: "ubuntu-latest"
-      needs: ["release-please", build-sdist, test-sdist, build-wheels-linux, build-wheels-mac-windows, test-wheels]
+      needs: ["release-please", pip-test-wheels]
       if: ${{ needs.release-please.outputs.release_created }}
       permissions:
         # IMPORTANT: this permission is mandatory for trusted publishing

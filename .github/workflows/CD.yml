@@ -88,7 +88,7 @@ jobs:
       - name: Building and install
         shell: bash -l {0}
         run: |
-          pip install --gdalversion 3.8.4 .
+          pip install .
 
       - name: Testing
         shell: bash -l {0}

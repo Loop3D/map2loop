@@ -180,20 +180,6 @@ jobs:
   
 
 
-  release-please:
-    runs-on: ubuntu-latest
-    needs: conda-continuous-integration
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: GoogleCloudPlatform/release-please-action@v4
-        id: release
-        with:
-          release-type: python
-          package-name: map2loop
-          include-v-in-tag: false
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-
  
   pip-build-sdist:
     name: Build Map2loop sdist
@@ -236,21 +222,21 @@ jobs:
       - name: Copy GDAL library - Linux
         if: runner.os == 'Linux'
         run: |
-          mkdir -p map2loop/gdal_lib
+          mkdir -p ./map2loop/gdal_lib
           cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
       
 
       - name: Copy GDAL library - macOS
         if: runner.os == 'macos-12'
         run: |
-          mkdir -p map2loop/gdal_lib
+          mkdir -p ./map2loop/gdal_lib
           cp ./vcpkg/installed/x64-osx/lib/libgdal.a ./map2loop/gdal_lib/
         
 
       - name: Copy GDAL library - Windows
         if: runner.os == 'Windows'
         run: |
-          mkdir map2loop\map2loop\gdal_lib
+          mkdir .\map2loop\gdal_lib
           copy .\vcpkg\installed\x64-windows\bin\gdal.dll .\map2loop\gdal_lib\
 
       # - name: Install system dependencies
@@ -514,6 +500,20 @@ jobs:
         run: |
           cd ..
           uv run python -c "import map2loop; print(f'GDAL version: {map2loop.__gdal_version__}\nGEOS version: {map2loop.__gdal_geos_version__}')"
+
+  release-please:
+    runs-on: ubuntu-latest
+    needs: conda-continuous-integration
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v4
+        id: release
+        with:
+          release-type: python
+          package-name: map2loop
+          include-v-in-tag: false
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
 
   conda-deploy:
     #runs all the same as the build stage but need to rerun after release created to get updated

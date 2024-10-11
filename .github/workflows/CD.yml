@@ -69,10 +69,12 @@ jobs:
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
       
-      - name: Install GDAL
+      - name: Install GDAL - Linux/macOS
+        if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
-          .\vcpkg\vcpkg install gdal
+          
+          ./vcpkg/vcpkg install gdal
 
       - name: Copy GDAL library - Linux
         if: runner.os == 'Linux'
@@ -214,9 +216,10 @@ jobs:
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
       
-      - name: Install GDAL
+      - name: Install GDAL - Linux/macOS
+        if: runner.os != 'Windows'
         run: |
-          .\vcpkg\vcpkg install gdal
+          ./vcpkg/vcpkg install gdal
 
       - name: Copy GDAL library - Linux
         if: runner.os == 'Linux'

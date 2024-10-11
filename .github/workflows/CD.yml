@@ -70,6 +70,7 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat
       
       - name: Install GDAL
+        shell: bash -l {0}
         run: |
           .\vcpkg\vcpkg install gdal
 
@@ -197,6 +198,10 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
 
       - name: Install vcpkg (Linux/macOS)
         if: runner.os != 'Windows'

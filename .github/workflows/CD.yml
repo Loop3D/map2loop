@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - setup_py
   pull_request:
     branches:
       - master

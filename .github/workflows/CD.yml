@@ -54,16 +54,47 @@ jobs:
         with:
           python-version: ${{ matrix.python-version}}
       
-      # Cache conda environments
-      - name: Cache conda environment
-        uses: actions/cache@v4
-        with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}
-          restore-keys: |
-            ${{ runner.os }}-conda-
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
 
-      - name: Installing dependencies - MacOs
+      - name: Install vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/bootstrap-vcpkg.sh
+      
+      - name: Install vcpkg on Windows
+        if: runner.os == 'Windows'
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+      
+      - name: Install GDAL
+        run: |
+          .\vcpkg\vcpkg install gdal
+
+      - name: Copy GDAL library - Linux
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p map2loop/gdal_lib
+          cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
+      
+
+      - name: Copy GDAL library - macOS
+        if: runner.os == 'macos-12'
+        run: |
+          mkdir -p map2loop/gdal_lib
+          cp ./vcpkg/installed/x64-osx/lib/libgdal.a ./map2loop/gdal_lib/
+        
+
+      - name: Copy GDAL library - Windows
+        if: runner.os == 'Windows'
+        run: |
+          mkdir map2loop\map2loop\gdal_lib
+          copy .\vcpkg\installed\x64-windows\bin\gdal.lib .\map2loop\gdal_lib\
+        
+
+      - name: Installing dependencies - macOs
         if: runner.os == 'macos-12'
         shell: bash -l {0}
         run: |
@@ -94,22 +125,6 @@ jobs:
         shell: bash -l {0}
         run: |
           pytest
-
-  
-
-  release-please:
-    runs-on: ubuntu-latest
-    needs: conda-continuous-integration
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: GoogleCloudPlatform/release-please-action@v4
-        id: release
-        with:
-          release-type: python
-          package-name: map2loop
-          include-v-in-tag: false
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
 
   conda-build:
     name: Building conda package for python
@@ -155,16 +170,66 @@ jobs:
           name: conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
   
+
+
+  release-please:
+    runs-on: ubuntu-latest
+    needs: conda-continuous-integration
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v4
+        id: release
+        with:
+          release-type: python
+          package-name: map2loop
+          include-v-in-tag: false
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+
+ 
   build-sdist:
     name: Build Map2loop sdist
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-12 ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
+      - name: Install vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          ./vcpkg/bootstrap-vcpkg.sh
+      
+      - name: Install vcpkg on Windows
+        if: runner.os == 'Windows'
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+      
+      - name: Install GDAL
+        run: |
+          .\vcpkg\vcpkg install gdal
+
+      - name: Copy GDAL library - Linux
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p map2loop/gdal_lib
+          cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
+      
+      - name: Copy GDAL library - macOS
+        if: runner.os == 'macos-12'
+        run: |
+          mkdir -p map2loop/gdal_lib
+          cp ./vcpkg/installed/x64-osx/lib/libgdal.a ./map2loop/gdal_lib/
+        
+      - name: Copy GDAL library - Windows
+        if: runner.os == 'Windows'
+        run: |
+          mkdir map2loop\map2loop\gdal_lib
+          copy .\vcpkg\installed\x64-windows\bin\gdal.lib .\map2loop\gdal_lib\
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
@@ -206,12 +271,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: map2loop-sdist
-          path: wheelhouse
+          path: dist
 
       - name: Build from sdist and install test dependencies
         shell: bash
         run: |
-          uv pip install --no-cache wheelhouse/*.tar.gz
+          uv pip install --no-cache dist/*.tar.gz
           uv pip install -r dependencies.txt
           uv pip list
 

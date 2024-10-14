@@ -20,7 +20,7 @@
         ],
         "name": "gdal_wrapper",
         "sources": [
-            "./map2loop/gdal_wrapper.pyx"
+            "./map2loop/gdal_wrapper/gdal_wrapper.pyx"
         ]
     },
     "module_name": "gdal_wrapper"
@@ -1498,7 +1498,7 @@ static const char *__pyx_filename;
 /* #### Code section: filename_table ### */
 
 static const char *__pyx_f[] = {
-  "map2loop/gdal_wrapper.pyx",
+  "map2loop/gdal_wrapper/gdal_wrapper.pyx",
   "type.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
@@ -2152,9 +2152,9 @@ static const char __pyx_k_gdal_use_exceptions[] = "gdal_use_exceptions";
 static const char __pyx_k_gdal_inv_geo_transform[] = "gdal_inv_geo_transform";
 static const char __pyx_k_gdal_get_driver_by_name[] = "gdal_get_driver_by_name";
 static const char __pyx_k_gdal_file_from_mem_buffer[] = "gdal_file_from_mem_buffer";
-static const char __pyx_k_map2loop_gdal_wrapper_pyx[] = "map2loop/gdal_wrapper.pyx";
 static const char __pyx_k_Geotransform_inversion_failed[] = "Geotransform inversion failed";
 static const char __pyx_k_Failed_to_allocate_memory_for_th[] = "Failed to allocate memory for the buffer";
+static const char __pyx_k_map2loop_gdal_wrapper_gdal_wrapp[] = "map2loop/gdal_wrapper/gdal_wrapper.pyx";
 /* #### Code section: decls ### */
 static PyObject *__pyx_pf_12gdal_wrapper_gdal_translate(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_srcDataset, PyObject *__pyx_v_options); /* proto */
 static PyObject *__pyx_pf_12gdal_wrapper_2gdal_warp(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_srcDataset, PyObject *__pyx_v_options); /* proto */
@@ -2238,7 +2238,7 @@ typedef struct {
   PyObject *__pyx_n_s_i;
   PyObject *__pyx_n_s_is_coroutine;
   PyObject *__pyx_n_s_main;
-  PyObject *__pyx_kp_s_map2loop_gdal_wrapper_pyx;
+  PyObject *__pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp;
   PyObject *__pyx_n_s_mem_file;
   PyObject *__pyx_n_s_name;
   PyObject *__pyx_n_s_name_2;
@@ -2335,7 +2335,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_i);
   Py_CLEAR(clear_module_state->__pyx_n_s_is_coroutine);
   Py_CLEAR(clear_module_state->__pyx_n_s_main);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_map2loop_gdal_wrapper_pyx);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp);
   Py_CLEAR(clear_module_state->__pyx_n_s_mem_file);
   Py_CLEAR(clear_module_state->__pyx_n_s_name);
   Py_CLEAR(clear_module_state->__pyx_n_s_name_2);
@@ -2410,7 +2410,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_i);
   Py_VISIT(traverse_module_state->__pyx_n_s_is_coroutine);
   Py_VISIT(traverse_module_state->__pyx_n_s_main);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_map2loop_gdal_wrapper_pyx);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp);
   Py_VISIT(traverse_module_state->__pyx_n_s_mem_file);
   Py_VISIT(traverse_module_state->__pyx_n_s_name);
   Py_VISIT(traverse_module_state->__pyx_n_s_name_2);
@@ -2511,7 +2511,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_i __pyx_mstate_global->__pyx_n_s_i
 #define __pyx_n_s_is_coroutine __pyx_mstate_global->__pyx_n_s_is_coroutine
 #define __pyx_n_s_main __pyx_mstate_global->__pyx_n_s_main
-#define __pyx_kp_s_map2loop_gdal_wrapper_pyx __pyx_mstate_global->__pyx_kp_s_map2loop_gdal_wrapper_pyx
+#define __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp __pyx_mstate_global->__pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp
 #define __pyx_n_s_mem_file __pyx_mstate_global->__pyx_n_s_mem_file
 #define __pyx_n_s_name __pyx_mstate_global->__pyx_n_s_name
 #define __pyx_n_s_name_2 __pyx_mstate_global->__pyx_n_s_name_2
@@ -2538,7 +2538,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_codeobj__13 __pyx_mstate_global->__pyx_codeobj__13
 /* #### Code section: module_code ### */
 
-/* "gdal_wrapper.pyx":19
+/* "gdal_wrapper.pyx":26
  * 
  * # Python-friendly wrapper for GDAL Translate
  * def gdal_translate(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
@@ -2607,7 +2607,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -2615,21 +2615,21 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("gdal_translate", 0, 2, 3, 1); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("gdal_translate", 0, 2, 3, 1); __PYX_ERR(0, 26, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_options);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_translate") < 0)) __PYX_ERR(0, 19, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_translate") < 0)) __PYX_ERR(0, 26, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -2647,7 +2647,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gdal_translate", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 19, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gdal_translate", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 26, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2661,7 +2661,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dest), (&PyString_Type), 1, "dest", 1))) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dest), (&PyString_Type), 1, "dest", 1))) __PYX_ERR(0, 26, __pyx_L1_error)
   __pyx_r = __pyx_pf_12gdal_wrapper_gdal_translate(__pyx_self, __pyx_v_dest, __pyx_v_srcDataset, __pyx_v_options);
 
   /* function exit code */
@@ -2691,29 +2691,29 @@ static PyObject *__pyx_pf_12gdal_wrapper_gdal_translate(CYTHON_UNUSED PyObject *
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gdal_translate", 1);
 
-  /* "gdal_wrapper.pyx":28
+  /* "gdal_wrapper.pyx":35
  *     """
  *     cdef const char *c_dest
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first             # <<<<<<<<<<<<<<
  *     c_dest = temp_dest  # Assign the safe reference
  *     GDALTranslate(c_dest, <GDALDatasetH>srcDataset, <void*>options)
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_dest, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_dest, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_temp_dest = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "gdal_wrapper.pyx":29
+  /* "gdal_wrapper.pyx":36
  *     cdef const char *c_dest
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first
  *     c_dest = temp_dest  # Assign the safe reference             # <<<<<<<<<<<<<<
  *     GDALTranslate(c_dest, <GDALDatasetH>srcDataset, <void*>options)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_dest); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_dest); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 36, __pyx_L1_error)
   __pyx_v_c_dest = __pyx_t_2;
 
-  /* "gdal_wrapper.pyx":30
+  /* "gdal_wrapper.pyx":37
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first
  *     c_dest = temp_dest  # Assign the safe reference
  *     GDALTranslate(c_dest, <GDALDatasetH>srcDataset, <void*>options)             # <<<<<<<<<<<<<<
@@ -2722,7 +2722,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_gdal_translate(CYTHON_UNUSED PyObject *
  */
   GDALTranslate(__pyx_v_c_dest, ((GDALDatasetH)__pyx_v_srcDataset), ((void *)__pyx_v_options));
 
-  /* "gdal_wrapper.pyx":19
+  /* "gdal_wrapper.pyx":26
  * 
  * # Python-friendly wrapper for GDAL Translate
  * def gdal_translate(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
@@ -2744,7 +2744,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_gdal_translate(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "gdal_wrapper.pyx":33
+/* "gdal_wrapper.pyx":40
  * 
  * # Python-friendly wrapper for GDAL Warp
  * def gdal_warp(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
@@ -2813,7 +2813,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 33, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -2821,21 +2821,21 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 33, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("gdal_warp", 0, 2, 3, 1); __PYX_ERR(0, 33, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("gdal_warp", 0, 2, 3, 1); __PYX_ERR(0, 40, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_options);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 33, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_warp") < 0)) __PYX_ERR(0, 33, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_warp") < 0)) __PYX_ERR(0, 40, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -2853,7 +2853,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gdal_warp", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 33, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gdal_warp", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 40, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2867,7 +2867,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dest), (&PyString_Type), 1, "dest", 1))) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dest), (&PyString_Type), 1, "dest", 1))) __PYX_ERR(0, 40, __pyx_L1_error)
   __pyx_r = __pyx_pf_12gdal_wrapper_2gdal_warp(__pyx_self, __pyx_v_dest, __pyx_v_srcDataset, __pyx_v_options);
 
   /* function exit code */
@@ -2898,29 +2898,29 @@ static PyObject *__pyx_pf_12gdal_wrapper_2gdal_warp(CYTHON_UNUSED PyObject *__py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gdal_warp", 1);
 
-  /* "gdal_wrapper.pyx":44
+  /* "gdal_wrapper.pyx":51
  *     """
  *     cdef const char *c_dest
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first             # <<<<<<<<<<<<<<
  *     c_dest = temp_dest  # Assign the safe reference
  *     return <object>GDALWarp(c_dest, <GDALDatasetH>srcDataset, <void*>options)
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_dest, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_dest, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_temp_dest = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "gdal_wrapper.pyx":45
+  /* "gdal_wrapper.pyx":52
  *     cdef const char *c_dest
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first
  *     c_dest = temp_dest  # Assign the safe reference             # <<<<<<<<<<<<<<
  *     return <object>GDALWarp(c_dest, <GDALDatasetH>srcDataset, <void*>options)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_dest); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_dest); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
   __pyx_v_c_dest = __pyx_t_2;
 
-  /* "gdal_wrapper.pyx":46
+  /* "gdal_wrapper.pyx":53
  *     temp_dest = dest.encode('utf-8')  # Store in a Python object first
  *     c_dest = temp_dest  # Assign the safe reference
  *     return <object>GDALWarp(c_dest, <GDALDatasetH>srcDataset, <void*>options)             # <<<<<<<<<<<<<<
@@ -2933,7 +2933,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_2gdal_warp(CYTHON_UNUSED PyObject *__py
   __pyx_r = ((PyObject *)__pyx_t_3);
   goto __pyx_L0;
 
-  /* "gdal_wrapper.pyx":33
+  /* "gdal_wrapper.pyx":40
  * 
  * # Python-friendly wrapper for GDAL Warp
  * def gdal_warp(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
@@ -2953,7 +2953,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_2gdal_warp(CYTHON_UNUSED PyObject *__py
   return __pyx_r;
 }
 
-/* "gdal_wrapper.pyx":49
+/* "gdal_wrapper.pyx":56
  * 
  * # Wrapper for GDALGetDriverByName
  * def gdal_get_driver_by_name(str name):             # <<<<<<<<<<<<<<
@@ -3015,12 +3015,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 49, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 56, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_get_driver_by_name") < 0)) __PYX_ERR(0, 49, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_get_driver_by_name") < 0)) __PYX_ERR(0, 56, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -3031,7 +3031,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gdal_get_driver_by_name", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 49, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gdal_get_driver_by_name", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 56, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3045,7 +3045,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyString_Type), 1, "name", 1))) __PYX_ERR(0, 49, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyString_Type), 1, "name", 1))) __PYX_ERR(0, 56, __pyx_L1_error)
   __pyx_r = __pyx_pf_12gdal_wrapper_4gdal_get_driver_by_name(__pyx_self, __pyx_v_name);
 
   /* function exit code */
@@ -3076,29 +3076,29 @@ static PyObject *__pyx_pf_12gdal_wrapper_4gdal_get_driver_by_name(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gdal_get_driver_by_name", 1);
 
-  /* "gdal_wrapper.pyx":58
+  /* "gdal_wrapper.pyx":65
  *     """
  *     cdef const char *c_name
  *     temp_name = name.encode('utf-8')  # Store in a Python object first             # <<<<<<<<<<<<<<
  *     c_name = temp_name  # Assign the safe reference
  *     return <object>GDALGetDriverByName(c_name)
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_name, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_name, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_temp_name = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "gdal_wrapper.pyx":59
+  /* "gdal_wrapper.pyx":66
  *     cdef const char *c_name
  *     temp_name = name.encode('utf-8')  # Store in a Python object first
  *     c_name = temp_name  # Assign the safe reference             # <<<<<<<<<<<<<<
  *     return <object>GDALGetDriverByName(c_name)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_name); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_name); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
   __pyx_v_c_name = __pyx_t_2;
 
-  /* "gdal_wrapper.pyx":60
+  /* "gdal_wrapper.pyx":67
  *     temp_name = name.encode('utf-8')  # Store in a Python object first
  *     c_name = temp_name  # Assign the safe reference
  *     return <object>GDALGetDriverByName(c_name)             # <<<<<<<<<<<<<<
@@ -3111,7 +3111,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_4gdal_get_driver_by_name(CYTHON_UNUSED 
   __pyx_r = ((PyObject *)__pyx_t_3);
   goto __pyx_L0;
 
-  /* "gdal_wrapper.pyx":49
+  /* "gdal_wrapper.pyx":56
  * 
  * # Wrapper for GDALGetDriverByName
  * def gdal_get_driver_by_name(str name):             # <<<<<<<<<<<<<<
@@ -3131,7 +3131,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_4gdal_get_driver_by_name(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "gdal_wrapper.pyx":63
+/* "gdal_wrapper.pyx":70
  * 
  * # Wrapper for GDALUseExceptions
  * def gdal_use_exceptions():             # <<<<<<<<<<<<<<
@@ -3161,7 +3161,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_6gdal_use_exceptions(CYTHON_UNUSED PyOb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("gdal_use_exceptions", 1);
 
-  /* "gdal_wrapper.pyx":68
+  /* "gdal_wrapper.pyx":75
  *     Enables the use of exceptions for GDAL errors.
  *     """
  *     GDALUseExceptions()             # <<<<<<<<<<<<<<
@@ -3170,7 +3170,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_6gdal_use_exceptions(CYTHON_UNUSED PyOb
  */
   GDALUseExceptions();
 
-  /* "gdal_wrapper.pyx":63
+  /* "gdal_wrapper.pyx":70
  * 
  * # Wrapper for GDALUseExceptions
  * def gdal_use_exceptions():             # <<<<<<<<<<<<<<
@@ -3185,7 +3185,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_6gdal_use_exceptions(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "gdal_wrapper.pyx":71
+/* "gdal_wrapper.pyx":78
  * 
  * # Wrapper for GDALFileFromMemBuffer
  * def gdal_file_from_mem_buffer(str filename, bytes buffer):             # <<<<<<<<<<<<<<
@@ -3250,7 +3250,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -3258,14 +3258,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("gdal_file_from_mem_buffer", 1, 2, 2, 1); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("gdal_file_from_mem_buffer", 1, 2, 2, 1); __PYX_ERR(0, 78, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_file_from_mem_buffer") < 0)) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_file_from_mem_buffer") < 0)) __PYX_ERR(0, 78, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
@@ -3278,7 +3278,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gdal_file_from_mem_buffer", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 71, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gdal_file_from_mem_buffer", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 78, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3292,8 +3292,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename), (&PyString_Type), 1, "filename", 1))) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_buffer), (&PyBytes_Type), 1, "buffer", 1))) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename), (&PyString_Type), 1, "filename", 1))) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_buffer), (&PyBytes_Type), 1, "buffer", 1))) __PYX_ERR(0, 78, __pyx_L1_error)
   __pyx_r = __pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(__pyx_self, __pyx_v_filename, __pyx_v_buffer);
 
   /* function exit code */
@@ -3329,39 +3329,39 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gdal_file_from_mem_buffer", 1);
 
-  /* "gdal_wrapper.pyx":81
+  /* "gdal_wrapper.pyx":88
  *     """
  *     cdef const char *c_filename
  *     temp_filename = filename.encode('utf-8')  # Store in a Python object first             # <<<<<<<<<<<<<<
  *     c_filename = temp_filename  # Assign the safe reference
  * 
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_filename, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_filename, __pyx_kp_s_utf_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_temp_filename = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "gdal_wrapper.pyx":82
+  /* "gdal_wrapper.pyx":89
  *     cdef const char *c_filename
  *     temp_filename = filename.encode('utf-8')  # Store in a Python object first
  *     c_filename = temp_filename  # Assign the safe reference             # <<<<<<<<<<<<<<
  * 
  *     cdef int buffer_size = PyBytes_Size(buffer)
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_temp_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 89, __pyx_L1_error)
   __pyx_v_c_filename = __pyx_t_2;
 
-  /* "gdal_wrapper.pyx":84
+  /* "gdal_wrapper.pyx":91
  *     c_filename = temp_filename  # Assign the safe reference
  * 
  *     cdef int buffer_size = PyBytes_Size(buffer)             # <<<<<<<<<<<<<<
  *     cdef void *c_buffer = malloc(buffer_size)
  * 
  */
-  __pyx_t_3 = PyBytes_Size(__pyx_v_buffer); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1L))) __PYX_ERR(0, 84, __pyx_L1_error)
+  __pyx_t_3 = PyBytes_Size(__pyx_v_buffer); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1L))) __PYX_ERR(0, 91, __pyx_L1_error)
   __pyx_v_buffer_size = __pyx_t_3;
 
-  /* "gdal_wrapper.pyx":85
+  /* "gdal_wrapper.pyx":92
  * 
  *     cdef int buffer_size = PyBytes_Size(buffer)
  *     cdef void *c_buffer = malloc(buffer_size)             # <<<<<<<<<<<<<<
@@ -3370,7 +3370,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
  */
   __pyx_v_c_buffer = malloc(__pyx_v_buffer_size);
 
-  /* "gdal_wrapper.pyx":87
+  /* "gdal_wrapper.pyx":94
  *     cdef void *c_buffer = malloc(buffer_size)
  * 
  *     if not c_buffer:             # <<<<<<<<<<<<<<
@@ -3380,20 +3380,20 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
   __pyx_t_4 = (!(__pyx_v_c_buffer != 0));
   if (unlikely(__pyx_t_4)) {
 
-    /* "gdal_wrapper.pyx":88
+    /* "gdal_wrapper.pyx":95
  * 
  *     if not c_buffer:
  *         raise MemoryError("Failed to allocate memory for the buffer")             # <<<<<<<<<<<<<<
  * 
  *     # Copy the content from the Python bytes object to the allocated C buffer
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 88, __pyx_L1_error)
+    __PYX_ERR(0, 95, __pyx_L1_error)
 
-    /* "gdal_wrapper.pyx":87
+    /* "gdal_wrapper.pyx":94
  *     cdef void *c_buffer = malloc(buffer_size)
  * 
  *     if not c_buffer:             # <<<<<<<<<<<<<<
@@ -3402,17 +3402,17 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
  */
   }
 
-  /* "gdal_wrapper.pyx":91
+  /* "gdal_wrapper.pyx":98
  * 
  *     # Copy the content from the Python bytes object to the allocated C buffer
  *     memcpy(c_buffer, PyBytes_AsString(buffer), buffer_size)             # <<<<<<<<<<<<<<
  * 
  *     cdef void *mem_file = GDALFileFromMemBuffer(c_filename, c_buffer, buffer_size)
  */
-  __pyx_t_5 = PyBytes_AsString(__pyx_v_buffer); if (unlikely(__pyx_t_5 == ((char *)NULL))) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_5 = PyBytes_AsString(__pyx_v_buffer); if (unlikely(__pyx_t_5 == ((char *)NULL))) __PYX_ERR(0, 98, __pyx_L1_error)
   (void)(memcpy(__pyx_v_c_buffer, __pyx_t_5, __pyx_v_buffer_size));
 
-  /* "gdal_wrapper.pyx":93
+  /* "gdal_wrapper.pyx":100
  *     memcpy(c_buffer, PyBytes_AsString(buffer), buffer_size)
  * 
  *     cdef void *mem_file = GDALFileFromMemBuffer(c_filename, c_buffer, buffer_size)             # <<<<<<<<<<<<<<
@@ -3421,7 +3421,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
  */
   __pyx_v_mem_file = GDALFileFromMemBuffer(__pyx_v_c_filename, __pyx_v_c_buffer, __pyx_v_buffer_size);
 
-  /* "gdal_wrapper.pyx":96
+  /* "gdal_wrapper.pyx":103
  * 
  *     # Free the allocated C buffer
  *     free(c_buffer)             # <<<<<<<<<<<<<<
@@ -3430,7 +3430,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
  */
   free(__pyx_v_c_buffer);
 
-  /* "gdal_wrapper.pyx":99
+  /* "gdal_wrapper.pyx":106
  * 
  *     # Return the memory file handle as an object (adjust if you need a specific object type)
  *     return <object>mem_file             # <<<<<<<<<<<<<<
@@ -3442,7 +3442,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
   __pyx_r = ((PyObject *)__pyx_v_mem_file);
   goto __pyx_L0;
 
-  /* "gdal_wrapper.pyx":71
+  /* "gdal_wrapper.pyx":78
  * 
  * # Wrapper for GDALFileFromMemBuffer
  * def gdal_file_from_mem_buffer(str filename, bytes buffer):             # <<<<<<<<<<<<<<
@@ -3462,7 +3462,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_8gdal_file_from_mem_buffer(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "gdal_wrapper.pyx":102
+/* "gdal_wrapper.pyx":109
  * 
  * # Wrapper for GDALInvGeoTransform
  * def gdal_inv_geo_transform(gt_in):             # <<<<<<<<<<<<<<
@@ -3524,12 +3524,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 109, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_inv_geo_transform") < 0)) __PYX_ERR(0, 102, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "gdal_inv_geo_transform") < 0)) __PYX_ERR(0, 109, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -3540,7 +3540,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gdal_inv_geo_transform", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 102, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gdal_inv_geo_transform", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 109, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3584,7 +3584,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_10gdal_inv_geo_transform(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gdal_inv_geo_transform", 1);
 
-  /* "gdal_wrapper.pyx":114
+  /* "gdal_wrapper.pyx":121
  * 
  *     # Copy the input list into the C array
  *     for i in range(6):             # <<<<<<<<<<<<<<
@@ -3594,21 +3594,21 @@ static PyObject *__pyx_pf_12gdal_wrapper_10gdal_inv_geo_transform(CYTHON_UNUSED 
   for (__pyx_t_1 = 0; __pyx_t_1 < 6; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "gdal_wrapper.pyx":115
+    /* "gdal_wrapper.pyx":122
  *     # Copy the input list into the C array
  *     for i in range(6):
  *         gt_in_c[i] = gt_in[i]             # <<<<<<<<<<<<<<
  * 
  *     # Call the GDALInvGeoTransform function
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_gt_in, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_gt_in, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     (__pyx_v_gt_in_c[__pyx_v_i]) = __pyx_t_3;
   }
 
-  /* "gdal_wrapper.pyx":118
+  /* "gdal_wrapper.pyx":125
  * 
  *     # Call the GDALInvGeoTransform function
  *     if GDALInvGeoTransform(gt_in_c, gt_out):             # <<<<<<<<<<<<<<
@@ -3618,20 +3618,20 @@ static PyObject *__pyx_pf_12gdal_wrapper_10gdal_inv_geo_transform(CYTHON_UNUSED 
   __pyx_t_4 = (GDALInvGeoTransform(__pyx_v_gt_in_c, __pyx_v_gt_out) != 0);
   if (unlikely(__pyx_t_4)) {
 
-    /* "gdal_wrapper.pyx":119
+    /* "gdal_wrapper.pyx":126
  *     # Call the GDALInvGeoTransform function
  *     if GDALInvGeoTransform(gt_in_c, gt_out):
  *         raise RuntimeError("Geotransform inversion failed")             # <<<<<<<<<<<<<<
  * 
  *     # Return the inverted geotransform as a Python list
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 119, __pyx_L1_error)
+    __PYX_ERR(0, 126, __pyx_L1_error)
 
-    /* "gdal_wrapper.pyx":118
+    /* "gdal_wrapper.pyx":125
  * 
  *     # Call the GDALInvGeoTransform function
  *     if GDALInvGeoTransform(gt_in_c, gt_out):             # <<<<<<<<<<<<<<
@@ -3640,20 +3640,20 @@ static PyObject *__pyx_pf_12gdal_wrapper_10gdal_inv_geo_transform(CYTHON_UNUSED 
  */
   }
 
-  /* "gdal_wrapper.pyx":122
+  /* "gdal_wrapper.pyx":129
  * 
  *     # Return the inverted geotransform as a Python list
  *     return [gt_out[i] for i in range(6)]             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
   { /* enter inner scope */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     for (__pyx_t_1 = 0; __pyx_t_1 < 6; __pyx_t_1+=1) {
       __pyx_7genexpr__pyx_v_i = __pyx_t_1;
-      __pyx_t_5 = PyFloat_FromDouble((__pyx_v_gt_out[__pyx_7genexpr__pyx_v_i])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_5 = PyFloat_FromDouble((__pyx_v_gt_out[__pyx_7genexpr__pyx_v_i])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 122, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
   } /* exit inner scope */
@@ -3661,7 +3661,7 @@ static PyObject *__pyx_pf_12gdal_wrapper_10gdal_inv_geo_transform(CYTHON_UNUSED 
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "gdal_wrapper.pyx":102
+  /* "gdal_wrapper.pyx":109
  * 
  * # Wrapper for GDALInvGeoTransform
  * def gdal_inv_geo_transform(gt_in):             # <<<<<<<<<<<<<<
@@ -3726,7 +3726,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
     {&__pyx_n_s_is_coroutine, __pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 0, 1, 1},
     {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
-    {&__pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_k_map2loop_gdal_wrapper_pyx, sizeof(__pyx_k_map2loop_gdal_wrapper_pyx), 0, 0, 1, 0},
+    {&__pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_k_map2loop_gdal_wrapper_gdal_wrapp, sizeof(__pyx_k_map2loop_gdal_wrapper_gdal_wrapp), 0, 0, 1, 0},
     {&__pyx_n_s_mem_file, __pyx_k_mem_file, sizeof(__pyx_k_mem_file), 0, 0, 1, 1},
     {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
     {&__pyx_n_s_name_2, __pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 0, 1, 1},
@@ -3744,9 +3744,9 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
 }
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 88, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 114, __pyx_L1_error)
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 126, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -3757,96 +3757,96 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "gdal_wrapper.pyx":88
+  /* "gdal_wrapper.pyx":95
  * 
  *     if not c_buffer:
  *         raise MemoryError("Failed to allocate memory for the buffer")             # <<<<<<<<<<<<<<
  * 
  *     # Copy the content from the Python bytes object to the allocated C buffer
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Failed_to_allocate_memory_for_th); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Failed_to_allocate_memory_for_th); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "gdal_wrapper.pyx":119
+  /* "gdal_wrapper.pyx":126
  *     # Call the GDALInvGeoTransform function
  *     if GDALInvGeoTransform(gt_in_c, gt_out):
  *         raise RuntimeError("Geotransform inversion failed")             # <<<<<<<<<<<<<<
  * 
  *     # Return the inverted geotransform as a Python list
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Geotransform_inversion_failed); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Geotransform_inversion_failed); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "gdal_wrapper.pyx":19
+  /* "gdal_wrapper.pyx":26
  * 
  * # Python-friendly wrapper for GDAL Translate
  * def gdal_translate(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALTranslate function.
  */
-  __pyx_tuple__3 = PyTuple_Pack(5, __pyx_n_s_dest, __pyx_n_s_srcDataset, __pyx_n_s_options, __pyx_n_s_c_dest, __pyx_n_s_temp_dest); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(5, __pyx_n_s_dest, __pyx_n_s_srcDataset, __pyx_n_s_options, __pyx_n_s_c_dest, __pyx_n_s_temp_dest); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_translate, 19, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 19, __pyx_L1_error)
-  __pyx_tuple__5 = PyTuple_Pack(1, Py_None); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_translate, 26, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, Py_None); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "gdal_wrapper.pyx":33
+  /* "gdal_wrapper.pyx":40
  * 
  * # Python-friendly wrapper for GDAL Warp
  * def gdal_warp(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALWarp function.
  */
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_warp, 33, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_warp, 40, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 40, __pyx_L1_error)
 
-  /* "gdal_wrapper.pyx":49
+  /* "gdal_wrapper.pyx":56
  * 
  * # Wrapper for GDALGetDriverByName
  * def gdal_get_driver_by_name(str name):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALGetDriverByName function.
  */
-  __pyx_tuple__7 = PyTuple_Pack(3, __pyx_n_s_name, __pyx_n_s_c_name, __pyx_n_s_temp_name); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(3, __pyx_n_s_name, __pyx_n_s_c_name, __pyx_n_s_temp_name); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
-  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_get_driver_by_name, 49, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_get_driver_by_name, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 56, __pyx_L1_error)
 
-  /* "gdal_wrapper.pyx":63
+  /* "gdal_wrapper.pyx":70
  * 
  * # Wrapper for GDALUseExceptions
  * def gdal_use_exceptions():             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALUseExceptions function.
  */
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_use_exceptions, 63, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_use_exceptions, 70, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 70, __pyx_L1_error)
 
-  /* "gdal_wrapper.pyx":71
+  /* "gdal_wrapper.pyx":78
  * 
  * # Wrapper for GDALFileFromMemBuffer
  * def gdal_file_from_mem_buffer(str filename, bytes buffer):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALFileFromMemBuffer function.
  */
-  __pyx_tuple__10 = PyTuple_Pack(7, __pyx_n_s_filename, __pyx_n_s_buffer, __pyx_n_s_c_filename, __pyx_n_s_temp_filename, __pyx_n_s_buffer_size, __pyx_n_s_c_buffer, __pyx_n_s_mem_file); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(7, __pyx_n_s_filename, __pyx_n_s_buffer, __pyx_n_s_c_filename, __pyx_n_s_temp_filename, __pyx_n_s_buffer_size, __pyx_n_s_c_buffer, __pyx_n_s_mem_file); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_file_from_mem_buffer, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_file_from_mem_buffer, 78, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 78, __pyx_L1_error)
 
-  /* "gdal_wrapper.pyx":102
+  /* "gdal_wrapper.pyx":109
  * 
  * # Wrapper for GDALInvGeoTransform
  * def gdal_inv_geo_transform(gt_in):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALInvGeoTransform function.
  */
-  __pyx_tuple__12 = PyTuple_Pack(5, __pyx_n_s_gt_in, __pyx_n_s_gt_out, __pyx_n_s_gt_in_c, __pyx_n_s_i, __pyx_n_s_i); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(5, __pyx_n_s_gt_in, __pyx_n_s_gt_out, __pyx_n_s_gt_in_c, __pyx_n_s_i, __pyx_n_s_i); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_pyx, __pyx_n_s_gdal_inv_geo_transform, 102, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_map2loop_gdal_wrapper_gdal_wrapp, __pyx_n_s_gdal_inv_geo_transform, 109, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -4232,78 +4232,78 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "gdal_wrapper.pyx":19
+  /* "gdal_wrapper.pyx":26
  * 
  * # Python-friendly wrapper for GDAL Translate
  * def gdal_translate(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALTranslate function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_1gdal_translate, 0, __pyx_n_s_gdal_translate, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_1gdal_translate, 0, __pyx_n_s_gdal_translate, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__5);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_translate, __pyx_t_2) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_translate, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "gdal_wrapper.pyx":33
+  /* "gdal_wrapper.pyx":40
  * 
  * # Python-friendly wrapper for GDAL Warp
  * def gdal_warp(str dest, srcDataset, options=None):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALWarp function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_3gdal_warp, 0, __pyx_n_s_gdal_warp, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_3gdal_warp, 0, __pyx_n_s_gdal_warp, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__5);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_warp, __pyx_t_2) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_warp, __pyx_t_2) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "gdal_wrapper.pyx":49
+  /* "gdal_wrapper.pyx":56
  * 
  * # Wrapper for GDALGetDriverByName
  * def gdal_get_driver_by_name(str name):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALGetDriverByName function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_5gdal_get_driver_by_name, 0, __pyx_n_s_gdal_get_driver_by_name, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_5gdal_get_driver_by_name, 0, __pyx_n_s_gdal_get_driver_by_name, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_get_driver_by_name, __pyx_t_2) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_get_driver_by_name, __pyx_t_2) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "gdal_wrapper.pyx":63
+  /* "gdal_wrapper.pyx":70
  * 
  * # Wrapper for GDALUseExceptions
  * def gdal_use_exceptions():             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALUseExceptions function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_7gdal_use_exceptions, 0, __pyx_n_s_gdal_use_exceptions, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_7gdal_use_exceptions, 0, __pyx_n_s_gdal_use_exceptions, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_use_exceptions, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_use_exceptions, __pyx_t_2) < 0) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "gdal_wrapper.pyx":71
+  /* "gdal_wrapper.pyx":78
  * 
  * # Wrapper for GDALFileFromMemBuffer
  * def gdal_file_from_mem_buffer(str filename, bytes buffer):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALFileFromMemBuffer function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_9gdal_file_from_mem_buffer, 0, __pyx_n_s_gdal_file_from_mem_buffer, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_9gdal_file_from_mem_buffer, 0, __pyx_n_s_gdal_file_from_mem_buffer, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_file_from_mem_buffer, __pyx_t_2) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_file_from_mem_buffer, __pyx_t_2) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "gdal_wrapper.pyx":102
+  /* "gdal_wrapper.pyx":109
  * 
  * # Wrapper for GDALInvGeoTransform
  * def gdal_inv_geo_transform(gt_in):             # <<<<<<<<<<<<<<
  *     """
  *     Wrapper around GDALInvGeoTransform function.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_11gdal_inv_geo_transform, 0, __pyx_n_s_gdal_inv_geo_transform, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_12gdal_wrapper_11gdal_inv_geo_transform, 0, __pyx_n_s_gdal_inv_geo_transform, NULL, __pyx_n_s_gdal_wrapper, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_inv_geo_transform, __pyx_t_2) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gdal_inv_geo_transform, __pyx_t_2) < 0) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "gdal_wrapper.pyx":1

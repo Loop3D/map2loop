@@ -53,54 +53,6 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-      
-      - name: Clone vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Install vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/bootstrap-vcpkg.sh
-      
-      - name: Install vcpkg on Windows
-        if: runner.os == 'Windows'
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
-      
-      - name: Install GDAL - Linux/macOs
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/vcpkg install gdal
-      
-      - name: Install GDAL - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          ./vcpkg/vcpkg install gdal
-
-      - name: Copy GDAL library - Linux
-        if: runner.os == 'Linux'
-        run: |
-          mkdir -p ./map2loop/gdal_lib
-          cp ./vcpkg/installed/x64-linux/lib/libgdal.a ./map2loop/gdal_lib/
-      
-
-      - name: Copy GDAL library - macOS
-        if: runner.os == 'macos-12'
-        run: |
-          mkdir -p ./map2loop/gdal_lib
-          cp ./vcpkg/installed/x64-osx/lib/libgdal.a ./map2loop/gdal_lib/
-        
-
-      - name: Copy GDAL library - Windows
-        if: runner.os == 'Windows'
-        run: |
-          mkdir .\map2loop\gdal_lib
-          copy .\vcpkg\installed\x64-windows\bin\gdal.dll .\map2loop\gdal_lib\
-        
 
       - name: Installing dependencies - macOs
         if: runner.os == 'macos-12'
@@ -110,15 +62,7 @@ jobs:
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
           conda install pytest -y
       
-      - name: Installing dependencies - Windows
-        if: runner.os == 'Windows'
-        shell: bash -l {0}
-        run: |
-          conda install -c conda-forge -c loop3d --file dependencies.txt -y
-          conda install pytest -y
-
-      - name: Installing dependencies - Linux
-        if: runner.os == 'Linux'
+      - name: Installing dependencies - Windows/Linux
         shell: bash -l {0}
         run: |
           conda install -c conda-forge -c loop3d --file dependencies.txt -y
@@ -148,15 +92,6 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-      # Restore Conda environment from cache if available
-      - name: Cache Conda environment
-        uses: actions/cache@v3
-        id: conda-cache
-        with:
-          path: ~/.conda/envs
-          key: conda-${{ matrix.os }}-${{ matrix.python-version }}-env
-          restore-keys: |
-            conda-${{ matrix.os }}-${{ matrix.python-version }}-env
 
       - uses: actions/checkout@v4
       - name: update submodules
@@ -192,12 +127,6 @@ jobs:
       - name: Clone vcpkg
         run: |
           git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Install vcpkg (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash -l {0}
-        run: |
-          ./vcpkg/bootstrap-vcpkg.sh
       
       - name: Install vcpkg on Windows
         if: runner.os == 'Windows'

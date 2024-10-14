@@ -3,6 +3,16 @@ from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .utils import generate_random_hex_colors
+from gdal_wrapper import (
+    gdal_translate, 
+    gdal_warp, 
+    gdal_get_driver_by_name, 
+    gdal_use_exceptions, 
+    gdal_file_from_mem_buffer, 
+    gdal_inv_geo_transform, 
+    GDT_Float32, 
+    GA_ReadOnly
+)
 
 # external imports
 import geopandas

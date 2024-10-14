@@ -1,5 +1,6 @@
 """See pyproject.toml for project metadata."""
 from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
 from Cython.Build import cythonize
 import logging
 import os
@@ -108,59 +109,122 @@ def get_gdal_config():
         else:
             raise e
         
-MIN_PYTHON_VERSION = (3, 8, 0)
-MIN_GDAL_VERSION = (3, 1, 0)
-ext_options, gdal_version_str = get_gdal_config()
-gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
-if not gdal_version >= MIN_GDAL_VERSION:
-    sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
+# MIN_PYTHON_VERSION = (3, 8, 0)
+# MIN_GDAL_VERSION = (3, 1, 0)
+# ext_options, gdal_version_str = get_gdal_config()
+# gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
+# if not gdal_version >= MIN_GDAL_VERSION:
+#     sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
     
-ext_modules = []
-package_data = {}
+# ext_modules = []
+# package_data = {}
 
-# setuptools clean does not cleanup Cython artifacts
-if "clean" in sys.argv:
-    for directory in ["build"]:
-        if os.path.exists(directory):
-            shutil.rmtree(directory)
+# # setuptools clean does not cleanup Cython artifacts
+# if "clean" in sys.argv:
+#     for directory in ["build"]:
+#         if os.path.exists(directory):
+#             shutil.rmtree(directory)
 
-    root = Path(".")
-    for ext in ["*.so", "*.pyc", "*.c", "*.cpp"]:
-        for entry in root.rglob(ext):
-            entry.unlink()
+#     root = Path(".")
+#     for ext in ["*.so", "*.pyc", "*.c", "*.cpp"]:
+#         for entry in root.rglob(ext):
+#             entry.unlink()
 
-elif "sdist" in sys.argv or "egg_info" in sys.argv:
-    # don't cythonize for the sdist
-    pass
+# elif "sdist" in sys.argv or "egg_info" in sys.argv:
+#     # don't cythonize for the sdist
+#     pass
 
-else:
-    if cythonize is None:
-        raise ImportError("Cython is required to build from source")
+# else:
+#     if cythonize is None:
+#         raise ImportError("Cython is required to build from source")
 
 ext_options, gdal_version_str = get_gdal_config()
 
-gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
-if not gdal_version >= MIN_GDAL_VERSION:
-    sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
+# gdal_version = tuple(int(i) for i in gdal_version_str.strip("dev").split("."))
+# if not gdal_version >= MIN_GDAL_VERSION:
+#     sys.exit(f"GDAL must be >= {'.'.join(map(str, MIN_GDAL_VERSION))}")
 
-compile_time_env = {
-    "CTE_GDAL_VERSION": gdal_version,
-}
+# compile_time_env = {
+#     "CTE_GDAL_VERSION": gdal_version,
+# }
 
 
-# Define the extension module
-ext_modules = [
-    Extension(
-        name="gdal_wrapper",
-        sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
-        include_dirs=ext_options["include_dirs"],
-        library_dirs=ext_options["library_dirs"],
-        libraries=ext_options["libraries"],
-        extra_compile_args=["-std=c++11"], 
-        compiler_directives={"language_level": "3"},
-        compile_time_env=compile_time_env
-    )
-]
+# # Define the extension module
+# ext_modules = [
+#     Extension(
+#         name="gdal_wrapper",
+#         sources=["./map2loop/gdal_wrapper/gdal_wrapper.pyx"],
+#         include_dirs=ext_options["include_dirs"],
+#         library_dirs=ext_options["library_dirs"],
+#         libraries=ext_options["libraries"],
+#         extra_compile_args=["-std=c++11"], 
+#         compiler_directives={"language_level": "3"},
+#         compile_time_env=compile_time_env
+#     )
+# ]
+
+class BuildGDAL(build_ext):
+    def run(self):
+        # Build GDAL as a static library
+        gdal_dir = os.path.abspath('map2loop/gdal/gdal_sources')
+        build_dir = os.path.join(gdal_dir, 'build')
+        install_dir = os.path.join(build_dir, 'install')
+
+        # Configure GDAL
+        configure_cmd = [
+            './configure',
+            '--prefix=' + install_dir,
+            '--disable-shared',
+            '--enable-static',
+            '--with-pic',
+            '--without-python',
+            '--without-libtiff',  # Adjust according to dependencies
+            '--without-libjpeg',
+            '--without-pg',  # Disable PostgreSQL support if not needed
+            # Add other configuration options as needed
+        ]
+
+        subprocess.check_call(configure_cmd, cwd=gdal_dir)
+
+        # Build and install GDAL
+        subprocess.check_call(['make', '-j4'], cwd=gdal_dir)
+        subprocess.check_call(['make', 'install'], cwd=gdal_dir)
+
+        # Build the GDAL Python bindings
+        gdal_python_dir = os.path.join(gdal_dir, 'swig', 'python')
+        env = os.environ.copy()
+        env['CPLUS_INCLUDE_PATH'] = os.path.join(install_dir, 'include')
+        env['C_INCLUDE_PATH'] = os.path.join(install_dir, 'include')
+        env['LD_LIBRARY_PATH'] = os.path.join(install_dir, 'lib')
+
+        subprocess.check_call(
+            ['python', 'setup.py', 'build_ext', '--include-dirs=' + os.path.join(install_dir, 'include'),
+             '--library-dirs=' + os.path.join(install_dir, 'lib')],
+            cwd=gdal_python_dir,
+            env=env
+        )
+
+        # Copy built extensions to map2loop package
+        # Assuming the built extensions are in gdal_python_dir/build/lib...
+        built_lib_dir = os.path.join(gdal_python_dir, 'build', 'lib.*')
+        self.copy_extensions_to_source()
+
+        # Continue with the standard build_ext
+        build_ext.run(self)
+
+# Define GDAL Extension Module
+gdal_module = Extension(
+    'map2loop.gdal._gdal',
+    sources=[],  # No sources needed since we're linking statically
+    include_dirs=[
+        os.path.join('map2loop', 'gdal_source', 'build', 'install', 'include'),
+    ],
+    library_dirs=[
+        os.path.join('map2loop', 'gdal_source', 'build', 'install', 'lib'),
+    ],
+    libraries=['gdal'],
+    extra_link_args=['-static'],
+)
 
 package_root = os.path.abspath(os.path.dirname(__file__))
 
@@ -170,5 +234,8 @@ with open(os.path.join(package_root, "map2loop/version.py")) as fp:
 version = version["__version__"]
 
 setup(
-    ext_modules=cythonize(ext_modules)
+    ext_modules=[gdal_module], 
+    cmdclass={
+        'build_ext': BuildGDAL,
+    },
     )

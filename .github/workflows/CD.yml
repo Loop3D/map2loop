@@ -60,7 +60,7 @@ jobs:
       - name : Install GDAL 
         run: |
           sudo apt-get update
-          sudo apt-get install libgdal-dev=3.8.4 gdal-bin=3.8.4
+          sudo apt-get install libgdal-dev gdal-bin
 
       - name: Create virtual environment
         # install uv and use it to create a virtual environment, then add it to

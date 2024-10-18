@@ -97,7 +97,7 @@ jobs:
 
       - name: Build Wheels
         run: |
-          # pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson
+          # pip install geopandas shapely networkx owslib map2model numpy loopprojectfile beartype gdal==3.8.4 hjson
           pip install build 
           python -m build --wheel
 

@@ -60,6 +60,7 @@ jobs:
       - name : Install GDAL 
         run: |
           sudo apt-get update
+          sudo apt-get upgrade
           sudo apt-get install libgdal-dev gdal-bin
 
       - name: Create virtual environment

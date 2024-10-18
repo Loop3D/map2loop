@@ -87,7 +87,7 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          # - macos-latest
+          - macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -116,12 +116,12 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          # - macos-latest
+          - macos-latest
         include:
           - os: "ubuntu-latest"
             artifact: map2loop-wheels-ubuntu-latest
-          # - os: "macos-latest"
-          #   artifact: map2loop-wheels-macos-latest
+          - os: "macos-latest"
+            artifact: map2loop-wheels-macos-latest
 
     steps:
       - name: Checkout
@@ -187,6 +187,7 @@ jobs:
       - name: Installing dependencies
         shell: bash -l {0}
         run: |
+          conda install -c conda-forge libgcc>=14 -y
           conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
           conda install pytest -y

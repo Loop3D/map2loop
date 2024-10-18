@@ -195,8 +195,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
-          activate-environment: anaconda-client-env
-          python-version: ${{ matrix.python-version }}
+          activate-environment: anaconda-client-env.
           use-only-tar-bz2: true
 
       - name: Installing dependencies

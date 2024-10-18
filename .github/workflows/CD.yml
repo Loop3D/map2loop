@@ -63,17 +63,6 @@ jobs:
           sudo apt-get upgrade
           sudo apt-get install libgdal-dev gdal-bin
 
-      - name: Create virtual environment
-        # install uv and use it to create a virtual environment, then add it to
-        # environment variables so that it is automatically activated and can be
-        # used for tests below
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          . $HOME/.cargo/env
-          uv venv .venv
-          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-
       - name: Download sdist from artifacts
         uses: actions/download-artifact@v4
         with:
@@ -83,9 +72,10 @@ jobs:
       - name: Build Map2Loop from sdist and install test dependencies
         shell: bash
         run: |
-          uv pip install --no-cache dist/*.tar.gz
-          uv pip install -r dependencies.txt
-          uv pip list
+          pip install --upgrade pip
+          pip install -r dependencies.txt
+          pip install --no-cache dist/*.tar.gz
+          pip list
     
   pypi-build-wheels:
     needs: pypi-test-sdist
@@ -155,18 +145,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 
-      - name: Create virtual environment (Linux / MacOS)
-        # install uv and use it to create a virtual environment, then add it to
-        # environment variables so that it is automatically activated and can be
-        # used for tests below
-        shell: bash
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          . $HOME/.cargo/env
-          uv venv .venv
-          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-
       - name: Download wheels from artifacts
         uses: actions/download-artifact@v4
         with:
@@ -176,10 +154,10 @@ jobs:
       - name: Install dependencies and Map2Loop wheel
         shell: bash
         run: |
-          uv pip install --upgrade pip
-          uv pip install -r dependencies.txt
-          uv pip install --no-cache --pre --no-index --find-links dist map2loop
-          uv pip list    
+          pip install --upgrade pip
+          pip install -r dependencies.txt
+          pip install --no-cache --pre --no-index --find-links dist map2loop
+          pip list    
 
       - name: Testing
         shell: bash -l {0}

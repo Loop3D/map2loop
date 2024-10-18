@@ -73,7 +73,8 @@ jobs:
         shell: bash
         run: |
           pip install --upgrade pip
-          pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson
+          pip install numpy
+          pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
           pip install --no-cache dist/*.tar.gz
           pip list
     
@@ -97,7 +98,6 @@ jobs:
       
       - name: Build Wheels
         run: |
-          # pip install geopandas shapely networkx owslib map2model numpy loopprojectfile beartype gdal==3.8.4 hjson
           pip install build 
           python -m build --wheel
 

@@ -202,7 +202,6 @@ jobs:
         with:
           miniforge-version: latest
           activate-environment: anaconda-client-env.
-          use-only-tar-bz2: true
 
       - name: Installing dependencies
         shell: bash -l {0}

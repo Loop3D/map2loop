@@ -29,7 +29,7 @@ requirements:
     - loopprojectfile
     - map2model
     - beartype
-    - gdal==3.8.4
+    - gdal=3.8.4
 
 
 

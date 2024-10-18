@@ -228,3 +228,4 @@ tests/thickness/m2l_data_tmp/*
 docs/m2l_data_tmp/*
 tests/thickness/StructurePoint/m2l_data_tmp/*
 
+map2loop/gdal/gdal_sources/gdal-3.9.2.tar.gz

@@ -1,5 +1,11 @@
-on: [push, pull_request]
 name: release-please
+
+on: [push, pull_request]
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   linting:
     name: Linting
@@ -27,23 +33,176 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
-  continuous-integration:
-    name: Continuous integration ${{ matrix.os }} python ${{ matrix.python-version }}
+
+  pypi-build-sdist:
+    name: Build SDist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SDist
+        run: |
+          pip install build
+          python -m build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: map2loop-dist
+          path: dist/*.tar.gz
+          compression-level: 0        
+
+  pypi-test-sdist:
+    name: Test sdist
+    needs: pypi-build-sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create virtual environment
+        # install uv and use it to create a virtual environment, then add it to
+        # environment variables so that it is automatically activated and can be
+        # used for tests below
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          . $HOME/.cargo/env
+          uv venv .venv
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Download sdist from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: map2loop-dist
+          path: dist
+
+      - name: Build LPF from sdist and install test dependencies
+        shell: bash
+        run: |
+          uv pip install --no-cache dist/*.tar.gz
+          uv pip install -r dependencies.txt
+          uv pip list
+    
+  pypi-build-wheels:
+    needs: pypi-test-sdist
+    name: Build Wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(vars.BUILD_OS)}}
-        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        os: 
+          - ubuntu-latest
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Build Wheels
+        run: |
+          # pip install -r dependencies.txt
+          pip install build 
+          python -m build --wheel
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: map2loop-wheels-${{ matrix.os }}
+          path: dist/*.whl
+          compression-level: 0
+
+  pypi-test-wheels:
+    name: Test wheels on ${{ matrix.os }}
+    needs: pypi-build-wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        include:
+          - os: "ubuntu-latest"
+            artifact: map2loop-wheels-ubuntu-latest
+          - os: "macos-latest"
+            artifact: map2loop-wheels-macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+      - name : Install GDAL - Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgdal-dev gdal-bin
+
+      - name : Install GDAL - MacOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install gdal
+
+      - name: Upgrade pip 
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Create virtual environment (Linux / MacOS)
+        # install uv and use it to create a virtual environment, then add it to
+        # environment variables so that it is automatically activated and can be
+        # used for tests below
+        shell: bash
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          . $HOME/.cargo/env
+          uv venv .venv
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Download wheels from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist
+
+      - name: Install dependencies and Map2Loop wheel
+        shell: bash
+        run: |
+          uv pip install --upgrade pip
+          uv pip install -r dependencies.txt
+          uv pip install --no-cache --pre --no-index --find-links dist map2loop
+          uv pip list    
+
+      - name: Testing
+        shell: bash -l {0}
+        run: |
+          pytest
+
+  conda-build:
+    name: Conda Build and Deploy ${{ matrix.os }} - Python Version-${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:   
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python }}
+          miniforge-version: latest
+          activate-environment: anaconda-client-env
+          python-version: ${{ matrix.python-version }}
+          use-only-tar-bz2: true
 
       - name: Installing dependencies
         shell: bash -l {0}
         run: |
+          conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
           conda install pytest -y
 
@@ -56,6 +215,34 @@ jobs:
         shell: bash -l {0}
         run: |
           pytest
+
+      - name: Conda Build
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
+          path: ~/conda_pkgs_dir
+        shell: bash -l {0}
+        run: |
+          conda build -c anaconda -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }} 
+      
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: map2loop-conda-${{ matrix.os }}-${{ matrix.python-version }}
+          path: conda
+
+  release-please:
+      runs-on: ubuntu-latest
+      if: github.ref == 'refs/heads/master'
+      steps:
+        - uses: actions/checkout@v4
+        - uses: googleapis/release-please-action@v4
+          id: release
+          with:
+            config-file: 'release-please-config.json'
+            manifest-file: '.release-please-manifest.json'
+      outputs:
+        release_created: ${{ steps.release.outputs.release_created }}
+        #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
   documentation-test:
     runs-on: ubuntu-latest
@@ -70,90 +257,6 @@ jobs:
         with:
           name: docs
           path: docs/build/html
-
-  conda-build:
-    name: Building conda package for python
-    needs: ["linting"]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
-    steps:
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-
-      - uses: actions/checkout@v4
-      - name: update submodules
-        #       shell: bash -l {0}
-        run: |
-          git submodule update --init --recursive
-      - name: Conda build
-        env:
-          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
-        shell: bash -l {0}
-        run: |
-          conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
-          conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }}
-          conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
-
-      - name: upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: conda-${{ matrix.os }}-${{ matrix.python-version }}
-          path: conda
-
-  release-please:
-    runs-on: ubuntu-latest
-    needs: continuous-integration
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: GoogleCloudPlatform/release-please-action@v4
-        id: release
-        with:
-          release-type: python
-          package-name: map2loop
-          include-v-in-tag: false
-
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-
-  conda-deploy:
-    #runs all the same as the build stage but need to rerun after release created to get updated
-    #tag
-    name: Building conda package for python
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
-    steps:
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-
-      - uses: actions/checkout@v4
-      - name: update submodules
-        #       shell: bash -l {0}
-        run: |
-          git submodule update --init --recursive
-      - name: Conda build
-        env:
-          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
-        shell: bash -l {0}
-        run: |
-          conda install --solver=classic -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
-          conda build -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }}
-          conda convert -p all conda/linux-64/*.tar.bz2 -f -o conda
-          anaconda upload --label main conda/*/*.tar.bz2
 
   documentation-deploy:
     runs-on: ubuntu-latest

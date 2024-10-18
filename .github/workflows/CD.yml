@@ -269,7 +269,7 @@ jobs:
       matrix:
         os:
         - ubuntu-latest
-        - macos-latest
+        # - macos-latest
         - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     if: ${{ needs.release-please.outputs.release_created }}
@@ -294,8 +294,8 @@ jobs:
     needs: [release-please, pypi-test-wheels] 
     runs-on:
       - ubuntu-latest
-      - macos-latest
-      - windows-latest
+      # - macos-latest
+      # - windows-latest
     
     if: ${{ needs.release-please.outputs.release_created }}
     permissions:

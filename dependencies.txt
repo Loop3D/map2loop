@@ -5,4 +5,5 @@ owslib
 map2model
 loopprojectfile
 beartype
-gdal<=3.7
+gdal
+hjson

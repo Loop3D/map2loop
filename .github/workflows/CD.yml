@@ -183,11 +183,11 @@ jobs:
         with:
           miniforge-version: latest
           activate-environment: anaconda-client-env.
-          
+
       - name: Install libgcc - MacOS
         if: runner.os == 'macOS'
         run: |
-          conda install conda-forge::libgcc
+          brew instal gcc
 
       - name: Installing dependencies
         shell: bash -l {0}

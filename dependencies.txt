@@ -8,3 +8,4 @@ loopprojectfile
 beartype
 gdal==3.8.4
 hjson
+pytest

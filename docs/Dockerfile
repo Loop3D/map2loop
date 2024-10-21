@@ -20,8 +20,8 @@ COPY . /map2loop
 WORKDIR /map2loop
 
 COPY dependencies.txt dependencies.txt
-RUN conda install  -c conda-forge -c loop3d --file dependencies.txt -y
-RUN conda install  --solver=classic -c conda-forge -c loop3d --file ./docs/requirements.txt -y
+RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
+RUN conda install -c conda-forge -c loop3d --file ./docs/requirements.txt -y
 
 RUN pip install .
 

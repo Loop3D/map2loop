@@ -4,7 +4,7 @@ from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
+from .thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
@@ -14,7 +14,7 @@ from .map2model_wrapper import Map2ModelWrapper
 
 # external imports
 import LoopProjectFile as LPF
-from typing import Union
+from typing import Union, List
 from osgeo import gdal
 import geopandas
 import beartype
@@ -123,6 +123,7 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.sorter = SorterUseHint()
+        self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
@@ -418,53 +419,115 @@ class Project(object):
                 self.map_data,
             )
     
+    @beartype.beartype
+    def set_thickness_calculator(self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']]) -> None:
+        """
+        Sets the thickness_calculator attribute for the object. 
+
+        If a single instance of ThicknessCalculator is passed, it wraps it in a list.
+        If a list of ThicknessCalculator instances is passed, it validates that all elements 
+        are instances of ThicknessCalculator before setting the attribute.
+
+        Args:
+            thickness_calculator (ThicknessCalculator or list of ThicknessCalculator): 
+            An instance or a list of ThicknessCalculator objects.
+
+        Raises:
+            TypeError: If the provided thickness_calculator is not an instance of 
+                    ThicknessCalculator or a list of such instances.
+        """
+        if isinstance(thickness_calculator, ThicknessCalculator):
+            thickness_calculator = [thickness_calculator]
+        
+        # Now check if thickness_calculator is a list of valid instances
+        if not isinstance(thickness_calculator, list) or not all(isinstance(tc, ThicknessCalculator) for tc in thickness_calculator):
+            raise TypeError("All items must be instances of ThicknessCalculator or a single ThicknessCalculator instance.")
+        
+        # Finally, set the calculators
+        self.thickness_calculator = thickness_calculator
+        
+                
+    def get_thickness_calculator(self) -> List[str]:
+        """
+        Retrieves the thickness_calculator_label from the thickness_calculator attribute.
+
+        This method checks if the thickness_calculator attribute is a list or a single object:
+        - If it's a list of ThicknessCalculator objects, it returns a list of their labels.
+        - If it's a single ThicknessCalculator object, it returns the label as a single-item list.
+        - If neither, it raises a TypeError.
+
+        Returns:
+            list: A list of thickness_calculator_label(s) from the ThicknessCalculator object(s).
+
+        Raises:
+            TypeError: If thickness_calculator is neither a list of objects nor a single object
+                    with a 'thickness_calculator_label' attribute.
+        """
+        
+        if isinstance(self.thickness_calculator, list):
+        # If it's a list, return labels from all items
+            return [calculator.thickness_calculator_label for calculator in self.thickness_calculator]
+        elif hasattr(self.thickness_calculator, 'thickness_calculator_label'):
+        # If it's a single object, return the label as a list
+            return [self.thickness_calculator.thickness_calculator_label]
+        else:
+            raise TypeError("self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute")
     
     def calculate_unit_thicknesses(self):
         """
-        Use the stratigraphic column, and fault and contact data to estimate unit thicknesses
-        """
-        thickness_calculator_labels = ['ThicknessCalculatorAlpha', 'InterpolatedStructure', 'StructuralPoint', ]
+        Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
+        in the stratigraphic column using the provided thickness calculators.
 
-        thickness_calculation_results = []
+        For each calculator in the `thickness_calculator` list:
+        - Computes the thickness statistics using the `compute()` method of each calculator.
+        - Repeats the computed results to match the number of rows in the stratigraphic units.
+        - Appends these results as new columns to the `stratigraphicUnits` dataframe.
+
+        The new columns added for each calculator will be named in the format:
+        - {calculator_label}_mean
+        - {calculator_label}_median
+        - {calculator_label}_stddev
+
+        Additionally, stores the labels of the calculators in the `thickness_calculator_labels` attribute.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         
-        for label in thickness_calculator_labels:
-            if label == 'InterpolatedStructure':
-                calculator = InterpolatedStructure()
-            elif label == 'StructuralPoint':
-                calculator = StructuralPoint()
-            elif label == 'ThicknessCalculatorAlpha':
-                calculator = ThicknessCalculatorAlpha()
-                
+        labels = []
+        
+        for calculator in self.thickness_calculator:
+            
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
                 self.map_data.basal_contacts,
                 self.structure_samples,
                 self.map_data,
-            )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']]
+            )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
             
-            # Rename the columns
-            result = result.rename(columns={
-                'ThicknessMean': f'ThicknessMean_{label}',
-                'ThicknessMedian': f'ThicknessMedian_{label}',
-                'ThicknessStdDev': f'ThicknessStdDev_{label}'
-            })
+            label = calculator.thickness_calculator_label
+            labels.append(label)
             
-            thickness_calculation_results.append(result)
+            # Repeat the results for the number of rows in stratigraphicUnits
+            num_rows = self.stratigraphic_column.stratigraphicUnits.shape[0]
+            repeated_result = numpy.tile(result, (num_rows // result.shape[0], 1))
             
-        thickness_combined_results = pandas.concat(thickness_calculation_results, axis=1)
+            # Append the repeated results to the lists
+            mean_col_name = f"{label}_mean"
+            median_col_name = f"{label}_median"
+            stddev_col_name = f"{label}_stddev"
+            
+                    # Attach the results as new columns to the stratigraphic column dataframe
+            self.stratigraphic_column.stratigraphicUnits[mean_col_name] = repeated_result[:, 0]
+            self.stratigraphic_column.stratigraphicUnits[median_col_name] = repeated_result[:, 1]
+            self.stratigraphic_column.stratigraphicUnits[stddev_col_name] = repeated_result[:, 2]
 
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMean_ThicknessCalculatorAlpha']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessMedian_ThicknessCalculatorAlpha']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_ThicknessCalculatorAlpha'] = thickness_combined_results['ThicknessStdDev_ThicknessCalculatorAlpha']
+        self.thickness_calculator_labels = labels
         
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_InterpolatedStructure'] = thickness_combined_results['ThicknessMean_InterpolatedStructure']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_InterpolatedStructure'] = thickness_combined_results['ThicknessMedian_InterpolatedStructure']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_InterpolatedStructure'] = thickness_combined_results['ThicknessStdDev_InterpolatedStructure']
-        
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMean_StructuralPoint'] = thickness_combined_results['ThicknessMean_StructuralPoint']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessMedian_StructuralPoint'] = thickness_combined_results['ThicknessMedian_StructuralPoint']
-        self.stratigraphic_column.stratigraphicUnits.loc[:, 'ThicknessStdDev_StructuralPoint'] = thickness_combined_results['ThicknessStdDev_StructuralPoint']
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -621,43 +684,43 @@ class Project(object):
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
 
-        
-        # stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits[
-        #     'ThicknessMean'
-        # ]
-        # stratigraphic_data['ThicknessMedian'] = self.stratigraphic_column.stratigraphicUnits[
-        #     'ThicknessMedian'
-        # ]
-        # stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits[
-        #     'ThicknessStdDev'
-        # ]
-        
-        column_len = len(self.stratigraphic_column.stratigraphicUnits)
-        
-        # thickness means by calculator
-        stratigraphic_data["ThicknessMean"] = list(zip(
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_ThicknessCalculatorAlpha']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_InterpolatedStructure']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMean_StructuralPoint']),
-            [0] * column_len, 
-            [0] * column_len))
 
-        # thickness medians by calculator
-        stratigraphic_data["ThicknessMedian"] = list(zip(
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_ThicknessCalculatorAlpha']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_InterpolatedStructure']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessMedian_StructuralPoint']),
-            [0] * column_len, 
-            [0] * column_len))
-        
-        # thickness medians by calculator
-        stratigraphic_data["ThicknessStdDev"] = list(zip(
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_ThicknessCalculatorAlpha']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_InterpolatedStructure']),
-            list(self.stratigraphic_column.stratigraphicUnits['ThicknessStdDev_StructuralPoint']),
-            [0] * column_len, 
-            [0] * column_len))
-        
+        # Length of the column (number of rows in stratigraphicUnits)
+        column_len = len(self.stratigraphic_column.stratigraphicUnits)
+
+        # Function to retrieve a column if it exists, otherwise return a list of default values
+        def get_column_or_default(column_name, default_value, length):
+            return list(self.stratigraphic_column.stratigraphicUnits.get(column_name, [default_value] * length))
+
+        # Get the current list of thickness calculator labels dynamically
+        thickness_labels = self.thickness_calculator_labels
+
+        # Define a constant for the maximum number of calculators (5 as per your requirement)
+        MAX_CALCULATORS = 5
+
+        # Create lists for mean, median, and stddev values for each calculator dynamically
+        thickness_mean_list = [
+            get_column_or_default(f'{label}_mean', 0, column_len) for label in thickness_labels
+        ]
+        thickness_median_list = [
+            get_column_or_default(f'{label}_median', 0, column_len) for label in thickness_labels
+        ]
+        thickness_stddev_list = [
+            get_column_or_default(f'{label}_stddev', 0, column_len) for label in thickness_labels
+        ]
+
+        # Pad with zeros if the number of calculators is less than MAX_CALCULATORS
+        for _ in range(MAX_CALCULATORS - len(thickness_mean_list)):
+            thickness_mean_list.append([0] * column_len)
+            thickness_median_list.append([0] * column_len)
+            thickness_stddev_list.append([0] * column_len)
+
+        # Zip these lists into tuples for each stratigraphic row dynamically, ensuring each tuple has exactly 5 elements
+        stratigraphic_data["ThicknessMean"] = list(zip(*thickness_mean_list[:MAX_CALCULATORS]))
+        stratigraphic_data["ThicknessMedian"] = list(zip(*thickness_median_list[:MAX_CALCULATORS]))
+        stratigraphic_data["ThicknessStdDev"] = list(zip(*thickness_stddev_list[:MAX_CALCULATORS]))
+
+
         # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
@@ -676,7 +739,15 @@ class Project(object):
         stratigraphic_data["colour2Blue"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
-        LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data)
+        
+        # get thickness calculator labels, and fill up with None if empty values up to 5 placeholders
+        while len(self.thickness_calculator_labels) < 5:
+            self.thickness_calculator_labels.append("None")
+        
+        thickness_calculator_labels = [tuple(self.thickness_calculator_labels[:5])]
+        
+        #save into LPF
+        LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data, thickness_calculator_data = thickness_calculator_labels, verbose=True)
 
         # Save contacts
         contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)

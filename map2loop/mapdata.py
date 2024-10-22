@@ -924,7 +924,7 @@ class MapData:
                                                                             area_percentage = 0.05)
         else:
             self.minimum_fault_length = config["minimum_fault_length"]
-        print(f'Minimum fault length: {self.minimum_fault_length}')
+        
         # crop 
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
         

@@ -273,27 +273,66 @@ class MapData:
         return self.colour_filename
 
     @beartype.beartype
-    def set_ignore_codes(self, codes: list):
+    def set_ignore_lithology_codes(self, codes: list):
         """
-        Set the codes to ignore in the geology shapefile
+        Set the lithology codes (names) to be ignored in the geology shapefile.
+
+        This method updates the `ignore_lithology_codes` entry in the geology configuration 
+        and marks the geology data as "clipped" to indicate that certain lithologies have been 
+        excluded. Additionally, it sets a dirty flag for the geology data to signal that it 
+        requires reprocessing.
 
         Args:
-            codes (list):
-                The list of codes to ignore
+            codes (list): 
+                A list of lithology names to ignore in the geology shapefile. These 
+                entries will be excluded from further processing.
         """
-        self.config.geology_config["ignore_codes"] = codes
+        self.config.geology_config["ignore_lithology_codes"] = codes
         self.data_states[Datatype.GEOLOGY] = Datastate.CLIPPED
         self.dirtyflags[Datatype.GEOLOGY] = True
 
     @beartype.beartype
-    def get_ignore_codes(self) -> list:
+    def get_ignore_lithology_codes(self) -> list:
         """
-        Get the list of codes to ignore
+        Retrieve the list of lithology names to be ignored in the geology shapefile.
+
+        This method fetches the current list of lithology names or codes from the geology 
+        configuration that have been marked for exclusion during processing.
 
         Returns:
-            list: The list of strings to ignore
+            list: A list of lithology names currently set to be ignored in the 
+            geology shapefile.
         """
-        return self.config.geology_config["ignore_codes"]
+        return self.config.geology_config["ignore_lithology_codes"]
+
+    @beartype.beartype
+    def set_ignore_fault_codes(self, codes: list):
+        """
+        Set the list of fault codes to be ignored during processing.
+
+        This method updates the `ignore_fault_codes` entry in the fault configuration and
+        marks the fault data as "clipped" to indicate that it has been filtered. Additionally,
+        it sets a dirty flag for the fault data to signal that it requires reprocessing.
+
+        Args:
+            codes (list): A list of fault codes to ignore during further processing.
+        """
+        self.config.fault_config["ignore_fault_codes"] = codes
+        self.data_states[Datatype.FAULT] = Datastate.CLIPPED
+        self.dirtyflags[Datatype.FAULT] = True
+
+    @beartype.beartype
+    def get_ignore_fault_codes(self) -> list:
+        """
+        Retrieve the list of fault codes that are set to be ignored.
+
+        This method fetches the current list of fault codes from the fault configuration
+        that have been marked for exclusion during processing.
+
+        Returns:
+            list: A list of fault codes that are currently marked for exclusion.
+        """
+        return self.config.fault_config["ignore_fault_codes"]
 
     @beartype.beartype
     def set_filenames_from_australian_state(self, state: str):
@@ -879,7 +918,7 @@ class MapData:
         geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace("[ -/?]", "_", regex=True)
 
         # Mask out ignored unit_names/codes (ie. for cover)
-        for code in self.config.geology_config["ignore_codes"]:
+        for code in self.config.geology_config["ignore_lithology_codes"]:
             geology = geology[~geology["CODE"].astype(str).str.contains(code)]
             geology = geology[~geology["UNITNAME"].astype(str).str.contains(code)]
 
@@ -920,13 +959,13 @@ class MapData:
         
         # update minimum fault length either with the value from the config or calculate it
         if config["minimum_fault_length"] is None:
-            self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, 
-                                                                            area_percentage = 0.05)
+            self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, area_percentage = 0.05)
         else:
             self.minimum_fault_length = config["minimum_fault_length"]
         
         # crop 
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
+        
         
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
@@ -941,6 +980,30 @@ class MapData:
         else:
             faults["NAME"] = "Fault_" + faults.index.astype(str)
 
+        # crop by the ignore fault codes
+        ignore_codes = config["ignore_fault_codes"]
+
+        # Find the intersection of ignore_codes and the 'NAME' column values
+        existing_codes = set(ignore_codes).intersection(set(faults["NAME"].values))
+
+        # Find the codes that do not exist in the DataFrame
+        # non_existing_codes = set(ignore_codes) - existing_codes
+
+        # Issue a warning if there are any non-existing codes
+        # if non_existing_codes:
+        #     print(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping") 
+        # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+
+        # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
+        if existing_codes:
+            faults = faults[~faults["NAME"].isin(existing_codes)]
+            # print(f"The following codes were found and removed: {existing_codes}") 
+            # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+        else:
+            pass
+            # print("None of the fault ignore codes exist in the original fault data.")
+        
+        #parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:
             faults["DIP"] = self.raw_data[Datatype.FAULT][config["dip_column"]].astype(
                 numpy.float64

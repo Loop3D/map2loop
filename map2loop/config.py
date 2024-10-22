@@ -47,7 +47,7 @@ class Config:
             "intrusive_text": "intrusive",
             "volcanic_text": "volcanic",
             "objectid_column": "ID",
-            "ignore_codes": ["cover"],
+            "ignore_lithology_codes": ["cover"],
         }
         self.fault_config = {
             "structtype_column": "FEATURE",
@@ -62,6 +62,7 @@ class Config:
             "name_column": "NAME",
             "objectid_column": "ID",
             "minimum_fault_length": None,
+            "ignore_fault_codes": [None],
         }
         self.fold_config = {
             "structtype_column": "FEATURE",

@@ -233,16 +233,39 @@ class Project(object):
 
     # Getters and Setters
     @beartype.beartype
-    def set_ignore_codes(self, codes: list):
+    def set_ignore_lithology_codes(self, codes: list):
         """
-        Set the ignore codes (a list of unit names to ignore in the geology shapefile)
+        Set the lithology unit names to be ignored in the geology shapefile.
+
+        This method sets the lithology codes that should be excluded from the geology shapefile 
+        and triggers the re-population of the stratigraphic column using the updated data 
+        from the geological map, ensuring the excluded lithologies are not considered.
 
         Args:
-            codes (list): The list of strings to ignore
+            codes (list): 
+                A list of strings representing the lithology unit names to be ignored 
+                in the geological shapefile.
         """
-        self.map_data.set_ignore_codes(codes)
+        self.map_data.set_ignore_lithology_codes(codes)
         # Re-populate the units in the column with the new set of ignored geographical units
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
+        
+    @beartype.beartype
+    def set_ignore_fault_codes(self, codes: list):
+        """
+        Set the fault names to be ignored in the fault map.
+
+        This method sets the fault codes to be ignored from the fault map and triggers 
+        re-parsing of the fault map to exclude the ignored faults during subsequent processing.
+
+        Args:
+            codes (list): 
+                A list of strings representing the fault unit names to be ignored 
+                in the fault map.
+        """
+        self.map_data.set_ignore_fault_codes(codes)
+        # Re-populate the units in the column with the new set of ignored geographical units
+        self.map_data.parse_fault_map() # remove the ignored faults
 
     @beartype.beartype
     def set_sorter(self, sorter: Sorter):

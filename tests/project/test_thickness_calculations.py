@@ -4,6 +4,7 @@ import geopandas
 import numpy
 
 from map2loop._datasets.geodata_files import load_map2loop_data
+from map2loop.thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
 from map2loop import Project
 
 
@@ -16,15 +17,6 @@ st_units = pandas.DataFrame({
     'maxAge': [100000.0] * 11,
     'group': [None] * 11,
     'supergroup': [None] * 11,
-    'ThicknessMean_ThicknessCalculatorAlpha': [0.0] * 11,
-    'ThicknessMedian_ThicknessCalculatorAlpha': [0.0] * 11,
-    'ThicknessStdDev_ThicknessCalculatorAlpha': [0.0] * 11,
-    'ThicknessMean_InterpolatedStructure': [0.0] * 11,
-    'ThicknessMedian_InterpolatedStructure': [0.0] * 11,
-    'ThicknessStdDev_InterpolatedStructure': [0.0] * 11,
-    'ThicknessMean_StructuralPoint': [0.0] * 11,
-    'ThicknessMedian_StructuralPoint': [0.0] * 11,
-    'ThicknessStdDev_StructuralPoint': [0.0] * 11,
     'stratigraphic_Order': list(range(11)),
     'colour': [
         '#5d7e60', '#387866', '#628304', '#a2f290', '#0c2562',
@@ -104,6 +96,8 @@ s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 import map2loop
 import pathlib
 
+
+
 def test_calculate_unit_thicknesses():
 
     units = st_units
@@ -131,26 +125,38 @@ def test_calculate_unit_thicknesses():
     project.stratigraphic_column.stratigraphicUnits = units
     project.stratigraphic_column.column = stratigraphic_order
     
-    # Run the calculate_unit_thicknesses method
+    ## test if set/get is working for thickness calculator
+    
+    assert project.get_thickness_calculator() == ['InterpolatedStructure'], "Default for thickness calculator not set" ## default is InterpolatedStructure
+    
+    # check set
+    
+    project.set_thickness_calculator([StructuralPoint(), InterpolatedStructure()])
+    assert project.get_thickness_calculator() == ['StructuralPoint', 'InterpolatedStructure'], "Setter method for thickness calculator not working" ## default is InterpolatedStructure
+    
+    # Run the calculate_unit_thicknesses
     project.calculate_unit_thicknesses()
     
-    # Check if thicknesses have been calculated
+    # # Check if all thicknesses have been calculated
     columns_to_check = [
-        'ThicknessMean_ThicknessCalculatorAlpha',
-        'ThicknessMedian_ThicknessCalculatorAlpha',
-        'ThicknessStdDev_ThicknessCalculatorAlpha',
-        'ThicknessMean_InterpolatedStructure',
-        'ThicknessMedian_InterpolatedStructure',
-        'ThicknessStdDev_InterpolatedStructure',
-        'ThicknessMean_StructuralPoint',
-        'ThicknessMedian_StructuralPoint',
-        'ThicknessStdDev_StructuralPoint'
+        'StructuralPoint_mean',
+        'StructuralPoint_median',
+        'StructuralPoint_stddev',
+        'InterpolatedStructure_mean',
+        'InterpolatedStructure_median',
+        'InterpolatedStructure_stddev',
     ]
     
     for column in columns_to_check:
+        # have all thicknesses been calculated
         assert column in project.stratigraphic_column.stratigraphicUnits.columns, f"project::calculate_unit_thicknesses: column {column} not in thickness results"
+        # is the result a number
         assert project.stratigraphic_column.stratigraphicUnits[column].dtype == numpy.float64, f"project::calculate_unit_thicknesses: column {column} is not of type numpy.float64"
+        # should not contain nans
         assert not project.stratigraphic_column.stratigraphicUnits[column].isna().any(), f"project::calculate_unit_thicknesses: column {column} contains NaNs"
-        
+    
+    #have all the units been calculated
     assert 'name' in project.stratigraphic_column.stratigraphicUnits.columns, 'project::calculate_unit_thicknesses: unitname not in result'
     assert all(name in project.stratigraphic_column.stratigraphicUnits['name'].values for name in st_units['name'].values), 'project::calculate_unit_thicknesses: units missing in results'
+    
+    

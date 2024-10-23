@@ -4,7 +4,6 @@ import beartype
 import geopandas
 import math
 
-
 class DeformationHistory:
     """
     A class containing all the fault and fold summaries and relationships
@@ -285,12 +284,16 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The fault_relationships with the correct eventIds
         """
+         
         faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
         rel = fault_fault_relationships.copy()
-        rel = rel.merge(faultIds, left_on="Fault1", right_on="name")
+        rel['Fault1'] = rel['Fault1'].astype(str)
+        rel['Fault2'] = rel['Fault2'].astype(str)
+        faultIds['eventId'] = faultIds['eventId'].astype(str)
+        rel = rel.merge(faultIds, left_on="Fault1", right_on="eventId")
         rel.rename(columns={"eventId": "eventId1"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
-        rel = rel.merge(faultIds, left_on="Fault2", right_on="name")
+        rel = rel.merge(faultIds, left_on="Fault2", right_on="eventId")
         rel.rename(columns={"eventId": "eventId2"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
         return rel

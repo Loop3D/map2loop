@@ -181,7 +181,7 @@ class Map2ModelWrapper:
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
-                    out += [[row[0], "Fault_" + row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+                    out += [[row[0],  row[1][i][0], row[1][i][1], float(row[1][i][2])]]
 
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
         self.fault_fault_relationships = df_out

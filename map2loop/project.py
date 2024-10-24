@@ -544,6 +544,7 @@ class Project(object):
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
+            self.map2model.run() # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
         else:
             if user_defined_stratigraphic_column is not None:
                 logger.warning(

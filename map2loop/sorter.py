@@ -92,7 +92,7 @@ class SorterUseHint(Sorter):
             list: the sorted unit names
         """
         logger.info('Stratigraphic order calculated using provided hint')
-        logger.info(','.joinstratigraphic_order_hint)
+        logger.info(','.join(stratigraphic_order_hint))
         return stratigraphic_order_hint
 
 

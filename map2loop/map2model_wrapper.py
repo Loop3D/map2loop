@@ -199,7 +199,7 @@ class Map2ModelWrapper:
             logger.warning(f"Fault-fault intersections file {fault_fault_intersection_filename} not found")
         
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
-        logger.info(f'Fault intersections')
+        logger.info('Fault intersections')
         logger.info(df_out.to_string())
         self.fault_fault_relationships = df_out
 

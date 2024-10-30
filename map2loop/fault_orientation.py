@@ -5,7 +5,9 @@ import geopandas
 from .mapdata import MapData
 import numpy as np
 
+from .logging import getLogger
 
+logger = getLogger(__name__)
 class FaultOrientation(ABC):
     """
     Base Class of Fault Orientation assigner to force structure of FaultOrientation

@@ -606,7 +606,7 @@ class Project(object):
                 logger.error(
                     f"       Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file"
                 )
-                raise FileTypeError(
+                raise Exception(
                     f"Cannot export loop project file as current file of name {self.loop_filename} is not a loop project file"
                 )
 
@@ -770,7 +770,7 @@ class Project(object):
             relationships["bidirectional"] = True
             relationships["angle"] = ff_relationships["Angle"]
             relationships["type"] = LPF.EventRelationshipType.FAULT_FAULT_ABUT
-            logger.info(f"Adding fault relationships to projectfile")
+            logger.info("Adding fault relationships to projectfile")
             logger.info(f"Fault relationships: {relationships}")    
             LPF.Set(self.loop_filename, "eventRelationships", data=relationships)
 

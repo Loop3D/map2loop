@@ -92,7 +92,7 @@ class SorterUseHint(Sorter):
             list: the sorted unit names
         """
         logger.info('Stratigraphic order calculated using provided hint')
-        loggger.info(','.joinstratigraphic_order_hint)
+        logger.info(','.joinstratigraphic_order_hint)
         return stratigraphic_order_hint
 
 
@@ -204,7 +204,7 @@ class SorterAgeBased(Sorter):
         else:
             sorted_units = sorted_units.sort_values(by=["meanAge"])
         logger.info("Stratigraphic order calculated using age based sorting")
-        for i, row in sorted_units.iterrows():
+        for _i, row in sorted_units.iterrows():
             logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']}")
         
 
@@ -413,7 +413,6 @@ class SorterObservationProjections(Sorter):
         geol = geol[~geol["SILL"]]
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
 
-        verbose = False
 
         # Create a map of maps to store younger/older observations
         ordered_unit_observations = []

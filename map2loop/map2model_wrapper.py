@@ -136,6 +136,13 @@ class Map2ModelWrapper:
         }
         logger.info(f"map2model params: {map2model_code_map}")
         # TODO: Simplify. Note: this is external so have to match fix to map2model module
+        logger.info(os.path.join(self.map_data.tmp_path, "map2model_data"))
+        logger.info(os.path.join(self.map_data.tmp_path, "map2model_data", "geology_wkt.csv"))
+        logger.info(os.path.join(self.map_data.tmp_path, "map2model_data", "faults_wkt.csv"))
+        logger.info(self.map_data.get_bounding_box())
+        logger.info(map2model_code_map)
+        logger.info(verbose_level == VerboseLevel.NONE)
+
         run_log = map2model.run(
             os.path.join(self.map_data.tmp_path, "map2model_data"),
             os.path.join(self.map_data.tmp_path, "map2model_data", "geology_wkt.csv"),

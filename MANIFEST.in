@@ -1,2 +1,3 @@
 include map2loop/_datasets/clut_files/*.csv
 include map2loop/_datasets/config_files/*.json
+include map2loop/_datasets/geodata_files/hamersley/*

@@ -162,6 +162,7 @@ jobs:
   conda-build:
     name: Conda Build and Deploy ${{ matrix.os }} - Python Version-${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    if : github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:

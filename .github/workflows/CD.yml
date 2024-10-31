@@ -59,6 +59,8 @@ jobs:
 
   documentation-test:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -73,6 +75,8 @@ jobs:
 
   conda-build:
     name: Building conda package for python
+    if: github.ref == 'refs/heads/master'
+
     needs: ["linting"]
     runs-on: ubuntu-latest
     strategy:

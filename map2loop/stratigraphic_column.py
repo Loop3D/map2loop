@@ -40,19 +40,7 @@ class StratigraphicColumn:
                 ("maxAge", float),
                 ("group", str),
                 ("supergroup", str),
-                # ("1_Thickness_Mean", float),
-                # ("1_Thickness_Median", float),
-                # ("1_ThicknessStdDev", float),
-                # ("2_ThicknessMean", float),
-                # ("2_ThicknessMedian", float),
-                # ("2_ThicknessStdDev", float),
-                # ("3_ThicknessMean_", float),
-                # ("3_ThicknessMedian_StructuralPoint", float),
-                # ("3_ThicknessStdDev_StructuralPoint", float),
                 ("colour", str),
-                # ("indexInGroup", int),
-                # ("groupNum", int),
-                # ("numInGroup", int),
             ]
         )
         self.stratigraphicUnits = pandas.DataFrame(

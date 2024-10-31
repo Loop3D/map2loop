@@ -5,9 +5,6 @@ from map2loop.m2l_enums import Datatype
 import map2loop
 
 
-
-
-
 # Sample test function for lithology and fault ignore codes
 def test_set_get_ignore_codes():
     # Set up a sample bounding box and other required data

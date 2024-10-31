@@ -12,8 +12,8 @@ RUN apt-get update -qq && \
     libgl1\
     libtinfo5\
     libtiff6\
-    libgl1-mesa-glx
-
+    libgl1-mesa-glx\
+    libarchive13
 
 COPY . /map2loop 
 

@@ -23,11 +23,19 @@ conda config --add channels conda-forge
 
 ### Run
 
-To just use map2loop, issue the following
+To just use map2loop, issue the following. <sup>*</sup>
 
 ```bash
-conda install -c conda-forge -c loop3d map2loop -y
+git clone https://github.com/Loop3D/map2loop.git
+
+cd map2loop
+
+conda install -c loop3d --file dependencies.txt
+
+pip install .
 ```
+
+<p><sup>*</sup> We're actively working towards a better approach - stay tuned! </p>
 
 ### Documentation
 

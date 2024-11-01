@@ -79,6 +79,11 @@ jobs:
           pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
           pip install --no-cache dist/*.tar.gz
           pip list
+
+      - name: Testing
+        shell: bash -l {0}
+        run: |
+          pytest
     
   pypi-build-wheels:
     needs: pypi-test-sdist

@@ -8,6 +8,8 @@ import re
 from .logging import getLogger
 
 logger = getLogger(__name__)
+
+
 class Map2ModelWrapper:
     """
     A wrapper around map2model functionality
@@ -113,7 +115,7 @@ class Map2ModelWrapper:
         logger.info("Exporting map data for map2model")
         self.map_data.export_wkt_format_files()
         logger.info("Running map2model...")
-        
+
         map2model_code_map = {
             "o": "ID",  # FIELD_COORDINATES
             "f": "FEATURE",  # FIELD_FAULT_ID
@@ -155,9 +157,8 @@ class Map2ModelWrapper:
         )
         logger.info("Parsing map2model output")
         logger.info(run_log)
-        
+
         logger.info("map2model complete")
-        
 
         # Parse units sorted
         units_sorted = pandas.read_csv(
@@ -185,7 +186,7 @@ class Map2ModelWrapper:
             df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
-            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in 
+            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in
             relations = df[1]
             for j in range(len(relations)):
                 relations[j] = [i.strip("()").replace(" ", "").split(",") for i in relations[j]]
@@ -193,11 +194,13 @@ class Map2ModelWrapper:
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
-                    out += [[row[0], "Fault_" + row[1][i][0], row[1][i][1], float(row[1][i][2])]]
-           
+                    out += [[row[0], row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+
         else:
-            logger.warning(f"Fault-fault intersections file {fault_fault_intersection_filename} not found")
-        
+            logger.warning(
+                f"Fault-fault intersections file {fault_fault_intersection_filename} not found"
+            )
+
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
         logger.info('Fault intersections')
         logger.info(df_out.to_string())

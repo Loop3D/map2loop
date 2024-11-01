@@ -328,6 +328,13 @@ class SorterMaximiseContacts(Sorter):
         graph = nx.Graph()
         units = list(units["name"].unique())
         for unit in units:
+            ## some units may not have any contacts e.g. if they are intrusives or sills. If we leave this then the
+            ## sorter crashes
+            if (
+                unit not in sorted_contacts['UNITNAME_1']
+                or unit not in sorted_contacts['UNITNAME_2']
+            ):
+                continue
             graph.add_node(unit, name=unit)
 
         max_weight = max(list(sorted_contacts["length"])) + 1

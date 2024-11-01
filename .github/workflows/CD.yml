@@ -112,6 +112,7 @@ jobs:
     name: Test wheels on ${{ matrix.os }}
     needs: pypi-build-wheels
     runs-on: ${{ matrix.os }}
+    if : github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:

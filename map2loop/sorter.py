@@ -280,7 +280,7 @@ class SorterAlpha(Sorter):
                     new_graph.add_edge(cnode, node_with_min_edges)
                     graph.remove_node(cnode)
                     cnode = node_with_min_edges
-        order = list(nx.topological_sort(new_graph))
+        order = list(reversed(list(nx.topological_sort(new_graph))))
         return order
 
 

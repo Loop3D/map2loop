@@ -85,7 +85,7 @@ jobs:
       - name: pytest
         shell: bash
         run: |
-          ls
+          pytest
     
   pypi-build-wheels:
     needs: pypi-test-sdist

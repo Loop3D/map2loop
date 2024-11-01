@@ -83,6 +83,7 @@ jobs:
       - name: Testing
         shell: bash -l {0}
         run: |
+          cd ..
           pytest
     
   pypi-build-wheels:

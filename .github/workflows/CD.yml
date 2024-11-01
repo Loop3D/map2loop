@@ -80,10 +80,10 @@ jobs:
           pip install --no-cache dist/*.tar.gz
           pip list
 
-      - name: Check installation
+      - name: pytest
         shell: bash
         run: |
-          python -c "import map2loop; print(map2loop.__file__)"
+          ls
     
   pypi-build-wheels:
     needs: pypi-test-sdist

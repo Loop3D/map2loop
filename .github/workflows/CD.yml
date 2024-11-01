@@ -44,7 +44,7 @@ jobs:
 
       - name: Build SDist
         run: |
-          pip install build
+          pip install build pytest
           python -m build
 
       - name: Testing

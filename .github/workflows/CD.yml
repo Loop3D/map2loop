@@ -58,6 +58,8 @@ jobs:
     needs: pypi-build-sdist
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name : Install GDAL 
         run: |
@@ -83,7 +85,7 @@ jobs:
       - name: pytest
         shell: bash
         run: |
-          pwd
+          ls
     
   pypi-build-wheels:
     needs: pypi-test-sdist

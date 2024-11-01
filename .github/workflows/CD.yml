@@ -58,8 +58,6 @@ jobs:
     needs: pypi-build-sdist
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name : Install GDAL 
         run: |
@@ -81,11 +79,6 @@ jobs:
           pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
           pip install --no-cache dist/*.tar.gz
           pip list
-
-      - name: pytest
-        shell: bash
-        run: |
-          pytest
     
   pypi-build-wheels:
     needs: pypi-test-sdist

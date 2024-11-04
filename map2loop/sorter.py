@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 import beartype
 import pandas
+import numpy as np
 import math
 from .mapdata import MapData
+from typing import Union
 
 
 class Sorter(ABC):
@@ -293,8 +295,17 @@ class SorterMaximiseContacts(Sorter):
     def __init__(self):
         """
         Initialiser for adjacency based sorter
+
+        Args:
+            graph (networkx.Graph): an object to use as a reference variable to store the networkx graph object
+            route (list): an object to use as a reference variable to store the list of the route of the graph
+            directed_graph (networkx.DiGraph): an object to use as a reference variable to store the directed graph object
         """
         self.sorter_label = "SorterMaximiseContacts"
+        # variables for visualising/interrogating the sorter
+        self.graph = None
+        self.route = None
+        self.directed_graph = None
 
     def sort(
         self,
@@ -325,7 +336,7 @@ class SorterMaximiseContacts(Sorter):
             return stratigraphic_order_hint
 
         sorted_contacts = contacts.sort_values(by="length", ascending=False)
-        graph = nx.Graph()
+        self.graph = nx.Graph()
         units = list(units["name"].unique())
         for unit in units:
             ## some units may not have any contacts e.g. if they are intrusives or sills. If we leave this then the
@@ -335,23 +346,31 @@ class SorterMaximiseContacts(Sorter):
                 or unit not in sorted_contacts['UNITNAME_2']
             ):
                 continue
-            graph.add_node(unit, name=unit)
+            self.graph.add_node(unit, name=unit)
 
         max_weight = max(list(sorted_contacts["length"])) + 1
+        sorted_contacts['length'] /= max_weight
         for _, row in sorted_contacts.iterrows():
-            graph.add_edge(
-                row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"])
-            )
+            self.graph.add_edge(row["UNITNAME_1"], row["UNITNAME_2"], weight=(1 - row["length"]))
 
-        route = nx_app.traveling_salesman_problem(graph)
-        edge_list = list(nx.utils.pairwise(route))
-        dg = nx.DiGraph()
-        dg.add_node(edge_list[0][0])
+        self.route = nx_app.traveling_salesman_problem(self.graph)
+        edge_list = list(nx.utils.pairwise(self.route))
+        self.directed_graph = nx.DiGraph()
+        self.directed_graph.add_node(edge_list[0][0])
         for edge in edge_list:
-            if edge[1] not in dg.nodes():
-                dg.add_node(edge[1])
-                dg.add_edge(edge[0], edge[1])
-        return list(nx.dfs_preorder_nodes(dg, source=list(dg.nodes())[0]))
+            if edge[1] not in self.directed_graph.nodes():
+                self.directed_graph.add_node(edge[1])
+                self.directed_graph.add_edge(edge[0], edge[1])
+        # we need to reverse the order of the graph to get the correct order
+        return list(
+            reversed(
+                list(
+                    nx.dfs_preorder_nodes(
+                        self.directed_graph, source=list(self.directed_graph.nodes())[0]
+                    )
+                )
+            )
+        )
 
 
 class SorterObservationProjections(Sorter):
@@ -360,11 +379,16 @@ class SorterObservationProjections(Sorter):
     using the direction of observations to predict which unit is adjacent to the current one
     """
 
-    def __init__(self):
+    def __init__(self, length: Union[float, int] = 1000):
         """
         Initialiser for adjacency based sorter
+
+        Args:
+            length (int): the length of the projection in metres
         """
         self.sorter_label = "SorterObservationProjections"
+        self.length = length
+        self.lines = []
 
     def sort(
         self,
@@ -397,11 +421,10 @@ class SorterObservationProjections(Sorter):
             return stratigraphic_order_hint
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol = geol[~geol["INTRUSIVE"]]
-        geol = geol[~geol["SILL"]]
+        geol = geol.drop(geol.index[np.logical_or(geol["INTRUSIVE"], geol["SILL"])])
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
 
-        verbose = False
+        verbose = True
 
         # Create a map of maps to store younger/older observations
         ordered_unit_observations = []
@@ -417,62 +440,80 @@ class SorterObservationProjections(Sorter):
                     print(f"Orientation {row.ID} is not in a unit")
                     print(f"Check geology map around coordinates {row.geometry}")
             else:
-                starting_unit_name = containing_unit.iloc[0]['UNITNAME']
 
                 # Get units that a projected line passes through
-                # TODO: question (how far should the projection go)
-                #       1km, 10km ???
-                length = 10000
+                length = self.length
                 dipDirRadians = row.DIPDIR * math.pi / 180.0
                 dipRadians = row.DIP * math.pi / 180.0
                 start = row.geometry
                 end = Point(
-                    start.x + math.cos(dipDirRadians) * length,
-                    start.y + math.sin(dipDirRadians) * length,
+                    start.x + math.sin(dipDirRadians) * length,
+                    start.y + math.cos(dipDirRadians) * length,
                 )
                 line = LineString([start, end])
-
+                self.lines.append(line)
                 inter = geol[line.intersects(geol.geometry)]
                 if len(inter) > 1:
                     intersect = line.intersection(inter.geometry.boundary)
-
-                    # Remove containing unit
-                    intersect.drop(containing_unit.index, inplace=True)
+                    # # Remove containing unit
+                    # intersect.drop(containing_unit.index, inplace=True)
 
                     # sort by distance from start point
-                    sub = geol.iloc[list(intersect.index)].copy()
+                    sub = geol.loc[intersect.index].copy()
                     sub["distance"] = geol.distance(start)
                     sub.sort_values(by="distance", inplace=True)
+                    for i in range(len(sub) - 1):
+                        first_unit_name = sub.iloc[
+                            i
+                        ].UNITNAME  # containing_unit.iloc[0]['UNITNAME']
 
-                    # Get first unit it hits and the point of intersection
-                    closest_unit_name = sub.iloc[0].UNITNAME
+                        # Get first unit it hits and the point of intersection
+                        second_unit_name = sub.iloc[i + 1].UNITNAME
+                        # Get intersection point
+                        if intersect.loc[sub.index[i]].geom_type == "MultiPoint":
+                            first_intersect_point = intersect.loc[sub.index[i]].geoms[0]
+                        elif intersect.loc[sub.index[i]].geom_type == "Point":
+                            first_intersect_point = intersect.loc[sub.index[i]]
+                        else:
+                            continue
+                        if intersect.loc[sub.index[i + 1]].geom_type == "MultiPoint":
+                            second_intersect_point = intersect.loc[sub.index[i + 1]].geoms[0]
+                        elif intersect.loc[sub.index[i + 1]].geom_type == "Point":
+                            second_intersect_point = intersect.loc[sub.index[i + 1]]
+                        else:
+                            continue
 
-                    # Get intersection point
-                    if intersect[sub.index[0]].geom_type == "MultiPoint":
-                        intersect_point = intersect[sub.index[0]].geoms[0]
-                    elif intersect[sub.index[0]].geom_type == "Point":
-                        intersect_point = intersect[sub.index[0]]
-                    else:
-                        continue
+                        # Get heights for intersection point and start of ray
+                        height = map_data.get_value_from_raster(
+                            Datatype.DTM, first_intersect_point.x, first_intersect_point.y
+                        )
+                        first_intersect_point = Point(
+                            first_intersect_point.x, first_intersect_point.y, height
+                        )
+                        height = map_data.get_value_from_raster(
+                            Datatype.DTM, second_intersect_point.x, start.y
+                        )
+                        second_intersect_point = Point(
+                            second_intersect_point.x, second_intersect_point.y, height
+                        )
 
-                    # Get heights for intersection point and start of ray
-                    height = map_data.get_value_from_raster(
-                        Datatype.DTM, intersect_point.x, intersect_point.y
-                    )
-                    intersect_point = Point(intersect_point.x, intersect_point.y, height)
-                    height = map_data.get_value_from_raster(Datatype.DTM, start.x, start.y)
-                    start = Point(start.x, start.y, height)
+                        # Check vertical difference between points and compare to projected dip angle
+                        horizontal_dist = (
+                            first_intersect_point.x - first_intersect_point.x,
+                            second_intersect_point.y - second_intersect_point.y,
+                        )
+                        horizontal_dist = math.sqrt(
+                            horizontal_dist[0] ** 2 + horizontal_dist[1] ** 2
+                        )
+                        projected_height = first_intersect_point.z + horizontal_dist * math.cos(
+                            dipRadians
+                        )
 
-                    # Check vertical difference between points and compare to projected dip angle
-                    horizontal_dist = (intersect_point.x - intersect_point.x, end.y - start.y)
-                    horizontal_dist = math.sqrt(horizontal_dist[0] ** 2 + horizontal_dist[1] ** 2)
-                    projected_height = start.z + horizontal_dist * math.cos(dipRadians)
-
-                    if intersect_point.z < projected_height:
-                        ordered_unit_observations += [(starting_unit_name, closest_unit_name)]
-                    else:
-                        ordered_unit_observations += [(closest_unit_name, starting_unit_name)]
-
+                        if second_intersect_point.z < projected_height:
+                            ordered_unit_observations += [(first_unit_name, second_unit_name)]
+                        else:
+                            ordered_unit_observations += [(second_unit_name, first_unit_name)]
+        self.ordered_unit_observations = ordered_unit_observations
         # Create a matrix of older versus younger frequency from observations
         unit_names = geol.UNITNAME.unique()
         df = pandas.DataFrame(0, index=unit_names, columns=unit_names)
@@ -494,7 +535,7 @@ class SorterObservationProjections(Sorter):
                         g.add_edge(unit1, unit2, weight=max_value + weight)
                     elif weight > 0:
                         g.add_edge(unit2, unit1, weight=max_value - weight)
-
+        self.G = g
         # Link in unlinked units from contacts with max weight
         g_undirected = g.to_undirected()
         for unit in unit_names:
@@ -509,11 +550,14 @@ class SorterObservationProjections(Sorter):
 
         # Run travelling salesman using the observation evidence as weighting
         route = nx_app.traveling_salesman_problem(g.to_undirected())
+        self.route = route
         edge_list = list(nx.utils.pairwise(route))
+        self.edge_list = edge_list
         dd = nx.DiGraph()
         dd.add_node(edge_list[0][0])
         for edge in edge_list:
             if edge[1] not in dd.nodes():
                 dd.add_node(edge[1])
                 dd.add_edge(edge[0], edge[1])
+        self.directed = dd
         return list(nx.dfs_preorder_nodes(dd, source=list(dd.nodes())[0]))

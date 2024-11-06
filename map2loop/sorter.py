@@ -440,7 +440,7 @@ class SorterObservationProjections(Sorter):
                     print(f"Orientation {row.ID} is not in a unit")
                     print(f"Check geology map around coordinates {row.geometry}")
             else:
-
+                first_unit_name = containing_unit.iloc[0]["UNITNAME"]
                 # Get units that a projected line passes through
                 length = self.length
                 dipDirRadians = row.DIPDIR * math.pi / 180.0
@@ -453,66 +453,49 @@ class SorterObservationProjections(Sorter):
                 line = LineString([start, end])
                 self.lines.append(line)
                 inter = geol[line.intersects(geol.geometry)]
+
                 if len(inter) > 1:
                     intersect = line.intersection(inter.geometry.boundary)
                     # # Remove containing unit
-                    # intersect.drop(containing_unit.index, inplace=True)
+                    intersect = intersect.drop(containing_unit.index)
 
                     # sort by distance from start point
                     sub = geol.loc[intersect.index].copy()
                     sub["distance"] = geol.distance(start)
-                    sub.sort_values(by="distance", inplace=True)
-                    for i in range(len(sub) - 1):
-                        first_unit_name = sub.iloc[
-                            i
-                        ].UNITNAME  # containing_unit.iloc[0]['UNITNAME']
+                    sub = sub.sort_values(by="distance")
 
-                        # Get first unit it hits and the point of intersection
-                        second_unit_name = sub.iloc[i + 1].UNITNAME
-                        # Get intersection point
-                        if intersect.loc[sub.index[i]].geom_type == "MultiPoint":
-                            first_intersect_point = intersect.loc[sub.index[i]].geoms[0]
-                        elif intersect.loc[sub.index[i]].geom_type == "Point":
-                            first_intersect_point = intersect.loc[sub.index[i]]
-                        else:
-                            continue
-                        if intersect.loc[sub.index[i + 1]].geom_type == "MultiPoint":
-                            second_intersect_point = intersect.loc[sub.index[i + 1]].geoms[0]
-                        elif intersect.loc[sub.index[i + 1]].geom_type == "Point":
-                            second_intersect_point = intersect.loc[sub.index[i + 1]]
-                        else:
-                            continue
+                    # Get first unit it hits and the point of intersection
+                    second_unit_name = sub.iloc[0].UNITNAME
 
-                        # Get heights for intersection point and start of ray
-                        height = map_data.get_value_from_raster(
-                            Datatype.DTM, first_intersect_point.x, first_intersect_point.y
-                        )
-                        first_intersect_point = Point(
-                            first_intersect_point.x, first_intersect_point.y, height
-                        )
-                        height = map_data.get_value_from_raster(
-                            Datatype.DTM, second_intersect_point.x, start.y
-                        )
-                        second_intersect_point = Point(
-                            second_intersect_point.x, second_intersect_point.y, height
-                        )
+                    if intersect.loc[sub.index[0]].geom_type == "MultiPoint":
+                        second_intersect_point = intersect.loc[sub.index[0]].geoms[0]
+                    elif intersect.loc[sub.index[0]].geom_type == "Point":
+                        second_intersect_point = intersect.loc[sub.index[0]]
+                    else:
+                        continue
 
-                        # Check vertical difference between points and compare to projected dip angle
-                        horizontal_dist = (
-                            first_intersect_point.x - first_intersect_point.x,
-                            second_intersect_point.y - second_intersect_point.y,
-                        )
-                        horizontal_dist = math.sqrt(
-                            horizontal_dist[0] ** 2 + horizontal_dist[1] ** 2
-                        )
-                        projected_height = first_intersect_point.z + horizontal_dist * math.cos(
-                            dipRadians
-                        )
+                    # Get heights for intersection point and start of ray
+                    height = map_data.get_value_from_raster(Datatype.DTM, start.x, start.y)
+                    first_intersect_point = Point(start.x, start.y, height)
+                    height = map_data.get_value_from_raster(
+                        Datatype.DTM, second_intersect_point.x, second_intersect_point.y
+                    )
+                    second_intersect_point = Point(second_intersect_point.x, start.y, height)
 
-                        if second_intersect_point.z < projected_height:
-                            ordered_unit_observations += [(first_unit_name, second_unit_name)]
-                        else:
-                            ordered_unit_observations += [(second_unit_name, first_unit_name)]
+                    # Check vertical difference between points and compare to projected dip angle
+                    horizontal_dist = (
+                        first_intersect_point.x - first_intersect_point.x,
+                        second_intersect_point.y - first_intersect_point.y,
+                    )
+                    horizontal_dist = math.sqrt(horizontal_dist[0] ** 2 + horizontal_dist[1] ** 2)
+                    projected_height = first_intersect_point.z + horizontal_dist * math.cos(
+                        dipRadians
+                    )
+
+                    if second_intersect_point.z < projected_height:
+                        ordered_unit_observations += [(first_unit_name, second_unit_name)]
+                    else:
+                        ordered_unit_observations += [(second_unit_name, first_unit_name)]
         self.ordered_unit_observations = ordered_unit_observations
         # Create a matrix of older versus younger frequency from observations
         unit_names = geol.UNITNAME.unique()
@@ -535,6 +518,12 @@ class SorterObservationProjections(Sorter):
                         g.add_edge(unit1, unit2, weight=max_value + weight)
                     elif weight > 0:
                         g.add_edge(unit2, unit1, weight=max_value - weight)
+                    if df.loc[unit1, unit2] > 0 and df.loc[unit2, unit1] > 0 and weight == 0:
+                        # if both units have the same weight add a bidirectional edge
+                        pass
+                        print('')
+                        g.add_edge(unit2, unit1, weight=max_value)
+                        g.add_edge(unit1, unit2, weight=max_value)
         self.G = g
         # Link in unlinked units from contacts with max weight
         g_undirected = g.to_undirected()

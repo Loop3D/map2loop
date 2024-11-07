@@ -296,10 +296,6 @@ class SorterMaximiseContacts(Sorter):
         """
         Initialiser for adjacency based sorter
 
-        Args:
-            graph (networkx.Graph): an object to use as a reference variable to store the networkx graph object
-            route (list): an object to use as a reference variable to store the list of the route of the graph
-            directed_graph (networkx.DiGraph): an object to use as a reference variable to store the directed graph object
         """
         self.sorter_label = "SorterMaximiseContacts"
         # variables for visualising/interrogating the sorter

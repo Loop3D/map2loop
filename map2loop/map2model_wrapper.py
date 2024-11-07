@@ -1,6 +1,9 @@
 import map2model
 import pandas
 import numpy
+import geopandas as gpd
+import pandas as pd
+import numpy as np
 import os
 from .m2l_enums import VerboseLevel
 import re
@@ -42,6 +45,7 @@ class Map2ModelWrapper:
         self.unit_unit_relationships = None
         self.map_data = map_data
         self.verbose_level = verbose_level
+        self.buffer_radius = 500
 
     def reset(self):
         """
@@ -59,6 +63,7 @@ class Map2ModelWrapper:
         Returns:
             list: The map2model stratigraphic column estimate
         """
+        raise NotImplementedError("This method is not implemented")
         if self.sorted_units is None:
             self.run()
         return self.sorted_units
@@ -71,7 +76,7 @@ class Map2ModelWrapper:
             pandas.DataFrame: The fault fault relationships
         """
         if self.fault_fault_relationships is None:
-            self.run()
+            self._calculate_fault_fault_relationships()
         return self.fault_fault_relationships
 
     def get_unit_fault_relationships(self):
@@ -82,7 +87,7 @@ class Map2ModelWrapper:
             pandas.DataFrame: The unit fault relationships
         """
         if self.unit_fault_relationships is None:
-            self.run()
+            self._calculate_fault_unit_relationships()
         return self.unit_fault_relationships
 
     def get_unit_unit_relationships(self):
@@ -93,8 +98,54 @@ class Map2ModelWrapper:
             pandas.DataFrame: The unit unit relationships
         """
         if self.unit_unit_relationships is None:
-            self.run()
+            self._calculate_unit_unit_relationships()
         return self.unit_unit_relationships
+
+    def _calculate_fault_fault_relationships(self):
+
+        faults = self.map_data.FAULT.copy()
+        # reset index so that we can index the adjacency matrix with the index
+        faults.reset_index(inplace=True)
+        buffers = faults.buffer(self.buffer_radius)
+        # create the adjacency matrix
+        intersection = gpd.sjoin(
+            gpd.GeoDataFrame(geometry=buffers), gpd.GeoDataFrame(geometry=faults["geometry"])
+        )
+        intersection["index_left"] = intersection.index
+        intersection.reset_index(inplace=True)
+
+        adjacency_matrix = np.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
+        adjacency_matrix[intersection.loc[:, "index_left"], intersection.loc[:, "index_right"]] = (
+            True
+        )
+        f1, f2 = np.where(np.tril(adjacency_matrix, k=-1))
+        df = pd.DataFrame(
+            {'Fault1': faults.loc[f1, 'ID'].to_list(), 'Fault2': faults.loc[f2, 'ID'].to_list()}
+        )
+        self.fault_fault_relationships = df
+
+    def _calculate_fault_unit_relationships(self):
+        """Calculate unit/fault relationships using geopandas sjoin.
+        This will return
+        """
+        units = self.map_data.GEOLOGY["UNITNAME"].unique()
+        faults = self.map_data.FAULT.copy().reset_index().drop(columns=['index'])
+        adjacency_matrix = np.zeros((len(units), faults.shape[0]), dtype=bool)
+        for i, u in enumerate(units):
+            unit = self.map_data.GEOLOGY[self.map_data.GEOLOGY["UNITNAME"] == u]
+            intersection = gpd.sjoin(
+                gpd.GeoDataFrame(geometry=faults["geometry"]),
+                gpd.GeoDataFrame(geometry=unit["geometry"]),
+            )
+            intersection["index_left"] = intersection.index
+            intersection.reset_index(inplace=True)
+            adjacency_matrix[i, intersection.loc[:, "index_left"]] = True
+        u, f = np.where(adjacency_matrix)
+        df = pd.DataFrame({"Unit": units[u].tolist(), "Fault": faults.loc[f, "ID"].to_list()})
+        self.unit_fault_relationships = df
+
+    def _calculate_unit_unit_relationships(self):
+        return self.map_data.contacts.copy().drop(columns=['length', 'geometry'])
 
     def run(self, verbose_level: VerboseLevel = None):
         """

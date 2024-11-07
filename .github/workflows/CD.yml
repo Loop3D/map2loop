@@ -1,4 +1,4 @@
-# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, use json instead of hjson 
+# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, use json instead of hjson
 
 name: release-please
 
@@ -51,15 +51,14 @@ jobs:
         with:
           name: map2loop-dist
           path: dist/*.tar.gz
-          compression-level: 0        
+          compression-level: 0
 
   pypi-test-sdist:
     name: Test sdist
     needs: pypi-build-sdist
     runs-on: ubuntu-latest
     steps:
-
-      - name : Install GDAL 
+      - name: Install GDAL
         run: |
           sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
@@ -79,7 +78,7 @@ jobs:
           pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
           pip install --no-cache dist/*.tar.gz
           pip list
-    
+
   pypi-build-wheels:
     needs: pypi-test-sdist
     name: Build Wheels
@@ -87,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: 
+        os:
           - ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +95,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      
+
       - name: Build Wheels
         run: |
           pip install build 
@@ -128,14 +127,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
 
-      - name : Install GDAL - Linux
+      - name: Install GDAL - Linux
         if: runner.os == 'Linux'
         run: |
           sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
           sudo apt-get install -y libgdal-dev gdal-bin
 
-      - name: Upgrade pip 
+      - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip
 
@@ -152,7 +151,7 @@ jobs:
           pip install numpy==1.26.4
           pip install -r dependencies.txt
           pip install --no-cache --pre --no-index --find-links dist map2loop
-          pip list    
+          pip list
 
       - name: Testing
         shell: bash -l {0}
@@ -165,10 +164,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:   
-        - ubuntu-latest
-        # - macos-latest # currently not supported because needs libgcc>= 14 and not available for macos-latest (version available is 4.x.x)
-        - windows-latest
+        os:
+          - ubuntu-latest
+          # - macos-latest # currently not supported because needs libgcc>= 14 and not available for macos-latest (version available is 4.x.x)
+          - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
@@ -200,8 +199,8 @@ jobs:
           path: ~/conda_pkgs_dir
         shell: bash -l {0}
         run: |
-          conda build -c anaconda -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }} 
-      
+          conda build -c anaconda -c conda-forge -c loop3d --output-folder conda conda --python ${{ matrix.python-version }}
+
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -217,14 +216,15 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          config-file: 'release-please-config.json'
-          manifest-file: '.release-please-manifest.json'
+          config-file: "release-please-config.json"
+          manifest-file: ".release-please-manifest.json"
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
   documentation-test:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -255,7 +255,7 @@ jobs:
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.
-  
+
   conda-upload:
     needs: [release-please, conda-build]
     runs-on: ${{matrix.os}}
@@ -263,9 +263,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - ubuntu-latest
-        # - macos-latest
-        - windows-latest
+          - ubuntu-latest
+          # - macos-latest
+          - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     if: ${{ needs.release-please.outputs.release_created }}
     steps:
@@ -278,15 +278,15 @@ jobs:
         shell: bash -l {0}
         env:
           ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN  }}
-          with: 
+          with:
           skip-existing: true
           verbose: true
         run: |
           conda install -c anaconda anaconda-client -y
           anaconda upload --label main conda/*/*.tar.bz2
-        
+
   pypi-upload:
-    needs: [release-please, pypi-test-wheels] 
+    needs: [release-please, pypi-test-wheels]
     runs-on:
       - ubuntu-latest
     if: ${{ needs.release-please.outputs.release_created }}

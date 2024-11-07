@@ -36,7 +36,6 @@ class Sorter(ABC):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -46,7 +45,6 @@ class Sorter(ABC):
         Args:
             units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
             units_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
-            stratigraphic_order_hint (list): a list of unit names to be used as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -54,43 +52,6 @@ class Sorter(ABC):
             list: sorted list of unit names
         """
         pass
-
-
-class SorterUseHint(Sorter):
-    """
-    Sorter class which only returns the hint (no algorithm for sorting is done in this class)
-    """
-
-    def __init__(self):
-        """
-        Initialiser for use hint sorter
-        """
-        self.sorter_label = "SorterUseHint"
-
-    @beartype.beartype
-    def sort(
-        self,
-        units: pandas.DataFrame,
-        unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
-        contacts: pandas.DataFrame,
-        map_data: MapData,
-    ) -> list:
-        """
-        Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
-        In this case it purely returns the hint list
-
-        Args:
-            units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
-            stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
-            contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
-
-        Returns:
-            list: the sorted unit names
-        """
-        return stratigraphic_order_hint
 
 
 class SorterUseNetworkX(Sorter):
@@ -109,7 +70,6 @@ class SorterUseNetworkX(Sorter):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -119,18 +79,13 @@ class SorterUseNetworkX(Sorter):
         Args:
             units (pandas.DataFrame): the data frame to sort
             units_relationships (pandas.DataFrame): the relationships between units
-            stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: the sorted unit names
         """
-        try:
-            import networkx as nx
-        except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
-            return stratigraphic_order_hint
+        import networkx as nx
 
         graph = nx.DiGraph()
         for row in units.iterrows():
@@ -153,6 +108,14 @@ class SorterUseNetworkX(Sorter):
         return order
 
 
+class SorterUseHint(SorterUseNetworkX):
+    def __init__(self):
+        print(
+            "SorterUseHint is deprecated and will be remoded in map2loop v3.2. Use SorterUseNetworkX instead"
+        )
+        super().__init__()
+
+
 class SorterAgeBased(Sorter):
     """
     Sorter class which returns a sorted list of units based on the min and max ages of the units
@@ -168,7 +131,6 @@ class SorterAgeBased(Sorter):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -216,7 +178,6 @@ class SorterAlpha(Sorter):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -233,11 +194,7 @@ class SorterAlpha(Sorter):
         Returns:
             list: the sorted unit names
         """
-        try:
-            import networkx as nx
-        except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
-            return stratigraphic_order_hint
+        import networkx as nx
 
         contacts = contacts.sort_values(by="length", ascending=False)[
             ["UNITNAME_1", "UNITNAME_2", "length"]
@@ -307,7 +264,6 @@ class SorterMaximiseContacts(Sorter):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -324,12 +280,8 @@ class SorterMaximiseContacts(Sorter):
         Returns:
             list: the sorted unit names
         """
-        try:
-            import networkx as nx
-            import networkx.algorithms.approximation as nx_app
-        except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
-            return stratigraphic_order_hint
+        import networkx as nx
+        import networkx.algorithms.approximation as nx_app
 
         sorted_contacts = contacts.sort_values(by="length", ascending=False)
         self.graph = nx.Graph()
@@ -390,7 +342,6 @@ class SorterObservationProjections(Sorter):
         self,
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
-        stratigraphic_order_hint: list,
         contacts: pandas.DataFrame,
         map_data: MapData,
     ) -> list:
@@ -407,14 +358,10 @@ class SorterObservationProjections(Sorter):
         Returns:
             list: the sorted unit names
         """
-        try:
-            import networkx as nx
-            import networkx.algorithms.approximation as nx_app
-            from shapely.geometry import LineString, Point
-            from map2loop.m2l_enums import Datatype
-        except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
-            return stratigraphic_order_hint
+        import networkx as nx
+        import networkx.algorithms.approximation as nx_app
+        from shapely.geometry import LineString, Point
+        from map2loop.m2l_enums import Datatype
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol = geol.drop(geol.index[np.logical_or(geol["INTRUSIVE"], geol["SILL"])])

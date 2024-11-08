@@ -40,12 +40,30 @@ class Map2ModelWrapper:
                 How much console output is sent. Defaults to VerboseLevel.ALL.
         """
         self.sorted_units = None
-        self.fault_fault_relationships = None
-        self.unit_fault_relationships = None
-        self.unit_unit_relationships = None
+        self._fault_fault_relationships = None
+        self._unit_fault_relationships = None
+        self._unit_unit_relationships = None
         self.map_data = map_data
         self.verbose_level = verbose_level
         self.buffer_radius = 500
+
+    @property
+    def fault_fault_relationships(self):
+        if self._fault_fault_relationships is None:
+            self._calculate_fault_fault_relationships()
+        return self._fault_fault_relationships
+
+    @property
+    def unit_fault_relationships(self):
+        if self._unit_fault_relationships is None:
+            self._calculate_fault_unit_relationships()
+        return self._unit_fault_relationships
+
+    @property
+    def unit_unit_relationships(self):
+        if self._unit_unit_relationships is None:
+            self._calculate_unit_unit_relationships()
+        return self._unit_unit_relationships
 
     def reset(self):
         """
@@ -124,7 +142,7 @@ class Map2ModelWrapper:
         )
         df['Angle'] = 60  # make it big to prevent LS from making splays
         df['Type'] = 'T'
-        self.fault_fault_relationships = df
+        self._fault_fault_relationships = df
 
     def _calculate_fault_unit_relationships(self):
         """Calculate unit/fault relationships using geopandas sjoin.
@@ -144,12 +162,15 @@ class Map2ModelWrapper:
             adjacency_matrix[i, intersection.loc[:, "index_left"]] = True
         u, f = np.where(adjacency_matrix)
         df = pd.DataFrame({"Unit": units[u].tolist(), "Fault": faults.loc[f, "ID"].to_list()})
-        self.unit_fault_relationships = df
+        self._unit_fault_relationships = df
 
     def _calculate_unit_unit_relationships(self):
         if self.map_data.contacts is None:
             self.map_data.extract_all_contacts()
-        return self.map_data.contacts.copy().drop(columns=['length', 'geometry'])
+        self._unit_unit_relationships = self.map_data.contacts.copy().drop(
+            columns=['length', 'geometry']
+        )
+        return self._unit_unit_relationships
 
     def run(self, verbose_level: VerboseLevel = None):
         """

@@ -287,10 +287,10 @@ class DeformationHistory:
         """
         faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
         rel = fault_fault_relationships.copy()
-        rel = rel.merge(faultIds, left_on="Fault1", right_on="name")
+        rel = rel.merge(faultIds, left_on="Fault1", right_on="eventId")
         rel.rename(columns={"eventId": "eventId1"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
-        rel = rel.merge(faultIds, left_on="Fault2", right_on="name")
+        rel = rel.merge(faultIds, left_on="Fault2", right_on="eventId")
         rel.rename(columns={"eventId": "eventId2"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
         return rel

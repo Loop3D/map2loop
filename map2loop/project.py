@@ -412,7 +412,6 @@ class Project(object):
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
                     self.map2model.get_unit_unit_relationships(),
-                    self.map2model.get_sorted_units(),
                     self.map_data.contacts,
                     self.map_data,
                 )
@@ -442,7 +441,6 @@ class Project(object):
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.map2model.get_unit_unit_relationships(),
-                self.map2model.get_sorted_units(),
                 self.map_data.contacts,
                 self.map_data,
             )

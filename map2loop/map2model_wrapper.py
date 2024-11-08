@@ -122,6 +122,8 @@ class Map2ModelWrapper:
         df = pd.DataFrame(
             {'Fault1': faults.loc[f1, 'ID'].to_list(), 'Fault2': faults.loc[f2, 'ID'].to_list()}
         )
+        df['Angle'] = 60  # make it big to prevent LS from making splays
+        df['Type'] = 'T'
         self.fault_fault_relationships = df
 
     def _calculate_fault_unit_relationships(self):
@@ -145,6 +147,8 @@ class Map2ModelWrapper:
         self.unit_fault_relationships = df
 
     def _calculate_unit_unit_relationships(self):
+        if self.map_data.contacts is None:
+            self.map_data.extract_all_contacts()
         return self.map_data.contacts.copy().drop(columns=['length', 'geometry'])
 
     def run(self, verbose_level: VerboseLevel = None):
@@ -155,6 +159,10 @@ class Map2ModelWrapper:
             verbose_level (VerboseLevel, optional):
                 How much console output is sent. Defaults to None (which uses the wrapper attribute).
         """
+        self.get_fault_fault_relationships()
+        self.get_unit_fault_relationships()
+        self.get_unit_unit_relationships()
+        return
         if verbose_level is None:
             verbose_level = self.verbose_level
         if verbose_level != VerboseLevel.NONE:

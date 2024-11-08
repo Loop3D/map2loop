@@ -88,10 +88,12 @@ class SorterUseNetworkX(Sorter):
         import networkx as nx
 
         graph = nx.DiGraph()
+        name_to_index = {}
         for row in units.iterrows():
             graph.add_node(int(row[1]["layerId"]), name=row[1]["name"])
+            name_to_index[row[1]["name"]] = int(row[1]["layerId"])
         for row in unit_relationships.iterrows():
-            graph.add_edge(row[1]["Index1"], row[1]["Index2"])
+            graph.add_edge(name_to_index[row[1]["UNITNAME_1"]], name_to_index[row[1]["UNITNAME_2"]])
 
         cycles = list(nx.simple_cycles(graph))
         for i in range(0, len(cycles)):
@@ -111,7 +113,7 @@ class SorterUseNetworkX(Sorter):
 class SorterUseHint(SorterUseNetworkX):
     def __init__(self):
         print(
-            "SorterUseHint is deprecated and will be remoded in map2loop v3.2. Use SorterUseNetworkX instead"
+            "SorterUseHint is deprecated and will be removed in map2loop v3.2. Use SorterUseNetworkX instead"
         )
         super().__init__()
 

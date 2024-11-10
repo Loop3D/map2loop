@@ -20,9 +20,12 @@ import os
 from io import BytesIO
 from typing import Union
 
+
 from .logging import getLogger
 
 logger = getLogger(__name__)
+
+
 class MapData:
     """
     A data structure containing all the map data loaded from map files
@@ -101,7 +104,7 @@ class MapData:
             projection (int or str):
                 The projection to use for map reprojection
         """
-        
+
         if issubclass(type(projection), int):
             projection = "EPSG:" + str(projection)
             self.working_projection = projection
@@ -150,7 +153,9 @@ class MapData:
 
         # Check for map based bounding_box and add depth boundaries
         if len(self.bounding_box) == 4:
-            logger.warning("Bounding box does not contain top and base values, setting to 0 and 2000")
+            logger.warning(
+                "Bounding box does not contain top and base values, setting to 0 and 2000"
+            )
             self.bounding_box["top"] = 0
             self.bounding_box["base"] = 2000
 
@@ -184,7 +189,9 @@ class MapData:
         miny = self.bounding_box["miny"]
         maxx = self.bounding_box["maxx"]
         maxy = self.bounding_box["maxy"]
-        logger.info('Creating bounding box string from: {minx}, {miny}, {maxx}, {maxy}, {self.working_projection}') 
+        logger.info(
+            'Creating bounding box string from: {minx}, {miny}, {maxx}, {maxy}, {self.working_projection}'
+        )
         self.bounding_box_str = f"{minx},{miny},{maxx},{maxy},{self.working_projection}"
         logger.info(f'Bounding box string is {self.bounding_box_str}')
 
@@ -259,6 +266,7 @@ class MapData:
         self.config_filename = filename
         self.config.update_from_file(filename, legacy_format=legacy_format, lower=lower)
         logger.info(f"Config is: {self.config.to_dict()}")
+
     def get_config_filename(self):
         """
         Get the config filename
@@ -331,7 +339,7 @@ class MapData:
             self.set_filename(Datatype.STRUCTURE, AustraliaStateUrls.aus_structure_urls[state])
             self.set_filename(Datatype.FAULT, AustraliaStateUrls.aus_fault_urls[state])
             self.set_filename(Datatype.FOLD, AustraliaStateUrls.aus_fold_urls[state])
-            self.set_filename(Datatype.DTM, "au")
+            self.set_filename(Datatype.DTM, "hawaii")
             lower = state == "SA"
 
             # Check if this is running a documentation test and use local datasets if so
@@ -502,8 +510,6 @@ class MapData:
         if not os.path.isdir(self.tmp_path):
             os.mkdir(self.tmp_path)
 
-
- 
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -517,10 +523,13 @@ class MapData:
             _type_: The open geotiff in a gdal handler
         """
         self.__check_and_create_tmp_path()
-        
+
         # For gdal debugging use exceptions
         gdal.UseExceptions()
-        bb_ll = tuple(float(coord) for coord in self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds)
+        bb_ll = tuple(
+            float(coord)
+            for coord in self.bounding_box_polygon.to_crs("EPSG:4326").geometry.total_bounds
+        )
 
         if filename.lower() == "aus" or filename.lower() == "au":
             logger.info('Using geoscience australia DEM')
@@ -530,7 +539,7 @@ class MapData:
             coverage = wcs.getCoverage(
                 identifier="1", bbox=bb_ll, format="GeoTIFF", crs=4326, width=2048, height=2048
             )
-            
+
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create
@@ -540,7 +549,7 @@ class MapData:
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
             tif = gdal.Open(tmp_file)
-        
+
         elif filename == "hawaii":
             logger.info('Using Hawaii DEM')
             import netCDF4
@@ -548,7 +557,7 @@ class MapData:
             bbox_str = (
                 f"[({str(bb_ll[1])}):1:({str(bb_ll[3])})][({str(bb_ll[0])}):1:({str(bb_ll[2])})]"
             )
-            
+
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
             f = urllib.request.urlopen(filename)
             ds = netCDF4.Dataset("in-mem-file", mode="r", memory=f.read())
@@ -756,10 +765,10 @@ class MapData:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
         else:
             print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
-                    
+
         # Ensure all DIPDIR values are within [0, 360]
         structure["DIPDIR"] = structure["DIPDIR"] % 360.0
-        
+
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
         else:
@@ -1516,9 +1525,9 @@ class MapData:
             )
 
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
-        # if there are duplicates in the clut file, drop. 
+        # if there are duplicates in the clut file, drop.
         colour_lookup = colour_lookup.drop_duplicates(subset=["UNITNAME"])
-        
+
         if "UNITNAME" in colour_lookup.columns and "colour" in colour_lookup.columns:
             stratigraphic_units = stratigraphic_units.merge(
                 colour_lookup,
@@ -1536,3 +1545,15 @@ class MapData:
                 f"Colour Lookup file {self.colour_filename} does not contain 'UNITNAME' or 'colour' field"
             )
         return stratigraphic_units
+
+    @property
+    def GEOLOGY(self):
+        return self.get_map_data(Datatype.GEOLOGY)
+
+    @property
+    def STRUCTURE(self):
+        return self.get_map_data(Datatype.STRUCTURE)
+
+    @property
+    def FAULT(self):
+        return self.get_map_data(Datatype.FAULT)

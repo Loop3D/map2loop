@@ -1,6 +1,6 @@
 {
     "packages": {
-      "map2Loop": {
+      "map2loop": {
         "release-type": "python",
         "bump-minor-pre-major": true,
         "bump-minor-pre-major-pattern": "feat",

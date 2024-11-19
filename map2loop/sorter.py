@@ -6,6 +6,10 @@ import math
 from .mapdata import MapData
 from typing import Union
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
+
 
 class Sorter(ABC):
     """
@@ -90,6 +94,8 @@ class SorterUseHint(Sorter):
         Returns:
             list: the sorted unit names
         """
+        logger.info('Stratigraphic order calculated using provided hint')
+        logger.info(','.join(stratigraphic_order_hint))
         return stratigraphic_order_hint
 
 
@@ -129,7 +135,7 @@ class SorterUseNetworkX(Sorter):
         try:
             import networkx as nx
         except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
+            logger.error("Cannot import networkx module, defaulting to SorterUseHint")
             return stratigraphic_order_hint
 
         graph = nx.DiGraph()
@@ -142,14 +148,16 @@ class SorterUseNetworkX(Sorter):
         for i in range(0, len(cycles)):
             if graph.has_edge(cycles[i][0], cycles[i][1]):
                 graph.remove_edge(cycles[i][0], cycles[i][1])
-                print(
-                    " SorterUseNetworkX Warning: Cycle found and contact edge removed:",
+                logger.warning(
+                    " SorterUseNetworkX: Cycle found and contact edge removed:",
                     units["name"][cycles[i][0]],
                     units["name"][cycles[i][1]],
                 )
 
         indexes = list(nx.topological_sort(graph))
         order = [units["name"][i] for i in list(indexes)]
+        logger.info("Stratigraphic order calculated using networkx topological sort")
+        logger.info(','.join(order))
         return order
 
 
@@ -185,8 +193,10 @@ class SorterAgeBased(Sorter):
         Returns:
             list: the sorted unit names
         """
+        logger.info("Calling age based sorter")
         sorted_units = units.copy()
         if "minAge" in units.columns and "maxAge" in units.columns:
+            print(sorted_units["minAge"], sorted_units["maxAge"])
             sorted_units["meanAge"] = sorted_units.apply(
                 lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
             )
@@ -196,6 +206,9 @@ class SorterAgeBased(Sorter):
             sorted_units = sorted_units.sort_values(by=["group", "meanAge"])
         else:
             sorted_units = sorted_units.sort_values(by=["meanAge"])
+        logger.info("Stratigraphic order calculated using age based sorting")
+        for _i, row in sorted_units.iterrows():
+            logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']}")
 
         return list(sorted_units["name"])
 
@@ -236,7 +249,7 @@ class SorterAlpha(Sorter):
         try:
             import networkx as nx
         except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
+            logger.warning("Cannot import networkx module, defaulting to SorterUseHint")
             return stratigraphic_order_hint
 
         contacts = contacts.sort_values(by="length", ascending=False)[
@@ -283,6 +296,8 @@ class SorterAlpha(Sorter):
                     graph.remove_node(cnode)
                     cnode = node_with_min_edges
         order = list(reversed(list(nx.topological_sort(new_graph))))
+        logger.info("Stratigraphic order calculated using adjacency based sorting")
+        logger.info(','.join(order))
         return order
 
 
@@ -328,7 +343,7 @@ class SorterMaximiseContacts(Sorter):
             import networkx as nx
             import networkx.algorithms.approximation as nx_app
         except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
+            logger.warning("Cannot import networkx module, defaulting to SorterUseHint")
             return stratigraphic_order_hint
 
         sorted_contacts = contacts.sort_values(by="length", ascending=False)
@@ -357,8 +372,9 @@ class SorterMaximiseContacts(Sorter):
             if edge[1] not in self.directed_graph.nodes():
                 self.directed_graph.add_node(edge[1])
                 self.directed_graph.add_edge(edge[0], edge[1])
+
         # we need to reverse the order of the graph to get the correct order
-        return list(
+        order = list(
             reversed(
                 list(
                     nx.dfs_preorder_nodes(
@@ -367,6 +383,9 @@ class SorterMaximiseContacts(Sorter):
                 )
             )
         )
+        logger.info("Stratigraphic order calculated using adjacency based sorting")
+        logger.info(','.join(order))
+        return order
 
 
 class SorterObservationProjections(Sorter):
@@ -413,14 +432,12 @@ class SorterObservationProjections(Sorter):
             from shapely.geometry import LineString, Point
             from map2loop.m2l_enums import Datatype
         except Exception:
-            print("Cannot import networkx module, defaulting to SorterUseHint")
+            logger.warning("Cannot import networkx module, defaulting to SorterUseHint")
             return stratigraphic_order_hint
 
         geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
         geol = geol.drop(geol.index[np.logical_or(geol["INTRUSIVE"], geol["SILL"])])
         orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
-
-        verbose = True
 
         # Create a map of maps to store younger/older observations
         ordered_unit_observations = []
@@ -428,13 +445,12 @@ class SorterObservationProjections(Sorter):
             # get containing unit
             containing_unit = geol[geol.contains(row.geometry)]
             if len(containing_unit) > 1:
-                if verbose:
-                    print(f"Orientation {row.ID} is within multiple units")
-                    print(f"Check geology map around coordinates {row.geometry}")
+                logger.info(f"Orientation {row.ID} is within multiple units")
+                logger.info(f"Check geology map around coordinates {row.geometry}")
+
             if len(containing_unit) < 1:
-                if verbose:
-                    print(f"Orientation {row.ID} is not in a unit")
-                    print(f"Check geology map around coordinates {row.geometry}")
+                logger.info(f"Orientation {row.ID} is not in a unit")
+                logger.info(f"Check geology map around coordinates {row.geometry}")
             else:
                 first_unit_name = containing_unit.iloc[0]["UNITNAME"]
                 # Get units that a projected line passes through
@@ -545,4 +561,7 @@ class SorterObservationProjections(Sorter):
                 dd.add_node(edge[1])
                 dd.add_edge(edge[0], edge[1])
         self.directed = dd
-        return list(nx.dfs_preorder_nodes(dd, source=list(dd.nodes())[0]))
+        logger.info("Stratigraphic order calculated using observation based sorting")
+        order = list(nx.dfs_preorder_nodes(dd, source=list(dd.nodes())[0]))
+        logger.info(','.join(order))
+        return order

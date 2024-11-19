@@ -391,7 +391,7 @@ class StructuralPoint(ThicknessCalculator):
     '''
 
     def __init__(self):
-        self.sorter_label = "StructuralPoint"
+        self.thickness_calculator_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
 

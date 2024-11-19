@@ -223,8 +223,6 @@ jobs:
       release_created: ${{ steps.release-please.outputs.release_created }}
       #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
-  
-
   conda-upload:
     needs: [release-please, conda-build]
     runs-on: ${{matrix.os}}

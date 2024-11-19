@@ -5,8 +5,7 @@
         "bump-minor-pre-major": true,
         "bump-minor-pre-major-pattern": "feat",
         "bump-patch-for-minor-pre-major": true,
-        "bump-patch-for-minor-pre-major-pattern": "fix",
-        "include-v-in-tag": false
+        "bump-patch-for-minor-pre-major-pattern": "fix"
       }
     }
   }

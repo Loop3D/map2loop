@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.1.13](https://github.com/Loop3D/map2loop/compare/v3.1.12...v3.1.13) (2024-11-19)
+
+
+### Bug Fixes
+
+* bump with vtag ([5ebc07b](https://github.com/Loop3D/map2loop/commit/5ebc07b0014dcbd6c2e053113e0f39c99d2ee0a6))
+* change docs build to combine all dependencies in one file ([fb51025](https://github.com/Loop3D/map2loop/commit/fb510250526fc35ab265e8273949a2c51ba52359))
+* lowercase m2l and add vtag to rp manifest ([7311e40](https://github.com/Loop3D/map2loop/commit/7311e402b0cb7d4c5efcb3272b8caebca00a901b))
+* remove vtag setting temporarily to see if this is what's stopping version bump PR ([c73e6fd](https://github.com/Loop3D/map2loop/commit/c73e6fda01f42d76b21267f2feae76c1e5e799ce))
+* revert and double check typo on release-please ([d455350](https://github.com/Loop3D/map2loop/commit/d4553504909a25935d2c7115b1830ab56a93a071))
+* rp manifest update ([e0bb75b](https://github.com/Loop3D/map2loop/commit/e0bb75b9e70acb98d0706b7320ea87f6cfd72c80))
+* typo in rp config ([9b1ba12](https://github.com/Loop3D/map2loop/commit/9b1ba122da3ff720e8ecc2354d6031d2df8cb7c0))
+
 ## [3.1.12](https://github.com/Loop3D/map2loop/compare/v3.1.11...v3.1.12) (2024-09-11)
 
 

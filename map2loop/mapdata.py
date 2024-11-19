@@ -21,6 +21,11 @@ from io import BytesIO
 from typing import Union
 
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
+
+
 class MapData:
     """
     A data structure containing all the map data loaded from map files
@@ -99,6 +104,7 @@ class MapData:
             projection (int or str):
                 The projection to use for map reprojection
         """
+
         if issubclass(type(projection), int):
             projection = "EPSG:" + str(projection)
             self.working_projection = projection
@@ -110,6 +116,7 @@ class MapData:
             )
         if self.bounding_box is not None:
             self.recreate_bounding_box_str()
+        logger.info("Setting working projection to {self.working_projection}")
 
     def get_working_projection(self):
         """
@@ -146,6 +153,9 @@ class MapData:
 
         # Check for map based bounding_box and add depth boundaries
         if len(self.bounding_box) == 4:
+            logger.warning(
+                "Bounding box does not contain top and base values, setting to 0 and 2000"
+            )
             self.bounding_box["top"] = 0
             self.bounding_box["base"] = 2000
 
@@ -153,12 +163,15 @@ class MapData:
         for i in ["minx", "maxx", "miny", "maxy", "top", "base"]:
             if i not in self.bounding_box:
                 raise KeyError(f"bounding_box dictionary does not contain {i} key")
-
         # Create geodataframe boundary for clipping
         minx = self.bounding_box["minx"]
         miny = self.bounding_box["miny"]
         maxx = self.bounding_box["maxx"]
         maxy = self.bounding_box["maxy"]
+        top = self.bounding_box["top"]
+        base = self.bounding_box["base"]
+        logger.info(f'Setting bounding box to {minx}, {miny}, {maxx}, {maxy},{base},{top}')
+
         lat_point_list = [miny, miny, maxy, maxy, miny]
         lon_point_list = [minx, maxx, maxx, minx, minx]
         self.bounding_box_polygon = geopandas.GeoDataFrame(
@@ -176,7 +189,11 @@ class MapData:
         miny = self.bounding_box["miny"]
         maxx = self.bounding_box["maxx"]
         maxy = self.bounding_box["maxy"]
+        logger.info(
+            'Creating bounding box string from: {minx}, {miny}, {maxx}, {maxy}, {self.working_projection}'
+        )
         self.bounding_box_str = f"{minx},{miny},{maxx},{maxy},{self.working_projection}"
+        logger.info(f'Bounding box string is {self.bounding_box_str}')
 
     @beartype.beartype
     def get_bounding_box(self, polygon: bool = False):
@@ -205,6 +222,7 @@ class MapData:
             filename (str):
                 The filename to store
         """
+        logger.info(f"Setting filename for {datatype} to {filename}")
         if self.filenames[datatype] != filename:
             self.filenames[datatype] = filename
             self.data_states[datatype] = Datastate.UNLOADED
@@ -228,7 +246,7 @@ class MapData:
         if self.data_states != Datastate.UNNAMED:
             return self.filenames[datatype]
         else:
-            print(f"Requested filename for {str(type(datatype))} is not set\n")
+            logger.warning(f"Requested filename for {str(type(datatype))} is not set\n")
             return None
 
     @beartype.beartype
@@ -244,8 +262,10 @@ class MapData:
             legacy_format (bool, optional):
                 Whether the file is in m2lv2 form. Defaults to False.
         """
+        logger.info('Setting config filename to {filename}')
         self.config_filename = filename
         self.config.update_from_file(filename, legacy_format=legacy_format, lower=lower)
+        logger.info(f"Config is: {self.config.to_dict()}")
 
     def get_config_filename(self):
         """
@@ -265,6 +285,7 @@ class MapData:
             filename (str):
                 The csv colour look up table filename
         """
+        logger.info(f'Colour filename is: {filename}')
         self.colour_filename = filename
 
     def get_colour_filename(self):
@@ -285,6 +306,7 @@ class MapData:
             codes (list):
                 The list of codes to ignore
         """
+        logger.info(f'Setting ignore codes to {codes}')
         self.config.geology_config["ignore_codes"] = codes
         self.data_states[Datatype.GEOLOGY] = Datastate.CLIPPED
         self.dirtyflags[Datatype.GEOLOGY] = True
@@ -311,6 +333,7 @@ class MapData:
         Raises:
             ValueError: state string not in state list ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']
         """
+        logger.info(f"Setting filenames for Australian state {state}")
         if state in ["WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"]:
             self.set_filename(Datatype.GEOLOGY, AustraliaStateUrls.aus_geology_urls[state])
             self.set_filename(Datatype.STRUCTURE, AustraliaStateUrls.aus_structure_urls[state])
@@ -374,6 +397,7 @@ class MapData:
         """
         Load all the map data for each datatype.  Cycles through each type and loads it
         """
+        logger.info('Loading all map data')
         for i in [
             Datatype.GEOLOGY,
             Datatype.STRUCTURE,
@@ -381,7 +405,7 @@ class MapData:
             Datatype.FOLD,
             Datatype.FAULT_ORIENTATION,
         ]:
-
+            logger.info(f'Loading map data for {i}')
             self.load_map_data(i)
         self.load_raster_map_data(Datatype.DTM)
 
@@ -395,7 +419,7 @@ class MapData:
                 The datatype to load
         """
         if self.filenames[datatype] is None or self.data_states[datatype] == Datastate.UNNAMED:
-            print(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
+            logger.warning(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
             self.data[datatype] = self.get_empty_dataframe(datatype)
             self.dirtyflags[datatype] = False
             self.data_states[datatype] = Datastate.COMPLETE
@@ -409,10 +433,10 @@ class MapData:
                     self.raw_data[datatype] = geopandas.read_file(map_filename)
                     self.data_states[datatype] = Datastate.LOADED
                 except Exception:
-                    print(
+                    logger.error(
                         f"Failed to open {datatype.name} file called '{self.filenames[datatype]}'\n"
                     )
-                    print(f"Cannot continue as {datatype.name} was not loaded\n")
+                    logger.error(f"Cannot continue as {datatype.name} was not loaded\n")
                     return
             if self.data_states[datatype] == Datastate.LOADED:
                 # Reproject geopanda to required CRS
@@ -466,6 +490,7 @@ class MapData:
         Returns:
             _type_: The geotiff file
         """
+        logger.info(f"Opening http query to {url}")
         try:
             request = urllib.Request(url, headers={"Accept-Encoding": "gzip"})
             response = urllib.request.urlopen(request, timeout=30)
@@ -474,6 +499,7 @@ class MapData:
             else:
                 return response
         except urllib.URLError:
+            logger.error(f"Failed to open url {url}")
             return None
 
     @beartype.beartype
@@ -506,7 +532,7 @@ class MapData:
         )
 
         if filename.lower() == "aus" or filename.lower() == "au":
-
+            logger.info('Using geoscience australia DEM')
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
@@ -525,6 +551,7 @@ class MapData:
             tif = gdal.Open(tmp_file)
 
         elif filename == "hawaii":
+            logger.info('Using Hawaii DEM')
             import netCDF4
 
             bbox_str = (
@@ -556,11 +583,13 @@ class MapData:
             tif.SetProjection(srs.ExportToWkt())
             tif.GetRasterBand(1).WriteArray(numpy.flipud(ds.variables["elev"][:][:]))
         elif filename.startswith("http"):
+            logger.info(f'Opening remote file {filename}')
             image_data = self.open_http_query(filename)
             mmap_name = f"/vsimem/{str(uuid4())}"
             gdal.FileFromMemBuffer(mmap_name, image_data.read())
             tif = gdal.Open(mmap_name)
         else:
+            logger.info(f'Opening local file {filename}')
             tif = gdal.Open(filename, gdal.GA_ReadOnly)
         # except Exception:
         #     print(
@@ -578,7 +607,7 @@ class MapData:
                 The raster datatype to load
         """
         if self.filenames[datatype] is None or self.data_states[datatype] == Datastate.UNNAMED:
-            print(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
+            logger.warning(f"Datatype {datatype.name} is not set and so cannot be loaded\n")
         elif self.dirtyflags[datatype] is True:
             if self.data_states[datatype] == Datastate.UNLOADED:
                 # Load data from file
@@ -596,7 +625,7 @@ class MapData:
                         outputType=gdal.GDT_Float32,
                     )
                 except Exception:
-                    print(f"Warp failed for {datatype.name}\n")
+                    logger.error(f"Warp failed for {datatype.name}\n")
                 self.data_states[datatype] = Datastate.REPROJECTED
             if self.data_states[datatype] == Datastate.REPROJECTED:
                 # Clip raster image to bounding polygon
@@ -641,7 +670,7 @@ class MapData:
         if func:
             error, message = func()
             if error:
-                print(message)
+                logger.error(message)
 
     @beartype.beartype
     def parse_fault_orientations(self) -> tuple:
@@ -1396,6 +1425,7 @@ class MapData:
         """
         Extract the contacts between units in the geology GeoDataFrame
         """
+        # print('extracting contacts')
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove intrusions
@@ -1414,6 +1444,7 @@ class MapData:
             units = units[1:]
             for unit2 in units:
                 if unit1 != unit2:
+                    # print(f'contact: {unit1} and {unit2}')
                     join = geopandas.overlay(
                         geology[geology["UNITNAME"] == unit1],
                         geology[geology["UNITNAME"] == unit2],
@@ -1427,6 +1458,7 @@ class MapData:
                         contacts = pandas.concat([contacts, end], ignore_index=True)
         # contacts["TYPE"] = "UNKNOWN"
         contacts["length"] = [row.length for row in contacts["geometry"]]
+        # print('finished extracting contacts')
         if save_contacts:
             self.contacts = contacts
         return contacts

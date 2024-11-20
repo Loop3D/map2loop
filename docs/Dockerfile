@@ -24,6 +24,8 @@ COPY dependencies.txt dependenciesdocs.txt
 
 RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
 RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
+RUN pip uninstall looprojectfile -y
+RUN pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
 
 RUN pip install .
 

@@ -75,7 +75,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install numpy==1.26.4
-          pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
+          pip install geopandas shapely networkx owslib map2model beartype gdal==3.8.4 hjson pytest scikit-learn
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache dist/*.tar.gz
           pip list
 
@@ -150,6 +151,7 @@ jobs:
           pip install --upgrade pip
           pip install numpy==1.26.4
           pip install -r dependencies.txt
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache --pre --no-index --find-links dist map2loop
           pip list
 
@@ -181,6 +183,7 @@ jobs:
         run: |
           conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           conda install pytest -y
 
       - name: Building and install

@@ -265,6 +265,7 @@ jobs:
   
   conda-upload:
     needs: [conda-build]
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
@@ -294,6 +295,7 @@ jobs:
 
   pypi-upload:
     needs: [pypi-test-wheels]
+    if: github.ref == 'refs/heads/master'
     runs-on:
       - ubuntu-latest
     # if: ${{ needs.release-please.outputs.release_created }}

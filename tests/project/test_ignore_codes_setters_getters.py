@@ -1,5 +1,4 @@
 import pathlib
-import pytest
 from map2loop.project import Project  
 from map2loop.m2l_enums import Datatype
 import map2loop

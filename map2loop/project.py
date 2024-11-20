@@ -4,7 +4,7 @@ from .utils import hex_to_rgb
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
-from .thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint, ThicknessCalculator
+from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
@@ -297,27 +297,6 @@ class Project(object):
             str: The name of the sorter used
         """
         return self.sorter.sorter_label
-
-    @beartype.beartype
-    def set_thickness_calculator(self, thickness_calculator: ThicknessCalculator):
-        """
-        Set the thickness calculator that estimates unit thickness of all units
-
-        Args:
-            thickness_calculator (ThicknessCalculator):
-                The calculator to use. Must be of base class ThicknessCalculator
-        """
-        logger.info(f"Setting thickness calculator to {thickness_calculator.thickness_calculator_label}")
-        self.thickness_calculator = thickness_calculator
-
-    def get_thickness_calculator(self):
-        """
-        Get the name of the thickness calculator being used
-
-        Returns:
-            str: The name of the thickness calculator used
-        """
-        return self.thickness_calculator.thickness_calculator_label
 
     @beartype.beartype
     def set_fault_orientation(self, fault_orientation: FaultOrientation):

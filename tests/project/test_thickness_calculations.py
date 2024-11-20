@@ -4,7 +4,7 @@ import geopandas
 import numpy
 
 from map2loop._datasets.geodata_files import load_map2loop_data
-from map2loop.thickness_calculator import ThicknessCalculatorAlpha, InterpolatedStructure, StructuralPoint
+from map2loop.thickness_calculator import InterpolatedStructure, StructuralPoint
 from map2loop import Project
 
 

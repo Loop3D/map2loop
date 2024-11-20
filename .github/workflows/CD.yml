@@ -209,21 +209,21 @@ jobs:
           name: map2loop-conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
 
-  release-please:
-    needs: [pypi-test-wheels, conda-build]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: googleapis/release-please-action@v4
-        id: release
-        with:
-          release-type: "python"
-          config-file: "release-please-config.json"
-          manifest-file: ".release-please-manifest.json"
-    outputs:
-      release_created: ${{ steps.release-please.outputs.release_created }}
-      #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
+  # release-please:
+  #   needs: [pypi-test-wheels, conda-build]
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: googleapis/release-please-action@v4
+  #       id: release
+  #       with:
+  #         release-type: "python"
+  #         config-file: "release-please-config.json"
+  #         manifest-file: ".release-please-manifest.json"
+  #   outputs:
+  #     release_created: ${{ steps.release.outputs.release_created }}
+  #     #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
   documentation-test:
     runs-on: ubuntu-latest
@@ -261,7 +261,7 @@ jobs:
           folder: docs # The folder the action should deploy.
   
   conda-upload:
-    needs: [release-please, conda-build]
+    needs: [conda-build]
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
@@ -271,7 +271,7 @@ jobs:
           # - macos-latest
           - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-    if: ${{ needs.release-please.outputs.release_created }}
+    # if: ${{ needs.release-please.outputs.release_created }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -290,10 +290,10 @@ jobs:
           anaconda upload --label main conda/*/*.tar.bz2
 
   pypi-upload:
-    needs: [release-please, pypi-test-wheels]
+    needs: [pypi-test-wheels]
     runs-on:
       - ubuntu-latest
-    if: ${{ needs.release-please.outputs.release_created }}
+    # if: ${{ needs.release-please.outputs.release_created }}
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write

@@ -5,7 +5,9 @@ import geopandas
 from .mapdata import MapData
 import numpy as np
 
+from .logging import getLogger
 
+logger = getLogger(__name__)
 class FaultOrientation(ABC):
     """
     Base Class of Fault Orientation assigner to force structure of FaultOrientation
@@ -80,7 +82,10 @@ class FaultOrientationNearest(FaultOrientation):
         Returns:
             pandas.DataFrame: fault orientations assigned to a fault label
         """
+        logger.info("Assigning fault orientations to fault traces from nearest orientation")
         orientations = fault_orientations.copy()
+        logger.info(f'There are {len(orientations)} fault orientations to assign')
+        
         orientations["ID"] = -1
 
         for i in orientations.index:

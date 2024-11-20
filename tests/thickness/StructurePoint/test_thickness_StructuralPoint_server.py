@@ -55,7 +55,7 @@ def test_from_aus_state():
     proj.run_all()
     print("from the test", proj.stratigraphic_column.stratigraphicUnits.columns)
     assert (
-        proj.thickness_calculator.sorter_label == "StructuralPoint"
+        proj.thickness_calculator.thickness_calculator_label == "StructuralPoint"
     ), 'Thickness_calc structural point not being set properly'
     assert (
         "ThicknessMedian" in proj.stratigraphic_column.stratigraphicUnits.columns

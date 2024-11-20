@@ -4,6 +4,9 @@ import beartype
 import geopandas
 import math
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 class DeformationHistory:
     """
@@ -90,6 +93,7 @@ class DeformationHistory:
             length (float or int):
                 The fault length cutoff
         """
+        logger.info(f"Setting minimum fault length to {length}")
         self.minimum_fault_length_to_export = length
 
     def get_minimum_fault_length(self):
@@ -113,11 +117,13 @@ class DeformationHistory:
             pandas.DataFrame: The sliced data frame containing the requested fault
         """
         if issubclass(type(id), int):
+            logger.info(f"Finding fault with eventId {id}")
             return self.faults[self.faults["eventId"] == id]
         elif issubclass(type(id), str):
+            logger.info(f"Finding fault with name {id}")
             return self.faults[self.faults["name"] == id]
         else:
-            print("ERROR: Unknown identifier type used to find fault")
+            logger.error("ERROR: Unknown identifier type used to find fault")
 
     def findfold(self, id):
         """
@@ -131,11 +137,13 @@ class DeformationHistory:
             pandas.DataFrame: The sliced data frame containing the requested fold
         """
         if issubclass(type(id), int):
+            logger.info(f"Finding fold with eventId {id}")
             return self.folds[self.folds["foldId"] == id]
         elif issubclass(type(id), str):
+            logger.info(f"Finding fold with name {id}")
             return self.folds[self.folds["name"] == id]
         else:
-            print("ERROR: Unknown identifier type used to find fold")
+            logger.error("ERROR: Unknown identifier type used to find fold")
 
     def addFault(self, fault):
         """
@@ -148,12 +156,13 @@ class DeformationHistory:
         if issubclass(type(fault), pandas.DataFrame) or issubclass(type(fault), dict):
             if "name" in fault.keys():
                 if fault["name"] in self.faults.index:
-                    print("Replacing fault", fault["name"])
+                    logger.warning("Replacing fault", fault["name"])
                 self.faults[fault["name"]] = fault
+                logger.info("Adding fault", fault["name"])
             else:
-                print("No name field in fault", fault)
+                logger.error("No name field in fault", fault)
         else:
-            print("Cannot add fault to dataframe with type", type(fault))
+            logger.error("Cannot add fault to dataframe with type", type(fault))
 
     def removeFaultByName(self, name: str):
         """
@@ -163,7 +172,8 @@ class DeformationHistory:
             name (str):
                 The name of the fault(s) to remove
         """
-        self.faults = self.faults[self.faults["name"] != name].copy()
+        logger.info(f"Removing fault with name {name}")
+        self.faults = self.faults.drop[self.faults.index[self.faults["name"] != name]]
 
     def removeFaultByEventId(self, eventId: int):
         """
@@ -173,6 +183,7 @@ class DeformationHistory:
             eventId (int):
                 The eventId of the fault to remove
         """
+        logger.info(f"Removing fault with eventId {eventId}")
         self.faults = self.faults[self.faults["eventId"] != eventId].copy()
 
     def addFold(self, fold):
@@ -186,12 +197,13 @@ class DeformationHistory:
         if issubclass(type(fold), pandas.DataFrame) or issubclass(type(fold), dict):
             if "name" in fold.keys():
                 if fold["name"] in self.folds.index:
-                    print("Replacing fold", fold["name"])
+                    logger.warning("Replacing fold", fold["name"])
+                logger.info("Adding fold", fold["name"])
                 self.folds[fold["name"]] = fold
             else:
-                print("No name field in fold", fold)
+                logger.error("No name field in fold", fold)
         else:
-            print("Cannot add fold to dataframe with type", type(fold))
+            logger.error("Cannot add fold to dataframe with type", type(fold))
 
     @beartype.beartype
     def populate(self, faults_map_data: geopandas.GeoDataFrame):
@@ -202,6 +214,7 @@ class DeformationHistory:
             faults_map_data (geopandas.GeoDataFrame):
                 The parsed data frame from the map
         """
+        logger.info("Populating fault/fold summary")
         if faults_map_data.shape[0] == 0:
             return
         faults_data = faults_map_data.copy()
@@ -251,6 +264,7 @@ class DeformationHistory:
             fault_observations (pandas.DataFrame):
                 The fault observations data
         """
+        logger.info("Summarising fault data")
         id_list = self.faults["eventId"].unique()
         for id in id_list:
             observations = fault_observations[fault_observations["ID"] == id]
@@ -272,6 +286,7 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
+        logger.info("Getting faults for export")
         return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
 
     @beartype.beartype
@@ -285,12 +300,16 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The fault_relationships with the correct eventIds
         """
+        logger.info("Getting fault relationships with eventIds")
         faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
         rel = fault_fault_relationships.copy()
-        rel = rel.merge(faultIds, left_on="Fault1", right_on="name")
+        rel['Fault1'] = rel['Fault1'].astype(str)
+        rel['Fault2'] = rel['Fault2'].astype(str)
+        faultIds['eventId'] = faultIds['eventId'].astype(str)
+        rel = rel.merge(faultIds, left_on="Fault1", right_on="eventId")
         rel.rename(columns={"eventId": "eventId1"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
-        rel = rel.merge(faultIds, left_on="Fault2", right_on="name")
+        rel = rel.merge(faultIds, left_on="Fault2", right_on="eventId")
         rel.rename(columns={"eventId": "eventId2"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)
         return rel

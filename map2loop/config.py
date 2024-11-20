@@ -6,6 +6,9 @@ import time
 import pathlib
 from typing import Union
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 class Config:
     """
@@ -98,28 +101,28 @@ class Config:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
                 if key not in self.structure_config:
-                    print(f"Config dictionary structure segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary structure segment contained {key} which is not used")
             dictionary.pop("structure")
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
                 if key not in self.geology_config:
-                    print(f"Config dictionary geology segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary geology segment contained {key} which is not used")
             dictionary.pop("geology")
         if "fault" in dictionary:
             self.fault_config.update(dictionary["fault"])
             for key in dictionary["fault"].keys():
                 if key not in self.fault_config:
-                    print(f"Config dictionary fault segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary fault segment contained {key} which is not used")
             dictionary.pop("fault")
         if "fold" in dictionary:
             self.fold_config.update(dictionary["fold"])
             for key in dictionary["fold"].keys():
                 if key not in self.fold_config:
-                    print(f"Config dictionary fold segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary fold segment contained {key} which is not used")
             dictionary.pop("fold")
         if len(dictionary):
-            print(f"Unused keys from config format {list(dictionary.keys())}")
+            logger.warning(f"Unused keys from config format {list(dictionary.keys())}")
 
     @beartype.beartype
     def update_from_legacy_file(self, file_map: dict, lower: bool = False):
@@ -179,7 +182,7 @@ class Config:
             file_map.pop("o")
 
         if len(file_map) > 0:
-            print(f"Unused keys from legacy format {list(file_map.keys())}")
+            logger.warning(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
     def update_from_file(

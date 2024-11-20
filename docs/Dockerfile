@@ -13,17 +13,17 @@ RUN apt-get update -qq && \
     libtinfo5\
     libtiff6\
     libgl1-mesa-glx
-    
+
 
 COPY . /map2loop 
 
 WORKDIR /map2loop
 
 COPY dependencies.txt dependencies.txt
-RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
-RUN conda install -c conda-forge -c loop3d LoopStructural -y
+COPY dependencies.txt dependenciesdocs.txt
 
-RUN conda install -c conda-forge --file ./docs/requirements.txt -y
+RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
+RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
 
 RUN pip install .
 

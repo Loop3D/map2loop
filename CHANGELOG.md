@@ -1,5 +1,63 @@
 # Changelog
 
+## [3.1.13](https://github.com/Loop3D/map2loop/compare/v3.1.12...v3.1.13) (2024-11-19)
+
+
+### Bug Fixes
+
+* bump with vtag ([5ebc07b](https://github.com/Loop3D/map2loop/commit/5ebc07b0014dcbd6c2e053113e0f39c99d2ee0a6))
+* change docs build to combine all dependencies in one file ([fb51025](https://github.com/Loop3D/map2loop/commit/fb510250526fc35ab265e8273949a2c51ba52359))
+* lowercase m2l and add vtag to rp manifest ([7311e40](https://github.com/Loop3D/map2loop/commit/7311e402b0cb7d4c5efcb3272b8caebca00a901b))
+* remove vtag setting temporarily to see if this is what's stopping version bump PR ([c73e6fd](https://github.com/Loop3D/map2loop/commit/c73e6fda01f42d76b21267f2feae76c1e5e799ce))
+* revert and double check typo on release-please ([d455350](https://github.com/Loop3D/map2loop/commit/d4553504909a25935d2c7115b1830ab56a93a071))
+* rp manifest update ([e0bb75b](https://github.com/Loop3D/map2loop/commit/e0bb75b9e70acb98d0706b7320ea87f6cfd72c80))
+* test trigger release ([2d87633](https://github.com/Loop3D/map2loop/commit/2d876337b826730cd7246f86b79d85b73acfe33c))
+* typo in rp config ([9b1ba12](https://github.com/Loop3D/map2loop/commit/9b1ba122da3ff720e8ecc2354d6031d2df8cb7c0))
+
+## [3.1.12](https://github.com/Loop3D/map2loop/compare/v3.1.11...v3.1.12) (2024-09-11)
+
+
+### Bug Fixes
+
+* removing additional indents ([cdd3eab](https://github.com/Loop3D/map2loop/commit/cdd3eabecf6c22fb88cdf64a9f2bad72b324eba1))
+
+## [3.1.11](https://github.com/Loop3D/map2loop/compare/v3.1.10...v3.1.11) (2024-08-09)
+
+
+### Bug Fixes
+
+* added check for collocated points ([#125](https://github.com/Loop3D/map2loop/issues/125)) ([2bef09f](https://github.com/Loop3D/map2loop/commit/2bef09fa3dbfecbbb012a1e393c6851e6c3bbced))
+* issue 122 ([c643721](https://github.com/Loop3D/map2loop/commit/c6437215125aea4d3a33b4150611ecc55eeb97c8))
+* linting issues ([94af4d9](https://github.com/Loop3D/map2loop/commit/94af4d9fe1bf689ddf269dfafa07a40bc5df545f))
+* remove pip pin for LPF because LPF has incorrect version tags ([dd99e15](https://github.com/Loop3D/map2loop/commit/dd99e15d167154bd902c005e012360b5005f20cf))
+* update str format ([c3339a6](https://github.com/Loop3D/map2loop/commit/c3339a63161e7945140f55e5adf394e585fa590a))
+
+## [3.1.10](https://github.com/Loop3D/map2loop/compare/v3.1.9...v3.1.10) (2024-08-02)
+
+
+### Documentation
+
+* corrected title ([86148a5](https://github.com/Loop3D/map2loop/commit/86148a59de1b96cddcae22c4d470c096c5fdbd5b))
+
+## [3.1.9](https://github.com/Loop3D/map2loop/compare/v3.1.8...v3.1.9) (2024-08-02)
+
+
+### Bug Fixes
+
+* adapt floats to new np & unpin ([7bdd346](https://github.com/Loop3D/map2loop/commit/7bdd346fc8a565f107ce6bcfe8ec687701baa028))
+* adapt floats to new np & unpin ([eac8ab2](https://github.com/Loop3D/map2loop/commit/eac8ab2e49142dd85e3bb4e9a09fb98d03482bab))
+* adding poppler dependency for gdal.... why? ([a716933](https://github.com/Loop3D/map2loop/commit/a71693380a72bc71445295ac392171a0727ebe08))
+* linting issues ([b743de4](https://github.com/Loop3D/map2loop/commit/b743de4ab1a8765cea703d041a65b1248abad1fc))
+* linting issues ([1bf6600](https://github.com/Loop3D/map2loop/commit/1bf6600a5fe12a65eb8b866376f01b5f87c8d710))
+* pin numpy version ([8a55469](https://github.com/Loop3D/map2loop/commit/8a554693b0a968e578560735f5bbb02db13d8b36))
+* pin numpy version ([7dfd91c](https://github.com/Loop3D/map2loop/commit/7dfd91cbf20d1022b00bf007e87a8b99cb3836b3))
+* update np version ([4acb184](https://github.com/Loop3D/map2loop/commit/4acb1849e7d51b3e878e59661e98d14e58187291))
+* update np version ([5614446](https://github.com/Loop3D/map2loop/commit/5614446c616479ab753b72ca1132fcd99344c94f))
+* update numpy version ([0fa6537](https://github.com/Loop3D/map2loop/commit/0fa6537841f1fa464adddae663351795e3158db1))
+* update numpy version ([b312176](https://github.com/Loop3D/map2loop/commit/b31217681d4f21ca557c9aabd5f1756b9e8e57ed))
+* use numpy type checker to catch new numpy typing ([48ac7cb](https://github.com/Loop3D/map2loop/commit/48ac7cb06d69f8549c484af6222ca6a96ab849d3))
+* use numpy type checker to catch new numpy typing ([678f25e](https://github.com/Loop3D/map2loop/commit/678f25ec77e6d8ab207b98e7cd32be706a191c35))
+
 ## [3.1.8](https://github.com/Loop3D/map2loop/compare/v3.1.7...v3.1.8) (2024-06-20)
 
 

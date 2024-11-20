@@ -151,6 +151,7 @@ jobs:
           pip install --upgrade pip
           pip install numpy==1.26.4
           pip install -r dependencies.txt
+          pip uninstall loopprojectfile -y
           pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache --pre --no-index --find-links dist map2loop
           pip list

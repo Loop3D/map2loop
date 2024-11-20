@@ -2,7 +2,7 @@
 from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
-from .utils import generate_random_hex_colors
+from .utils import generate_random_hex_colors, calculate_minimum_fault_length
 
 # external imports
 import geopandas
@@ -19,6 +19,7 @@ import beartype
 import os
 from io import BytesIO
 from typing import Union
+import tempfile
 
 
 from .logging import getLogger
@@ -58,15 +59,13 @@ class MapData:
         The filename of the json config file
     colour_filename: str
         The filename of the csv colour table file (columns are unit name and colour in #000000 form)
-    tmp_path: str
-        The path to the directory holding the temporary files
     verbose_level: m2l_enums.VerboseLevel
         A selection that defines how much console logging is output
     config: Config
         A link to the config structure which is defined in config.py
     """
 
-    def __init__(self, tmp_path: str = "", verbose_level: VerboseLevel = VerboseLevel.ALL):
+    def __init__(self, verbose_level: VerboseLevel = VerboseLevel.ALL):
         """
         The initialiser for the map data
 
@@ -82,7 +81,6 @@ class MapData:
         self.basal_contacts = None
         self.sampled_contacts = None
         self.filenames = [None] * len(Datatype)
-        # self.output_filenames = [None] * len(Datatype)
         self.dirtyflags = [True] * len(Datatype)
         self.data_states = [Datastate.UNNAMED] * len(Datatype)
         self.working_projection = None
@@ -91,10 +89,9 @@ class MapData:
         self.bounding_box_str = None
         self.config_filename = None
         self.colour_filename = None
-        self.tmp_path = tmp_path
         self.verbose_level = verbose_level
-
         self.config = Config()
+        self.minimum_fault_length = None
 
     def set_working_projection(self, projection):
         """
@@ -106,7 +103,7 @@ class MapData:
         """
 
         if issubclass(type(projection), int):
-            projection = "EPSG:" + str(projection)
+            projection = f"EPSG:{str(projection)}"
             self.working_projection = projection
         elif issubclass(type(projection), str):
             self.working_projection = projection
@@ -180,7 +177,7 @@ class MapData:
             geometry=[shapely.Polygon(zip(lon_point_list, lat_point_list))],
         )
         self.recreate_bounding_box_str()
-
+    
     def recreate_bounding_box_str(self):
         """
         Creates the bounding box string from the bounding box dict
@@ -298,28 +295,66 @@ class MapData:
         return self.colour_filename
 
     @beartype.beartype
-    def set_ignore_codes(self, codes: list):
+    def set_ignore_lithology_codes(self, codes: list):
         """
-        Set the codes to ignore in the geology shapefile
+        Set the lithology codes (names) to be ignored in the geology shapefile.
+
+        This method updates the `ignore_lithology_codes` entry in the geology configuration 
+        and marks the geology data as "clipped" to indicate that certain lithologies have been 
+        excluded. Additionally, it sets a dirty flag for the geology data to signal that it 
+        requires reprocessing.
 
         Args:
-            codes (list):
-                The list of codes to ignore
+            codes (list): 
+                A list of lithology names to ignore in the geology shapefile. These 
+                entries will be excluded from further processing.
         """
-        logger.info(f'Setting ignore codes to {codes}')
-        self.config.geology_config["ignore_codes"] = codes
+        self.config.geology_config["ignore_lithology_codes"] = codes
         self.data_states[Datatype.GEOLOGY] = Datastate.CLIPPED
         self.dirtyflags[Datatype.GEOLOGY] = True
 
     @beartype.beartype
-    def get_ignore_codes(self) -> list:
+    def get_ignore_lithology_codes(self) -> list:
         """
-        Get the list of codes to ignore
+        Retrieve the list of lithology names to be ignored in the geology shapefile.
+
+        This method fetches the current list of lithology names or codes from the geology 
+        configuration that have been marked for exclusion during processing.
 
         Returns:
-            list: The list of strings to ignore
+            list: A list of lithology names currently set to be ignored in the 
+            geology shapefile.
         """
-        return self.config.geology_config["ignore_codes"]
+        return self.config.geology_config["ignore_lithology_codes"]
+
+    @beartype.beartype
+    def set_ignore_fault_codes(self, codes: list):
+        """
+        Set the list of fault codes to be ignored during processing.
+
+        This method updates the `ignore_fault_codes` entry in the fault configuration and
+        marks the fault data as "clipped" to indicate that it has been filtered. Additionally,
+        it sets a dirty flag for the fault data to signal that it requires reprocessing.
+
+        Args:
+            codes (list): A list of fault codes to ignore during further processing.
+        """
+        self.config.fault_config["ignore_fault_codes"] = codes
+        self.data_states[Datatype.FAULT] = Datastate.CLIPPED
+        self.dirtyflags[Datatype.FAULT] = True
+
+    @beartype.beartype
+    def get_ignore_fault_codes(self) -> list:
+        """
+        Retrieve the list of fault codes that are set to be ignored.
+
+        This method fetches the current list of fault codes from the fault configuration
+        that have been marked for exclusion during processing.
+
+        Returns:
+            list: A list of fault codes that are currently marked for exclusion.
+        """
+        return self.config.fault_config["ignore_fault_codes"]
 
     @beartype.beartype
     def set_filenames_from_australian_state(self, state: str):
@@ -499,17 +534,9 @@ class MapData:
             else:
                 return response
         except urllib.URLError:
-            logger.error(f"Failed to open url {url}")
-            return None
-
-    @beartype.beartype
-    def __check_and_create_tmp_path(self):
-        """
-        Create the temporary files directory if it is not valid
-        """
-        if not os.path.isdir(self.tmp_path):
-            os.mkdir(self.tmp_path)
-
+            return None        
+        
+ 
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -522,7 +549,6 @@ class MapData:
         Returns:
             _type_: The open geotiff in a gdal handler
         """
-        self.__check_and_create_tmp_path()
 
         # For gdal debugging use exceptions
         gdal.UseExceptions()
@@ -532,7 +558,7 @@ class MapData:
         )
 
         if filename.lower() == "aus" or filename.lower() == "au":
-            logger.info('Using geoscience australia DEM')
+            logger.info('Using Geoscience australia DEM')
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
@@ -543,12 +569,13 @@ class MapData:
             # This is stupid that gdal cannot read a byte stream and has to have a
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create
-
-            tmp_file = os.path.join(self.tmp_path, "StupidGDALLocalFile.tif")
-
+            import pathlib
+            tmp_file = pathlib.Path(tempfile.mkdtemp()) / pathlib.Path("temp.tif")
+            
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
-            tif = gdal.Open(tmp_file)
+                
+            tif = gdal.Open(str(tmp_file))
 
         elif filename == "hawaii":
             logger.info('Using Hawaii DEM')
@@ -590,11 +617,7 @@ class MapData:
             tif = gdal.Open(mmap_name)
         else:
             logger.info(f'Opening local file {filename}')
-            tif = gdal.Open(filename, gdal.GA_ReadOnly)
-        # except Exception:
-        #     print(
-        #         f"Failed to open geoTIFF file from '{filename}'\n"
-        #     )
+            tif = gdal.Open(str(filename), gdal.GA_ReadOnly)
         return tif
 
     @beartype.beartype
@@ -691,8 +714,9 @@ class MapData:
         fault_orientations = geopandas.GeoDataFrame(
             self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
         )
-        config = self.config.fault_config
-
+        
+        config = self.config.fault_config        
+        
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
             if config["orientation_type"] == "strike":
@@ -921,7 +945,7 @@ class MapData:
         geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace("[ -/?]", "_", regex=True)
 
         # Mask out ignored unit_names/codes (ie. for cover)
-        for code in self.config.geology_config["ignore_codes"]:
+        for code in self.config.geology_config["ignore_lithology_codes"]:
             geology = geology[~geology["CODE"].astype(str).str.contains(code)]
             geology = geology[~geology["UNITNAME"].astype(str).str.contains(code)]
 
@@ -932,9 +956,17 @@ class MapData:
         return (False, "")
 
     @beartype.beartype
+    def get_minimum_fault_length(self) -> Union[float, int, None]:
+        """
+        Get the minimum fault length
+        """
+
+        return self.minimum_fault_length
+    
+    @beartype.beartype
     def parse_fault_map(self) -> tuple:
         """
-        Parse the fault shapefile data into a consistent format
+        Parse the fault shapefile data into a consistent format.
 
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
@@ -946,10 +978,22 @@ class MapData:
         ):
             return (True, "Fault map is not loaded or valid")
 
-        # Create new geodataframe
+        # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
+      
+        # Get fault configuration
         config = self.config.fault_config
-
+        
+        # update minimum fault length either with the value from the config or calculate it
+        if config["minimum_fault_length"] is None:
+            self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, area_percentage = 0.05)
+        else:
+            self.minimum_fault_length = config["minimum_fault_length"]
+        
+        # crop 
+        faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
+        
+        
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
             faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
@@ -963,6 +1007,30 @@ class MapData:
         else:
             faults["NAME"] = "Fault_" + faults.index.astype(str)
 
+        # crop by the ignore fault codes
+        ignore_codes = config["ignore_fault_codes"]
+
+        # Find the intersection of ignore_codes and the 'NAME' column values
+        existing_codes = set(ignore_codes).intersection(set(faults["NAME"].values))
+
+        # Find the codes that do not exist in the DataFrame
+        # non_existing_codes = set(ignore_codes) - existing_codes
+
+        # Issue a warning if there are any non-existing codes
+        # if non_existing_codes:
+        #     print(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping") 
+        # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+
+        # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
+        if existing_codes:
+            faults = faults[~faults["NAME"].isin(existing_codes)]
+            # print(f"The following codes were found and removed: {existing_codes}") 
+            # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+        else:
+            pass
+            # print("None of the fault ignore codes exist in the original fault data.")
+        
+        #parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:
             faults["DIP"] = self.raw_data[Datatype.FAULT][config["dip_column"]].astype(
                 numpy.float64
@@ -1039,10 +1107,10 @@ class MapData:
                 axis=1,
             )
             faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
-
         self.data[Datatype.FAULT] = faults
+        
         return (False, "")
-
+    
     @beartype.beartype
     def parse_fold_map(self) -> tuple:
         """
@@ -1125,7 +1193,7 @@ class MapData:
             )
 
     @beartype.beartype
-    def save_all_map_data(self, output_dir: str, extension: str = ".csv"):
+    def save_all_map_data(self, output_dir: pathlib.Path, extension: str = ".csv"):
         """
         Save all the map data to file
 
@@ -1139,12 +1207,12 @@ class MapData:
             self.save_raw_map_data(output_dir, i, extension)
 
     @beartype.beartype
-    def save_raw_map_data(self, output_dir: str, datatype: Datatype, extension: str = ".shp.zip"):
+    def save_raw_map_data(self, output_dir: pathlib.Path, datatype: Datatype, extension: str = ".shp.zip"):
         """
         Save the map data from datatype to file
 
         Args:
-            output_dir (str):
+            output_dir (pathlib.Path):
                 The directory to save to
             datatype (Datatype):
                 The datatype of the geopanda to save
@@ -1152,15 +1220,21 @@ class MapData:
                 The extension to use for the data. Defaults to ".csv".
         """
         try:
-            filename = os.path.join(output_dir, datatype.name + extension)
+            filename = pathlib.Path(output_dir) / f"{datatype.name}{extension}"
+            raw_data = self.raw_data[datatype]
+            
+            if raw_data is None:
+                ## Leaving this print statement in for now, as it will be useful for logging, but repetitive as a warning message
+                # print(f"No data available for {datatype.name}. Skipping saving to file {filename}.")
+                return
+            
             if extension == ".csv":
-                # TODO: Add geopandas to pandas converter and then write csv
-                # self.raw_data[datatype].write_csv(filename)
-                print("GeoDataFrame to CSV conversion not implimented")
+                raw_data.to_csv(filename, index=False)  # Save as CSV
             else:
                 self.raw_data[datatype].to_file(filename)
-        except Exception:
-            print(f"Failed to save {datatype.name} to file named {filename}\n")
+                
+        except Exception as e:
+            print(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
 
     @beartype.beartype
     def get_raw_map_data(self, datatype: Datatype):
@@ -1272,10 +1346,8 @@ class MapData:
         """
         # TODO: - Move away from tab seperators entirely (topology and map2model)
 
-        self.__check_and_create_tmp_path()
-        if not os.path.isdir(os.path.join(self.tmp_path, "map2model_data")):
-            os.mkdir(os.path.join(self.tmp_path, "map2model_data"))
-
+        self.map2model_tmp_path = pathlib.Path(tempfile.mkdtemp()) 
+        
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
         if type(self.data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame:
@@ -1308,7 +1380,7 @@ class MapData:
             geology["ROCKTYPE1"] = geology["ROCKTYPE1"].replace("", "None")
             geology["ROCKTYPE2"] = geology["ROCKTYPE2"].replace("", "None")
             geology.to_csv(
-                os.path.join(self.tmp_path, "map2model_data", "geology_wkt.csv"),
+                pathlib.Path(self.map2model_tmp_path) / "geology_wkt.csv",
                 sep="\t",
                 index=False,
             )
@@ -1325,7 +1397,7 @@ class MapData:
             faults = self.get_map_data(Datatype.FAULT).copy()
             faults.rename(columns={"geometry": "WKT"}, inplace=True)
             faults.to_csv(
-                os.path.join(self.tmp_path, "map2model_data", "faults_wkt.csv"),
+                pathlib.Path(self.map2model_tmp_path) / "faults_wkt.csv",
                 sep="\t",
                 index=False,
             )
@@ -1462,7 +1534,7 @@ class MapData:
         if save_contacts:
             self.contacts = contacts
         return contacts
-
+    
     @beartype.beartype
     def extract_basal_contacts(self, stratigraphic_column: list, save_contacts=True):
         """
@@ -1474,19 +1546,46 @@ class MapData:
         """
         units = stratigraphic_column
         basal_contacts = self.contacts.copy()
+        
+        # check if the units in the strati colum are in the geology dataset, so that basal contacts can be built
+        # if not, stop the project
+        if any(
+            unit not in units for unit in basal_contacts["UNITNAME_1"].unique()
+        ):
+            missing_units = basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"].unique().tolist()
+            raise ValueError(
+                "There are units in stratigraphic column, but not in the Geology dataset: " +
+                ", ".join(missing_units) +
+                ". Please readjust the stratigraphic column if this is a user defined column."
+            )
+            
+        # apply minimum lithological id between the two units 
         basal_contacts["ID"] = basal_contacts.apply(
             lambda row: min(units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])), axis=1
         )
+        # match the name of the unit with the minimum id
         basal_contacts["basal_unit"] = basal_contacts.apply(lambda row: units[row["ID"]], axis=1)
-        basal_contacts["distance"] = basal_contacts.apply(
+        # how many units apart are the two units? 
+        basal_contacts["stratigraphic_distance"] = basal_contacts.apply(
             lambda row: abs(units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])), axis=1
         )
+        # if the units are more than 1 unit apart, the contact is abnormal (meaning that there is one (or more) unit(s) missing in between the two)
         basal_contacts["type"] = basal_contacts.apply(
-            lambda row: "ABNORMAL" if abs(row["distance"]) > 1 else "BASAL", axis=1
+            lambda row: "ABNORMAL" if abs(row["stratigraphic_distance"]) > 1 else "BASAL", axis=1
         )
+        
         basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
+        
+        # added code to make sure that multi-line that touch each other are snapped and merged. 
+        # necessary for the reconstruction based on featureId
+        basal_contacts["geometry"] = [shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]]
+        
         if save_contacts:
-            self.basal_contacts = basal_contacts
+            #keep abnormal contacts as all_basal_contacts
+            self.all_basal_contacts = basal_contacts
+            #remove the abnormal contacts from basal contacts
+            self.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
+            
         return basal_contacts
 
     @beartype.beartype
@@ -1518,7 +1617,7 @@ class MapData:
                 self.colour_filename = None
 
         if self.colour_filename is None:
-            print("No colour configuration file found. Assigning random colors to units")
+            print("\nNo colour configuration file found. Assigning random colors to units")
             missing_colour_n = len(stratigraphic_units["colour"])
             stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
                 generate_random_hex_colors(missing_colour_n)

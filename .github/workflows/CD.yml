@@ -44,7 +44,7 @@ jobs:
 
       - name: Build SDist
         run: |
-          pip install build
+          pip install build 
           python -m build
 
       - uses: actions/upload-artifact@v4
@@ -111,6 +111,7 @@ jobs:
     name: Test wheels on ${{ matrix.os }}
     needs: pypi-build-wheels
     runs-on: ${{ matrix.os }}
+    if : github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
@@ -161,6 +162,7 @@ jobs:
   conda-build:
     name: Conda Build and Deploy ${{ matrix.os }} - Python Version-${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    if : github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
@@ -223,6 +225,41 @@ jobs:
       release_created: ${{ steps.release-please.outputs.release_created }}
       #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
+  documentation-test:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cp CHANGELOG.md docs/source/CHANGELOG.md
+          docker build . -t=docs -f docs/Dockerfile 
+          docker run -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs/build/html
+
+  documentation-deploy:
+    runs-on: ubuntu-latest
+    needs: [release-please, documentation-test]
+    if: ${{ needs.release-please.outputs.release_created }} && github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: docs
+      - name: ls
+        run: |
+          ls -l docs
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
+  
   conda-upload:
     needs: [release-please, conda-build]
     runs-on: ${{matrix.os}}

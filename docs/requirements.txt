@@ -3,7 +3,6 @@ sphinx
 sphinx-gallery 
 pydata-sphinx-theme 
 myst-parser 
-beartype
 sphinxcontrib-bibtex
 conda-forge::poppler
 LoopStructural

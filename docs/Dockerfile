@@ -25,8 +25,11 @@ COPY dependencies.txt dependenciesdocs.txt
 
 RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
 RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
+
+#temporary to align with fix_thicknesses branch
 RUN pip uninstall looprojectfile -y
 RUN pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
+RUN conda install beartype -y
 
 RUN pip install .
 

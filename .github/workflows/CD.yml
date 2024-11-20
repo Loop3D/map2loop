@@ -230,7 +230,7 @@ jobs:
 
   documentation-test:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    
     steps:
       - uses: actions/checkout@v4
       - run: |

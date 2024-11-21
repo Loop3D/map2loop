@@ -207,21 +207,21 @@ jobs:
           name: map2loop-conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
 
-  # release-please:
-  #   needs: [pypi-test-wheels, conda-build]
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/master'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: googleapis/release-please-action@v4
-  #       id: release
-  #       with:
-  #         release-type: "python"
-  #         config-file: "release-please-config.json"
-  #         manifest-file: ".release-please-manifest.json"
-  #   outputs:
-  #     release_created: ${{ steps.release.outputs.release_created }}
-  #     #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
+  release-please:
+    needs: [pypi-test-wheels, conda-build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: "python"
+          config-file: "release-please-config.json"
+          manifest-file: ".release-please-manifest.json"
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
   conda-upload:
     needs: [conda-build]

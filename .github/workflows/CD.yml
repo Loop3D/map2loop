@@ -225,6 +225,7 @@ jobs:
 
   conda-upload:
     needs: [conda-build]
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
@@ -253,6 +254,7 @@ jobs:
           anaconda upload --label main conda/*/*.tar.bz2
 
   pypi-upload:
+    if: github.ref == 'refs/heads/master'
     needs: [pypi-test-wheels]
     runs-on:
       - ubuntu-latest

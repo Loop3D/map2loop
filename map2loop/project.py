@@ -135,7 +135,7 @@ class Project(object):
         self.deformation_history = DeformationHistory()
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
-        
+
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
@@ -143,7 +143,6 @@ class Project(object):
         self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
-
 
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
@@ -210,14 +209,13 @@ class Project(object):
             self.map_data.set_filename(Datatype.DTM, dtm_filename)
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
-        
-        
+
         if config_filename != "":
             if clut_file_legacy:
                 logger.warning("DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2")
 
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
-        
+
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
         if clut_filename != "":
@@ -237,7 +235,7 @@ class Project(object):
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
-        
+
         if len(kwargs):
             logger.warning(f"Unused keyword arguments: {kwargs}")
 
@@ -259,7 +257,7 @@ class Project(object):
         self.map_data.set_ignore_lithology_codes(codes)
         # Re-populate the units in the column with the new set of ignored geographical units
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
-        
+
     @beartype.beartype
     def set_ignore_fault_codes(self, codes: list):
         """
@@ -379,7 +377,28 @@ class Project(object):
         """
         return self.samplers[datatype].sampler_label
 
-    
+    @beartype.beartype
+    def set_minimum_fault_length(self, length: float):
+        """
+        Set the cutoff length for faults to ignore
+
+        Args:
+            length (float):
+                The cutoff length
+        """
+        logger.info(f"Setting minimum fault length to {length}")    
+        self.map_data.config.fault_config['minimum_fault_length'] = length
+
+    @beartype.beartype
+    def get_minimum_fault_length(self) -> float:
+        """
+        Get the cutoff length for faults
+
+        Returns:
+            float: The cutoff length
+        """
+        return float(self.map_data.config.fault_config['minimum_fault_length'])
+
     # Processing functions
     def sample_map_data(self):
         """
@@ -408,12 +427,12 @@ class Project(object):
         """
         # Use stratigraphic column to determine basal contacts
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
-        
+
         # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.basal_contacts
         )
-        
+
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
@@ -463,7 +482,7 @@ class Project(object):
                 self.map_data.contacts,
                 self.map_data,
             )
-    
+
     @beartype.beartype
     def set_thickness_calculator(self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']]) -> None:
         """
@@ -483,15 +502,14 @@ class Project(object):
         """
         if isinstance(thickness_calculator, ThicknessCalculator):
             thickness_calculator = [thickness_calculator]
-        
+
         # Now check if thickness_calculator is a list of valid instances
         if not isinstance(thickness_calculator, list) or not all(isinstance(tc, ThicknessCalculator) for tc in thickness_calculator):
             raise TypeError("All items must be instances of ThicknessCalculator or a single ThicknessCalculator instance.")
-        
+
         # Finally, set the calculators
         self.thickness_calculator = thickness_calculator
-        
-                
+
     def get_thickness_calculator(self) -> List[str]:
         """
         Retrieves the thickness_calculator_label from the thickness_calculator attribute.
@@ -508,16 +526,16 @@ class Project(object):
             TypeError: If thickness_calculator is neither a list of objects nor a single object
                     with a 'thickness_calculator_label' attribute.
         """
-        
+
         if isinstance(self.thickness_calculator, list):
-        # If it's a list, return labels from all items
+            # If it's a list, return labels from all items
             return [calculator.thickness_calculator_label for calculator in self.thickness_calculator]
         elif hasattr(self.thickness_calculator, 'thickness_calculator_label'):
-        # If it's a single object, return the label as a list
+            # If it's a single object, return the label as a list
             return [self.thickness_calculator.thickness_calculator_label]
         else:
             raise TypeError("self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute")
-    
+
     def calculate_unit_thicknesses(self):
         """
         Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
@@ -541,11 +559,11 @@ class Project(object):
         Raises:
             None
         """
-        
+
         labels = []
-        
+
         for calculator in self.thickness_calculator:
-            
+
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
@@ -553,26 +571,25 @@ class Project(object):
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
-            
+
             label = calculator.thickness_calculator_label
             labels.append(label)
-            
+
             # Repeat the results for the number of rows in stratigraphicUnits
             num_rows = self.stratigraphic_column.stratigraphicUnits.shape[0]
             repeated_result = numpy.tile(result, (num_rows // result.shape[0], 1))
-            
+
             # Append the repeated results to the lists
             mean_col_name = f"{label}_mean"
             median_col_name = f"{label}_median"
             stddev_col_name = f"{label}_stddev"
-            
-                    # Attach the results as new columns to the stratigraphic column dataframe
+
+            # Attach the results as new columns to the stratigraphic column dataframe
             self.stratigraphic_column.stratigraphicUnits[mean_col_name] = repeated_result[:, 0]
             self.stratigraphic_column.stratigraphicUnits[median_col_name] = repeated_result[:, 1]
             self.stratigraphic_column.stratigraphicUnits[stddev_col_name] = repeated_result[:, 2]
 
         self.thickness_calculator_labels = labels
-        
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -614,7 +631,6 @@ class Project(object):
             self.map_data,
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')  
-
 
     def run_all(self, user_defined_stratigraphic_column=None, take_best=False):
         """
@@ -745,7 +761,6 @@ class Project(object):
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
 
-
         # Length of the column (number of rows in stratigraphicUnits)
         column_len = len(self.stratigraphic_column.stratigraphicUnits)
 
@@ -781,7 +796,6 @@ class Project(object):
         stratigraphic_data["ThicknessMedian"] = list(zip(*thickness_median_list[:MAX_CALCULATORS]))
         stratigraphic_data["ThicknessStdDev"] = list(zip(*thickness_stddev_list[:MAX_CALCULATORS]))
 
-
         # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
             int(a[1:3], 16) for a in self.stratigraphic_column.stratigraphicUnits["colour"]
@@ -800,14 +814,14 @@ class Project(object):
         stratigraphic_data["colour2Blue"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
-        
+
         # get thickness calculator labels, and fill up with None if empty values up to 5 placeholders
         while len(self.thickness_calculator_labels) < 5:
             self.thickness_calculator_labels.append("None")
-        
+
         thickness_calculator_labels = [tuple(self.thickness_calculator_labels[:5])]
-        
-        #save into LPF
+
+        # save into LPF
         LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data, thickness_calculator_data = thickness_calculator_labels, verbose=True)
 
         # Save contacts

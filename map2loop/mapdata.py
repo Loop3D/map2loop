@@ -91,8 +91,16 @@ class MapData:
         self.colour_filename = None
         self.verbose_level = verbose_level
         self.config = Config()
-        self.minimum_fault_length = None
 
+    @property
+    @beartype.beartype
+    def minimum_fault_length(self) -> float:
+        return self.config.fault_config["minimum_fault_length"]
+    @minimum_fault_length.setter
+    @beartype.beartype
+    def set_minimum_fault_length(self, length: float):
+        self.config.fault_config["minimum_fault_length"] = length
+    
     def set_working_projection(self, projection):
         """
         Set the working projection for the map data
@@ -177,7 +185,7 @@ class MapData:
             geometry=[shapely.Polygon(zip(lon_point_list, lat_point_list))],
         )
         self.recreate_bounding_box_str()
-    
+
     def recreate_bounding_box_str(self):
         """
         Creates the bounding box string from the bounding box dict
@@ -535,8 +543,7 @@ class MapData:
                 return response
         except urllib.URLError:
             return None        
-        
- 
+
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
         """
@@ -558,7 +565,7 @@ class MapData:
         )
 
         if filename.lower() == "aus" or filename.lower() == "au":
-            logger.info('Using Geoscience australia DEM')
+            logger.info('Using Geoscience Australia DEM')
             url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
@@ -571,10 +578,10 @@ class MapData:
             # from scratch with Create
             import pathlib
             tmp_file = pathlib.Path(tempfile.mkdtemp()) / pathlib.Path("temp.tif")
-            
+
             with open(tmp_file, "wb") as fh:
                 fh.write(coverage.read())
-                
+
             tif = gdal.Open(str(tmp_file))
 
         elif filename == "hawaii":
@@ -714,9 +721,9 @@ class MapData:
         fault_orientations = geopandas.GeoDataFrame(
             self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
         )
-        
+
         config = self.config.fault_config        
-        
+
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
             if config["orientation_type"] == "strike":
@@ -962,7 +969,7 @@ class MapData:
         """
 
         return self.minimum_fault_length
-    
+
     @beartype.beartype
     def parse_fault_map(self) -> tuple:
         """
@@ -980,20 +987,18 @@ class MapData:
 
         # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
-      
+
         # Get fault configuration
         config = self.config.fault_config
-        
+
         # update minimum fault length either with the value from the config or calculate it
-        if config["minimum_fault_length"] is None:
+        if self.minimum_fault_length is None:
             self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, area_percentage = 0.05)
-        else:
-            self.minimum_fault_length = config["minimum_fault_length"]
         
-        # crop 
+
+        # crop
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
-        
-        
+
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
             faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
@@ -1018,19 +1023,19 @@ class MapData:
 
         # Issue a warning if there are any non-existing codes
         # if non_existing_codes:
-        #     print(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping") 
-        # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+        #     print(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping")
+        # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented.
 
         # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
         if existing_codes:
             faults = faults[~faults["NAME"].isin(existing_codes)]
-            # print(f"The following codes were found and removed: {existing_codes}") 
-            # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented. 
+            # print(f"The following codes were found and removed: {existing_codes}")
+            # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented.
         else:
             pass
             # print("None of the fault ignore codes exist in the original fault data.")
-        
-        #parse dip column
+
+        # parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:
             faults["DIP"] = self.raw_data[Datatype.FAULT][config["dip_column"]].astype(
                 numpy.float64
@@ -1108,9 +1113,9 @@ class MapData:
             )
             faults["NAME"] = faults["NAME"].str.replace(" -/?", "_", regex=True)
         self.data[Datatype.FAULT] = faults
-        
+
         return (False, "")
-    
+
     @beartype.beartype
     def parse_fold_map(self) -> tuple:
         """
@@ -1222,17 +1227,17 @@ class MapData:
         try:
             filename = pathlib.Path(output_dir) / f"{datatype.name}{extension}"
             raw_data = self.raw_data[datatype]
-            
+
             if raw_data is None:
                 ## Leaving this print statement in for now, as it will be useful for logging, but repetitive as a warning message
                 # print(f"No data available for {datatype.name}. Skipping saving to file {filename}.")
                 return
-            
+
             if extension == ".csv":
                 raw_data.to_csv(filename, index=False)  # Save as CSV
             else:
                 self.raw_data[datatype].to_file(filename)
-                
+
         except Exception as e:
             print(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
 
@@ -1347,7 +1352,7 @@ class MapData:
         # TODO: - Move away from tab seperators entirely (topology and map2model)
 
         self.map2model_tmp_path = pathlib.Path(tempfile.mkdtemp()) 
-        
+
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
         if type(self.data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame:
@@ -1534,7 +1539,7 @@ class MapData:
         if save_contacts:
             self.contacts = contacts
         return contacts
-    
+
     @beartype.beartype
     def extract_basal_contacts(self, stratigraphic_column: list, save_contacts=True):
         """
@@ -1546,7 +1551,7 @@ class MapData:
         """
         units = stratigraphic_column
         basal_contacts = self.contacts.copy()
-        
+
         # check if the units in the strati colum are in the geology dataset, so that basal contacts can be built
         # if not, stop the project
         if any(
@@ -1558,14 +1563,14 @@ class MapData:
                 ", ".join(missing_units) +
                 ". Please readjust the stratigraphic column if this is a user defined column."
             )
-            
-        # apply minimum lithological id between the two units 
+
+        # apply minimum lithological id between the two units
         basal_contacts["ID"] = basal_contacts.apply(
             lambda row: min(units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])), axis=1
         )
         # match the name of the unit with the minimum id
         basal_contacts["basal_unit"] = basal_contacts.apply(lambda row: units[row["ID"]], axis=1)
-        # how many units apart are the two units? 
+        # how many units apart are the two units?
         basal_contacts["stratigraphic_distance"] = basal_contacts.apply(
             lambda row: abs(units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])), axis=1
         )
@@ -1573,19 +1578,19 @@ class MapData:
         basal_contacts["type"] = basal_contacts.apply(
             lambda row: "ABNORMAL" if abs(row["stratigraphic_distance"]) > 1 else "BASAL", axis=1
         )
-        
+
         basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
-        
-        # added code to make sure that multi-line that touch each other are snapped and merged. 
+
+        # added code to make sure that multi-line that touch each other are snapped and merged.
         # necessary for the reconstruction based on featureId
         basal_contacts["geometry"] = [shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]]
-        
+
         if save_contacts:
-            #keep abnormal contacts as all_basal_contacts
+            # keep abnormal contacts as all_basal_contacts
             self.all_basal_contacts = basal_contacts
-            #remove the abnormal contacts from basal contacts
+            # remove the abnormal contacts from basal contacts
             self.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
-            
+
         return basal_contacts
 
     @beartype.beartype

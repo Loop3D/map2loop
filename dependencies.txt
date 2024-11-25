@@ -5,10 +5,8 @@ shapely
 networkx
 owslib
 map2model
-hjson
 loopprojectfile==0.1.4
 beartype
 gdal==3.8.4
-hjson
 pytest
 scikit-learn

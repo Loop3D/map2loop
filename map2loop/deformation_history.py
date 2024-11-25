@@ -16,7 +16,7 @@ class DeformationHistory:
 
     Attributes
     ----------
-    minimum_fault_length_to_export: float
+    minimum_fault_length: float
         The cutoff for ignoring faults. Any fault shorter than this is not exported
     history: list
         The time ordered list of deformation events

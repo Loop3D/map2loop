@@ -10,7 +10,6 @@ RUN apt-get update -qq && \
     libc-dev \
     make\
     libgl1\
-    python3-sphinx\
     libtinfo5\
     libtiff6\
     libgl1-mesa-glx\

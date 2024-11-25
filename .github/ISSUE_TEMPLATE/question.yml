@@ -1,4 +1,4 @@
-name: "Question"
+name: "💬 Question"
 description: "Ask a question about map2loop!"
 title: "[Question] - "
 labels: ["question"]
@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Question
+        ## 💬 Question
         Please use this template to ask a question about applying map2loop to your data. 
         Provide as much detail as possible to help us understand and answer your question efficiently.
 
@@ -28,7 +28,7 @@ body:
     validations:
       required: false
 
-  - type: input
+  - type: textarea
     id: additional_context
     attributes:
       label: "Additional Context"

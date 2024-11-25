@@ -1,4 +1,4 @@
-name: "Bug Report"
+name: "🐛 Bug Report"
 description: "Report a bug or an issue in map2loop"
 title: "[Bug] - "
 labels: ["bug"]
@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Bug Report
+        ## 🐛 Bug Report
         Thanks for submitting a bug report to map2loop!
         Please use this template to report a bug. Please provide as much detail as possible to help us reproduce and fix the issue efficiently.
 
@@ -16,6 +16,8 @@ body:
       label: Version
       description: What version of map2loop and LoopProjectFile are you running? You can find this information by running `import map2loop` and `map2loop.__version__` in your python terminal or jupyter notebook. 
       placeholder: "Enter map2loop and LoopProjectFile versions"
+    validations:
+      required: true
 
   - type: textarea
     id: bug_description
@@ -33,25 +35,7 @@ body:
       description: "Provide a minimal reproducible example with the code necessary to reproduce the bug. For more guidance, visit: [How to create a minimal complete reproducible example](https://forum.access-hive.org.au/t/how-to-create-a-minimal-complete-reproducible-example/843)"
       placeholder: "Enter the steps to reproduce the bug"
     validations:
-      required: true
-
-  - type: textarea
-    id: expected_behavior
-    attributes:
-      label: "Expected Behavior"
-      description: "Describe what you expected to happen."
-      placeholder: "Enter the expected behavior"
-    validations:
-      required: true
-
-  - type: textarea
-    id: actual_behavior
-    attributes:
-      label: "Actual Behavior"
-      description: "Describe what actually happened when you encountered the bug."
-      placeholder: "Enter the actual behavior"
-    validations:
-      required: true
+      required: false
 
   - type: textarea
     id: additional_context
@@ -69,18 +53,7 @@ body:
       description: "Specify the environment in which the bug occurred (e.g., operating system, browser, application version)."
       placeholder: "Enter the environment details"
     validations:
-      required: true
+      required: false
 
-  - type: checkboxes
-    id: severity
-    attributes:
-      label: "Severity"
-      description: "Select the severity level of the bug."
-      options:
-        - label: "Low"
-        - label: "Medium"
-        - label: "High"
-        - label: "Critical"
-    validations:
-      required: true
+
 

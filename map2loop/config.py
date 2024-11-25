@@ -65,7 +65,7 @@ class Config:
             "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
             "name_column": "NAME",
             "objectid_column": "ID",
-            "minimum_fault_length": None,
+            "minimum_fault_length": -1., #negative -1 means not set
             "ignore_fault_codes": [None],
         }
         self.fold_config = {

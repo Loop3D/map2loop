@@ -12,7 +12,7 @@ def setup_map_data():
     map_data = MapData(verbose_level=VerboseLevel.ALL)
 
     # Simulate config with no minimum_fault_length set
-    map_data.config.fault_config['minimum_fault_length'] = None
+    map_data.config.fault_config['minimum_fault_length'] = -1.
 
     return map_data
 

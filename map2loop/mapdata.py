@@ -92,13 +92,15 @@ class MapData:
         self.verbose_level = verbose_level
         self.config = Config()
 
+
     @property
     @beartype.beartype
     def minimum_fault_length(self) -> float:
         return self.config.fault_config["minimum_fault_length"]
+    
     @minimum_fault_length.setter
     @beartype.beartype
-    def set_minimum_fault_length(self, length: float):
+    def minimum_fault_length(self, length: float):
         self.config.fault_config["minimum_fault_length"] = length
     
     def set_working_projection(self, projection):
@@ -992,7 +994,7 @@ class MapData:
         config = self.config.fault_config
 
         # update minimum fault length either with the value from the config or calculate it
-        if self.minimum_fault_length is None:
+        if self.minimum_fault_length < 0:
             self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, area_percentage = 0.05)
         
 

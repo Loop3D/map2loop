@@ -1,10 +1,14 @@
+import urllib.error
 import beartype
-import hjson
+import json
 import urllib
 import time
 import pathlib
 from typing import Union
 
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 class Config:
     """
@@ -47,7 +51,7 @@ class Config:
             "intrusive_text": "intrusive",
             "volcanic_text": "volcanic",
             "objectid_column": "ID",
-            "ignore_codes": ["cover"],
+            "ignore_lithology_codes": ["cover"],
         }
         self.fault_config = {
             "structtype_column": "FEATURE",
@@ -61,6 +65,8 @@ class Config:
             "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
             "name_column": "NAME",
             "objectid_column": "ID",
+            "minimum_fault_length": -1., #negative -1 means not set
+            "ignore_fault_codes": [None],
         }
         self.fold_config = {
             "structtype_column": "FEATURE",
@@ -97,28 +103,28 @@ class Config:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
                 if key not in self.structure_config:
-                    print(f"Config dictionary structure segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary structure segment contained {key} which is not used")
             dictionary.pop("structure")
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
                 if key not in self.geology_config:
-                    print(f"Config dictionary geology segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary geology segment contained {key} which is not used")
             dictionary.pop("geology")
         if "fault" in dictionary:
             self.fault_config.update(dictionary["fault"])
             for key in dictionary["fault"].keys():
                 if key not in self.fault_config:
-                    print(f"Config dictionary fault segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary fault segment contained {key} which is not used")
             dictionary.pop("fault")
         if "fold" in dictionary:
             self.fold_config.update(dictionary["fold"])
             for key in dictionary["fold"].keys():
                 if key not in self.fold_config:
-                    print(f"Config dictionary fold segment contained {key} which is not used")
+                    logger.warning(f"Config dictionary fold segment contained {key} which is not used")
             dictionary.pop("fold")
         if len(dictionary):
-            print(f"Unused keys from config format {list(dictionary.keys())}")
+            logger.warning(f"Unused keys from config format {list(dictionary.keys())}")
 
     @beartype.beartype
     def update_from_legacy_file(self, file_map: dict, lower: bool = False):
@@ -178,7 +184,7 @@ class Config:
             file_map.pop("o")
 
         if len(file_map) > 0:
-            print(f"Unused keys from legacy format {list(file_map.keys())}")
+            logger.warning(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
     def update_from_file(
@@ -188,8 +194,9 @@ class Config:
         Update the config dictionary from the provided json filename or url
 
         Args:
-            filename (str): Filename or URL of the JSON config file
+            filename (Union[pathlib.Path, str]): Filename or URL of the JSON config file
             legacy_format (bool, optional): Whether the JSON is an old version. Defaults to False.
+            lower (bool, optional): convert keys to lowercase. Defaults to False.
         """
         if legacy_format:
             func = self.update_from_legacy_file
@@ -199,26 +206,49 @@ class Config:
         try:
             filename = str(filename)
 
+            #if url, open the url
             if filename.startswith("http") or filename.startswith("ftp"):
-                try_count = 10
+                try_count = 5
                 success = False
-                while try_count >= 0 and not success:
+                # try 5 times to access the URL
+                while try_count > 0 and not success:
                     try:
                         with urllib.request.urlopen(filename) as url_data:
-                            data = hjson.load(url_data)
+                            data = json.load(url_data)
                             func(data, lower)
                         success = True
-                    except Exception as e:
-                        # Catch a failed online access or file load, re-attempt
-                        # a few times before throwing further
+
+                    #case 1. handle url error
+                    except urllib.error.URLError as e:
+                        # wait 0.25 seconds before trying again
                         time.sleep(0.25)
-                        try_count = try_count - 1
-                        if try_count < 0:
-                            raise e
+                        # decrease the number of tries by 1
+                        try_count -= 1
+                        # if no more tries left, raise the error
+                        if try_count <= 0:
+                            raise urllib.error.URLError(f"Failed to access URL after multiple attempts: {filename}") from e
+
+                    # case 2. handle json error
+                    except json.JSONDecodeError as e:
+                        raise json.JSONDecodeError(
+                            f"Error decoding JSON data from URL: {filename}") from e
             else:
-                with open(filename) as url_data:
-                    data = hjson.load(url_data)
-                    func(data, lower)
+                try:
+                    with open(filename) as file_data:
+                        data = json.load(file_data)
+                        func(data, lower)
+                except FileNotFoundError as e:
+                    err_string = f"The specified config file does not exist ({filename}).\n"
+                    err_string += "Please check the file exists and is accessible, then try again.\n"
+                    raise FileNotFoundError(err_string) from e
+                except json.JSONDecodeError as e:
+                    raise json.JSONDecodeError(
+                        f"Error decoding JSON data from file: {filename}"
+                    ) from e
+
+        except FileNotFoundError:
+            raise  
+
         except Exception:
             err_string = f"There is a problem parsing the config file ({filename}).\n"
             if filename.startswith("http"):

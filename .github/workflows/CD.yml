@@ -1,4 +1,4 @@
-# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, use json instead of hjson
+# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, 
 
 name: release-please
 
@@ -75,7 +75,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install numpy==1.26.4
-          pip install geopandas shapely networkx owslib map2model beartype gdal==3.8.4 hjson pytest scikit-learn
+          pip install geopandas shapely networkx owslib map2model beartype gdal==3.8.4 pytest scikit-learn
           pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache dist/*.tar.gz
           pip list

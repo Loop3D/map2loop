@@ -189,6 +189,7 @@ class Map2ModelWrapper:
             df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
+
             # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in
             relations = df[1]
             for j in range(len(relations)):
@@ -197,6 +198,7 @@ class Map2ModelWrapper:
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
+
                     out += [[row[0], row[1][i][0], row[1][i][1], float(row[1][i][2])]]
 
         else:

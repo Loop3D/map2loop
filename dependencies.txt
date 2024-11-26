@@ -1,9 +1,12 @@
+numpy
+scipy
 geopandas
 shapely
 networkx
 owslib
 map2model
-hjson
-loopprojectfile==0.1.3
+loopprojectfile==0.1.4
 beartype
-gdal<=3.7
+gdal==3.8.4
+pytest
+scikit-learn

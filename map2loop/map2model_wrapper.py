@@ -1,9 +1,16 @@
+# internal imports
+from .m2l_enums import VerboseLevel
+
+# external imports
 import map2model
 import pandas
 import numpy
 import os
-from .m2l_enums import VerboseLevel
 import re
+
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 
 class Map2ModelWrapper:
@@ -36,6 +43,7 @@ class Map2ModelWrapper:
             verbose_level (VerboseLevel, optional):
                 How much console output is sent. Defaults to VerboseLevel.ALL.
         """
+        logger
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None
@@ -47,6 +55,7 @@ class Map2ModelWrapper:
         """
         Reset the wrapper to before the map2model process
         """
+        logger.info("Resetting map2model wrapper")
         self.sorted_units = None
         self.fault_fault_relationships = None
         self.unit_fault_relationships = None
@@ -106,11 +115,10 @@ class Map2ModelWrapper:
         """
         if verbose_level is None:
             verbose_level = self.verbose_level
-        if verbose_level != VerboseLevel.NONE:
-            print("Exporting map data for map2model")
+        logger.info("Exporting map data for map2model")
         self.map_data.export_wkt_format_files()
-        if verbose_level != VerboseLevel.NONE:
-            print("Running map2model...")
+        logger.info("Running map2model...")
+
         map2model_code_map = {
             "o": "ID",  # FIELD_COORDINATES
             "f": "FEATURE",  # FIELD_FAULT_ID
@@ -131,26 +139,33 @@ class Map2ModelWrapper:
             "volcanic": self.map_data.config.geology_config["volcanic_text"],  # VOLCANIC_STRING
             "deposit_dist": 100,  # deposit_dist
         }
+        logger.info(f"map2model params: {map2model_code_map}")
         # TODO: Simplify. Note: this is external so have to match fix to map2model module
+        logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data"))
+        logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "geology_wkt.csv"))
+        logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "faults_wkt.csv"))
+        logger.info(self.map_data.get_bounding_box())
+        logger.info(map2model_code_map)
+        logger.info(verbose_level == VerboseLevel.NONE)
+
         run_log = map2model.run(
-            os.path.join(self.map_data.tmp_path, "map2model_data"),
-            os.path.join(self.map_data.tmp_path, "map2model_data", "geology_wkt.csv"),
-            os.path.join(self.map_data.tmp_path, "map2model_data", "faults_wkt.csv"),
+            os.path.join(self.map_data.map2model_tmp_path),
+            os.path.join(self.map_data.map2model_tmp_path, "geology_wkt.csv"),
+            os.path.join(self.map_data.map2model_tmp_path, "faults_wkt.csv"),
             "",
             self.map_data.get_bounding_box(),
             map2model_code_map,
             verbose_level == VerboseLevel.NONE,
             "None",
         )
-        if verbose_level == VerboseLevel.ALL:
-            print("map2model log:")
-            print(run_log)
-        if verbose_level != VerboseLevel.NONE:
-            print("map2model complete")
+        logger.info("Parsing map2model output")
+        logger.info(run_log)
+
+        logger.info("map2model complete")
 
         # Parse units sorted
         units_sorted = pandas.read_csv(
-            os.path.join(self.map_data.tmp_path, "map2model_data", "units_sorted.txt"),
+            os.path.join(self.map_data.map2model_tmp_path, "units_sorted.txt"),
             header=None,
             sep=' ',
         )
@@ -162,8 +177,9 @@ class Map2ModelWrapper:
         # Parse fault intersections
         out = []
         fault_fault_intersection_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "fault-fault-intersection.txt"
+            self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
         )
+        logger.info(f"Reading fault-fault intersections from {fault_fault_intersection_filename}")
         if (
             os.path.isfile(fault_fault_intersection_filename)
             and os.path.getsize(fault_fault_intersection_filename) > 0
@@ -173,7 +189,8 @@ class Map2ModelWrapper:
             df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
             df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
             df[0] = list(df[0].str.replace(", ", "", regex=False))
-            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in 
+
+            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in
             relations = df[1]
             for j in range(len(relations)):
                 relations[j] = [i.strip("()").replace(" ", "").split(",") for i in relations[j]]
@@ -181,15 +198,23 @@ class Map2ModelWrapper:
 
             for _, row in df.iterrows():
                 for i in numpy.arange(len(row[1])):
-                    out += [[row[0],  row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+
+                    out += [[row[0], row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+
+        else:
+            logger.warning(
+                f"Fault-fault intersections file {fault_fault_intersection_filename} not found"
+            )
 
         df_out = pandas.DataFrame(columns=["Fault1", "Fault2", "Type", "Angle"], data=out)
+        logger.info('Fault intersections')
+        logger.info(df_out.to_string())
         self.fault_fault_relationships = df_out
 
         # Parse unit fault relationships
         out = []
         unit_fault_intersection_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "unit-fault-intersection.txt"
+            self.map_data.map2model_tmp_path, "unit-fault-intersection.txt"
         )
         if (
             os.path.isfile(unit_fault_intersection_filename)
@@ -212,11 +237,11 @@ class Map2ModelWrapper:
         units = []
         links = []
         graph_filename = os.path.join(
-            self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt"
+            self.map_data.map2model_tmp_path, "graph_all_None.gml.txt"
         )
         if os.path.isfile(graph_filename) and os.path.getsize(graph_filename) > 0:
             with open(
-                os.path.join(self.map_data.tmp_path, "map2model_data", "graph_all_None.gml.txt")
+                os.path.join(self.map_data.map2model_tmp_path, "graph_all_None.gml.txt")
             ) as file:
                 contents = file.read()
                 segments = contents.split("\n\n")

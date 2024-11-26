@@ -12,16 +12,23 @@ RUN apt-get update -qq && \
     libgl1\
     libtinfo5\
     libtiff6\
-    libgl1-mesa-glx
-
+    libgl1-mesa-glx\
+    libarchive13
 
 COPY . /map2loop 
 
 WORKDIR /map2loop
 
 COPY dependencies.txt dependencies.txt
-RUN conda install  -c conda-forge -c loop3d --file dependencies.txt -y
-RUN conda install  --solver=classic -c conda-forge -c loop3d --file ./docs/requirements.txt -y
+COPY dependencies.txt dependenciesdocs.txt
+
+RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
+RUN conda install -c conda-forge -c loop3d --file dependenciesdocs.txt -y
+
+#temporary code  to align with fix_thicknesses branch
+RUN pip uninstall loopprojectfile -y
+RUN pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
+####
 
 RUN pip install .
 

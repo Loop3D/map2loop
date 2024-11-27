@@ -4,6 +4,7 @@ import beartype
 import geopandas
 import math
 
+
 from .logging import getLogger
 
 logger = getLogger(__name__)
@@ -280,6 +281,7 @@ class DeformationHistory:
             pandas.DataFrame: The fault_relationships with the correct eventIds
         """
         logger.info("Getting fault relationships with eventIds")
+
         faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
         rel = fault_fault_relationships.copy()
         rel = rel.merge(faultIds, left_on="Fault1", right_on="eventId")

@@ -1,5 +1,4 @@
 # internal imports
-from math import e
 from .m2l_enums import VerboseLevel
 
 # external imports

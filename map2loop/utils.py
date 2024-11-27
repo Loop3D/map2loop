@@ -374,8 +374,10 @@ def hex_to_rgb(hex_color: str) -> tuple:
 
 
 @beartype.beartype
-def calculate_minimum_fault_length(bbox: Dict[str, Union[int, float]], area_percentage: float) -> float:
-    
+def calculate_minimum_fault_length(
+    bbox: Dict[str, Union[int, float]], area_percentage: float
+) -> float:
+
     """
     Calculate the minimum fault length based on the map bounding box and a given area percentage.
 
@@ -386,7 +388,7 @@ def calculate_minimum_fault_length(bbox: Dict[str, Union[int, float]], area_perc
     Returns:
         float: The calculated minimum fault length as the square root of the threshold area.
     """
-    
+
     # Calculate the width and height of the bounding box in meters
     width = bbox['maxx'] - bbox['minx']
     height = bbox['maxy'] - bbox['miny']
@@ -398,4 +400,4 @@ def calculate_minimum_fault_length(bbox: Dict[str, Union[int, float]], area_perc
     threshold_area = area_percentage * bbox_area
 
     # Return the square root of the threshold area as the minimum fault length
-    return (threshold_area ** 0.5)
+    return threshold_area**0.5

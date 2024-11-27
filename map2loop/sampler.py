@@ -168,6 +168,6 @@ class SamplerSpacing(Sampler):
 
                 df2["ID"] = row["ID"] if "ID" in spatial_data.columns else 0
                 df = df2 if len(df) == 0 else pandas.concat([df, df2])
-                
+
         df.reset_index(drop=True, inplace=True)
         return df

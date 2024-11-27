@@ -345,10 +345,12 @@ class DipDipDirectionInterpolator(Interpolator):
         # Check if there are any clusters with more than one point (indicating collocated points)
         collocated_clusters = structure_data['cluster'].value_counts()
         collocated_clusters = collocated_clusters[collocated_clusters > 1]
-    
+
         if not collocated_clusters.empty:
             # Log a warning if collocated points are detected
-            logging.warning(f"Detected {len(collocated_clusters)} collocated point clusters. Aggregating these points.")
+            logging.warning(
+                f"Detected {len(collocated_clusters)} collocated point clusters. Aggregating these points."
+            )
 
         # Aggregate data for collocated points by taking the mean of X, Y, DIP, and DIPDIR within each cluster
         aggregated_data = (

@@ -36,7 +36,9 @@ class Map2ModelWrapper:
         A selection that defines how much console logging is output
     """
 
-    def __init__(self, map_data, mode:str='geopandas',verbose_level: VerboseLevel = VerboseLevel.NONE):
+    def __init__(
+        self, map_data, mode: str = 'geopandas', verbose_level: VerboseLevel = VerboseLevel.NONE
+    ):
         """
         The initialiser for the map2model wrapper
 
@@ -113,7 +115,7 @@ class Map2ModelWrapper:
         Returns:
             pandas.DataFrame: The fault fault relationships
         """
-        
+
         return self.fault_fault_relationships
 
     def get_unit_fault_relationships(self):
@@ -123,7 +125,7 @@ class Map2ModelWrapper:
         Returns:
             pandas.DataFrame: The unit fault relationships
         """
-        
+
         return self.unit_fault_relationships
 
     def get_unit_unit_relationships(self):
@@ -133,7 +135,7 @@ class Map2ModelWrapper:
         Returns:
             pandas.DataFrame: The unit unit relationships
         """
-        
+
         return self.unit_unit_relationships
 
     def _calculate_fault_fault_relationships(self):
@@ -150,9 +152,9 @@ class Map2ModelWrapper:
         intersection.reset_index(inplace=True)
 
         adjacency_matrix = np.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
-        adjacency_matrix[intersection.loc[:, "index_left"], intersection.loc[:, "index_right"]] = (
-            True
-        )
+        adjacency_matrix[
+            intersection.loc[:, "index_left"], intersection.loc[:, "index_right"]
+        ] = True
         f1, f2 = np.where(np.tril(adjacency_matrix, k=-1))
         df = pd.DataFrame(
             {'Fault1': faults.loc[f1, 'ID'].to_list(), 'Fault2': faults.loc[f2, 'ID'].to_list()}
@@ -227,15 +229,21 @@ class Map2ModelWrapper:
                 "mscm": "",  # FIELD_SITE_COMMO
                 "fold": self.map_data.config.fold_config["fold_text"],  # FAULT_AXIAL_FEATURE_NAME
                 "sill": self.map_data.config.geology_config["sill_text"],  # SILL_STRING
-                "intrusive": self.map_data.config.geology_config["intrusive_text"],  # IGNEOUS_STRING
+                "intrusive": self.map_data.config.geology_config[
+                    "intrusive_text"
+                ],  # IGNEOUS_STRING
                 "volcanic": self.map_data.config.geology_config["volcanic_text"],  # VOLCANIC_STRING
                 "deposit_dist": 100,  # deposit_dist
             }
             logger.info(f"map2model params: {map2model_code_map}")
             # TODO: Simplify. Note: this is external so have to match fix to map2model module
             logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data"))
-            logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "geology_wkt.csv"))
-            logger.info(os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "faults_wkt.csv"))
+            logger.info(
+                os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "geology_wkt.csv")
+            )
+            logger.info(
+                os.path.join(self.map_data.map2model_tmp_path, "map2model_data", "faults_wkt.csv")
+            )
             logger.info(self.map_data.get_bounding_box())
             logger.info(map2model_code_map)
             logger.info(verbose_level == VerboseLevel.NONE)
@@ -249,11 +257,11 @@ class Map2ModelWrapper:
                 map2model_code_map,
                 verbose_level == VerboseLevel.NONE,
                 "None",
-
+            )
         # Parse fault intersections
         out = []
         fault_fault_intersection_filename = os.path.join(
-            self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
+            self.map_data.map2model_tmp_path, 'fault-fault-intersection.txt'
         )
         logger.info(f"Reading fault-fault intersections from {fault_fault_intersection_filename}")
         if (
@@ -302,7 +310,9 @@ class Map2ModelWrapper:
             fault_fault_intersection_filename = os.path.join(
                 self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
             )
-            logger.info(f"Reading fault-fault intersections from {fault_fault_intersection_filename}")
+            logger.info(
+                f"Reading fault-fault intersections from {fault_fault_intersection_filename}"
+            )
             if (
                 os.path.isfile(fault_fault_intersection_filename)
                 and os.path.getsize(fault_fault_intersection_filename) > 0
@@ -376,5 +386,7 @@ class Map2ModelWrapper:
             out = []
             for row in links:
                 out += [[int(row[0]), df["unit"][row[0]], int(row[1]), df["unit"][row[1]]]]
-            df_out = pandas.DataFrame(columns=["Index1", "UnitName1", "Index2", "UnitName2"], data=out)
+            df_out = pandas.DataFrame(
+                columns=["Index1", "UnitName1", "Index2", "UnitName2"], data=out
+            )
             self.unit_unit_relationships = df_out

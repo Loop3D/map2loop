@@ -10,6 +10,7 @@ from .logging import getLogger
 
 logger = getLogger(__name__)
 
+
 class Config:
     """
     A data structure containing column name mappings for files and keywords
@@ -65,7 +66,7 @@ class Config:
             "dipestimate_text": "'NORTH_EAST','NORTH',<rest of cardinals>,'NOT ACCESSED'",
             "name_column": "NAME",
             "objectid_column": "ID",
-            "minimum_fault_length": -1., #negative -1 means not set
+            "minimum_fault_length": -1.0,  # negative -1 means not set
             "ignore_fault_codes": [None],
         }
         self.fold_config = {
@@ -103,25 +104,33 @@ class Config:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
                 if key not in self.structure_config:
-                    logger.warning(f"Config dictionary structure segment contained {key} which is not used")
+                    logger.warning(
+                        f"Config dictionary structure segment contained {key} which is not used"
+                    )
             dictionary.pop("structure")
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
                 if key not in self.geology_config:
-                    logger.warning(f"Config dictionary geology segment contained {key} which is not used")
+                    logger.warning(
+                        f"Config dictionary geology segment contained {key} which is not used"
+                    )
             dictionary.pop("geology")
         if "fault" in dictionary:
             self.fault_config.update(dictionary["fault"])
             for key in dictionary["fault"].keys():
                 if key not in self.fault_config:
-                    logger.warning(f"Config dictionary fault segment contained {key} which is not used")
+                    logger.warning(
+                        f"Config dictionary fault segment contained {key} which is not used"
+                    )
             dictionary.pop("fault")
         if "fold" in dictionary:
             self.fold_config.update(dictionary["fold"])
             for key in dictionary["fold"].keys():
                 if key not in self.fold_config:
-                    logger.warning(f"Config dictionary fold segment contained {key} which is not used")
+                    logger.warning(
+                        f"Config dictionary fold segment contained {key} which is not used"
+                    )
             dictionary.pop("fold")
         if len(dictionary):
             logger.warning(f"Unused keys from config format {list(dictionary.keys())}")
@@ -206,7 +215,7 @@ class Config:
         try:
             filename = str(filename)
 
-            #if url, open the url
+            # if url, open the url
             if filename.startswith("http") or filename.startswith("ftp"):
                 try_count = 5
                 success = False
@@ -218,7 +227,7 @@ class Config:
                             func(data, lower)
                         success = True
 
-                    #case 1. handle url error
+                    # case 1. handle url error
                     except urllib.error.URLError as e:
                         # wait 0.25 seconds before trying again
                         time.sleep(0.25)
@@ -226,12 +235,15 @@ class Config:
                         try_count -= 1
                         # if no more tries left, raise the error
                         if try_count <= 0:
-                            raise urllib.error.URLError(f"Failed to access URL after multiple attempts: {filename}") from e
+                            raise urllib.error.URLError(
+                                f"Failed to access URL after multiple attempts: {filename}"
+                            ) from e
 
                     # case 2. handle json error
                     except json.JSONDecodeError as e:
                         raise json.JSONDecodeError(
-                            f"Error decoding JSON data from URL: {filename}") from e
+                            f"Error decoding JSON data from URL: {filename}"
+                        ) from e
             else:
                 try:
                     with open(filename) as file_data:
@@ -239,7 +251,9 @@ class Config:
                         func(data, lower)
                 except FileNotFoundError as e:
                     err_string = f"The specified config file does not exist ({filename}).\n"
-                    err_string += "Please check the file exists and is accessible, then try again.\n"
+                    err_string += (
+                        "Please check the file exists and is accessible, then try again.\n"
+                    )
                     raise FileNotFoundError(err_string) from e
                 except json.JSONDecodeError as e:
                     raise json.JSONDecodeError(
@@ -247,7 +261,7 @@ class Config:
                     ) from e
 
         except FileNotFoundError:
-            raise  
+            raise
 
         except Exception:
             err_string = f"There is a problem parsing the config file ({filename}).\n"

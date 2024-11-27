@@ -29,32 +29,42 @@ def create_project(state_data="WA", projection="EPSG:28350"):
         overwrite_loopprojectfile=True,
     )
 
+
 # is the project running?
 def test_project_execution():
-    
+
     proj = create_project()
     try:
         proj.run_all(take_best=True)
-    # if there's a timeout: 
+    # if there's a timeout:
     except requests.exceptions.ReadTimeout:
         print("Timeout occurred, skipping the test.")  # Debugging line
-        pytest.skip("Skipping the project test from server data due to timeout while attempting to run proj.run_all")
+        pytest.skip(
+            "Skipping the project test from server data due to timeout while attempting to run proj.run_all"
+        )
 
     # if no timeout:
     # is there a project?
     assert proj is not None, "Plot Hamersley Basin failed to execute"
     # is there a LPF?
-    assert os.path.exists(loop_project_filename), f"Expected file {loop_project_filename} was not created"
+    assert os.path.exists(
+        loop_project_filename
+    ), f"Expected file {loop_project_filename} was not created"
 
-# Is the test_project_execution working - ie, is the test skipped on timeout? 
+
+# Is the test_project_execution working - ie, is the test skipped on timeout?
 def test_timeout_handling():
     # Mock `openURL` in `owslib.util` to raise a ReadTimeout directly
     with patch("owslib.util.openURL"):
         # Run `test_project_execution` and check if the skip occurs
-        result = pytest.main(["-q", "--tb=short", "--disable-warnings", "-k", "test_project_execution"])
-        assert result.value == pytest.ExitCode.OK, "The test was not skipped as expected on timeout."
+        result = pytest.main(
+            ["-q", "--tb=short", "--disable-warnings", "-k", "test_project_execution"]
+        )
+        assert (
+            result.value == pytest.ExitCode.OK
+        ), "The test was not skipped as expected on timeout."
 
-        
+
 # does the project fail when the CRS is invalid?
 def test_expect_crs_error():
     try:
@@ -65,6 +75,7 @@ def test_expect_crs_error():
         print("Timeout occurred, skipping test_expect_crs_error.")
         pytest.skip("Skipping test_expect_crs_error due to a timeout.")
 
+
 # does the project fail when the Aus state name is invalid?
 def test_expect_state_error():
     try:
@@ -74,6 +85,7 @@ def test_expect_state_error():
     except requests.exceptions.ReadTimeout:
         print("Timeout occurred, skipping test_expect_state_error.")
         pytest.skip("Skipping test_expect_state_error due to a timeout.")
+
 
 # does the project fail when a config file is invalid?
 def test_expect_config_error():

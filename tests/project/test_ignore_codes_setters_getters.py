@@ -1,5 +1,5 @@
 import pathlib
-from map2loop.project import Project  
+from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
 import map2loop
 
@@ -15,46 +15,56 @@ def test_set_get_ignore_codes():
         "base": -3200,
         "top": 3000,
     }
-    
+
     # Set up the config dictionary
     config_dictionary = {
-        "structure": {
-            "dipdir_column": "azimuth2",
-            "dip_column": "dip",
-        },
-        "geology": {
-            "unitname_column": "unitname",
-            "alt_unitname_column": "code",
-        },
+        "structure": {"dipdir_column": "azimuth2", "dip_column": "dip"},
+        "geology": {"unitname_column": "unitname", "alt_unitname_column": "code"},
     }
 
-    project = Project(working_projection='EPSG:28350', bounding_box=bbox_3d, 
-                      geology_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/geology.geojson',)), 
-                      fault_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/faults.geojson',)),
-                      dtm_filename=str(pathlib.Path(map2loop.__file__).parent / pathlib.Path('_datasets/geodata_files/hamersley/dtm_rp.tif',)),
-                      config_dictionary= config_dictionary
-                      )
-    
-      # Define test ignore codes for lithology and faults
+    project = Project(
+        working_projection='EPSG:28350',
+        bounding_box=bbox_3d,
+        geology_filename=str(
+            pathlib.Path(map2loop.__file__).parent
+            / pathlib.Path('_datasets/geodata_files/hamersley/geology.geojson')
+        ),
+        fault_filename=str(
+            pathlib.Path(map2loop.__file__).parent
+            / pathlib.Path('_datasets/geodata_files/hamersley/faults.geojson')
+        ),
+        dtm_filename=str(
+            pathlib.Path(map2loop.__file__).parent
+            / pathlib.Path('_datasets/geodata_files/hamersley/dtm_rp.tif')
+        ),
+        config_dictionary=config_dictionary,
+    )
+
+    # Define test ignore codes for lithology and faults
     lithology_codes = ["cover", "Fortescue_Group", "A_FO_od"]
     fault_codes = ['Fault_9', "NotAFault"]
-    
 
     # Test Lithology ignore codes
     project.set_ignore_lithology_codes(lithology_codes)
-    assert project.map_data.get_ignore_lithology_codes() == lithology_codes, "Lithology ignore codes mismatch"
-    
+    assert (
+        project.map_data.get_ignore_lithology_codes() == lithology_codes
+    ), "Lithology ignore codes mismatch"
+
     # Test Fault ignore codes
     project.set_ignore_fault_codes(fault_codes)
     assert project.map_data.get_ignore_fault_codes() == fault_codes, "Fault ignore codes mismatch"
-    
-    
+
     project.map_data.parse_fault_map()
     # check if the skipped fault has been removed now:
     assert not project.map_data.get_map_data(Datatype.FAULT)['NAME'].str.contains('Fault_9').any()
-    
-    
+
     project.map_data.parse_geology_map()
     # check if the skipped lithology has been removed now:
-    assert not project.map_data.get_map_data(Datatype.GEOLOGY)['UNITNAME'].str.contains('Fortescue_Group').any()
-    assert not project.map_data.get_map_data(Datatype.GEOLOGY)['UNITNAME'].str.contains('cover').any()
+    assert (
+        not project.map_data.get_map_data(Datatype.GEOLOGY)['UNITNAME']
+        .str.contains('Fortescue_Group')
+        .any()
+    )
+    assert (
+        not project.map_data.get_map_data(Datatype.GEOLOGY)['UNITNAME'].str.contains('cover').any()
+    )

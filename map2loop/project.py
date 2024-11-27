@@ -28,6 +28,7 @@ from .logging import getLogger
 
 logger = getLogger(__name__)
 
+
 class Project(object):
     """
     The main entry point into using map2loop
@@ -178,16 +179,7 @@ class Project(object):
         # Assign filenames
         if use_australian_state_data != "":
             # Sanity check on state string
-            if use_australian_state_data in {
-                "WA",
-                "SA",
-                "QLD",
-                "NSW",
-                "TAS",
-                "VIC",
-                "ACT",
-                "NT",
-            }:
+            if use_australian_state_data in {"WA", "SA", "QLD", "NSW", "TAS", "VIC", "ACT", "NT"}:
                 self.map_data.set_filenames_from_australian_state(use_australian_state_data)
             else:
                 logger.error(
@@ -212,7 +204,9 @@ class Project(object):
 
         if config_filename != "":
             if clut_file_legacy:
-                logger.warning("DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2")
+                logger.warning(
+                    "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
+                )
 
             self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
 
@@ -245,13 +239,13 @@ class Project(object):
         """
         Set the lithology unit names to be ignored in the geology shapefile.
 
-        This method sets the lithology codes that should be excluded from the geology shapefile 
-        and triggers the re-population of the stratigraphic column using the updated data 
+        This method sets the lithology codes that should be excluded from the geology shapefile
+        and triggers the re-population of the stratigraphic column using the updated data
         from the geological map, ensuring the excluded lithologies are not considered.
 
         Args:
-            codes (list): 
-                A list of strings representing the lithology unit names to be ignored 
+            codes (list):
+                A list of strings representing the lithology unit names to be ignored
                 in the geological shapefile.
         """
         self.map_data.set_ignore_lithology_codes(codes)
@@ -263,17 +257,17 @@ class Project(object):
         """
         Set the fault names to be ignored in the fault map.
 
-        This method sets the fault codes to be ignored from the fault map and triggers 
+        This method sets the fault codes to be ignored from the fault map and triggers
         re-parsing of the fault map to exclude the ignored faults during subsequent processing.
 
         Args:
-            codes (list): 
-                A list of strings representing the fault unit names to be ignored 
+            codes (list):
+                A list of strings representing the fault unit names to be ignored
                 in the fault map.
         """
         self.map_data.set_ignore_fault_codes(codes)
         # Re-populate the units in the column with the new set of ignored geographical units
-        self.map_data.parse_fault_map() # remove the ignored faults
+        self.map_data.parse_fault_map()  # remove the ignored faults
 
     @beartype.beartype
     def set_sorter(self, sorter: Sorter):
@@ -386,7 +380,7 @@ class Project(object):
             length (float):
                 The cutoff length
         """
-        logger.info(f"Setting minimum fault length to {length}")    
+        logger.info(f"Setting minimum fault length to {length}")
         self.map_data.config.fault_config['minimum_fault_length'] = length
 
     @beartype.beartype
@@ -404,11 +398,15 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
-        logger.info(f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}")
+        logger.info(
+            f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
+        )
         self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
             self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
         )
-        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
+        logger.info(
+            f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}"
+        )
         self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
             self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
         )
@@ -441,7 +439,9 @@ class Project(object):
         """
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
-            logger.info(f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}")
+            logger.info(
+                f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}"
+            )
 
             columns = [
                 sorter.sort(
@@ -482,28 +482,34 @@ class Project(object):
             )
 
     @beartype.beartype
-    def set_thickness_calculator(self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']]) -> None:
+    def set_thickness_calculator(
+        self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']]
+    ) -> None:
         """
-        Sets the thickness_calculator attribute for the object. 
+        Sets the thickness_calculator attribute for the object.
 
         If a single instance of ThicknessCalculator is passed, it wraps it in a list.
-        If a list of ThicknessCalculator instances is passed, it validates that all elements 
+        If a list of ThicknessCalculator instances is passed, it validates that all elements
         are instances of ThicknessCalculator before setting the attribute.
 
         Args:
-            thickness_calculator (ThicknessCalculator or list of ThicknessCalculator): 
+            thickness_calculator (ThicknessCalculator or list of ThicknessCalculator):
             An instance or a list of ThicknessCalculator objects.
 
         Raises:
-            TypeError: If the provided thickness_calculator is not an instance of 
+            TypeError: If the provided thickness_calculator is not an instance of
                     ThicknessCalculator or a list of such instances.
         """
         if isinstance(thickness_calculator, ThicknessCalculator):
             thickness_calculator = [thickness_calculator]
 
         # Now check if thickness_calculator is a list of valid instances
-        if not isinstance(thickness_calculator, list) or not all(isinstance(tc, ThicknessCalculator) for tc in thickness_calculator):
-            raise TypeError("All items must be instances of ThicknessCalculator or a single ThicknessCalculator instance.")
+        if not isinstance(thickness_calculator, list) or not all(
+            isinstance(tc, ThicknessCalculator) for tc in thickness_calculator
+        ):
+            raise TypeError(
+                "All items must be instances of ThicknessCalculator or a single ThicknessCalculator instance."
+            )
 
         # Finally, set the calculators
         self.thickness_calculator = thickness_calculator
@@ -527,12 +533,16 @@ class Project(object):
 
         if isinstance(self.thickness_calculator, list):
             # If it's a list, return labels from all items
-            return [calculator.thickness_calculator_label for calculator in self.thickness_calculator]
+            return [
+                calculator.thickness_calculator_label for calculator in self.thickness_calculator
+            ]
         elif hasattr(self.thickness_calculator, 'thickness_calculator_label'):
             # If it's a single object, return the label as a list
             return [self.thickness_calculator.thickness_calculator_label]
         else:
-            raise TypeError("self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute")
+            raise TypeError(
+                "self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute"
+            )
 
     def calculate_unit_thicknesses(self):
         """
@@ -599,7 +609,10 @@ class Project(object):
             )
             self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
         else:
-            logger.warning("No fault orientation data found, skipping fault orientation calculation")
+            logger.warning(
+                "No fault orientation data found, skipping fault orientation calculation"
+            )
+
     def apply_colour_to_units(self):
         """
         Apply the clut file to the units in the stratigraphic column
@@ -628,7 +641,7 @@ class Project(object):
             self.map_data.basal_contacts,
             self.map_data,
         )
-        logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')  
+        logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')
 
     def run_all(self, user_defined_stratigraphic_column=None, take_best=False):
         """
@@ -648,12 +661,12 @@ class Project(object):
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
-            self.map2model.run() # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
+            self.map2model.run()  # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
         else:
             if user_defined_stratigraphic_column is not None:
                 logger.warning(
                     f"user_defined_stratigraphic_column is not of type list and is {type(user_defined_stratigraphic_column)}. Attempting to calculate column"
-                ) #why not try casting to a list?
+                )  # why not try casting to a list?
             self.calculate_stratigraphic_order(take_best)
         self.sort_stratigraphic_column()
 
@@ -764,7 +777,11 @@ class Project(object):
 
         # Function to retrieve a column if it exists, otherwise return a list of default values
         def get_column_or_default(column_name, default_value, length):
-            return list(self.stratigraphic_column.stratigraphicUnits.get(column_name, [default_value] * length))
+            return list(
+                self.stratigraphic_column.stratigraphicUnits.get(
+                    column_name, [default_value] * length
+                )
+            )
 
         # Get the current list of thickness calculator labels dynamically
         thickness_labels = self.thickness_calculator_labels
@@ -820,7 +837,13 @@ class Project(object):
         thickness_calculator_labels = [tuple(self.thickness_calculator_labels[:5])]
 
         # save into LPF
-        LPF.Set(self.loop_filename, "stratigraphicLog", data=stratigraphic_data, thickness_calculator_data = thickness_calculator_labels, verbose=True)
+        LPF.Set(
+            self.loop_filename,
+            "stratigraphicLog",
+            data=stratigraphic_data,
+            thickness_calculator_data=thickness_calculator_labels,
+            verbose=True,
+        )
 
         # Save contacts
         contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
@@ -844,9 +867,9 @@ class Project(object):
         faults_obs_data["dipDir"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["dip"][0 : len(self.fault_samples)] = numpy.nan
         faults_obs_data["posOnly"][0 : len(self.fault_samples)] = 1
-        faults_obs_data["displacement"] = (
-            100  # self.fault_samples["DISPLACEMENT"] #TODO remove note needed
-        )
+        faults_obs_data[
+            "displacement"
+        ] = 100  # self.fault_samples["DISPLACEMENT"] #TODO remove note needed
 
         faults_obs_data["eventId"][len(self.fault_samples) :] = self.fault_orientations["ID"]
         faults_obs_data["easting"][len(self.fault_samples) :] = self.fault_orientations["X"]
@@ -909,7 +932,7 @@ class Project(object):
             relationships["angle"] = ff_relationships["Angle"]
             relationships["type"] = LPF.EventRelationshipType.FAULT_FAULT_ABUT
             logger.info("Adding fault relationships to projectfile")
-            logger.info(f"Fault relationships: {relationships}")    
+            logger.info(f"Fault relationships: {relationships}")
             LPF.Set(self.loop_filename, "eventRelationships", data=relationships)
 
     @beartype.beartype

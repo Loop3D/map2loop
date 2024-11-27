@@ -92,17 +92,16 @@ class MapData:
         self.verbose_level = verbose_level
         self.config = Config()
 
-
     @property
     @beartype.beartype
     def minimum_fault_length(self) -> float:
         return self.config.fault_config["minimum_fault_length"]
-    
+
     @minimum_fault_length.setter
     @beartype.beartype
     def minimum_fault_length(self, length: float):
         self.config.fault_config["minimum_fault_length"] = length
-    
+
     def set_working_projection(self, projection):
         """
         Set the working projection for the map data
@@ -309,14 +308,14 @@ class MapData:
         """
         Set the lithology codes (names) to be ignored in the geology shapefile.
 
-        This method updates the `ignore_lithology_codes` entry in the geology configuration 
-        and marks the geology data as "clipped" to indicate that certain lithologies have been 
-        excluded. Additionally, it sets a dirty flag for the geology data to signal that it 
+        This method updates the `ignore_lithology_codes` entry in the geology configuration
+        and marks the geology data as "clipped" to indicate that certain lithologies have been
+        excluded. Additionally, it sets a dirty flag for the geology data to signal that it
         requires reprocessing.
 
         Args:
-            codes (list): 
-                A list of lithology names to ignore in the geology shapefile. These 
+            codes (list):
+                A list of lithology names to ignore in the geology shapefile. These
                 entries will be excluded from further processing.
         """
         self.config.geology_config["ignore_lithology_codes"] = codes
@@ -328,11 +327,11 @@ class MapData:
         """
         Retrieve the list of lithology names to be ignored in the geology shapefile.
 
-        This method fetches the current list of lithology names or codes from the geology 
+        This method fetches the current list of lithology names or codes from the geology
         configuration that have been marked for exclusion during processing.
 
         Returns:
-            list: A list of lithology names currently set to be ignored in the 
+            list: A list of lithology names currently set to be ignored in the
             geology shapefile.
         """
         return self.config.geology_config["ignore_lithology_codes"]
@@ -544,7 +543,7 @@ class MapData:
             else:
                 return response
         except urllib.URLError:
-            return None        
+            return None
 
     @beartype.beartype
     def __retrieve_tif(self, filename: str):
@@ -579,6 +578,7 @@ class MapData:
             # file on the local system to open or otherwise create a gdal file
             # from scratch with Create
             import pathlib
+
             tmp_file = pathlib.Path(tempfile.mkdtemp()) / pathlib.Path("temp.tif")
 
             with open(tmp_file, "wb") as fh:
@@ -724,7 +724,7 @@ class MapData:
             self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
         )
 
-        config = self.config.fault_config        
+        config = self.config.fault_config
 
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
@@ -995,8 +995,9 @@ class MapData:
 
         # update minimum fault length either with the value from the config or calculate it
         if self.minimum_fault_length < 0:
-            self.minimum_fault_length = calculate_minimum_fault_length(bbox = self.bounding_box, area_percentage = 0.05)
-        
+            self.minimum_fault_length = calculate_minimum_fault_length(
+                bbox=self.bounding_box, area_percentage=0.05
+            )
 
         # crop
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
@@ -1214,7 +1215,9 @@ class MapData:
             self.save_raw_map_data(output_dir, i, extension)
 
     @beartype.beartype
-    def save_raw_map_data(self, output_dir: pathlib.Path, datatype: Datatype, extension: str = ".shp.zip"):
+    def save_raw_map_data(
+        self, output_dir: pathlib.Path, datatype: Datatype, extension: str = ".shp.zip"
+    ):
         """
         Save the map data from datatype to file
 
@@ -1353,7 +1356,7 @@ class MapData:
         """
         # TODO: - Move away from tab seperators entirely (topology and map2model)
 
-        self.map2model_tmp_path = pathlib.Path(tempfile.mkdtemp()) 
+        self.map2model_tmp_path = pathlib.Path(tempfile.mkdtemp())
 
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
@@ -1387,9 +1390,7 @@ class MapData:
             geology["ROCKTYPE1"] = geology["ROCKTYPE1"].replace("", "None")
             geology["ROCKTYPE2"] = geology["ROCKTYPE2"].replace("", "None")
             geology.to_csv(
-                pathlib.Path(self.map2model_tmp_path) / "geology_wkt.csv",
-                sep="\t",
-                index=False,
+                pathlib.Path(self.map2model_tmp_path) / "geology_wkt.csv", sep="\t", index=False
             )
 
         # Check faults data status and export to a WKT format file
@@ -1404,9 +1405,7 @@ class MapData:
             faults = self.get_map_data(Datatype.FAULT).copy()
             faults.rename(columns={"geometry": "WKT"}, inplace=True)
             faults.to_csv(
-                pathlib.Path(self.map2model_tmp_path) / "faults_wkt.csv",
-                sep="\t",
-                index=False,
+                pathlib.Path(self.map2model_tmp_path) / "faults_wkt.csv", sep="\t", index=False
             )
 
     @beartype.beartype
@@ -1556,14 +1555,16 @@ class MapData:
 
         # check if the units in the strati colum are in the geology dataset, so that basal contacts can be built
         # if not, stop the project
-        if any(
-            unit not in units for unit in basal_contacts["UNITNAME_1"].unique()
-        ):
-            missing_units = basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"].unique().tolist()
+        if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
+            missing_units = (
+                basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
+                .unique()
+                .tolist()
+            )
             raise ValueError(
-                "There are units in stratigraphic column, but not in the Geology dataset: " +
-                ", ".join(missing_units) +
-                ". Please readjust the stratigraphic column if this is a user defined column."
+                "There are units in stratigraphic column, but not in the Geology dataset: "
+                + ", ".join(missing_units)
+                + ". Please readjust the stratigraphic column if this is a user defined column."
             )
 
         # apply minimum lithological id between the two units
@@ -1585,7 +1586,9 @@ class MapData:
 
         # added code to make sure that multi-line that touch each other are snapped and merged.
         # necessary for the reconstruction based on featureId
-        basal_contacts["geometry"] = [shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]]
+        basal_contacts["geometry"] = [
+            shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]
+        ]
 
         if save_contacts:
             # keep abnormal contacts as all_basal_contacts
@@ -1626,9 +1629,9 @@ class MapData:
         if self.colour_filename is None:
             print("\nNo colour configuration file found. Assigning random colors to units")
             missing_colour_n = len(stratigraphic_units["colour"])
-            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
-                generate_random_hex_colors(missing_colour_n)
-            )
+            stratigraphic_units.loc[
+                stratigraphic_units["colour"].isna(), "colour"
+            ] = generate_random_hex_colors(missing_colour_n)
 
         colour_lookup["colour"] = colour_lookup["colour"].str.upper()
         # if there are duplicates in the clut file, drop.
@@ -1642,9 +1645,9 @@ class MapData:
                 suffixes=("_old", ""),
                 how="left",
             )
-            stratigraphic_units.loc[stratigraphic_units["colour"].isna(), "colour"] = (
-                generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
-            )
+            stratigraphic_units.loc[
+                stratigraphic_units["colour"].isna(), "colour"
+            ] = generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:
             print(

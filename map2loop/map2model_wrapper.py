@@ -250,6 +250,37 @@ class Map2ModelWrapper:
                 map2model_code_map,
                 verbose_level == VerboseLevel.NONE,
                 "None",
+
+        # Parse fault intersections
+        out = []
+        fault_fault_intersection_filename = os.path.join(
+            self.map_data.map2model_tmp_path, "fault-fault-intersection.txt"
+        )
+        logger.info(f"Reading fault-fault intersections from {fault_fault_intersection_filename}")
+        if (
+            os.path.isfile(fault_fault_intersection_filename)
+            and os.path.getsize(fault_fault_intersection_filename) > 0
+        ):
+            df = pandas.read_csv(fault_fault_intersection_filename, delimiter="{", header=None)
+            df[1] = list(df[1].str.replace("}", "", regex=False))
+            df[1] = [re.findall("\(.*?\)", i) for i in df[1]]  # Valid escape for regex
+            df[0] = list(df[0].str.replace("^[0-9]*, ", "", regex=True))
+            df[0] = list(df[0].str.replace(", ", "", regex=False))
+
+            # df[0] = "Fault_" + df[0] #removed 7/10/24 as it seems to break the merge in
+            relations = df[1]
+            for j in range(len(relations)):
+                relations[j] = [i.strip("()").replace(" ", "").split(",") for i in relations[j]]
+            df[1] = relations
+
+            for _, row in df.iterrows():
+                for i in numpy.arange(len(row[1])):
+
+                    out += [[row[0], row[1][i][0], row[1][i][1], float(row[1][i][2])]]
+
+        else:
+            logger.warning(
+                f"Fault-fault intersections file {fault_fault_intersection_filename} not found"
             )
             logger.info("Parsing map2model output")
             logger.info(run_log)

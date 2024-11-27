@@ -4,6 +4,8 @@ name: release-please
 
 on: [push, pull_request]
 
+
+
 permissions:
   contents: write
   pull-requests: write
@@ -75,7 +77,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install numpy==1.26.4
-          pip install geopandas shapely networkx owslib map2model beartype gdal==3.8.4 pytest scikit-learn
+          pip install geopandas shapely networkx owslib map2model beartype gdal pytest scikit-learn
           pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache dist/*.tar.gz
           pip list

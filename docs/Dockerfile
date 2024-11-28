@@ -11,6 +11,7 @@ RUN apt-get update -qq && \
     make\
     libgl1\
     gdal-bin\
+    libgdal-dev\
     python3-gdal\
     libtinfo5\
     libtiff6\

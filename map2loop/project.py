@@ -356,7 +356,22 @@ class Project(object):
             sampler (Sampler):
                 The sampler to use
         """
-        ## does the enum print the number or the label?
+        allowed_samplers = {
+            Datatype.STRUCTURE: SamplerDecimator,
+            Datatype.GEOLOGY: SamplerSpacing,
+            Datatype.FAULT: SamplerSpacing,
+            Datatype.FOLD: SamplerSpacing,
+            Datatype.DTM: SamplerSpacing,
+        }
+
+        # Check for wrong sampler
+        if datatype in allowed_samplers:
+            allowed_sampler_type = allowed_samplers[datatype]
+            if not isinstance(sampler, allowed_sampler_type):
+                raise ValueError(
+                    f"Got wrong argument for this datatype: {type(sampler).__name__}, please use {allowed_sampler_type.__name__} instead"
+                )
+
         logger.info(f"Setting sampler for {datatype} to {sampler.sampler_label}")
         self.samplers[datatype] = sampler
 

@@ -10,7 +10,7 @@ RUN apt-get update -qq && \
     libc-dev \
     make\
     libgl1\
-    libgdal\
+    libgdal-dev\
     libtinfo5\
     libtiff6\
     libgl1-mesa-glx\

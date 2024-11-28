@@ -137,7 +137,8 @@ class Project(object):
         self.deformation_history = DeformationHistory(project=self)
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
-
+        self.active_thickness = None
+        
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
@@ -600,6 +601,31 @@ class Project(object):
             self.stratigraphic_column.stratigraphicUnits[stddev_col_name] = repeated_result[:, 2]
 
         self.thickness_calculator_labels = labels
+        
+        if self.active_thickness is None:
+            self.active_thickness = labels[0]
+    
+    def set_active_thickness(self, thickness_calculator):
+        """
+        Sets the active_thickness attribute based on the provided thickness_calculator.
+
+        Args:
+            thickness_calculator (object or str): The thickness calculator object or its label.
+                If an object is provided, it should have a 'thickness_calculator_label' attribute.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the thickness calculator label cannot be determined.
+        """
+
+        try:
+            label = thickness_calculator.thickness_calculator_label
+        except AttributeError:
+            raise ValueError("The provided thickness calculator object does not have a 'thickness_calculator_label' attribute.")
+        
+        self.active_thickness = label
 
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
@@ -832,11 +858,19 @@ class Project(object):
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
 
-        # get thickness calculator labels, and fill up with None if empty values up to 5 placeholders
+        # Ensure the thickness calculator labels list has up to 5 entries, filling with "None" if necessary
         while len(self.thickness_calculator_labels) < 5:
             self.thickness_calculator_labels.append("None")
 
         thickness_calculator_labels = [tuple(self.thickness_calculator_labels[:5])]
+
+        thickness_calculator_active_flags = ["None"] * 5
+        for i, label in enumerate(self.thickness_calculator_labels[:5]):  # Match only the first 5 labels
+            if label == self.active_thickness:
+                thickness_calculator_active_flags[i] = "Active"  # Capitalize "Active" for consistency
+
+        # Convert the flags to a tuple to match thickness_calculator_labels
+        thickness_calculator_active_flags = [tuple(thickness_calculator_active_flags)]
 
         # save into LPF
         LPF.Set(
@@ -844,6 +878,7 @@ class Project(object):
             "stratigraphicLog",
             data=stratigraphic_data,
             thickness_calculator_data=thickness_calculator_labels,
+            thickness_calculator_active_flags=thickness_calculator_active_flags,
             verbose=True,
         )
 

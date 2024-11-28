@@ -94,7 +94,7 @@ class MapData:
 
     @property
     @beartype.beartype
-    def minimum_fault_length(self) -> float:
+    def minimum_fault_length(self) -> Union[int,float]:
         return self.config.fault_config["minimum_fault_length"]
 
     @minimum_fault_length.setter

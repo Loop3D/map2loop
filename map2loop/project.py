@@ -126,6 +126,7 @@ class Project(object):
         self.verbose_level = verbose_level
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
+        self.bounding_box = bounding_box
         self.sorter = SorterUseHint()
         self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
@@ -133,7 +134,7 @@ class Project(object):
         self.map_data = MapData(verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
-        self.deformation_history = DeformationHistory()
+        self.deformation_history = DeformationHistory(project=self)
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
 
@@ -382,6 +383,7 @@ class Project(object):
         """
         logger.info(f"Setting minimum fault length to {length}")
         self.map_data.config.fault_config['minimum_fault_length'] = length
+        self.map_data.parse_fault_map()
 
     @beartype.beartype
     def get_minimum_fault_length(self) -> float:

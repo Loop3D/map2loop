@@ -4,11 +4,12 @@ import beartype
 import geopandas
 import math
 
+from .utils import calculate_minimum_fault_length
+
 
 from .logging import getLogger
 
 logger = getLogger(__name__)
-from .config import Config
 
 
 class DeformationHistory:
@@ -30,13 +31,15 @@ class DeformationHistory:
 
     """
 
-    def __init__(self):
+    def __init__(self, project):
         """
         The initialiser for the deformation history. All attributes are defaulted
         """
         self.history = []
         self.fault_fault_relationships = []
-
+        self.minimum_fault_length = project.get_minimum_fault_length()
+        self.bounding_box = project.bounding_box
+        
         # Create empty fault and fold dataframes
         self.faultColumns = numpy.dtype(
             [
@@ -66,7 +69,7 @@ class DeformationHistory:
         )
         self.faults = pandas.DataFrame(numpy.empty(0, dtype=self.faultColumns))
         # self.faults = self.faults.set_index("name")
-
+        
         self.foldColumns = numpy.dtype(
             [
                 ("eventId", int),
@@ -84,7 +87,9 @@ class DeformationHistory:
         )
         self.folds = pandas.DataFrame(numpy.empty(0, dtype=self.foldColumns))
         # self.folds = self.folds.set_index("name")
-
+        
+        
+        
     def findfault(self, id):
         """
         Find the fault in the summary based on its eventId
@@ -258,7 +263,8 @@ class DeformationHistory:
             self.faults.at[index, "centreX"] = numpy.mean(observations["X"])
             self.faults.at[index, "centreY"] = numpy.mean(observations["Y"])
             self.faults.at[index, "centreZ"] = numpy.mean(observations["Z"])
-
+    
+    
     def get_faults_for_export(self):
         """
         Get the faults for export (removes any fault that is shorter than the cutoff)
@@ -266,8 +272,12 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
-        mfl = Config().fault_config["minimum_fault_length"]
-        return self.faults[self.faults["length"] >= mfl].copy()
+        # if no minimum fault length is set, calculate it
+        if self.minimum_fault_length < 0:
+            self.minimum_fault_length = calculate_minimum_fault_length(
+                bbox=self.bounding_box, area_percentage=0.05
+            )
+        return self.faults[self.faults["length"] >= self.minimum_fault_length].copy()
 
     @beartype.beartype
     def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):

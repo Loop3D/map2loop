@@ -37,8 +37,7 @@ class DeformationHistory:
         """
         self.history = []
         self.fault_fault_relationships = []
-        self.minimum_fault_length = project.get_minimum_fault_length()
-        self.bounding_box = project.bounding_box
+        self.project = project
         
         # Create empty fault and fold dataframes
         self.faultColumns = numpy.dtype(
@@ -273,11 +272,11 @@ class DeformationHistory:
             pandas.DataFrame: The filtered fault summary
         """
         # if no minimum fault length is set, calculate it
-        if self.minimum_fault_length < 0:
-            self.minimum_fault_length = calculate_minimum_fault_length(
-                bbox=self.bounding_box, area_percentage=0.05
-            )
-        return self.faults[self.faults["length"] >= self.minimum_fault_length].copy()
+        if self.project.get_minimum_fault_length() < 0:
+            self.project.set_minimum_fault_length( calculate_minimum_fault_length(
+                bbox=self.project.bounding_box, area_percentage=0.05
+            ))
+        return self.faults[self.faults["length"] >= self.project.get_minimum_fault_length()].copy()
 
     @beartype.beartype
     def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):

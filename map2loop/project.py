@@ -703,7 +703,7 @@ class Project(object):
                     file_exists = False
                     logger.info(f"\nExisting file '{self.loop_filename}' was successfully deleted.")
                 except Exception as e:
-                    logger.errow(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
+                    logger.error(f"\nFailed to delete existing file '{self.loop_filename}': {e}")
                     raise e
             else:
                 logger.error(
@@ -767,6 +767,9 @@ class Project(object):
         stratigraphic_data = numpy.zeros(
             len(self.stratigraphic_column.stratigraphicUnits), LPF.stratigraphicLayerType
         )
+        stratigraphic_thicknesses = numpy.zeros(
+            len(self.stratigraphic_column.stratigraphicUnits), LPF.stratigraphicThicknessType)
+        
         stratigraphic_data["layerId"] = self.stratigraphic_column.stratigraphicUnits["layerId"]
         stratigraphic_data["minAge"] = self.stratigraphic_column.stratigraphicUnits["minAge"]
         stratigraphic_data["maxAge"] = self.stratigraphic_column.stratigraphicUnits["maxAge"]
@@ -774,44 +777,18 @@ class Project(object):
         stratigraphic_data["group"] = self.stratigraphic_column.stratigraphicUnits["group"]
         stratigraphic_data["enabled"] = 1
 
-        # Length of the column (number of rows in stratigraphicUnits)
-        column_len = len(self.stratigraphic_column.stratigraphicUnits)
-
-        # Function to retrieve a column if it exists, otherwise return a list of default values
-        def get_column_or_default(column_name, default_value, length):
-            return list(
-                self.stratigraphic_column.stratigraphicUnits.get(
-                    column_name, [default_value] * length
-                )
-            )
-
-        # Get the current list of thickness calculator labels dynamically
-        thickness_labels = self.thickness_calculator_labels
-
-        # Define a constant for the maximum number of calculators (5 as per your requirement)
-        MAX_CALCULATORS = 5
-
-        # Create lists for mean, median, and stddev values for each calculator dynamically
-        thickness_mean_list = [
-            get_column_or_default(f'{label}_mean', 0, column_len) for label in thickness_labels
-        ]
-        thickness_median_list = [
-            get_column_or_default(f'{label}_median', 0, column_len) for label in thickness_labels
-        ]
-        thickness_stddev_list = [
-            get_column_or_default(f'{label}_stddev', 0, column_len) for label in thickness_labels
-        ]
-
-        # Pad with zeros if the number of calculators is less than MAX_CALCULATORS
-        for _ in range(MAX_CALCULATORS - len(thickness_mean_list)):
-            thickness_mean_list.append([0] * column_len)
-            thickness_median_list.append([0] * column_len)
-            thickness_stddev_list.append([0] * column_len)
-
-        # Zip these lists into tuples for each stratigraphic row dynamically, ensuring each tuple has exactly 5 elements
-        stratigraphic_data["ThicknessMean"] = list(zip(*thickness_mean_list[:MAX_CALCULATORS]))
-        stratigraphic_data["ThicknessMedian"] = list(zip(*thickness_median_list[:MAX_CALCULATORS]))
-        stratigraphic_data["ThicknessStdDev"] = list(zip(*thickness_stddev_list[:MAX_CALCULATORS]))
+        stratigraphic_thicknesses['name']= self.stratigraphic_column.stratigraphicUnits["name"]
+        # store all of the thickness estimates in a separate table
+        for i, label in enumerate(self.thickness_calculator_labels):
+            stratigraphic_thicknesses[f'thickness{i+1}_mean'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_mean',0)
+            stratigraphic_thicknesses[f'thickness{i+1}_median'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_median',0)
+            stratigraphic_thicknesses[f'thickness{i+1}_stddev'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_stddev',0)
+        
+        
+        # store the first thickness calculator as the default thickness
+        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_mean',0)
+        stratigraphic_data["ThicknessMedian"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_median',0)
+        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_stddev',0) 
 
         # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
@@ -831,21 +808,27 @@ class Project(object):
         stratigraphic_data["colour2Blue"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
-
+        n_thick_calcs = len(self.thickness_calculator_labels)
         # get thickness calculator labels, and fill up with None if empty values up to 5 placeholders
         while len(self.thickness_calculator_labels) < 5:
             self.thickness_calculator_labels.append("None")
 
-        thickness_calculator_labels = [tuple(self.thickness_calculator_labels[:5])]
+        headers = 'name;'+';'.join([f'{l}_mean;{l}_median;{l}_stddev' for l in self.thickness_calculator_labels[:5]])
+        headers = headers.split(';') # split into list
 
         # save into LPF
         LPF.Set(
             self.loop_filename,
             "stratigraphicLog",
             data=stratigraphic_data,
-            thickness_calculator_data=thickness_calculator_labels,
             verbose=True,
         )
+        LPF.Set(self.loop_filename,
+                "stratigraphicThicknesses",
+                data=stratigraphic_thicknesses,
+                headers=headers,
+                ncols=1+3*n_thick_calcs, # index and mean, median, stddev for each thickness calculator
+                verbose=True)
 
         # Save contacts
         contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)

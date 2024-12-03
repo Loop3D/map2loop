@@ -138,14 +138,13 @@ class Config:
 
     @beartype.beartype
     def update_from_file(
-        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+        self, filename: Union[pathlib.Path, str],  lower: bool = False
     ):
         """
         Update the config dictionary from the provided json filename or url
 
         Args:
             filename (Union[pathlib.Path, str]): Filename or URL of the JSON config file
-            legacy_format (bool, optional): Whether the JSON is an old version. Defaults to False.
             lower (bool, optional): convert keys to lowercase. Defaults to False.
         """
         func = self.update_from_dictionary
@@ -207,7 +206,5 @@ class Config:
                 err_string += "Please check the file is accessible online and then\n"
             else:
                 err_string += "Please check the file exists and is accessible then\n"
-            if not legacy_format:
-                err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)

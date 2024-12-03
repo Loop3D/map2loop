@@ -373,7 +373,7 @@ class Project(object):
         return self.samplers[datatype].sampler_label
 
     @beartype.beartype
-    def set_minimum_fault_length(self, length: float):
+    def set_minimum_fault_length(self, length: Union[float, int]):
         """
         Set the cutoff length for faults to ignore
 
@@ -808,6 +808,7 @@ class Project(object):
         stratigraphic_data["colour2Blue"] = [
             int(a * 0.95) for a in stratigraphic_data["colour1Blue"]
         ]
+        
         n_thick_calcs = len(self.thickness_calculator_labels)
         # get thickness calculator labels, and fill up with None if empty values up to 5 placeholders
         while len(self.thickness_calculator_labels) < 5:

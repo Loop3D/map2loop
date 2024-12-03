@@ -588,12 +588,14 @@ class StructuralPoint(ThicknessCalculator):
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
         result.rename(columns={'thickness': 'ThicknessMedian'}, inplace=True)
 
+
+
         output_units = units.copy()
         # remove the old thickness column
-        output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
-        output_units['ThicknessMean'] = numpy.empty((len(output_units)))
-        output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
-
+        output_units['ThicknessMedian'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessMean'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessStdDev'] = numpy.full(len(output_units), numpy.nan)
+        print(output_units)
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
         # assign the thicknesses to the each unit
@@ -602,10 +604,12 @@ class StructuralPoint(ThicknessCalculator):
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
-
+       
         output_units["ThicknessMean"] = output_units["ThicknessMean"].fillna(-1)
         output_units["ThicknessMedian"] = output_units["ThicknessMedian"].fillna(-1)
         output_units["ThicknessStdDev"] = output_units["ThicknessStdDev"].fillna(-1)
+        
+        
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
@@ -634,5 +638,5 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
-
+        # print("output", output_units)
         return output_units

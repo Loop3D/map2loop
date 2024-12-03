@@ -137,7 +137,8 @@ class Project(object):
         self.deformation_history = DeformationHistory(project=self)
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
-
+        self.active_thickness = None
+        
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
             columns=["ID", "DIPDIR", "DIP", "X", "Y", "Z", "featureId"]
@@ -395,6 +396,35 @@ class Project(object):
         """
         return float(self.map_data.config.fault_config['minimum_fault_length'])
 
+    @beartype.beartype    
+    def set_active_thickness(self, thickness_calculator: ThicknessCalculator):
+        """
+        Sets the active_thickness attribute based on the provided thickness_calculator.
+        Args:
+            thickness_calculator (object or str): The thickness calculator object or its label.
+                If an object is provided, it should have a 'thickness_calculator_label' attribute.
+        Returns:
+            None
+        Raises:
+            ValueError: If the thickness calculator label cannot be determined.
+        """
+        
+        try:
+            label = thickness_calculator.thickness_calculator_label
+        except AttributeError:
+            raise ValueError("The provided thickness calculator object does not have a 'thickness_calculator_label' attribute.")
+        self.active_thickness = label
+    
+    @beartype.beartype
+    def get_active_thickness(self) -> str:
+        """
+        Retrieves the active_thickness attribute.
+
+        Returns:
+            str: The label of the active thickness calculator.
+        """
+        return self.active_thickness
+            
     # Processing functions
     def sample_map_data(self):
         """
@@ -600,7 +630,9 @@ class Project(object):
             self.stratigraphic_column.stratigraphicUnits[stddev_col_name] = repeated_result[:, 2]
 
         self.thickness_calculator_labels = labels
-
+        if self.active_thickness is None:
+            self.active_thickness = labels[0]
+            
     def calculate_fault_orientations(self):
         if self.map_data.get_map_data(Datatype.FAULT_ORIENTATION) is not None:
             logger.info(f"Calculating fault orientations using {self.fault_orientation.label}")
@@ -778,17 +810,17 @@ class Project(object):
         stratigraphic_data["enabled"] = 1
 
         stratigraphic_thicknesses['name']= self.stratigraphic_column.stratigraphicUnits["name"]
+        
         # store all of the thickness estimates in a separate table
         for i, label in enumerate(self.thickness_calculator_labels):
             stratigraphic_thicknesses[f'thickness{i+1}_mean'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_mean',0)
             stratigraphic_thicknesses[f'thickness{i+1}_median'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_median',0)
             stratigraphic_thicknesses[f'thickness{i+1}_stddev'] = self.stratigraphic_column.stratigraphicUnits.get(f'{label}_stddev',0)
         
-        
-        # store the first thickness calculator as the default thickness
-        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_mean',0)
-        stratigraphic_data["ThicknessMedian"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_median',0)
-        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.thickness_calculator_labels[0]}_stddev',0) 
+        # store the active thickness calculator as the default thickness
+        stratigraphic_data["ThicknessMean"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.active_thickness}_mean',0)
+        stratigraphic_data["ThicknessMedian"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.active_thickness}_median',0)
+        stratigraphic_data["ThicknessStdDev"] = self.stratigraphic_column.stratigraphicUnits.get(f'{self.active_thickness}_stddev',0) 
 
         # Assign colours to startigraphic data
         stratigraphic_data["colour1Red"] = [
@@ -822,14 +854,14 @@ class Project(object):
             self.loop_filename,
             "stratigraphicLog",
             data=stratigraphic_data,
-            verbose=True,
+            verbose=False,
         )
         LPF.Set(self.loop_filename,
                 "stratigraphicThicknesses",
                 data=stratigraphic_thicknesses,
                 headers=headers,
                 ncols=1+3*n_thick_calcs, # index and mean, median, stddev for each thickness calculator
-                verbose=True)
+                verbose=False)
 
         # Save contacts
         contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)

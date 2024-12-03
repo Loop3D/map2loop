@@ -1,5 +1,4 @@
 # internal imports
-import scipy.interpolate
 from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
@@ -13,6 +12,7 @@ from .mapdata import MapData
 
 # external imports
 from abc import ABC, abstractmethod
+import scipy.interpolate
 import beartype
 import numpy
 import scipy
@@ -590,10 +590,10 @@ class StructuralPoint(ThicknessCalculator):
 
         output_units = units.copy()
         # remove the old thickness column
-        output_units['ThicknessMedian'] = numpy.empty((len(output_units)))
-        output_units['ThicknessMean'] = numpy.empty((len(output_units)))
-        output_units['ThicknessStdDev'] = numpy.empty((len(output_units)))
-
+        output_units['ThicknessMedian'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessMean'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessStdDev'] = numpy.full(len(output_units), numpy.nan)
+        
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
         # assign the thicknesses to the each unit
@@ -602,10 +602,12 @@ class StructuralPoint(ThicknessCalculator):
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
-
+       
         output_units["ThicknessMean"] = output_units["ThicknessMean"].fillna(-1)
         output_units["ThicknessMedian"] = output_units["ThicknessMedian"].fillna(-1)
         output_units["ThicknessStdDev"] = output_units["ThicknessStdDev"].fillna(-1)
+        
+        
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit

@@ -70,8 +70,6 @@ class MapData:
         The initialiser for the map data
 
         Args:
-            tmp_path (str, optional):
-                The directory for storing temporary files. Defaults to "".
             verbose_level (VerboseLevel, optional):
                 How much console output is sent. Defaults to VerboseLevel.ALL.
         """

@@ -148,7 +148,7 @@ class Project(object):
         # check if user is using a config file or dictionary, if file, break the project.
         if config_filename != "":
             logger.error("Config legacy files have been deprecated in v3.2. Please use a dictionary instead.")
-            raise ValueError("Config legacy files have been deprecated in v3.2. Please use a dictionary instead.You can use the utils function update_from_legacy_file")
+            raise ValueError("Config legacy files have been deprecated in v3.2. Please use a config dictionary instead. You can use the utils function update_from_legacy_file")
 
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":

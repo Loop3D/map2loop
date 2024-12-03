@@ -70,7 +70,6 @@ class Project(object):
         config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
         clut_filename: Union[pathlib.Path, str] = "",
-        # clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
         overwrite_loopprojectfile: bool = False,
@@ -145,11 +144,7 @@ class Project(object):
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
 
-        # check if user is using a config file or dictionary, if file, break the project.
-        if config_filename != "":
-            logger.error("Config legacy files have been deprecated in v3.2. Please use a dictionary instead.")
-            raise ValueError("Config legacy files have been deprecated in v3.2. Please use a config dictionary instead. You can use the utils function update_from_legacy_file")
-
+        
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
             config_filename = kwargs["metadata_filename"]
@@ -207,11 +202,17 @@ class Project(object):
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
 
+        if config_filename != "":
+        
+
+            self.map_data.set_config_filename(config_filename)
+
+        if config_dictionary != {}:
+            self.map_data.config.update_from_dictionary(config_dictionary)
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
             
-        #set config dict
-        self.map_data.config.update_from_dictionary(config_dictionary)
+
         
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()

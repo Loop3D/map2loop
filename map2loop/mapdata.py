@@ -269,7 +269,7 @@ class MapData:
                 Whether the file is in m2lv2 form. Defaults to False.
         """
         logger.info('Setting config filename to {filename}')
-        self.config_filename = filename
+
         self.config.update_from_file(filename, legacy_format=legacy_format, lower=lower)
         logger.info(f"Config is: {self.config.to_dict()}")
 

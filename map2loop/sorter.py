@@ -118,8 +118,8 @@ class SorterUseNetworkX(Sorter):
 
 class SorterUseHint(SorterUseNetworkX):
     def __init__(self):
-        print(
-            "SorterUseHint is deprecated and will be removed in map2loop v3.2. Use SorterUseNetworkX instead"
+        logger.info(
+            "SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead"
         )
         super().__init__()
 

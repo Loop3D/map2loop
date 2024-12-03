@@ -70,7 +70,7 @@ class Project(object):
         config_filename: Union[pathlib.Path, str] = "",
         config_dictionary: dict = {},
         clut_filename: Union[pathlib.Path, str] = "",
-        clut_file_legacy: bool = False,
+        # clut_file_legacy: bool = False,
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
         overwrite_loopprojectfile: bool = False,
@@ -106,10 +106,8 @@ class Project(object):
                 The filename of the configuration json file to use (if not using config_dictionary). Defaults to "".
             config_dictionary (dict, optional):
                 A dictionary version of the configuration file. Defaults to {}.
-            clut_filename (str, optional):
+            clut_filename (str, deprecated):
                 The filename of the colour look up table to use. Defaults to "".
-            clut_file_legacy (bool, optional):
-                A flag to indicate if the clut file is in the legacy format. Defaults to False.
             save_pre_checked_map_data (bool, optional):
                 A flag to save all map data to file before use. Defaults to False.
             loop_project_filename (str, optional):
@@ -145,6 +143,11 @@ class Project(object):
         self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
+
+        # check if user is using a config file or dictionary, if file, break the project.
+        if config_filename != "":
+            logger.error("Config legacy files have been deprecated in v3.2. Please use a dictionary instead.")
+            raise ValueError("Config legacy files have been deprecated in v3.2. Please use a dictionary instead.You can use the utils function update_from_legacy_file")
 
         # Check for alternate config filenames in kwargs
         if "metadata_filename" in kwargs and config_filename == "":
@@ -203,18 +206,12 @@ class Project(object):
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
 
-        if config_filename != "":
-            if clut_file_legacy:
-                logger.warning(
-                    "DEPRECATION: Legacy files are deprecated and their use will be removed in v3.2"
-                )
-
-            self.map_data.set_config_filename(config_filename, legacy_format=clut_file_legacy)
-
-        if config_dictionary != {}:
-            self.map_data.config.update_from_dictionary(config_dictionary)
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
+            
+        #set config dict
+        self.map_data.config.update_from_dictionary(config_dictionary)
+        
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()
 

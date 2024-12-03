@@ -9,7 +9,7 @@ import geopandas
 import pandas
 import shapely
 import numpy
-from typing import Optional
+from typing import Optional, Union
 
 
 class Sampler(ABC):
@@ -60,7 +60,7 @@ class SamplerDecimator(Sampler):
     """
 
     @beartype.beartype
-    def __init__(self, decimation: int = 1):
+    def __init__(self, decimation: Union[int, float] = 1):
         """
         Initialiser for decimator sampler
 

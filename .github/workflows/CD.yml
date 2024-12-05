@@ -40,7 +40,7 @@ jobs:
 
   pypi-build-sdist:
     name: Build SDist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -58,7 +58,7 @@ jobs:
   pypi-test-sdist:
     name: Test sdist
     needs: pypi-build-sdist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Install GDAL
         run: |
@@ -90,7 +90,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -118,10 +118,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
         include:
-          - os: "ubuntu-latest"
-            artifact: map2loop-wheels-ubuntu-latest
+          - os: "ubuntu-24.04"
+            artifact: map2loop-wheels-ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -171,7 +171,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           # - macos-latest # currently not supported because needs libgcc>= 14 and not available for macos-latest (version available is 4.x.x)
           - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -217,7 +217,7 @@ jobs:
 
   release-please:
     needs: [pypi-test-wheels, conda-build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
@@ -232,7 +232,7 @@ jobs:
       #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
   documentation-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
       - uses: actions/checkout@v4
@@ -247,7 +247,7 @@ jobs:
           path: docs/build/html
 
   documentation-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [release-please, documentation-test]
     if: ${{ needs.release-please.outputs.release_created }} && github.ref == 'refs/heads/master'
 
@@ -274,7 +274,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           # - macos-latest
           - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -300,7 +300,7 @@ jobs:
     needs: [pypi-test-wheels]
     if: github.ref == 'refs/heads/master'
     runs-on:
-      - ubuntu-latest
+      - ubuntu-24.04  # https://github.com/actions/runner-images/issues/10636
     # if: ${{ needs.release-please.outputs.release_created }}
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing

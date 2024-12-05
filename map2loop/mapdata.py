@@ -120,8 +120,8 @@ class MapData:
             )
         if self.bounding_box is not None:
             self.recreate_bounding_box_str()
-        logger.info("Setting working projection to {self.working_projection}")
-
+        logger.info(f"Setting working projection to {self.working_projection}")
+        
     def get_working_projection(self):
         """
         Get the working projection

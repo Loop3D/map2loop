@@ -105,7 +105,7 @@ class Project(object):
                 The filename of the configuration json file to use (if not using config_dictionary). Defaults to "".
             config_dictionary (dict, optional):
                 A dictionary version of the configuration file. Defaults to {}.
-            clut_filename (str, deprecated):
+            clut_filename (str, optional):
                 The filename of the colour look up table to use. Defaults to "".
             save_pre_checked_map_data (bool, optional):
                 A flag to save all map data to file before use. Defaults to False.
@@ -201,14 +201,13 @@ class Project(object):
             self.map_data.set_filename(Datatype.DTM, dtm_filename)
         if fault_orientation_filename != "":
             self.map_data.set_filename(Datatype.FAULT_ORIENTATION, fault_orientation_filename)
-
+       
         if config_filename != "":
-        
-
             self.map_data.set_config_filename(config_filename)
 
         if config_dictionary != {}:
             self.map_data.config.update_from_dictionary(config_dictionary)
+            
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
             

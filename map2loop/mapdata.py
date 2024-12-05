@@ -267,8 +267,9 @@ class MapData:
                 Flag to convert the config file to lowercase. Defaults to False.
         """
         logger.info('Setting config filename to {filename}')
-
+        
         self.config.update_from_file(filename,  lower=lower)
+        
         logger.info(f"Config is: {self.config.to_dict()}")
 
     def get_config_filename(self):

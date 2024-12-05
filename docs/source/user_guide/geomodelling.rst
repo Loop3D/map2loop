@@ -87,7 +87,7 @@ This file contains point data that is used to represent orientation data (e.g. b
 
 An example of the QGIS attribute table for simple orientation data is shown in the image below: 
 
-.. image:: _static/images/ori_attributes_table.png
+.. image:: _static/images/ori_attributes_table_r.png
    :width: 400
 
 LineString Shapefile 
@@ -131,7 +131,7 @@ This shapefile contains lineStrings that represent fault traces at the surface. 
 
 An example of the QGIS attribute table for a single fault is shown in the image below: 
 
-.. image:: _static/images/fault_attributes_table.png
+.. image:: _static/images/fault_attributes_table_r.png
    :width: 400
 
 
@@ -206,7 +206,7 @@ This contains polygons representing different lithologies and the contacts betwe
 
 A simple example of the QGIS attribute table for lithology data is shown in the image below: 
 
-.. image:: _static/images/litho_attributes_table.png
+.. image:: _static/images/litho_attributes_table_r.png
    :width: 400
 
 Tips and Trouble Shooting for QGIS map 

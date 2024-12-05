@@ -176,6 +176,16 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 val = min(distance, thicknesses.at[idx, "ThicknessMean"])
             thicknesses.loc[idx, "ThicknessMean"] = val
 
+        # add check more than 75% of the unit thicknesses are -1
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
+
+        if units_with_no_thickness / len(thicknesses) >= 0.75:
+            logger.warning(
+                f"More than 75% of units ({units_with_no_thickness}/{len(thicknesses)}) have a calculated thickness of -1. "
+                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
+            )
+        
+        
         return thicknesses
 
 
@@ -299,6 +309,7 @@ class InterpolatedStructure(ThicknessCalculator):
         ].copy()
 
         _lines = []
+        _dips = []
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -346,6 +357,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # get the dip of the points that are within
                         # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
+                        _dips.append(_dip)
                         # get the end points of the shortest line
                         # calculate the true thickness t = L . sin dip
                         thickness = line_length * numpy.sin(_dip)
@@ -374,9 +386,18 @@ class InterpolatedStructure(ThicknessCalculator):
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
                 
-        print("lines", geopandas.GeoDataFrame(geometry = _lines))
-        # self.lines = geopandas.GeoDataFrame(geometry= _lines, crs=basal_contacts.crs)
-        # self.lines["DIP"] = dip
+        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs = basal_contacts.crs)
+        self.lines['dip'] = _dips
+        
+        # add check more than 75% of the unit thicknesses are -1
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
+
+        if units_with_no_thickness / len(thicknesses) >= 0.75:
+            logger.warning(
+                f"More than 75% of units ({units_with_no_thickness}/{len(thicknesses)}) have a calculated thickness of -1. "
+                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
+            )
+        
         return thicknesses
 
 
@@ -655,4 +676,12 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
+        # check if more than 75% of the unit thicknesses are -1
+        units_with_no_thickness = len(output_units[output_units['ThicknessMedian'] == -1])
+
+        if units_with_no_thickness / len(output_units) >= 0.75:
+            logger.warning(
+                f"More than 75% of units ({units_with_no_thickness}/{len(output_units)}) have a calculated thickness of -1. "
+                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
+            )
         return output_units

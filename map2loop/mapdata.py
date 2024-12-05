@@ -999,6 +999,7 @@ class MapData:
 
         # update minimum fault length either with the value from the config or calculate it
         if self.minimum_fault_length < 0:
+            logger.info("Calculating minimum fault length")
             self.minimum_fault_length = calculate_minimum_fault_length(
                 bbox=self.bounding_box, area_percentage=0.05
             )

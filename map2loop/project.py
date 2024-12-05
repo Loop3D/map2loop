@@ -14,10 +14,11 @@ from .map2model_wrapper import Map2ModelWrapper
 
 # external imports
 import LoopProjectFile as LPF
-from typing import Union, List
 from osgeo import gdal
+gdal.UseExceptions()
 import geopandas
 import beartype
+from beartype.typing import Union, List
 import pathlib
 import numpy
 import pandas

@@ -11,6 +11,7 @@ import numpy
 import pathlib
 import shapely
 from osgeo import gdal, osr
+gdal.UseExceptions()
 from owslib.wcs import WebCoverageService
 import urllib
 from gzip import GzipFile

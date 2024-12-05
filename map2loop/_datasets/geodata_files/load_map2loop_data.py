@@ -1,7 +1,7 @@
 import geopandas
-import pkg_resources
+from importlib.resources import files
 from osgeo import gdal
-
+gdal.UseExceptions()
 
 def load_hamersley_geology():
     """
@@ -14,9 +14,7 @@ def load_hamersley_geology():
     Returns:
         geopandas.GeoDataFrame: The geology data
     """
-    stream = pkg_resources.resource_filename(
-        "map2loop", "/_datasets/geodata_files/hamersley/geology.geojson"
-    )
+    stream = files("map2loop._datasets.geodata_files.hamersley").joinpath("geology.geojson")
     return geopandas.read_file(stream)
 
 
@@ -32,9 +30,7 @@ def load_hamersley_structure():
         geopandas.GeoDataFrame: The structure data
     """
 
-    path = pkg_resources.resource_filename(
-        "map2loop", "/_datasets/geodata_files/hamersley/structure.geojson"
-    )
+    path = files("map2loop._datasets.geodata_files.hamersley").joinpath("structure.geojson")
     return geopandas.read_file(path)
 
 
@@ -45,7 +41,5 @@ def load_hamersley_dtm():
     Returns:
         gdal.Dataset: The DTM data
     """
-    path = pkg_resources.resource_filename(
-        "map2loop", "/_datasets/geodata_files/hamersley/dtm_rp.tif"
-    )
+    path = files("map2loop._datasets.geodata_files.hamersley").joinpath("dtm_rp.tif")
     return gdal.Open(path)

@@ -375,7 +375,7 @@ def hex_to_rgb(hex_color: str) -> tuple:
 
 @beartype.beartype
 def calculate_minimum_fault_length(
-    bbox: Dict[str, Union[int, float]], area_percentage: float
+    bbox: dict[str, int | float], area_percentage: float
 ) -> float:
 
     """

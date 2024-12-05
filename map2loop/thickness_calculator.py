@@ -84,7 +84,17 @@ class ThicknessCalculator(ABC):
             )
             return units
 
+    def _check_thickness_percentage_calculations(self, thicknesses: pandas.DataFrame):
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMean'] == -1])
+        total_units = len(thicknesses)
 
+        if total_units > 0 and (units_with_no_thickness / total_units) >= 0.75:
+            logger.warning(
+                f"More than {int(0.75 * 100)}% of units ({units_with_no_thickness}/{total_units}) "
+                f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
+                f"is not suitable for this dataset."
+            )
+            
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
@@ -176,6 +186,8 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 val = min(distance, thicknesses.at[idx, "ThicknessMean"])
             thicknesses.loc[idx, "ThicknessMean"] = val
 
+        self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
 
 
@@ -199,6 +211,7 @@ class InterpolatedStructure(ThicknessCalculator):
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []
+        self.max_line_length = None
 
     @beartype.beartype
     def compute(
@@ -298,6 +311,8 @@ class InterpolatedStructure(ThicknessCalculator):
             ["geometry", "dip", "UNITNAME"]
         ].copy()
 
+        _lines = []
+        _dips = []
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -323,7 +338,12 @@ class InterpolatedStructure(ThicknessCalculator):
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        self.lines.append(short_line)
+                        _lines.append(short_line)
+                        
+                        # check if the short line is 
+                        if self.max_line_length is not None and short_line.length > self.max_line_length:
+                            continue
+ 
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -345,6 +365,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # get the dip of the points that are within
                         # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
+                        _dips.append(_dip)
                         # get the end points of the shortest line
                         # calculate the true thickness t = L . sin dip
                         thickness = line_length * numpy.sin(_dip)
@@ -372,7 +393,10 @@ class InterpolatedStructure(ThicknessCalculator):
                 logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-
+                
+        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs = basal_contacts.crs)
+        self.lines['dip'] = _dips
+        self._check_thickness_percentage_calculations(thicknesses)
         return thicknesses
 
 
@@ -394,6 +418,8 @@ class StructuralPoint(ThicknessCalculator):
         self.thickness_calculator_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
+        self.max_line_length = None
+        self.lines = []
 
     @beartype.beartype
     def compute(
@@ -474,6 +500,8 @@ class StructuralPoint(ThicknessCalculator):
         # create empty lists to store thicknesses and lithologies
         thicknesses = []
         lis = []
+        _lines = []
+        _dip = []
 
         # loop over each sampled structural measurement
         for s in range(0, len(sampled_structures)):
@@ -577,15 +605,28 @@ class StructuralPoint(ThicknessCalculator):
             if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
+            #build the debug info
+            line = shapely.geometry.LineString([int_pt1, int_pt2])
+            _lines.append(line)
+            _dip.append(measurement['DIP'])  
+
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
 
+            # if length is higher than max_line_length, skip
+            if self.max_line_length is not None and L > self.max_line_length:
+                continue
+            
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))
 
             thicknesses.append(thickness)
             lis.append(litho_in)
-
+        
+        # create the debug gdf
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines["DIP"] = _dip
+        
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
@@ -640,4 +681,6 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
+        self._check_thickness_percentage_calculations(output_units)
+        
         return output_units

@@ -60,7 +60,7 @@ class SamplerDecimator(Sampler):
     """
 
     @beartype.beartype
-    def __init__(self, decimation: Union[int, float] = 1):
+    def __init__(self, decimation: int = 1):
         """
         Initialiser for decimator sampler
 

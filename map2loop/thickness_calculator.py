@@ -85,7 +85,7 @@ class ThicknessCalculator(ABC):
             return units
 
     def _check_thickness_percentage_calculations(self, thicknesses: pandas.DataFrame):
-        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMean'] == -1])
         total_units = len(thicknesses)
 
         if total_units > 0 and (units_with_no_thickness / total_units) >= 0.75:

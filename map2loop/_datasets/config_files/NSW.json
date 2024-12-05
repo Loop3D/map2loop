@@ -24,7 +24,7 @@
         "intrusive_text": "intrusive",
         "volcanic_text": "volcanic",
         "objectid_column": "ID",
-        "ignore_codes": ["cover"]},
+        "ignore_lithology_codes": ["cover"]},
     "fault": {
         "structtype_column": "boundaryty",
         "fault_text": "Fault",
@@ -36,7 +36,7 @@
         "dipestimate_column": "faultdipan",
         "dipestimate_text": "Moderate,Listric,Steep,Vertical",
         "name_column": "name",
-        "objectid_column": "unique_id"
+        "objectid_column": "unique_id", 
     },
     "fold": {
         "structtype_column": "codedescpt",

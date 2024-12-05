@@ -24,7 +24,7 @@
         "intrusive_text": "intrusive",
         "volcanic_text": "volc",
         "objectid_column": "ID",
-        "ignore_codes": ["cover"]
+        "ignore_lithology_codes": ["cover"]
     },
     "fault": {
         "structtype_column": "descriptio",

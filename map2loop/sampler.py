@@ -9,7 +9,7 @@ import geopandas
 import pandas
 import shapely
 import numpy
-from typing import Optional
+from typing import Optional, Union
 
 
 class Sampler(ABC):

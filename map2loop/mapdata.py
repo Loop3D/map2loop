@@ -23,8 +23,8 @@ import tempfile
 
 
 from .logging import getLogger
+logger = getLogger(__name__)  
 
-logger = getLogger(__name__)
 
 
 class MapData:
@@ -115,7 +115,7 @@ class MapData:
         elif issubclass(type(projection), str):
             self.working_projection = projection
         else:
-            print(
+            logger.warning(
                 f"Warning: Unknown projection set {projection}. Leaving all map data in original projection\n"
             )
         if self.bounding_box is not None:
@@ -418,7 +418,7 @@ class MapData:
             bool: true if the filename is set, false otherwise
         """
         if self.filenames[datatype] is None or self.filenames[datatype] == "":
-            print(f"Warning: Filename for {str(datatype)} is not set")
+            logger.warning(f"Warning: Filename for {str(datatype)} is not set")
             return False
         return True
 
@@ -715,6 +715,7 @@ class MapData:
             self.raw_data[Datatype.FAULT_ORIENTATION] is None
             or type(self.raw_data[Datatype.FAULT_ORIENTATION]) is not geopandas.GeoDataFrame
         ):
+            logger.warning("Fault orientation shapefile is not loaded or valid")
             return (True, "Fault orientation shapefile is not loaded or valid")
 
         # Create new geodataframe
@@ -775,10 +776,11 @@ class MapData:
             self.raw_data[Datatype.STRUCTURE] is None
             or type(self.raw_data[Datatype.STRUCTURE]) is not geopandas.GeoDataFrame
         ):
+            logger.warning("Structure map is not loaded or valid")
             return (True, "Structure map is not loaded or valid")
 
         if len(self.raw_data[Datatype.STRUCTURE]) < 2:
-            print(
+            logger.warning(
                 "Stucture map does not enough orientations to complete calculations (need at least 2), projection may be inconsistent"
             )
 
@@ -846,6 +848,7 @@ class MapData:
             self.raw_data[Datatype.GEOLOGY] is None
             or type(self.raw_data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame
         ):
+            logger.warning("Geology map is not loaded or valid")
             return (True, "Geology map is not loaded or valid")
 
         # Create new geodataframe
@@ -860,6 +863,7 @@ class MapData:
         else:
             msg = f"Geology map does not contain unitname_column {config['unitname_column']}"
             print(msg)
+            logger.warning(msg)
             return (True, msg)
         if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
             geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
@@ -870,6 +874,7 @@ class MapData:
                 f"Geology map does not contain alt_unitname_column {config['alt_unitname_column']}"
             )
             print(msg)
+            logger.warning(msg)
             return (True, msg)
 
         # Parse group and supergroup columns
@@ -983,6 +988,7 @@ class MapData:
             self.raw_data[Datatype.FAULT] is None
             or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame
         ):
+            logger.warning("Fault map is not loaded or valid")
             return (True, "Fault map is not loaded or valid")
 
         # Create a new geodataframe
@@ -1007,6 +1013,7 @@ class MapData:
                 if len(faults) < len(self.raw_data[Datatype.GEOLOGY]) and len(faults) == 0:
                     msg = f"Fault map reduced to 0 faults as structtype_column ({config['structtype_column']}) does not contains as row with fault_text \"{config['fault_text']}\""
                     print(msg)
+                    logger.warning(msg)
 
         if config["name_column"] in self.raw_data[Datatype.FAULT]:
             faults["NAME"] = self.raw_data[Datatype.FAULT][config["name_column"]].astype(str)
@@ -1020,21 +1027,20 @@ class MapData:
         existing_codes = set(ignore_codes).intersection(set(faults["NAME"].values))
 
         # Find the codes that do not exist in the DataFrame
-        # non_existing_codes = set(ignore_codes) - existing_codes
+        non_existing_codes = set(ignore_codes) - existing_codes
 
         # Issue a warning if there are any non-existing codes
-        # if non_existing_codes:
-        #     print(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping")
-        # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented.
+        if non_existing_codes:
+            logger.info(f"Warning: {non_existing_codes} set to fault ignore codes are not in the provided data. Skipping")
 
         # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
         if existing_codes:
             faults = faults[~faults["NAME"].isin(existing_codes)]
-            # print(f"The following codes were found and removed: {existing_codes}")
-            # TODO: these print statements could be in the logger internal statement, pass into the logger file when implemented.
+            logger.info(f"The following codes were found and removed: {existing_codes}")
         else:
+            logger.info("None of the fault ignore codes exist in the original fault data.")
             pass
-            # print("None of the fault ignore codes exist in the original fault data.")
+            
 
         # parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:
@@ -1146,6 +1152,7 @@ class MapData:
             if self.verbose_level > VerboseLevel.NONE:
                 if len(folds) < len(self.raw_data[Datatype.GEOLOGY]) and len(folds) == 0:
                     msg = f"Fold map reduced to 0 folds as structtype_column ({config['structtype_column']}) does not contains any row with fold_text \"{config['fold_text']}\""
+                    logger.warning(msg)
                     print(msg)
 
         if config["foldname_column"] in self.raw_data[Datatype.FOLD]:
@@ -1187,14 +1194,14 @@ class MapData:
         elif type(self.raw_data[datatype]) is geopandas.GeoDataFrame:
             if self.data_states[datatype] >= Datastate.LOADED:
                 if self.raw_data[datatype].crs is None:
-                    print(
+                    logger.info(
                         f"No projection on original map data, assigning to working_projection {self.working_projection}"
                     )
                     self.raw_data[datatype].crs = self.working_projection
                 else:
                     self.raw_data[datatype].to_crs(crs=self.working_projection, inplace=True)
         else:
-            print(
+            logger.warning(
                 f"Type of {datatype.name} map not a GeoDataFrame so cannot change map crs projection"
             )
 
@@ -1232,8 +1239,7 @@ class MapData:
             raw_data = self.raw_data[datatype]
 
             if raw_data is None:
-                ## Leaving this print statement in for now, as it will be useful for logging, but repetitive as a warning message
-                # print(f"No data available for {datatype.name}. Skipping saving to file {filename}.")
+                logger.info(f"No data available for {datatype.name}. Skipping saving to file {filename}.")
                 return
 
             if extension == ".csv":
@@ -1242,6 +1248,7 @@ class MapData:
                 self.raw_data[datatype].to_file(filename)
 
         except Exception as e:
+            logger.error(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
             print(f"Failed to save {datatype.name} to file named {filename}\nError: {str(e)}")
 
     @beartype.beartype
@@ -1293,6 +1300,7 @@ class MapData:
             str: The modified filename
         """
         if filename is None:
+            logger.error(f"Filename {filename} is invalid")
             raise ValueError(f"Filename {filename} is invalid")
         return filename.replace("{BBOX_STR}", self.bounding_box_str)
 
@@ -1313,6 +1321,7 @@ class MapData:
             str: The modified filename
         """
         if filename is None:
+            logger.error(f"Filename {filename} is invalid")
             raise ValueError(f"Filename {filename} is invalid")
         return filename.replace("{PROJ_STR}", self.working_projection)
 
@@ -1324,7 +1333,7 @@ class MapData:
             dict, str: The bounding box and projection of the geology shapefile
         """
         if self.filenames[Datatype.GEOLOGY] is None:
-            print(
+            logger.info(
                 "Could not open geology file as none set, no bounding box or projection available"
             )
             return None, None
@@ -1341,7 +1350,7 @@ class MapData:
                 "maxy": bounds[3],
             }, geology_data.crs
         except Exception:
-            print(
+            logger.error(
                 f"Could not open geology file {temp_geology_filename} so no bounding box or projection found"
             )
             return None, None
@@ -1359,9 +1368,9 @@ class MapData:
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
         if type(self.data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame:
-            print("Cannot export geology data as it is not a GeoDataFrame")
+            logger.warning("Cannot export geology data as it is not a GeoDataFrame")
         elif self.data_states[Datatype.GEOLOGY] != Datastate.COMPLETE:
-            print(
+            logger.warning(
                 f"Cannot export geology data as it only loaded to {self.data_states[Datatype.GEOLOGY].name} status"
             )
         else:
@@ -1394,9 +1403,9 @@ class MapData:
         # Check faults data status and export to a WKT format file
         self.load_map_data(Datatype.FAULT)
         if type(self.data[Datatype.FAULT]) is not geopandas.GeoDataFrame:
-            print("Cannot export fault data as it is not a GeoDataFrame")
+            logger.warning("Cannot export fault data as it is not a GeoDataFrame")
         elif self.data_states[Datatype.FAULT] != Datastate.COMPLETE:
-            print(
+            logger.warning(
                 f"Cannot export fault data as it only loaded to {self.data_states[Datatype.FAULT].name} status"
             )
         else:
@@ -1424,7 +1433,7 @@ class MapData:
         """
         data = self.get_map_data(datatype)
         if data is None:
-            print(f"Cannot get value from {datatype.name} data as data is not loaded")
+            logger.warning(f"Cannot get value from {datatype.name} data as data is not loaded")
             return None
         inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
 
@@ -1484,7 +1493,7 @@ class MapData:
             return df
         data = self.get_map_data(datatype)
         if data is None:
-            print("Cannot get value from data as data is not loaded")
+            logger.warning("Cannot get value from data as data is not loaded")
             return None
 
         inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
@@ -1501,7 +1510,7 @@ class MapData:
         """
         Extract the contacts between units in the geology GeoDataFrame
         """
-        # print('extracting contacts')
+        logger.info("Extracting contacts")
         geology = self.get_map_data(Datatype.GEOLOGY).copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
         # Remove intrusions
@@ -1548,6 +1557,8 @@ class MapData:
             stratigraphic_column (list):
                 The stratigraphic column to use
         """
+        logger.info("Extracting basal contacts")
+        
         units = stratigraphic_column
         basal_contacts = self.contacts.copy()
 
@@ -1558,6 +1569,11 @@ class MapData:
                 basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
                 .unique()
                 .tolist()
+            )
+            logger.error(
+                "There are units in the Geology dataset, but not in the stratigraphic column: "
+                + ", ".join(missing_units)
+                + ". Please readjust the stratigraphic column if this is a user defined column."
             )
             raise ValueError(
                 "There are units in stratigraphic column, but not in the Geology dataset: "
@@ -1619,13 +1635,13 @@ class MapData:
             try:
                 colour_lookup = pandas.read_csv(self.colour_filename, sep=",")
             except FileNotFoundError:
-                print(
+                logger.info(
                     f"Colour Lookup file {self.colour_filename} not found. Assigning random colors to units"
                 )
                 self.colour_filename = None
 
         if self.colour_filename is None:
-            print("\nNo colour configuration file found. Assigning random colors to units")
+            logger.info("\nNo colour configuration file found. Assigning random colors to units")
             missing_colour_n = len(stratigraphic_units["colour"])
             stratigraphic_units.loc[
                 stratigraphic_units["colour"].isna(), "colour"
@@ -1648,7 +1664,7 @@ class MapData:
             ] = generate_random_hex_colors(int(stratigraphic_units["colour"].isna().sum()))
             stratigraphic_units.drop(columns=["UNITNAME", "colour_old"], inplace=True)
         else:
-            print(
+            logger.warning(
                 f"Colour Lookup file {self.colour_filename} does not contain 'UNITNAME' or 'colour' field"
             )
         return stratigraphic_units

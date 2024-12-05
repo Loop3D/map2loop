@@ -10,6 +10,9 @@ from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
 from .mapdata import MapData
 
+from .logging import getLogger
+logger = getLogger(__name__)  
+
 # external imports
 from abc import ABC, abstractmethod
 import scipy.interpolate
@@ -76,7 +79,7 @@ class ThicknessCalculator(ABC):
         """
 
         if len(stratigraphic_order) < 3:
-            print(
+            logger.warning(
                 f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
             )
             return units
@@ -133,7 +136,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         )
 
         if len(stratigraphic_order) < 3:
-            print(
+            logger.warning(
                 f"ThicknessCalculatorAlpha: Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
             )
             return thicknesses
@@ -153,12 +156,12 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 if contact1 is not None and contact2 is not None:
                     distance = contact1.distance(contact2)
                 else:
-                    print(
+                    logger.warning(
                         f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                     )
                     distance = no_distance
             else:
-                print(
+                logger.warning(
                     f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                 )
 
@@ -366,7 +369,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
 
             else:
-                print(
+                logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
 
@@ -454,7 +457,7 @@ class StructuralPoint(ThicknessCalculator):
 
         # remove nans from sampled structures
         # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
-        print(
+        logger.info(
             f"skipping row(s) {sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy()} in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n"
         )
         sampled_structures = sampled_structures.dropna(subset=['unit_name'])
@@ -489,7 +492,7 @@ class StructuralPoint(ThicknessCalculator):
             # check if litho_in is in geology
             # for a special case when the litho_in is not in the geology
             if len(geology[geology['UNITNAME'] == litho_in]) == 0:
-                print(
+                logger.info(
                     f"There are structural measurements in unit - {litho_in} - that are not in the geology shapefile. Skipping this structural measurement"
                 )
                 continue
@@ -619,7 +622,7 @@ class StructuralPoint(ThicknessCalculator):
             ):
                 idx = stratigraphic_order.index(unit)
                 # throw warning to user
-                print(
+                logger.warning(
                     'Thickness Calculator StructuralPoint: Cannot calculate thickness between',
                     unit,
                     "and ",

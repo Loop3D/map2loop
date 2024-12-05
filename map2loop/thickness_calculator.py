@@ -298,6 +298,7 @@ class InterpolatedStructure(ThicknessCalculator):
             ["geometry", "dip", "UNITNAME"]
         ].copy()
 
+        _lines = []
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -323,7 +324,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        self.lines.append(short_line)
+                        _lines.append(short_line)
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -372,7 +373,10 @@ class InterpolatedStructure(ThicknessCalculator):
                 logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-
+                
+        print("lines", geopandas.GeoDataFrame(geometry = _lines))
+        # self.lines = geopandas.GeoDataFrame(geometry= _lines, crs=basal_contacts.crs)
+        # self.lines["DIP"] = dip
         return thicknesses
 
 
@@ -394,6 +398,7 @@ class StructuralPoint(ThicknessCalculator):
         self.thickness_calculator_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
+        self.lines = []
 
     @beartype.beartype
     def compute(
@@ -474,6 +479,8 @@ class StructuralPoint(ThicknessCalculator):
         # create empty lists to store thicknesses and lithologies
         thicknesses = []
         lis = []
+        _lines = []
+        _dip = []
 
         # loop over each sampled structural measurement
         for s in range(0, len(sampled_structures)):
@@ -580,12 +587,20 @@ class StructuralPoint(ThicknessCalculator):
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
 
+            #build the debug info
+            _lines.append(shapely.geometry.LineString([int_pt1, int_pt2]))
+            _dip.append(measurement['DIP'])            
+            
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))
 
             thicknesses.append(thickness)
             lis.append(litho_in)
-
+        
+        # create the debug gdf
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines["DIP"] = _dip
+        
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()

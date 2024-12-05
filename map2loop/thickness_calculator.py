@@ -84,7 +84,17 @@ class ThicknessCalculator(ABC):
             )
             return units
 
+    def _check_thickness_percentage_calculations(self, thicknesses: pandas.DataFrame):
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
+        total_units = len(thicknesses)
 
+        if total_units > 0 and (units_with_no_thickness / total_units) >= 0.75:
+            logger.warning(
+                f"More than {int(0.75 * 100)}% of units ({units_with_no_thickness}/{total_units}) "
+                f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
+                f"is not suitable for this dataset."
+            )
+            
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
@@ -176,15 +186,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 val = min(distance, thicknesses.at[idx, "ThicknessMean"])
             thicknesses.loc[idx, "ThicknessMean"] = val
 
-        # add check more than 75% of the unit thicknesses are -1
-        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
-
-        if units_with_no_thickness / len(thicknesses) >= 0.75:
-            logger.warning(
-                f"More than 75% of units ({units_with_no_thickness}/{len(thicknesses)}) have a calculated thickness of -1. "
-                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
-            )
-        
+        self._check_thickness_percentage_calculations(thicknesses)
         
         return thicknesses
 
@@ -394,16 +396,7 @@ class InterpolatedStructure(ThicknessCalculator):
                 
         self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs = basal_contacts.crs)
         self.lines['dip'] = _dips
-        
-        # add check more than 75% of the unit thicknesses are -1
-        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMedian'] == -1])
-
-        if units_with_no_thickness / len(thicknesses) >= 0.75:
-            logger.warning(
-                f"More than 75% of units ({units_with_no_thickness}/{len(thicknesses)}) have a calculated thickness of -1. "
-                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
-            )
-        
+        self._check_thickness_percentage_calculations(thicknesses)
         return thicknesses
 
 
@@ -688,12 +681,6 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
-        # check if more than 75% of the unit thicknesses are -1
-        units_with_no_thickness = len(output_units[output_units['ThicknessMedian'] == -1])
-
-        if units_with_no_thickness / len(output_units) >= 0.75:
-            logger.warning(
-                f"More than 75% of units ({units_with_no_thickness}/{len(output_units)}) have a calculated thickness of -1. "
-                f"This may indicate that {self.thickness_calculator_label} is not suitable for this dataset."
-            )
+        self._check_thickness_percentage_calculations(output_units)
+        
         return output_units

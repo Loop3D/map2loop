@@ -209,6 +209,7 @@ class InterpolatedStructure(ThicknessCalculator):
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = []
+        self.max_line_length = None
 
     @beartype.beartype
     def compute(
@@ -336,6 +337,11 @@ class InterpolatedStructure(ThicknessCalculator):
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         _lines.append(short_line)
+                        
+                        # check if the short line is 
+                        if self.max_line_length is not None and short_line.length > self.max_line_length:
+                            continue
+ 
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -419,6 +425,7 @@ class StructuralPoint(ThicknessCalculator):
         self.thickness_calculator_label = "StructuralPoint"
         self.line_length = 10000
         self.strike_allowance = 30
+        self.max_line_length = None
         self.lines = []
 
     @beartype.beartype
@@ -605,12 +612,17 @@ class StructuralPoint(ThicknessCalculator):
             if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
+            #build the debug info
+            line = shapely.geometry.LineString([int_pt1, int_pt2])
+            _lines.append(line)
+            _dip.append(measurement['DIP'])  
+
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
 
-            #build the debug info
-            _lines.append(shapely.geometry.LineString([int_pt1, int_pt2]))
-            _dip.append(measurement['DIP'])            
+            # if length is higher than max_line_length, skip
+            if self.max_line_length is not None and L > self.max_line_length:
+                continue
             
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))

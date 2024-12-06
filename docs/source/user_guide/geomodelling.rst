@@ -206,7 +206,7 @@ This contains polygons representing different lithologies and the contacts betwe
 
 A simple example of the QGIS attribute table for lithology data is shown in the image below: 
 
-.. image:: .../_static/images/litho_attributes_table_r.png
+.. image:: ../_static/images/litho_attributes_table_r.png
    :width: 900
 
 Tips and Trouble Shooting for QGIS map 

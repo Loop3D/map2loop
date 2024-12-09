@@ -19,7 +19,7 @@ from uuid import uuid4
 import beartype
 import os
 from io import BytesIO
-from typing import Union
+from typing import Union, Tuple
 import tempfile
 
 
@@ -689,8 +689,17 @@ class MapData:
         """
         func = None
         if datatype == Datatype.GEOLOGY:
+            validity_check, message = self.check_geology_fields_validity()
+            if validity_check:
+                logger.error(f"Datatype GEOLOGY data validation failed: {message}")
+                return
             func = self.parse_geology_map
+            
         elif datatype == Datatype.STRUCTURE:
+            validity_check, message = self.check_structure_fields_validity()
+            if validity_check:
+                logger.error(f"Datatype STRUCTURE data validation failed: {message}")
+                return
             func = self.parse_structure_map
         elif datatype == Datatype.FAULT:
             func = self.parse_fault_map
@@ -704,65 +713,185 @@ class MapData:
                 logger.error(message)
 
     @beartype.beartype
-    def parse_fault_orientations(self) -> tuple:
+    def check_geology_fields_validity(self) -> tuple[bool, str]:
         """
-        Parse the fault orientations shapefile data into a consistent format
+        Validate the columns in GEOLOGY geodataframe
+
+        Several checks to ensure that the geology data:
+        - Is loaded and valid.
+        - Contains required columns with appropriate types and no missing or blank values.
+        - Has optional columns with valid types, if present.
+        - Does not contain duplicate in IDs.
+        - Ensures the geometry column has valid geometries.
+
+        Returns:
+            Tuple[bool, str]: A tuple indicating success (False) or failure (True)
+        """
+        # Check if geology data is loaded and valid
+        if (
+            self.raw_data[Datatype.GEOLOGY] is None
+            or type(self.raw_data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame
+        ):
+            logger.error("GEOLOGY data is not loaded or is not a valid GeoDataFrame")
+            return (True, "GEOLOGY data is not loaded or is not a valid GeoDataFrame")
+        
+        geology_data = self.raw_data[Datatype.GEOLOGY]
+        config = self.config.geology_config
+        
+        # 1. Check geometry validity - tested & working
+        if not geology_data.geometry.is_valid.all():
+            logger.error(f"datatype GEOLOGY: Invalid geometries found in datatype GEOLOGY. Please fix those before proceeding with map2loop processing")
+            return (True, "Invalid geometries found in datatype GEOLOGY")
+    
+        # # 2. Required Columns & are they str, and then empty or null? 
+        required_columns = [config["unitname_column"], config["alt_unitname_column"]]
+        for col in required_columns:
+            if col not in geology_data.columns:
+                logger.error(f"Datatype GEOLOGY: Required column with config key: '{[k for k, v in config.items() if v == col][0]}' is missing from geology data.")
+                return (True, f"Datatype GEOLOGY: Required column with config key: '{[k for k, v in config.items() if v == col][0]}' is missing from geology data.")
+            if not geology_data[col].apply(lambda x: isinstance(x, str)).all():
+                config_key = [k for k, v in config.items() if v == col][0]
+                logger.error(f"Datatype GEOLOGY: Column '{config_key}' must contain only string values. Please check that the column contains only string values.")
+                return (True, f"Datatype GEOLOGY: Column '{config_key}' must contain only string values. Please check that the column contains only string values.")
+            if geology_data[col].isnull().any() or geology_data[col].str.strip().eq("").any():
+                config_key = [k for k, v in config.items() if v == col][0]
+                logger.error(f"Datatype GEOLOGY: NaN or blank values found in required column '{config_key}'. Please double check the column for blank values.")
+                return (True, f"Datatype GEOLOGY: NaN or blank values found in required column '{config_key}'. Please double check the column for blank values.")
+
+        # # 3. Optional Columns
+        optional_string_columns = [
+            "group_column", "supergroup_column", "description_column",
+            "rocktype_column", "alt_rocktype_column",
+        ]
+        
+        for key in optional_string_columns:
+            if key in config and config[key] in geology_data.columns:
+                if not geology_data[config[key]].apply(lambda x: isinstance(x, str)).all():
+                    logger.warning(
+                        f"Datatype GEOLOGY: Optional column '{config[key]}' (config key: '{key}') contains non-string values. "
+                        "Map2loop processing might not work as expected."
+                    )
+
+        optional_numeric_columns = ["minage_column", "maxage_column", "objectid_column"]
+        for key in optional_numeric_columns:
+            if key in config and config[key] in geology_data.columns:
+                if not geology_data[config[key]].apply(lambda x: isinstance(x, (int, float))).all():
+                    logger.warning(
+                        f"Datatype GEOLOGY: Optional column '{config[key]}' (config key: '{key}') contains non-numeric values. "
+                        "Map2loop processing might not work as expected."
+            )
+        
+        # # 4. Check for duplicates in ID
+        if "objectid_column" in config and config["objectid_column"] in geology_data.columns:
+            objectid_values = geology_data[config["objectid_column"]]
+        
+        # Check for None, NaN, or other null-like values
+        if objectid_values.isnull().any():
+            logger.error(
+                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values. Ensure all values are valid and non-null."
+            )
+            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values.")
+        
+        # Check for duplicate values
+        if objectid_values.duplicated().any():
+            logger.error(
+                f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column'). Please make sure that the column contains unique values."
+            )
+            return (True, f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column').")
+        
+        # Check for uniqueness
+        if not objectid_values.is_unique:
+            logger.error(
+                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values. Ensure all values are unique."
+            )
+            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values.")
+
+    
+        # # 5. Check for NaNs/blanks in optional fields with warnings
+        warning_fields = [
+            "group_column", "supergroup_column", "description_column",
+            "rocktype_column", "minage_column", "maxage_column",
+        ]
+        for key in warning_fields:
+            col = config.get(key)
+            if col and col in geology_data.columns:
+                # Check if column contains string values before applying `.str`
+                if pandas.api.types.is_string_dtype(geology_data[col]):
+                    if geology_data[col].isnull().any() or geology_data[col].str.strip().eq("").any():
+                        logger.warning(
+                            f"Datatype GEOLOGY: NaN or blank values found in optional column '{col}' (config key: '{key}')."
+                        )
+                else:
+                    # Non-string columns, check only for NaN values
+                    if geology_data[col].isnull().any():
+                        logger.warning(
+                            f"Datatype GEOLOGY: NaN values found in optional column '{col}' (config key: '{key}')."
+                        )
+
+
+        logger.info("Geology fields validation passed.")
+        return (False, "")
+
+
+
+    @beartype.beartype
+    def parse_geology_map(self) -> tuple:
+        """
+        Parse the geology shapefile data into a consistent format
 
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type and size of loaded structure map
-        if (
-            self.raw_data[Datatype.FAULT_ORIENTATION] is None
-            or type(self.raw_data[Datatype.FAULT_ORIENTATION]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Fault orientation shapefile is not loaded or valid")
-            return (True, "Fault orientation shapefile is not loaded or valid")
 
         # Create new geodataframe
-        fault_orientations = geopandas.GeoDataFrame(
-            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
-        )
+        geology = geopandas.GeoDataFrame(self.raw_data[Datatype.GEOLOGY]["geometry"])
+        config = self.config.geology_config
 
-        config = self.config.fault_config
+        # Parse unit names and codes
+        geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(str)
 
-        # Parse dip direction and dip columns
-        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            if config["orientation_type"] == "strike":
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
-                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
-                )
-            else:
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                    config["dipdir_column"]
-                ]
-        else:
-            print(
-                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
-            )
+        geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(str)
 
-        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                config["dip_column"]
-            ]
-        else:
-            print(
-                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
-            )
+        # Parse group and supergroup columns if existent
+        geology["GROUP"] = self.raw_data[Datatype.GEOLOGY].get(config["group_column"], "").astype(str)
+        geology["SUPERGROUP"] = self.raw_data[Datatype.GEOLOGY].get(config["supergroup_column"], "").astype(str)
+        
+        # Parse description and rocktype columns for sill and intrusive flags
+        description_column = self.raw_data[Datatype.GEOLOGY].get(config["description_column"], "").astype(str)
+        geology["DESCRIPTION"] = description_column
+        geology["SILL"] = description_column.str.contains(config.get("sill_text", ""), na=False)
 
-        # TODO LG would it be worthwhile adding a description column for faults?
-        # it would be possible to parse out the fault displacement, type, slip direction
-        # if this was stored in the descriptions?
+        rocktype_column = self.raw_data[Datatype.GEOLOGY].get(config["rocktype_column"], "").astype(str)
+        geology["ROCKTYPE1"] = rocktype_column
+        geology["INTRUSIVE"] = rocktype_column.str.contains(config.get("intrusive_text", ""), na=False)
+
+        geology["ROCKTYPE2"] = self.raw_data[Datatype.GEOLOGY].get(config["alt_rocktype_column"], "").astype(str)
+
+        # Parse age columns
+        geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY].get(config["minage_column"], 0.0).astype(numpy.float64)
+        geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY].get(config["maxage_column"], 100000.0).astype(numpy.float64)
+
 
         # Add object id
-        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                config["objectid_column"]
-            ]
-        else:
-            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
-        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        geology["ID"] = self.raw_data[Datatype.GEOLOGY].get(config["objectid_column"], numpy.arange(len(geology)))
+
+        # Strip out whitespace (/n <space> /t) and '-', ',', '?' from "UNITNAME", "CODE" "GROUP" "SUPERGROUP"
+        geology["UNITNAME"] = geology["UNITNAME"].str.replace("[ -/?]", "_", regex=True)
+        geology["CODE"] = geology["CODE"].str.replace("[ -/?]", "_", regex=True)
+        geology["GROUP"] = geology["GROUP"].str.replace("[ -/?]", "_", regex=True)
+        geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace("[ -/?]", "_", regex=True)
+
+        # Mask out ignored unit_names/codes (ie. for cover)
+        for code in self.config.geology_config["ignore_lithology_codes"]:
+            geology = geology[~geology["CODE"].astype(str).str.contains(code)]
+            geology = geology[~geology["UNITNAME"].astype(str).str.contains(code)]
+
+        geology = geology.dissolve(by="UNITNAME", as_index=False)
+
+        # Note: alt_rocktype_column and volcanic_text columns not used
+        self.data[Datatype.GEOLOGY] = geology
         return (False, "")
+    
 
     @beartype.beartype
     def parse_structure_map(self) -> tuple:
@@ -836,137 +965,64 @@ class MapData:
         self.data[Datatype.STRUCTURE] = structure
         return (False, "")
 
+
+
     @beartype.beartype
-    def parse_geology_map(self) -> tuple:
+    def parse_fault_orientations(self) -> tuple:
         """
-        Parse the geology shapefile data into a consistent format
+        Parse the fault orientations shapefile data into a consistent format
 
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded geology map
-        if (
-            self.raw_data[Datatype.GEOLOGY] is None
-            or type(self.raw_data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Geology map is not loaded or valid")
-            return (True, "Geology map is not loaded or valid")
+        # Check type and size of loaded structure map
+
 
         # Create new geodataframe
-        geology = geopandas.GeoDataFrame(self.raw_data[Datatype.GEOLOGY]["geometry"])
-        config = self.config.geology_config
+        fault_orientations = geopandas.GeoDataFrame(
+            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
+        )
 
-        # Parse unit names and codes
-        if config["unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(
-                str
-            )
-        else:
-            msg = f"Geology map does not contain unitname_column {config['unitname_column']}"
-            print(msg)
-            logger.warning(msg)
-            return (True, msg)
-        if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
-                str
-            )
-        else:
-            msg = (
-                f"Geology map does not contain alt_unitname_column {config['alt_unitname_column']}"
-            )
-            print(msg)
-            logger.warning(msg)
-            return (True, msg)
+        config = self.config.fault_config
 
-        # Parse group and supergroup columns
-        if config["group_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["GROUP"] = self.raw_data[Datatype.GEOLOGY][config["group_column"]].astype(str)
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            if config["orientation_type"] == "strike":
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                    config["dipdir_column"]
+                ]
         else:
-            geology["GROUP"] = ""
-        if config["supergroup_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["SUPERGROUP"] = self.raw_data[Datatype.GEOLOGY][
-                config["supergroup_column"]
-            ].astype(str)
-        else:
-            geology["SUPERGROUP"] = ""
-
-        # Parse description and rocktype columns for sill and intrusive flags
-        if config["description_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["SILL"] = (
-                self.raw_data[Datatype.GEOLOGY][config["description_column"]]
-                .astype(str)
-                .str.contains(config["sill_text"])
+            print(
+                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
             )
-            geology["DESCRIPTION"] = self.raw_data[Datatype.GEOLOGY][
-                config["description_column"]
-            ].astype(str)
-        else:
-            geology["SILL"] = False
-            geology["DESCRIPTION"] = ""
 
-        if config["rocktype_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["INTRUSIVE"] = (
-                self.raw_data[Datatype.GEOLOGY][config["rocktype_column"]]
-                .astype(str)
-                .str.contains(config["intrusive_text"])
+        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["dip_column"]
+            ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
             )
-            geology["ROCKTYPE1"] = self.raw_data[Datatype.GEOLOGY][
-                config["rocktype_column"]
-            ].astype(str)
-        else:
-            geology["INTRUSIVE"] = False
-            geology["ROCKTYPE1"] = ""
 
-        if config["alt_rocktype_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["ROCKTYPE2"] = self.raw_data[Datatype.GEOLOGY][
-                config["alt_rocktype_column"]
-            ].astype(str)
-        else:
-            geology["ROCKTYPE2"] = ""
-
-        # TODO: Explode intrusion multipart geology
-
-        # Parse age columns
-        if config["minage_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY][config["minage_column"]].astype(
-                numpy.float64
-            )
-        else:
-            geology["MIN_AGE"] = 0.0
-        if config["maxage_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY][config["maxage_column"]].astype(
-                numpy.float64
-            )
-        else:
-            geology["MAX_AGE"] = 100000.0
+        # TODO LG would it be worthwhile adding a description column for faults?
+        # it would be possible to parse out the fault displacement, type, slip direction
+        # if this was stored in the descriptions?
 
         # Add object id
-        if config["objectid_column"] in self.raw_data[Datatype.GEOLOGY]:
-            geology["ID"] = self.raw_data[Datatype.GEOLOGY][config["objectid_column"]]
+        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["objectid_column"]
+            ]
         else:
-            geology["ID"] = numpy.arange(len(geology))
-
-        # TODO: Check for duplicates in "ID"
-        # TODO: Check that the exploded geology has more than 1 unit
-        #       Do we need to explode the geometry at this stage for geology/faults/folds???
-        #       If not subsequent classes will need to be able to deal with them
-        # TODO: Check for Nans or blanks in "UNITNAME", "GROUP", "SUPERGROUP", "DESCRIPTION", "CODE", "ROCKTYPE"
-        # Strip out whitespace (/n <space> /t) and '-', ',', '?' from "UNITNAME", "CODE" "GROUP" "SUPERGROUP"
-        geology["UNITNAME"] = geology["UNITNAME"].str.replace("[ -/?]", "_", regex=True)
-        geology["CODE"] = geology["CODE"].str.replace("[ -/?]", "_", regex=True)
-        geology["GROUP"] = geology["GROUP"].str.replace("[ -/?]", "_", regex=True)
-        geology["SUPERGROUP"] = geology["SUPERGROUP"].str.replace("[ -/?]", "_", regex=True)
-
-        # Mask out ignored unit_names/codes (ie. for cover)
-        for code in self.config.geology_config["ignore_lithology_codes"]:
-            geology = geology[~geology["CODE"].astype(str).str.contains(code)]
-            geology = geology[~geology["UNITNAME"].astype(str).str.contains(code)]
-
-        geology = geology.dissolve(by="UNITNAME", as_index=False)
-
-        # Note: alt_rocktype_column and volcanic_text columns not used
-        self.data[Datatype.GEOLOGY] = geology
+            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
+        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
         return (False, "")
+
 
     @beartype.beartype
     def get_minimum_fault_length(self) -> Union[float, int, None]:

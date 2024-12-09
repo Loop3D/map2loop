@@ -696,11 +696,12 @@ class MapData:
             func = self.parse_geology_map
             
         elif datatype == Datatype.STRUCTURE:
-            # validity_check, message = self.check_structure_fields_validity()
-            # if validity_check:
-            #     logger.error(f"Datatype STRUCTURE data validation failed: {message}")
-            #     return
+            validity_check, message = self.check_structure_fields_validity()
+            if validity_check:
+                logger.error(f"Datatype STRUCTURE data validation failed: {message}")
+                return
             func = self.parse_structure_map
+            
         elif datatype == Datatype.FAULT:
             func = self.parse_fault_map
         elif datatype == Datatype.FOLD:
@@ -944,17 +945,23 @@ class MapData:
         self.data[Datatype.GEOLOGY] = geology
         return (False, "")
 
-
-
-
     @beartype.beartype
-    def parse_structure_map(self) -> tuple:
+    def check_structure_fields_validity(self) -> Tuple[bool, str]:
         """
-        Parse the structure shapefile data into a consistent format
+        Validate the structure data for required and optional fields.
+
+        Performs the following checks:
+        - Ensures the structure map is loaded, valid, and contains at least two structures.
+        - Validates the geometry column
+        - Checks required numeric columns (`dip_column`, `dipdir_column`) for existence, dtype, range, and null values.
+        - Checks optional string columns (`description_column`, `overturned_column`) for type and null/empty values.
+        - Validates the optional numeric `objectid_column` for type, null values, and duplicates.
 
         Returns:
-            tuple: A tuple of (bool: success/fail, str: failure message)
+            Tuple[bool, str]: A tuple where the first value indicates if validation failed (True = failed),
+                            and the second value provides a message describing the issue.
         """
+        
         # Check type and size of loaded structure map
         if (
             self.raw_data[Datatype.STRUCTURE] is None
@@ -965,8 +972,103 @@ class MapData:
 
         if len(self.raw_data[Datatype.STRUCTURE]) < 2:
             logger.warning(
-                "Stucture map does not enough orientations to complete calculations (need at least 2), projection may be inconsistent"
+                "Datatype STRUCTURE: map does with not enough orientations to complete calculations (need at least 2), projection may be inconsistent"
             )
+        
+        structure_data = self.raw_data[Datatype.STRUCTURE]
+        config = self.config.structure_config
+
+        # 1. Check geometry validity
+        if not structure_data.geometry.is_valid.all():
+            logger.error(f"datatype STRUCTURE: Invalid geometries found in datatype STRUCTURE. Please fix those before proceeding with map2loop processing")
+            return (True, "Invalid geometries found in datatype STRUCTURE")
+
+        # 2. Check mandatory numeric columns
+        required_columns = [config["dipdir_column"], config["dip_column"]]
+        for col in required_columns:
+            if col not in structure_data.columns:
+                logger.error(f"DDatatype STRUCTURE: Required column with config key: '{[k for k, v in config.items() if v == col][0]}' is missing from structure data.")
+                return (True, f"Datatype STRUCTURE: Required column with config key: '{[k for k, v in config.items() if v == col][0]}' is missing from structure data.")
+            if not structure_data[col].apply(lambda x: isinstance(x, (int, float))).all():
+                config_key = [k for k, v in config.items() if v == col][0]
+                logger.error(f"Datatype STRUCTURE: Column '{config_key}' must contain only numeric values. Please check that the column contains only numeric values.")
+                return (True, f"Datatype STRUCTURE: Column '{config_key}' must contain only numeric values. Please check that the column contains only numeric values.")
+            if structure_data[col].isnull().any():
+                config_key = [k for k, v in config.items() if v == col][0]
+                logger.error(f"Datatype STRUCTURE: NaN or blank values found in required column '{config_key}'. Please double check the column for blank values.")
+                return (True, f"Datatype STRUCTURE: NaN or blank values found in required column '{config_key}'. Please double check the column for blank values.")
+
+        if config["dip_column"] in structure_data.columns:
+            invalid_dip = ~((structure_data[config["dip_column"]] >= 0) & (structure_data[config["dip_column"]] <= 90))
+            if invalid_dip.any():
+                logger.warning(
+                    f"Datatype STRUCTURE: Column '{config['dip_column']}' has values that are not between 0 and 90 degrees. Is this intentional?"
+                )
+
+        if config["dipdir_column"] in structure_data.columns:
+            invalid_dipdir = ~((structure_data[config["dipdir_column"]] >= 0) & (structure_data[config["dipdir_column"]] <= 360))
+            if invalid_dipdir.any():
+                logger.warning(
+                    f"Datatype STRUCTURE: Column '{config['dipdir_column']}' has values that are not between 0 and 360 degrees. Is this intentional?"
+                )
+        
+        # check validity of optional string columns
+        optional_string_columns = ["description_column", "overturned_column"]
+        for key in optional_string_columns:
+            if key in config and config[key] in structure_data.columns:
+                column_name = config[key]
+                if not structure_data[column_name].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+                    logger.warning(
+                        f"Datatype STRUCTURE: Optional column with config key: '{key}' contains non-string values. "
+                        "Map2loop processing might not work as expected."
+                    )
+                if structure_data[column_name].isnull().any() or structure_data[column_name].str.strip().eq("").any():
+                    logger.warning(
+                        f"Datatype STRUCTURE: Optional column config key: '{key}' contains NaN, empty, or null values. "
+                        "Map2loop processing might not work as expected."
+            )
+
+
+        optional_numeric_column_key = "objectid_column"
+        optional_numeric_column = config.get(optional_numeric_column_key)
+
+        if optional_numeric_column:
+            if optional_numeric_column in structure_data.columns:
+                # Check for non-integer values
+                if not structure_data[optional_numeric_column].apply(lambda x: isinstance(x, int) or pandas.isnull(x)).all():
+                    logger.error(
+                        f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains non-integer values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
+                    )
+                    return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains non-integer values.")
+                # Check for NaN
+                if structure_data[optional_numeric_column].isnull().any():
+                    logger.error(
+                        f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains NaN values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
+                    )
+                    return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains NaN values.")
+                # Check for duplicates
+                if structure_data[optional_numeric_column].duplicated().any():
+                    logger.error(
+                        f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
+                    )
+                    return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values.")
+            else:
+                logger.warning(
+                    f"Datatype STRUCTURE: Config key '{optional_numeric_column_key}' refers to a column '{optional_numeric_column}' that does not exist in the data. Map2loop will generate a new ID if needed."
+                )
+            
+        return (False, "")
+
+
+    @beartype.beartype
+    def parse_structure_map(self) -> tuple:
+        """
+        Parse the structure shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
+        """
+
 
         # Create new geodataframe
         structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])

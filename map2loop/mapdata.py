@@ -363,7 +363,15 @@ class MapData:
             list: A list of fault codes that are currently marked for exclusion.
         """
         return self.config.fault_config["ignore_fault_codes"]
+    
+    @beartype.beartype
+    def get_minimum_fault_length(self) -> Union[float, int, None]:
+        """
+        Get the minimum fault length
+        """
 
+        return self.minimum_fault_length
+    
     @beartype.beartype
     def set_filenames_from_australian_state(self, state: str):
         """
@@ -688,6 +696,7 @@ class MapData:
                 The datatype to check
         """
         func = None
+        #check and parse geology data
         if datatype == Datatype.GEOLOGY:
             validity_check, message = self.check_geology_fields_validity()
             if validity_check:
@@ -695,19 +704,25 @@ class MapData:
                 return
             func = self.parse_geology_map
             
+        #check and parse structure data
         elif datatype == Datatype.STRUCTURE:
             validity_check, message = self.check_structure_fields_validity()
             if validity_check:
                 logger.error(f"Datatype STRUCTURE data validation failed: {message}")
                 return
             func = self.parse_structure_map
-            
+        
+        #check and parse fault data
         elif datatype == Datatype.FAULT:
             func = self.parse_fault_map
-        elif datatype == Datatype.FOLD:
-            func = self.parse_fold_map
+                    
         elif datatype == Datatype.FAULT_ORIENTATION:
             func = self.parse_fault_orientations
+            
+        #check and parse fold data
+        elif datatype == Datatype.FOLD:
+            func = self.parse_fold_map
+
         if func:
             error, message = func()
             if error:
@@ -1052,11 +1067,7 @@ class MapData:
                         f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
                     )
                     return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values.")
-            else:
-                logger.warning(
-                    f"Datatype STRUCTURE: Config key '{optional_numeric_column_key}' refers to a column '{optional_numeric_column}' that does not exist in the data. Map2loop will generate a new ID if needed."
-                )
-            
+
         return (False, "")
 
 
@@ -1068,7 +1079,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-
 
         # Create new geodataframe
         structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])
@@ -1082,16 +1092,14 @@ class MapData:
                 )
             else:
                 structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
-        else:
-            print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
+
 
         # Ensure all DIPDIR values are within [0, 360]
         structure["DIPDIR"] = structure["DIPDIR"] % 360.0
 
         if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
             structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
-        else:
-            print(f"Structure map does not contain dip_column '{config['dip_column']}'")
+
 
         # Add bedding and overturned booleans
         if config["overturned_column"] in self.raw_data[Datatype.STRUCTURE]:
@@ -1180,13 +1188,6 @@ class MapData:
         return (False, "")
 
 
-    @beartype.beartype
-    def get_minimum_fault_length(self) -> Union[float, int, None]:
-        """
-        Get the minimum fault length
-        """
-
-        return self.minimum_fault_length
 
     @beartype.beartype
     def parse_fault_map(self) -> tuple:

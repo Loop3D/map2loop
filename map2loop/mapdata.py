@@ -696,10 +696,10 @@ class MapData:
             func = self.parse_geology_map
             
         elif datatype == Datatype.STRUCTURE:
-            validity_check, message = self.check_structure_fields_validity()
-            if validity_check:
-                logger.error(f"Datatype STRUCTURE data validation failed: {message}")
-                return
+            # validity_check, message = self.check_structure_fields_validity()
+            # if validity_check:
+            #     logger.error(f"Datatype STRUCTURE data validation failed: {message}")
+            #     return
             func = self.parse_structure_map
         elif datatype == Datatype.FAULT:
             func = self.parse_fault_map
@@ -784,27 +784,27 @@ class MapData:
         # # 4. Check for duplicates in ID
         if "objectid_column" in config and config["objectid_column"] in geology_data.columns:
             objectid_values = geology_data[config["objectid_column"]]
-        
-        # Check for None, NaN, or other null-like values
-        if objectid_values.isnull().any():
-            logger.error(
-                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values. Ensure all values are valid and non-null."
-            )
-            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values.")
-        
-        # Check for duplicate values
-        if objectid_values.duplicated().any():
-            logger.error(
-                f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column'). Please make sure that the column contains unique values."
-            )
-            return (True, f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column').")
-        
-        # Check for uniqueness
-        if not objectid_values.is_unique:
-            logger.error(
-                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values. Ensure all values are unique."
-            )
-            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values.")
+            
+            # Check for None, NaN, or other null-like values
+            if objectid_values.isnull().any():
+                logger.error(
+                    f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values. Ensure all values are valid and non-null."
+                )
+                return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values.")
+            
+            # Check for duplicate values
+            if objectid_values.duplicated().any():
+                logger.error(
+                    f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column'). Please make sure that the column contains unique values."
+                )
+                return (True, f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column').")
+            
+            # Check for uniqueness
+            if not objectid_values.is_unique:
+                logger.error(
+                    f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values. Ensure all values are unique."
+                )
+                return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values.")
 
     
         # # 5. Check for NaNs/blanks in optional fields with warnings
@@ -832,8 +832,6 @@ class MapData:
         logger.info("Geology fields validation passed.")
         return (False, "")
 
-
-
     @beartype.beartype
     def parse_geology_map(self) -> tuple:
         """
@@ -848,33 +846,87 @@ class MapData:
         config = self.config.geology_config
 
         # Parse unit names and codes
-        geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(str)
+        if config["unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(
+                str
+            )
 
-        geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(str)
+        if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
+                str
+            )
 
-        # Parse group and supergroup columns if existent
-        geology["GROUP"] = self.raw_data[Datatype.GEOLOGY].get(config["group_column"], "").astype(str)
-        geology["SUPERGROUP"] = self.raw_data[Datatype.GEOLOGY].get(config["supergroup_column"], "").astype(str)
-        
+        # Parse group and supergroup columns
+        if config["group_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["GROUP"] = self.raw_data[Datatype.GEOLOGY][config["group_column"]].astype(str)
+        else:
+            geology["GROUP"] = ""
+        if config["supergroup_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["SUPERGROUP"] = self.raw_data[Datatype.GEOLOGY][
+                config["supergroup_column"]
+            ].astype(str)
+        else:
+            geology["SUPERGROUP"] = ""
+
         # Parse description and rocktype columns for sill and intrusive flags
-        description_column = self.raw_data[Datatype.GEOLOGY].get(config["description_column"], "").astype(str)
-        geology["DESCRIPTION"] = description_column
-        geology["SILL"] = description_column.str.contains(config.get("sill_text", ""), na=False)
+        if config["description_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["SILL"] = (
+                self.raw_data[Datatype.GEOLOGY][config["description_column"]]
+                .astype(str)
+                .str.contains(config["sill_text"])
+            )
+            geology["DESCRIPTION"] = self.raw_data[Datatype.GEOLOGY][
+                config["description_column"]
+            ].astype(str)
+        else:
+            geology["SILL"] = False
+            geology["DESCRIPTION"] = ""
 
-        rocktype_column = self.raw_data[Datatype.GEOLOGY].get(config["rocktype_column"], "").astype(str)
-        geology["ROCKTYPE1"] = rocktype_column
-        geology["INTRUSIVE"] = rocktype_column.str.contains(config.get("intrusive_text", ""), na=False)
+        if config["rocktype_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["INTRUSIVE"] = (
+                self.raw_data[Datatype.GEOLOGY][config["rocktype_column"]]
+                .astype(str)
+                .str.contains(config["intrusive_text"])
+            )
+            geology["ROCKTYPE1"] = self.raw_data[Datatype.GEOLOGY][
+                config["rocktype_column"]
+            ].astype(str)
+        else:
+            geology["INTRUSIVE"] = False
+            geology["ROCKTYPE1"] = ""
 
-        geology["ROCKTYPE2"] = self.raw_data[Datatype.GEOLOGY].get(config["alt_rocktype_column"], "").astype(str)
+        if config["alt_rocktype_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["ROCKTYPE2"] = self.raw_data[Datatype.GEOLOGY][
+                config["alt_rocktype_column"]
+            ].astype(str)
+        else:
+            geology["ROCKTYPE2"] = ""
+
+        # TODO: Explode intrusion multipart geology
 
         # Parse age columns
-        geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY].get(config["minage_column"], 0.0).astype(numpy.float64)
-        geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY].get(config["maxage_column"], 100000.0).astype(numpy.float64)
-
+        if config["minage_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["MIN_AGE"] = self.raw_data[Datatype.GEOLOGY][config["minage_column"]].astype(
+                numpy.float64
+            )
+        else:
+            geology["MIN_AGE"] = 0.0
+        if config["maxage_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["MAX_AGE"] = self.raw_data[Datatype.GEOLOGY][config["maxage_column"]].astype(
+                numpy.float64
+            )
+        else:
+            geology["MAX_AGE"] = 100000.0
 
         # Add object id
-        geology["ID"] = self.raw_data[Datatype.GEOLOGY].get(config["objectid_column"], numpy.arange(len(geology)))
+        if config["objectid_column"] in self.raw_data[Datatype.GEOLOGY]:
+            geology["ID"] = self.raw_data[Datatype.GEOLOGY][config["objectid_column"]]
+        else:
+            geology["ID"] = numpy.arange(len(geology))
 
+        # TODO: Check that the exploded geology has more than 1 unit
+        #       Do we need to explode the geometry at this stage for geology/faults/folds???
+        #       If not subsequent classes will need to be able to deal with them
         # Strip out whitespace (/n <space> /t) and '-', ',', '?' from "UNITNAME", "CODE" "GROUP" "SUPERGROUP"
         geology["UNITNAME"] = geology["UNITNAME"].str.replace("[ -/?]", "_", regex=True)
         geology["CODE"] = geology["CODE"].str.replace("[ -/?]", "_", regex=True)
@@ -891,7 +943,9 @@ class MapData:
         # Note: alt_rocktype_column and volcanic_text columns not used
         self.data[Datatype.GEOLOGY] = geology
         return (False, "")
-    
+
+
+
 
     @beartype.beartype
     def parse_structure_map(self) -> tuple:

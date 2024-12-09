@@ -3,16 +3,13 @@ import geopandas
 import numpy
 
 from map2loop.mapdata import MapData
-from map2loop.thickness_calculator import InterpolatedStructure
-from map2loop._datasets.geodata_files.load_map2loop_data import (
-    load_hamersley_geology,
-    load_hamersley_dtm,
-)
+from map2loop.thickness_calculator import StructuralPoint
+from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology
 from map2loop.m2l_enums import Datatype
 
-##########################################################################
-### Define the test data for ThicknessCalculator InterpolatedStructure ###
-##########################################################################
+####################################################################
+### Define the test data for ThicknessCalculator StructuralPoint ###
+####################################################################
 
 # Sample stratigraphic units data
 st_units = pandas.DataFrame(
@@ -1643,9 +1640,9 @@ featureid = [
 s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 
 
-##################################
-### TEST InterpolatedStructure ###
-##################################
+############################
+### TEST StructuralPoint ###
+############################
 
 geology = load_hamersley_geology()
 geology.rename(columns={'unitname': 'UNITNAME', 'code': 'CODE'}, inplace=True)
@@ -1658,31 +1655,20 @@ def check_thickness_values(result, column, description):
     ]:
         assert (
             result[result['stratigraphic_Order'] == order][column].values == -1
-        ), f"InterpolatedStructure: {position} unit not assigned as -1 ({description})"
+        ), f"StructuralPoint: {position} unit not assigned as -1 ({description})"
 
 
-def test_calculate_thickness_InterpolatedStructure():
+def test_calculate_thickness_structural_point():
     # Run the calculation
-    thickness_calculator = InterpolatedStructure()
+    thickness_calculator = StructuralPoint()
 
     md = MapData()
+    md.sampled_contacts = s_c
     md.sampled_contacts = s_c
     md.raw_data[Datatype.GEOLOGY] = geology
     md.load_map_data(Datatype.GEOLOGY)
     md.check_map(Datatype.GEOLOGY)
     md.parse_geology_map()
-
-    md.raw_data[Datatype.DTM] = load_hamersley_dtm()
-    md.data[Datatype.DTM] = md.get_raw_map_data(Datatype.DTM)
-
-    md.bounding_box = {
-        "minx": 515687.31005864,
-        "miny": 7493446.76593407,
-        "maxx": 562666.860106543,
-        "maxy": 7521273.57407786,
-        "base": -3200,
-        "top": 3000,
-    }
 
     result = thickness_calculator.compute(
         units=st_units,
@@ -1694,24 +1680,22 @@ def test_calculate_thickness_InterpolatedStructure():
 
     # is thickness calc alpha the label?
     assert (
-        thickness_calculator.thickness_calculator_label == 'InterpolatedStructure'
-    ), 'InterpolatedStructure: thickness calculator name not set correctly'
+        thickness_calculator.thickness_calculator_label == 'StructuralPoint'
+    ), 'StructuralPoint: thickness calculator name not set correctly'
 
     # is the result a pandas dataframe?
-    assert isinstance(
-        result, pandas.DataFrame
-    ), 'InterpolatedStructure result not a pandas DataFrame'
+    assert isinstance(result, pandas.DataFrame), 'StructuralPoint result not a pandas DataFrame'
 
     # Check if there is mean, std, and median in results
     required_columns = ['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']
     for column in required_columns:
-        assert column in result.columns, f'{column} not in InterpolatedStructure result'
+        assert column in result.columns, f'{column} not in StructuralPoint result'
 
     # check if all units are in the results
-    assert 'name' in result.columns, 'unit_name not in InterpolatedStructure result'
+    assert 'name' in result.columns, 'unit_name not in StructuralPoint result'
     assert all(
         name in result['name'].values for name in st_units['name'].values
-    ), 'units missing from in InterpolatedStructure result'
+    ), 'units missing from in StructuralPoint result'
 
     # are bottom and top units being assigned -1
     for column, description in [
@@ -1725,10 +1709,10 @@ def test_calculate_thickness_InterpolatedStructure():
     for column in required_columns:
         assert (
             result[column].dtype == numpy.float64
-        ), f'InterpolatedStructure: result column {column} not numpy.float64'
+        ), f'StructuralPoint: result column {column} not numpy.float64'
 
     # check for nans in the results
     for column in required_columns:
         assert (
             not result[column].isnull().values.any()
-        ), f'InterpolatedStructure: result column {column} has NaN values'
+        ), f'StructuralPoint: result column {column} has NaN values'

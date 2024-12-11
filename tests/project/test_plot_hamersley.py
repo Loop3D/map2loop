@@ -23,7 +23,6 @@ def create_project(state_data="WA", projection="EPSG:28350"):
         use_australian_state_data=state_data,
         working_projection=projection,
         bounding_box=bbox_3d,
-        clut_file_legacy=False,
         verbose_level=VerboseLevel.NONE,
         loop_project_filename=loop_project_filename,
         overwrite_loopprojectfile=True,

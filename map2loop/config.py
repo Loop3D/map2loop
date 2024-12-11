@@ -93,13 +93,19 @@ class Config:
         }
 
     @beartype.beartype
-    def update_from_dictionary(self, dictionary: dict, lower: bool = False):
+    def update_from_dictionary(self, dictionary: dict, lower: bool = True):
         """
         Update the config dictionary from a provided dict
 
         Args:
             dictionary (dict): The dictionary to update from
         """
+        # make sure dictionary doesn't contain legacy keys
+        self.check_for_legacy_keys(dictionary)
+        
+        # make sure it has the minimum requirements
+        self.validate_config_dictionary(dictionary)
+        
         if "structure" in dictionary:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
@@ -108,6 +114,7 @@ class Config:
                         f"Config dictionary structure segment contained {key} which is not used"
                     )
             dictionary.pop("structure")
+            
         if "geology" in dictionary:
             self.geology_config.update(dictionary["geology"])
             for key in dictionary["geology"].keys():
@@ -135,82 +142,19 @@ class Config:
         if len(dictionary):
             logger.warning(f"Unused keys from config format {list(dictionary.keys())}")
 
-    @beartype.beartype
-    def update_from_legacy_file(self, file_map: dict, lower: bool = False):
-        """
-        Update the config dictionary from the provided old version dictionary
-
-        Args:
-            file_map (dict): The old version dictionary to update from
-        """
-
-        code_mapping = {
-            "otype": (self.structure_config, "orientation_type"),
-            "dd": (self.structure_config, "dipdir_column"),
-            "d": (self.structure_config, "dip_column"),
-            "sf": (self.structure_config, "description_column"),
-            "bedding": (self.structure_config, "bedding_text"),
-            "bo": (self.structure_config, "overturned_column"),
-            "btype": (self.structure_config, "overturned_text"),
-            "gi": (self.structure_config, "objectid_column"),
-            "c": (self.geology_config, "unitname_column"),
-            "u": (self.geology_config, "alt_unitname_column"),
-            "g": (self.geology_config, "group_column"),
-            "g2": (self.geology_config, "supergroup_column"),
-            "ds": (self.geology_config, "description_column"),
-            "min": (self.geology_config, "minage_column"),
-            "max": (self.geology_config, "maxage_column"),
-            "r1": (self.geology_config, "rocktype_column"),
-            "r2": (self.geology_config, "alt_rocktype_column"),
-            "sill": (self.geology_config, "sill_text"),
-            "intrusive": (self.geology_config, "intrusive_text"),
-            "volcanic": (self.geology_config, "volcanic_text"),
-            "f": (self.fault_config, "structtype_column"),
-            "fault": (self.fault_config, "fault_text"),
-            "fdipnull": (self.fault_config, "dip_null_value"),
-            "fdipdip_flag": (self.fault_config, "dipdir_flag"),
-            "fdipdir": (self.fault_config, "dipdir_column"),
-            "fdip": (self.fault_config, "dip_column"),
-            "fdipest": (self.fault_config, "dipestimate_column"),
-            "fdipest_vals": (self.fault_config, "dipestimate_text"),
-            "n": (self.fault_config, "name_column"),
-            "ff": (self.fold_config, "structtype_column"),
-            "fold": (self.fold_config, "fold_text"),
-            "t": (self.fold_config, "description_column"),
-            "syn": (self.fold_config, "synform_text"),
-        }
-        for code in code_mapping:
-            if code in file_map:
-                if lower is True:
-                    file_map[code] = str(file_map[code]).lower()
-                code_mapping[code][0][code_mapping[code][1]] = file_map[code]
-                file_map.pop(code)
-
-        if "o" in file_map:
-            self.structure_config["objectid_column"] = file_map["o"]
-            self.fault_config["objectid_column"] = file_map["o"]
-            self.fold_config["objectid_column"] = file_map["o"]
-            file_map.pop("o")
-
-        if len(file_map) > 0:
-            logger.warning(f"Unused keys from legacy format {list(file_map.keys())}")
 
     @beartype.beartype
     def update_from_file(
-        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+        self, filename: Union[pathlib.Path, str],  lower: bool = False
     ):
         """
         Update the config dictionary from the provided json filename or url
 
         Args:
             filename (Union[pathlib.Path, str]): Filename or URL of the JSON config file
-            legacy_format (bool, optional): Whether the JSON is an old version. Defaults to False.
             lower (bool, optional): convert keys to lowercase. Defaults to False.
         """
-        if legacy_format:
-            func = self.update_from_legacy_file
-        else:
-            func = self.update_from_dictionary
+        func = self.update_from_dictionary
 
         try:
             filename = str(filename)
@@ -269,7 +213,60 @@ class Config:
                 err_string += "Please check the file is accessible online and then\n"
             else:
                 err_string += "Please check the file exists and is accessible then\n"
-            if not legacy_format:
-                err_string += "Also check if this is a legacy config file and add clut_file_legacy=True to the Project function\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)
+
+    @beartype.beartype
+    def validate_config_dictionary(self, config_dict: dict) -> None:
+        """
+        Validate the structure and keys of the configuration dictionary.
+
+        Args:
+            config_dict (dict): The config dictionary to validate.
+
+        Raises:
+            ValueError: If the dictionary does not meet the minimum requirements for ma2p2loop.
+        """    
+        required_keys = {
+            "structure": {"dipdir_column", "dip_column"},
+            "geology": {"unitname_column", "alt_unitname_column"},
+        }
+
+        for section, keys in required_keys.items():
+            if section not in config_dict:
+                logger.error(f"Missing required section '{section}' in config dictionary.")
+                raise ValueError(f"Missing required section '{section}' in config dictionary.")
+            
+            for key in keys:
+                if key not in config_dict[section]:
+                    logger.error(
+                        f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                    )
+                    raise ValueError(
+                        f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                    )
+
+    @beartype.beartype
+    def check_for_legacy_keys(self, config_dict: dict) -> None:
+
+        legacy_keys = {
+            "otype", "dd", "d", "sf", "bedding", "bo", "btype", "gi", "c", "u",
+            "g", "g2", "ds", "min", "max", "r1", "r2", "sill", "intrusive", "volcanic",
+            "f", "fdipnull", "fdipdip_flag", "fdipdir", "fdip", "fdipest",
+            "fdipest_vals", "n", "ff", "t", "syn"
+        }
+
+        # Recursively search for keys in the dictionary
+        def check_keys(d: dict, parent_key=""):
+            for key, value in d.items():
+                if key in legacy_keys:
+                    logger.error(
+                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
+                    )
+                    raise ValueError(
+                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
+                    )
+                if isinstance(value, dict):
+                    check_keys(value, parent_key=f"{parent_key}{key}.")
+        
+        check_keys(config_dict)

@@ -1161,27 +1161,27 @@ class MapData:
             return (True, "FAULT data contains geometries that are not LineString or MultiLineString.")
         
         # Check "structtype_column" if it exists
-        if "structtype_column" in config:
-            structtype_column = config["structtype_column"]
+        # if "structtype_column" in config:
+        #     structtype_column = config["structtype_column"]
 
-            # Ensure the column exists in the data
-            if structtype_column not in fault_data.columns:
-                logger.warning(
-                    f"Datatype FAULT: '{structtype_column}' (config key: 'structtype_column') is missing from the fault data. Consider removing that key from the config"
-                )
-            else:
-            # Check if all entries in the column are strings
-                if not fault_data[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
-                    logger.error(
-                        f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
-                    )
-                    return (True, f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
+        #     # Ensure the column exists in the data
+        #     if structtype_column not in fault_data.columns:
+        #         logger.warning(
+        #             f"Datatype FAULT: '{structtype_column}' (config key: 'structtype_column') is missing from the fault data. Consider removing that key from the config"
+        #         )
+        #     else:
+        #     # Check if all entries in the column are strings
+        #         if not fault_data[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+        #             logger.error(
+        #                 f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
+        #             )
+        #             return (True, f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
 
-                # Warn about empty or null cells
-                if fault_data[structtype_column].isnull().any() or fault_data[structtype_column].str.strip().eq("").any():
-                    logger.warning(
-                        f"Datatype FAULT: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
-                    )
+        #         # Warn about empty or null cells
+        #         if fault_data[structtype_column].isnull().any() or fault_data[structtype_column].str.strip().eq("").any():
+        #             logger.warning(
+        #                 f"Datatype FAULT: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
+        #             )
 
             # Check if "fault_text" is defined and contained in the column
             fault_text = config.get("fault_text", None)

@@ -422,6 +422,7 @@ def preprocess_hjson_to_json(hjson_content):
     hjson_content = re.sub(r'\s+', ' ', hjson_content.strip())
     return hjson_content
 
+
 @beartype.beartype
 def read_hjson_with_json(file_path: str) -> dict:
     try:
@@ -439,7 +440,7 @@ def read_hjson_with_json(file_path: str) -> dict:
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to decode preprocessed HJSON as JSON: {e}") from e
     
-    
+@beartype.beartype
 def update_from_legacy_file(
     filename: str,
     json_save_path: Optional[str] = None,
@@ -448,7 +449,16 @@ def update_from_legacy_file(
     """
     Update the config dictionary from the provided old version dictionary
     Args:
-        file_map (dict): The old version dictionary to update from
+        filename (str): the path to the legacy file
+        json_save_path (str, optional): the path to save the updated json file. Defaults to None.
+        lower (bool, optional): whether to convert all strings to lowercase. Defaults to False.
+        
+    Returns:
+        Dict[Dict]: the updated config dictionary
+    
+    Example:
+        from map2loop.utils import update_from_legacy_file
+        update_from_legacy_file(filename=r"./source_data/example.hjson")
     """
     # only import config if needed
     from .config import Config

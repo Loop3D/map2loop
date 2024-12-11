@@ -419,7 +419,7 @@ class StructuralPoint(ThicknessCalculator):
         self.thickness_calculator_label = "StructuralPoint"
         self.strike_allowance = 30
         self.lines = None
-        super().max_line_length = max_line_length
+        super().__init__(max_line_length)
 
     @beartype.beartype
     def compute(
@@ -533,7 +533,9 @@ class StructuralPoint(ThicknessCalculator):
             )
 
             # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
-            B = calculate_endpoints(measurement_pt, strike, self.line_length, bbox_poly)
+            if self.max_line_length is None:
+                self.max_line_length = 10000
+            B = calculate_endpoints(measurement_pt, strike, self.max_line_length, bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
             # find all intersections

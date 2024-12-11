@@ -393,12 +393,8 @@ class InterpolatedStructure(ThicknessCalculator):
                 logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-                
-        geometries = []
-        for line in _lines:
-            geometries.append(line)
         
-        self.lines = geopandas.GeoDataFrame(geometry=geometries, crs = basal_contacts.crs)
+        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs = basal_contacts.crs)
         self.lines['dip'] = _dips
         self._check_thickness_percentage_calculations(thicknesses)
         return thicknesses

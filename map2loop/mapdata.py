@@ -1184,18 +1184,18 @@ class MapData:
         #             )
 
             # Check if "fault_text" is defined and contained in the column
-            fault_text = config.get("fault_text", None)
-            if not fault_text:
-                logger.error(
-                    "Datatype FAULT: 'fault_text' is not defined in the configuration, but it is required to filter faults."
-                )
-                return (True, "Datatype FAULT: 'fault_text' is not defined in the configuration.")
+            # fault_text = config.get("fault_text", None)
+            # if not fault_text:
+            #     logger.error(
+            #         "Datatype FAULT: 'fault_text' is not defined in the configuration, but it is required to filter faults."
+            #     )
+            #     return (True, "Datatype FAULT: 'fault_text' is not defined in the configuration.")
 
-            if not fault_data[structtype_column].str.contains(fault_text).any():
-                logger.error(
-                    f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Ensure it is correctly defined at least for one row"
-                )
-                return (True, f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'.")
+            # if not fault_data[structtype_column].str.contains(fault_text).any():
+            #     logger.error(
+            #         f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Ensure it is correctly defined at least for one row"
+            #     )
+            #     return (True, f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'.")
         
         #checks on name column
         name_column = config.get("name_column")

@@ -210,9 +210,10 @@ class InterpolatedStructure(ThicknessCalculator):
         """
         Initialiser for interpolated structure version of the thickness calculator
         """
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = None
-        super().__init__(max_line_length)
+        
 
     @beartype.beartype
     def compute(
@@ -416,10 +417,11 @@ class StructuralPoint(ThicknessCalculator):
     '''
 
     def __init__(self, max_line_length: float = None):
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "StructuralPoint"
         self.strike_allowance = 30
         self.lines = None
-        super().__init__(max_line_length)
+        
 
     @beartype.beartype
     def compute(

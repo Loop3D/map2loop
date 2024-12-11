@@ -714,8 +714,12 @@ class MapData:
         
         #check and parse fault data
         elif datatype == Datatype.FAULT:
+            validity_check, message = self.check_fault_fields_validity()
+            if validity_check:
+                logger.error(f"Datatype FAULT data validation failed: {message}")
+                return
             func = self.parse_fault_map
-                    
+        
         elif datatype == Datatype.FAULT_ORIENTATION:
             func = self.parse_fault_orientations
             
@@ -730,6 +734,7 @@ class MapData:
 
     @beartype.beartype
     def check_geology_fields_validity(self) -> tuple[bool, str]:
+        #TODO (AR) - add check for gaps in geology data
         """
         Validate the columns in GEOLOGY geodataframe
 
@@ -756,7 +761,7 @@ class MapData:
         
         # 1. Check geometry validity - tested & working
         if not geology_data.geometry.is_valid.all():
-            logger.error(f"datatype GEOLOGY: Invalid geometries found in datatype GEOLOGY. Please fix those before proceeding with map2loop processing")
+            logger.error("Invalid geometries found. Please fix those before proceeding with map2loop processing")
             return (True, "Invalid geometries found in datatype GEOLOGY")
     
         # # 2. Required Columns & are they str, and then empty or null? 
@@ -995,7 +1000,7 @@ class MapData:
 
         # 1. Check geometry validity
         if not structure_data.geometry.is_valid.all():
-            logger.error(f"datatype STRUCTURE: Invalid geometries found in datatype STRUCTURE. Please fix those before proceeding with map2loop processing")
+            logger.error("datatype STRUCTURE: Invalid geometries found. Please fix those before proceeding with map2loop processing")
             return (True, "Invalid geometries found in datatype STRUCTURE")
 
         # 2. Check mandatory numeric columns
@@ -1043,7 +1048,7 @@ class MapData:
                         "Map2loop processing might not work as expected."
             )
 
-
+        # check ID column for type, null values, and duplicates
         optional_numeric_column_key = "objectid_column"
         optional_numeric_column = config.get(optional_numeric_column_key)
 
@@ -1129,64 +1134,212 @@ class MapData:
         self.data[Datatype.STRUCTURE] = structure
         return (False, "")
 
-
-
-    @beartype.beartype
-    def parse_fault_orientations(self) -> tuple:
-        """
-        Parse the fault orientations shapefile data into a consistent format
-
-        Returns:
-            tuple: A tuple of (bool: success/fail, str: failure message)
-        """
-        # Check type and size of loaded structure map
-
-
-        # Create new geodataframe
-        fault_orientations = geopandas.GeoDataFrame(
-            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
-        )
-
+    def check_fault_fields_validity(self) -> Tuple[bool, str]:
+        
+        # Check type of loaded fault map
+        if (
+            self.raw_data[Datatype.FAULT] is None
+            or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame
+        ):
+            logger.warning("Fault map is not loaded or valid")
+            return (True, "Fault map is not loaded or valid")
+        
+        fault_data = self.raw_data[Datatype.FAULT]
         config = self.config.fault_config
+        
+        # Check geometry
+        if not fault_data.geometry.is_valid.all():
+            logger.error("datatype FAULT: Invalid geometries found. Please fix those before proceeding with map2loop processing")
+            return (True, "Invalid geometries found in FAULT data.")
 
-        # Parse dip direction and dip columns
-        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            if config["orientation_type"] == "strike":
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
-                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+        # Check for LineString or MultiLineString geometries
+        if not fault_data.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString))).all():
+            invalid_types = fault_data[~fault_data.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString)))]
+            logger.error(
+                f"FAULT data contains invalid geometry types. Rows with invalid geometry types: {invalid_types.index.tolist()}"
+            )
+            return (True, "FAULT data contains geometries that are not LineString or MultiLineString.")
+        
+        # Check "structtype_column" if it exists
+        if "structtype_column" in config:
+            structtype_column = config["structtype_column"]
+
+            # Ensure the column exists in the data
+            if structtype_column not in fault_data.columns:
+                logger.warning(
+                    f"Datatype FAULT: '{structtype_column}' (config key: 'structtype_column') is missing from the fault data. Consider removing that key from the config"
                 )
             else:
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                    config["dipdir_column"]
+            # Check if all entries in the column are strings
+                if not fault_data[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+                    logger.error(
+                        f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
+                    )
+                    return (True, f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
+
+                # Warn about empty or null cells
+                if fault_data[structtype_column].isnull().any() or fault_data[structtype_column].str.strip().eq("").any():
+                    logger.warning(
+                        f"Datatype FAULT: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
+                    )
+
+            # Check if "fault_text" is defined and contained in the column
+            fault_text = config.get("fault_text", None)
+            if not fault_text:
+                logger.error(
+                    "Datatype FAULT: 'fault_text' is not defined in the configuration, but it is required to filter faults."
+                )
+                return (True, "Datatype FAULT: 'fault_text' is not defined in the configuration.")
+
+            if not fault_data[structtype_column].str.contains(fault_text).any():
+                logger.error(
+                    f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Ensure it is correctly defined at least for one row"
+                )
+                return (True, f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'.")
+        
+        #checks on name column
+        name_column = config.get("name_column")
+        if name_column not in fault_data.columns:
+            logger.error(
+                f"Datatype FAULT: Column '{name_column}' (config key 'name_column') is missing from the fault data."
+                "Please ensure it is present, or remove that key from the config."
+            )
+            return (True, f"Datatype FAULT: Column '{name_column}' (config key 'name_column') is missing from the fault data.")
+        
+        if name_column and name_column in fault_data.columns:
+            # Check if the column contains non-string values
+            if not fault_data[name_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+                logger.error(
+                    f"Datatype FAULT: Column '{name_column}' (config key 'name_column') contains non-string values. Ensure all values are valid strings."
+                )
+                return (True, f"Datatype FAULT: Column '{name_column}' (config key 'name_column') contains non-string values.")
+            
+            # Check for NaN values
+            if fault_data[name_column].isnull().any():
+                logger.warning(
+                    f"Datatype FAULT: Column '{name_column}' (config key 'name_column') contains NaN or empty values. This may affect processing."
+                )
+            
+            # Check for duplicate values
+            if fault_data[name_column].duplicated().any():
+                logger.warning(
+                    f"Datatype FAULT: Column '{name_column}' contains duplicate values. This may affect processing."
+                )
+
+        # dips & strikes
+        # Check for dips and dip directions
+        strike_dips_columns = ["dip_column", "dipdir_column"]
+
+        for key in strike_dips_columns:
+            column_name = config.get(key)
+            if column_name:  # Only proceed if the config has this key
+                if column_name in fault_data.columns:
+                    # Check if the column contains only numeric values
+                    if not fault_data[column_name].apply(lambda x: isinstance(x, (int, float)) or pandas.isnull(x)).all():
+                        logger.error(
+                            f"Datatype FAULT: Column '{column_name}' (config key {key}) must contain only numeric values. Please ensure the column is numeric."
+                        )
+                        return (True, f"Datatype FAULT: Column '{column_name}' (config key {key}) must contain only numeric values.")
+
+                    # Check for NaN or empty values
+                    if fault_data[column_name].isnull().any():
+                        logger.warning(
+                            f"Datatype FAULT: Column '{column_name}' (config key {key}) contains NaN or empty values. This may affect processing."
+                        )
+
+                    # Check range constraints
+                    if key == "dip_column":
+                        # Dips must be between 0 and 90
+                        invalid_values = ~((fault_data[column_name] >= 0) & (fault_data[column_name] <= 90))
+                        if invalid_values.any():
+                            logger.warning(
+                                f"Datatype FAULT: Column '{column_name}' (config key {key}) contains values outside the range [0, 90]. Was this intentional?"
+                            )
+                    elif key == "dipdir_column":
+                        # Dip directions must be between 0 and 360
+                        invalid_values = ~((fault_data[column_name] >= 0) & (fault_data[column_name] <= 360))
+                        if invalid_values.any():
+                            logger.warning(
+                                f"Datatype FAULT: Column '{column_name}' (config key {key}) contains values outside the range [0, 360]. Was this intentional?"
+                            )
+                else:
+                    logger.error(
+                        f"Datatype FAULT: Column '{column_name}' (config key {key}) is missing from the fault data. Please ensure the column name is correct, or otherwise remove that key from the config."
+                    )
+                    return (True, f"Datatype FAULT: Column '{column_name}' (config key {key}) is missing from the fault data.")
+        
+        # dip estimates
+        dip_estimate_column = config.get("dip_estimate_column")
+        valid_directions = [
+            "north_east", "south_east", "south_west", "north_west",
+            "north", "east", "south", "west"
+        ]
+
+        if dip_estimate_column:  
+            if dip_estimate_column in fault_data.columns:
+                # Ensure all values are in the set of valid directions or are NaN
+                invalid_values = fault_data[dip_estimate_column][
+                    ~fault_data[dip_estimate_column].apply(lambda x: x in valid_directions or pandas.isnull(x))
                 ]
-        else:
-            print(
-                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
-            )
 
-        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                config["dip_column"]
-            ]
-        else:
-            print(
-                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
-            )
+                if not invalid_values.empty:
+                    logger.error(
+                        f"Datatype FAULT: Column '{dip_estimate_column}' contains invalid values not in the set of allowed dip estimates: {valid_directions}."
+                    )
+                    return (
+                        True,
+                        f"Datatype FAULT: Column '{dip_estimate_column}' contains invalid values. Allowed values: {valid_directions}.",
+                    )
 
-        # TODO LG would it be worthwhile adding a description column for faults?
-        # it would be possible to parse out the fault displacement, type, slip direction
-        # if this was stored in the descriptions?
+                # Warn if there are NaN or empty values
+                if fault_data[dip_estimate_column].isnull().any():
+                    logger.warning(
+                        f"Datatype FAULT: Column '{dip_estimate_column}' contains NaN or empty values. This may affect processing."
+                    )
+            else:
+                logger.error(
+                    f"Datatype FAULT: Column '{dip_estimate_column}' is missing from the fault data. Please ensure the column name is correct or remove that key from the config."
+                )
+                return (True, f"Datatype FAULT: Column '{dip_estimate_column}' is missing from the fault data.")
 
-        # Add object id
-        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
-            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
-                config["objectid_column"]
-            ]
-        else:
-            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
-        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        # # Check ID column
+        # id_column = config.get("objectid_column")
+        # if id_column:  
+        #     if id_column in fault_data.columns:
+        #         # Check for non-integer values
+        #         # Attempt to coerce the ID column to integers because WA data says so (signed ARodrigues)
+        #         fault_data[id_column] = pandas.to_numeric(fault_data[id_column], errors='coerce')
+
+        #         # Check if all values are integers or null after coercion
+        #         if not fault_data[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
+        #             logger.error(
+        #                 f"Datatype FAULT: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
+        #             )
+        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains non-integer values.")
+
+                
+        #         # Check for NaN values
+        #         if fault_data[id_column].isnull().any():
+        #             logger.error(
+        #                 f"Datatype FAULT: ID column '{id_column}' contains NaN or null values. Rectify this or remove the key from the config to auto-generate IDs."
+        #             )
+        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains NaN values.")
+
+        #         # Check for duplicates
+        #         if fault_data[id_column].duplicated().any():
+        #             logger.error(
+        #                 f"Datatype FAULT: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
+        #             )
+        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains duplicate values.")
+        #     else:
+        #         logger.error(
+        #             f"Datatype FAULT: ID column '{id_column}' is missing from the fault data. Please ensure the column name is correct or remove that key from the config."
+        #         )
+        #         return (True, f"Datatype FAULT: ID column '{id_column}' is missing from the fault data.")
+
+        # 
+        
         return (False, "")
-
 
 
     @beartype.beartype
@@ -1197,13 +1350,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded fault map
-        if (
-            self.raw_data[Datatype.FAULT] is None
-            or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Fault map is not loaded or valid")
-            return (True, "Fault map is not loaded or valid")
 
         # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
@@ -1213,14 +1359,14 @@ class MapData:
 
         # update minimum fault length either with the value from the config or calculate it
         if self.minimum_fault_length < 0:
-            logger.info("Calculating minimum fault length")
             self.minimum_fault_length = calculate_minimum_fault_length(
                 bbox=self.bounding_box, area_percentage=0.05
             )
-
+        logger.info(f"Calculated minimum fault length - {self.minimum_fault_length}")
+        
         # crop
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
-
+        
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
             faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
@@ -1251,11 +1397,10 @@ class MapData:
         # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
         if existing_codes:
             faults = faults[~faults["NAME"].isin(existing_codes)]
-            logger.info(f"The following codes were found and removed: {existing_codes}")
+            logger.info(f"The following faults were found and removed as per the config: {existing_codes}")
         else:
             logger.info("None of the fault ignore codes exist in the original fault data.")
             pass
-            
 
         # parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:
@@ -1337,6 +1482,63 @@ class MapData:
         self.data[Datatype.FAULT] = faults
 
         return (False, "")
+
+    @beartype.beartype
+    def parse_fault_orientations(self) -> tuple:
+        """
+        Parse the fault orientations shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
+        """
+        # Check type and size of loaded structure map
+
+
+        # Create new geodataframe
+        fault_orientations = geopandas.GeoDataFrame(
+            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
+        )
+
+        config = self.config.fault_config
+
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            if config["orientation_type"] == "strike":
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                    config["dipdir_column"]
+                ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
+            )
+
+        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["dip_column"]
+            ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
+            )
+
+        # TODO LG would it be worthwhile adding a description column for faults?
+        # it would be possible to parse out the fault displacement, type, slip direction
+        # if this was stored in the descriptions?
+
+        # Add object id
+        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["objectid_column"]
+            ]
+        else:
+            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
+        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        return (False, "")
+
 
     @beartype.beartype
     def parse_fold_map(self) -> tuple:

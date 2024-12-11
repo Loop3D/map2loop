@@ -158,7 +158,7 @@ class SorterAgeBased(Sorter):
         logger.info("Calling age based sorter")
         sorted_units = units.copy()
         if "minAge" in units.columns and "maxAge" in units.columns:
-            print(sorted_units["minAge"], sorted_units["maxAge"])
+            # print(sorted_units["minAge"], sorted_units["maxAge"])
             sorted_units["meanAge"] = sorted_units.apply(
                 lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
             )

@@ -4,9 +4,13 @@ import beartype
 import geopandas
 import math
 
+from .utils import calculate_minimum_fault_length
+
+
 from .logging import getLogger
 
 logger = getLogger(__name__)
+
 
 class DeformationHistory:
     """
@@ -14,8 +18,6 @@ class DeformationHistory:
 
     Attributes
     ----------
-    minimum_fault_length_to_export: float
-        The cutoff for ignoring faults. Any fault shorter than this is not exported
     history: list
         The time ordered list of deformation events
     faultColumns: numpy.dtype
@@ -29,14 +31,14 @@ class DeformationHistory:
 
     """
 
-    def __init__(self):
+    def __init__(self, project):
         """
         The initialiser for the deformation history. All attributes are defaulted
         """
-        self.minimum_fault_length_to_export = 500.0
         self.history = []
         self.fault_fault_relationships = []
-
+        self.project = project
+        
         # Create empty fault and fold dataframes
         self.faultColumns = numpy.dtype(
             [
@@ -66,7 +68,7 @@ class DeformationHistory:
         )
         self.faults = pandas.DataFrame(numpy.empty(0, dtype=self.faultColumns))
         # self.faults = self.faults.set_index("name")
-
+        
         self.foldColumns = numpy.dtype(
             [
                 ("eventId", int),
@@ -84,27 +86,9 @@ class DeformationHistory:
         )
         self.folds = pandas.DataFrame(numpy.empty(0, dtype=self.foldColumns))
         # self.folds = self.folds.set_index("name")
-
-    def set_minimum_fault_length(self, length):
-        """
-        Sets the minimum fault length to export
-
-        Args:
-            length (float or int):
-                The fault length cutoff
-        """
-        logger.info(f"Setting minimum fault length to {length}")
-        self.minimum_fault_length_to_export = length
-
-    def get_minimum_fault_length(self):
-        """
-        Getter for the fault length cutoff
-
-        Returns:
-            float: The fault length cutoff
-        """
-        return self.minimum_fault_length_to_export
-
+        
+        
+        
     def findfault(self, id):
         """
         Find the fault in the summary based on its eventId
@@ -278,7 +262,8 @@ class DeformationHistory:
             self.faults.at[index, "centreX"] = numpy.mean(observations["X"])
             self.faults.at[index, "centreY"] = numpy.mean(observations["Y"])
             self.faults.at[index, "centreZ"] = numpy.mean(observations["Z"])
-
+    
+    
     def get_faults_for_export(self):
         """
         Get the faults for export (removes any fault that is shorter than the cutoff)
@@ -286,8 +271,12 @@ class DeformationHistory:
         Returns:
             pandas.DataFrame: The filtered fault summary
         """
-        logger.info("Getting faults for export")
-        return self.faults[self.faults["length"] >= self.minimum_fault_length_to_export].copy()
+        # if no minimum fault length is set, calculate it
+        if self.project.get_minimum_fault_length() < 0:
+            self.project.set_minimum_fault_length( calculate_minimum_fault_length(
+                bbox=self.project.bounding_box, area_percentage=0.05
+            ))
+        return self.faults[self.faults["length"] >= self.project.get_minimum_fault_length()].copy()
 
     @beartype.beartype
     def get_fault_relationships_with_ids(self, fault_fault_relationships: pandas.DataFrame):
@@ -301,11 +290,9 @@ class DeformationHistory:
             pandas.DataFrame: The fault_relationships with the correct eventIds
         """
         logger.info("Getting fault relationships with eventIds")
+
         faultIds = self.get_faults_for_export()[["eventId", "name"]].copy()
         rel = fault_fault_relationships.copy()
-        rel['Fault1'] = rel['Fault1'].astype(str)
-        rel['Fault2'] = rel['Fault2'].astype(str)
-        faultIds['eventId'] = faultIds['eventId'].astype(str)
         rel = rel.merge(faultIds, left_on="Fault1", right_on="eventId")
         rel.rename(columns={"eventId": "eventId1"}, inplace=True)
         rel.drop(columns=["name"], inplace=True)

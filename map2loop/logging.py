@@ -1,5 +1,7 @@
 import logging
 import map2loop
+
+
 def get_levels():
     """dict for converting to logger levels from string
 
@@ -16,7 +18,8 @@ def get_levels():
         "debug": logging.DEBUG,
     }
 
-def getLogger(name:str):
+
+def getLogger(name: str):
     """Get a logger object with a specific name
 
 
@@ -32,13 +35,17 @@ def getLogger(name:str):
     """
     if name in map2loop.loggers:
         return map2loop.loggers[name]
-    logger =  logging.getLogger(name)
+    logger = logging.getLogger(name)
     logger.addHandler(map2loop.ch)
     logger.propagate = False
     map2loop.loggers[name] = logger
     return logger
+
+
 logger = getLogger(__name__)
-def set_level(level:str):
+
+
+def set_level(level: str):
     """Set the level of the logging object
 
 
@@ -54,4 +61,4 @@ def set_level(level:str):
     for name in map2loop.loggers:
         logger = logging.getLogger(name)
         logger.setLevel(level)
-    logger.info(f"Logging level set to {level}")    
+    logger.info(f"Logging level set to {level}")

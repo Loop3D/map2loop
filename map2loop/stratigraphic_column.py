@@ -40,13 +40,7 @@ class StratigraphicColumn:
                 ("maxAge", float),
                 ("group", str),
                 ("supergroup", str),
-                ("ThicknessMean", float),
-                ("ThicknessMedian", float),
-                ("ThicknessStdDev", float),
                 ("colour", str),
-                # ("indexInGroup", int),
-                # ("groupNum", int),
-                # ("numInGroup", int),
             ]
         )
         self.stratigraphicUnits = pandas.DataFrame(
@@ -61,7 +55,6 @@ class StratigraphicColumn:
                 ("minAge", float),
                 ("maxAge", float),
                 ("group", str),
-                ("ThicknessMedian", float),
                 ("colour", str),
             ]
         )
@@ -164,7 +157,6 @@ class StratigraphicColumn:
         self.stratigraphicUnits["maxAge"] = geology_data["MAX_AGE"]
         self.stratigraphicUnits["group"] = geology_data["GROUP"]
         self.stratigraphicUnits["supergroup"] = geology_data["SUPERGROUP"]
-        self.stratigraphicUnits["ThicknessMedian"] = -1.0
         self.stratigraphicUnits["colour"] = "#000000"
         # self.stratigraphicUnits["indexInGroup"] = -1
 
@@ -190,5 +182,5 @@ class StratigraphicColumn:
                 The order of the units by name
         """
         sorter = dict(zip(relationshipList, range(len(relationshipList))))
-        self.stratigraphicUnits["Order"] = self.stratigraphicUnits["name"].map(sorter)
-        self.stratigraphicUnits.sort_values(["Order"], inplace=True)
+        self.stratigraphicUnits["stratigraphic_Order"] = self.stratigraphicUnits["name"].map(sorter)
+        self.stratigraphicUnits.sort_values(["stratigraphic_Order"], inplace=True)

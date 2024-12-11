@@ -1,4 +1,4 @@
-# Map2Loop 3.0
+# Map2Loop 3.1
 
 Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 
@@ -23,11 +23,19 @@ conda config --add channels conda-forge
 
 ### Run
 
-To just use map2loop, issue the following
+To just use map2loop, issue the following. <sup>*</sup>
 
 ```bash
-conda install -c conda-forge -c loop3d map2loop -y
+git clone https://github.com/Loop3D/map2loop.git
+
+cd map2loop
+
+conda install -c loop3d --file dependencies.txt
+
+pip install .
 ```
+
+<p><sup>*</sup> We're actively working towards a better approach - stay tuned! </p>
 
 ### Documentation
 

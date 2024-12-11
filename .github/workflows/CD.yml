@@ -1,8 +1,10 @@
-# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, use json instead of hjson
+# for this workflow to work, need to release LPF=1.0.5, map2model=1.0.1, 
 
 name: release-please
 
 on: [push, pull_request]
+
+
 
 permissions:
   contents: write
@@ -38,13 +40,13 @@ jobs:
 
   pypi-build-sdist:
     name: Build SDist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Build SDist
         run: |
-          pip install build
+          pip install build 
           python -m build
 
       - uses: actions/upload-artifact@v4
@@ -56,7 +58,7 @@ jobs:
   pypi-test-sdist:
     name: Test sdist
     needs: pypi-build-sdist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Install GDAL
         run: |
@@ -75,7 +77,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install numpy==1.26.4
-          pip install geopandas shapely networkx owslib map2model loopprojectfile beartype gdal==3.8.4 hjson pytest scikit-learn
+          pip install geopandas shapely networkx owslib map2model beartype gdal pytest scikit-learn
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache dist/*.tar.gz
           pip list
 
@@ -87,7 +90,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -115,10 +118,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
         include:
-          - os: "ubuntu-latest"
-            artifact: map2loop-wheels-ubuntu-latest
+          - os: "ubuntu-24.04"
+            artifact: map2loop-wheels-ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -150,6 +153,8 @@ jobs:
           pip install --upgrade pip
           pip install numpy==1.26.4
           pip install -r dependencies.txt
+          pip uninstall loopprojectfile -y
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           pip install --no-cache --pre --no-index --find-links dist map2loop
           pip list
 
@@ -159,13 +164,14 @@ jobs:
           pytest
 
   conda-build:
+  
     name: Conda Build and Deploy ${{ matrix.os }} - Python Version-${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           # - macos-latest # currently not supported because needs libgcc>= 14 and not available for macos-latest (version available is 4.x.x)
           - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -181,6 +187,8 @@ jobs:
         run: |
           conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
+          pip uninstall loopprojectfile -y
+          pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
           conda install pytest -y
 
       - name: Building and install
@@ -207,30 +215,66 @@ jobs:
           name: map2loop-conda-${{ matrix.os }}-${{ matrix.python-version }}
           path: conda
 
-  # release-please:
-  #   needs: [pypi-test-wheels, conda-build]
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/master'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: googleapis/release-please-action@v4
-  #       id: release
-  #       with:
-  #         release-type: "python"
-  #         config-file: "release-please-config.json"
-  #         manifest-file: ".release-please-manifest.json"
-  #   outputs:
-  #     release_created: ${{ steps.release.outputs.release_created }}
-  #     #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
+  release-please:
+    needs: [pypi-test-wheels, conda-build]
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: "python"
+          config-file: "release-please-config.json"
+          manifest-file: ".release-please-manifest.json"
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      #if a release is created then run the deploy scripts for github.io, conda, pypi and docker
 
+  documentation-test:
+    runs-on: ubuntu-24.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cp CHANGELOG.md docs/source/CHANGELOG.md
+          docker build . -t=docs -f docs/Dockerfile 
+          docker run -v $(pwd):/map2loop docs bash map2loop/docs/build_docs.sh
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs/build/html
+
+  documentation-deploy:
+    runs-on: ubuntu-24.04
+    needs: [release-please, documentation-test]
+    if: ${{ needs.release-please.outputs.release_created }} && github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: docs
+      - name: ls
+        run: |
+          ls -l docs
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
+  
   conda-upload:
     needs: [conda-build]
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           # - macos-latest
           - windows-latest
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -254,8 +298,9 @@ jobs:
 
   pypi-upload:
     needs: [pypi-test-wheels]
+    if: github.ref == 'refs/heads/master'
     runs-on:
-      - ubuntu-latest
+      - ubuntu-24.04  # https://github.com/actions/runner-images/issues/10636
     # if: ${{ needs.release-please.outputs.release_created }}
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing

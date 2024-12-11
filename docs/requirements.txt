@@ -1,8 +1,7 @@
-# all on conda forge
 sphinx 
 sphinx-gallery 
 pydata-sphinx-theme 
 myst-parser 
 sphinxcontrib-bibtex
-conda-forge::poppler
+poppler
 LoopStructural

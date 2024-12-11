@@ -344,7 +344,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        _lines.append(short_line)
+                        _lines.append(short_line[0])
                         
                         # check if the short line is 
                         if self.max_line_length is not None and short_line.length > self.max_line_length:
@@ -415,7 +415,7 @@ class InterpolatedStructure(ThicknessCalculator):
         self.location_tracking = combined_location_tracking
         
         # Create GeoDataFrame for lines
-        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs=basal_contacts.crs)
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
         self.lines['dip'] = _dips
         
         # Check thickness calculation

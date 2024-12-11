@@ -33,11 +33,12 @@ class ThicknessCalculator(ABC):
         ABC (ABC): Derived from Abstract Base Class
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser of for ThicknessCalculator
         """
         self.thickness_calculator_label = "ThicknessCalculatorBaseClass"
+        self.max_line_length = max_line_length
 
     def type(self):
         """
@@ -205,13 +206,13 @@ class InterpolatedStructure(ThicknessCalculator):
         -> pandas.DataFrame: Calculates a thickness map for the overall map area.
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser for interpolated structure version of the thickness calculator
         """
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = None
-        self.max_line_length = None
+        super().__init__(max_line_length)
 
     @beartype.beartype
     def compute(
@@ -414,12 +415,11 @@ class StructuralPoint(ThicknessCalculator):
 
     '''
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         self.thickness_calculator_label = "StructuralPoint"
-        self.line_length = 10000
         self.strike_allowance = 30
-        self.max_line_length = None
         self.lines = None
+        super().max_line_length = max_line_length
 
     @beartype.beartype
     def compute(

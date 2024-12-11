@@ -312,9 +312,11 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations[
             ["geometry", "dip", "UNITNAME"]
         ].copy()
-
+        
         _lines = []
         _dips = []
+        _location_tracking = []
+        
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -336,7 +338,9 @@ class InterpolatedStructure(ThicknessCalculator):
                     dip = interpolated_orientations.loc[
                         interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
+                    
                     _thickness = []
+                
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
@@ -358,19 +362,27 @@ class InterpolatedStructure(ThicknessCalculator):
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
-                        # get the elevation Z of the end point p2
-                        p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
                         indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within
-                        # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
                         _dips.append(_dip)
-                        # get the end points of the shortest line
-                        # calculate the true thickness t = L . sin dip
+                        # calculate the true thickness t = L * sin(dip)
                         thickness = line_length * numpy.sin(_dip)
+                        
+                        # add location tracking
+                        location_tracking = pandas.DataFrame(
+                            {
+                                "p1_x": [p1[0]], "p1_y": [p1[1]], "p1_z": [p1[2]],
+                                "p2_x": [p2[0]], "p2_y": [p2[1]], "p2_z": [p2[2]],
+                                "thickness": [thickness],
+                                "unit": [stratigraphic_order[i]]
+                            }
+                        )
+                        _location_tracking.append(location_tracking)
+                        
                         # Average thickness along the shortest line
                         if all(numpy.isnan(thickness)):
                             pass
@@ -396,11 +408,20 @@ class InterpolatedStructure(ThicknessCalculator):
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
         
-        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs = basal_contacts.crs)
+        # Combine all location_tracking DataFrames into a single DataFrame
+        combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
+        
+        # Save the combined DataFrame as an attribute of the class
+        self.location_tracking = combined_location_tracking
+        
+        # Create GeoDataFrame for lines
+        self.lines = geopandas.GeoDataFrame(geometry=[line[0] for line in _lines], crs=basal_contacts.crs)
         self.lines['dip'] = _dips
+        
+        # Check thickness calculation
         self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
-
 
 class StructuralPoint(ThicknessCalculator):
     '''

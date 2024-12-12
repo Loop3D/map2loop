@@ -2,7 +2,7 @@ services:
   map2loop:
     build:
       dockerfile: docs/Dockerfile
-      context: ./
+      context: ../
     volumes:
       - ../:/map2loop
       - ../../LoopStructural:/LoopStructural

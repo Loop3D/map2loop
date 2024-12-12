@@ -2,6 +2,7 @@ import pytest
 import geopandas as gpd
 import shapely.geometry
 from map2loop.mapdata import MapData
+from map2loop.data_checks import check_geology_fields_validity
 
 # Datatype Enum
 class Datatype:
@@ -196,6 +197,6 @@ def test_check_geology_fields_validity(geology_data, expected_validity, expected
     map_data.raw_data[Datatype.GEOLOGY] = geology_gdf
 
     # Test the check_geology_fields_validity function
-    validity_check, message = map_data.check_geology_fields_validity()
+    validity_check, message = check_geology_fields_validity(map_data)
     assert validity_check == expected_validity
     assert message == expected_message

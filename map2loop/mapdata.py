@@ -911,7 +911,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-
         # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
 
@@ -920,6 +919,7 @@ class MapData:
 
         # update minimum fault length either with the value from the config or calculate it
         if self.minimum_fault_length < 0:
+            logger.info("Calculating minimum fault length")
             self.minimum_fault_length = calculate_minimum_fault_length(
                 bbox=self.bounding_box, area_percentage=0.05
             )
@@ -928,7 +928,7 @@ class MapData:
         # crop
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
         
-        if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
+        if config["structtype_column"] in self.raw_data[Datatype.FAULT]:               
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
             faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
             if self.verbose_level > VerboseLevel.NONE:
@@ -962,6 +962,7 @@ class MapData:
         else:
             logger.info("None of the fault ignore codes exist in the original fault data.")
             pass
+            
 
         # parse dip column
         if config["dip_column"] in self.raw_data[Datatype.FAULT]:

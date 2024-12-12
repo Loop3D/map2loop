@@ -2,6 +2,7 @@ import pytest
 import geopandas as gpd
 import shapely.geometry
 from map2loop.mapdata import MapData
+from map2loop.data_checks import check_structure_fields_validity
 
 # Datatype Enum
 class Datatype:
@@ -130,6 +131,6 @@ def test_check_structure_fields_validity(structure_data, expected_validity, expe
     map_data.raw_data[Datatype.STRUCTURE] = structure_gdf
 
     # Test the check_structure_fields_validity function
-    validity_check, message = map_data.check_structure_fields_validity()
+    validity_check, message = check_structure_fields_validity(map_data)
     assert validity_check == expected_validity
     assert message == expected_message

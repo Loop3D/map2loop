@@ -292,19 +292,20 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
                     f"Datatype FAULT: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
                 )
 
-        # Check if "fault_text" is defined and contained in the column
-        fault_text = config.get("fault_text", None)
-        if not fault_text:
-            logger.error(
-                "Datatype FAULT: 'fault_text' is not defined in the configuration, but it is required to filter faults."
-            )
-            return (True, "Datatype FAULT: 'fault_text' is not defined in the configuration.")
+    # Check if "fault_text" is defined and contained in the column
+    fault_text = config.get("fault_text", None)
 
+    # Check if the structtype_column exists in the fault_data
+    if structtype_column not in fault_data.columns:
+        logger.warning(
+            f"Datatype FAULT: The column '{structtype_column}' is not present in the fault data."
+        )
+
+    else:
         if not fault_data[structtype_column].str.contains(fault_text).any():
             logger.error(
-                f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Ensure it is correctly defined at least for one row"
+                f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Project might end up with no faults"
             )
-            return (True, f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'.")
     
     #checks on name column
     name_column = config.get("name_column")

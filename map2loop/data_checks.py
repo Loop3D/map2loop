@@ -442,3 +442,4 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
                 )
     
     return (False, "")
+

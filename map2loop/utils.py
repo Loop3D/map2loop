@@ -3,7 +3,7 @@ import math
 import shapely
 import geopandas
 import beartype
-from typing import Union, Optional, Dict
+from beartype.typing import Union, Optional, Dict
 import pandas
 import re
 import json

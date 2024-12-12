@@ -828,7 +828,7 @@ class MapData:
                 return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values.")
 
     
-        # # 5. Check for NaNs/blanks in optional fields with warnings
+        # 5. Check for NaNs/blanks in optional fields with warnings
         warning_fields = [
             "group_column", "supergroup_column", "description_column",
             "rocktype_column", "minage_column", "maxage_column",
@@ -1200,11 +1200,10 @@ class MapData:
         #checks on name column
         name_column = config.get("name_column")
         if name_column not in fault_data.columns:
-            logger.error(
+            logger.warning(
                 f"Datatype FAULT: Column '{name_column}' (config key 'name_column') is missing from the fault data."
                 "Please ensure it is present, or remove that key from the config."
             )
-            return (True, f"Datatype FAULT: Column '{name_column}' (config key 'name_column') is missing from the fault data.")
         
         if name_column and name_column in fault_data.columns:
             # Check if the column contains non-string values
@@ -1234,12 +1233,15 @@ class MapData:
             column_name = config.get(key)
             if column_name:  # Only proceed if the config has this key
                 if column_name in fault_data.columns:
-                    # Check if the column contains only numeric values
+                    
+                    #coerce to numeric
+                    fault_data[column_name] = pandas.to_numeric(fault_data[column_name], errors='coerce')
+                    
+                    # Check if the column contains only numeric values                    
                     if not fault_data[column_name].apply(lambda x: isinstance(x, (int, float)) or pandas.isnull(x)).all():
-                        logger.error(
+                        logger.warning(
                             f"Datatype FAULT: Column '{column_name}' (config key {key}) must contain only numeric values. Please ensure the column is numeric."
                         )
-                        return (True, f"Datatype FAULT: Column '{column_name}' (config key {key}) must contain only numeric values.")
 
                     # Check for NaN or empty values
                     if fault_data[column_name].isnull().any():
@@ -1263,10 +1265,10 @@ class MapData:
                                 f"Datatype FAULT: Column '{column_name}' (config key {key}) contains values outside the range [0, 360]. Was this intentional?"
                             )
                 else:
-                    logger.error(
+                    logger.warning(
                         f"Datatype FAULT: Column '{column_name}' (config key {key}) is missing from the fault data. Please ensure the column name is correct, or otherwise remove that key from the config."
                     )
-                    return (True, f"Datatype FAULT: Column '{column_name}' (config key {key}) is missing from the fault data.")
+                    
         
         # dip estimates
         dip_estimate_column = config.get("dip_estimate_column")
@@ -1302,42 +1304,33 @@ class MapData:
                 )
                 return (True, f"Datatype FAULT: Column '{dip_estimate_column}' is missing from the fault data.")
 
-        # # Check ID column
-        # id_column = config.get("objectid_column")
-        # if id_column:  
-        #     if id_column in fault_data.columns:
-        #         # Check for non-integer values
-        #         # Attempt to coerce the ID column to integers because WA data says so (signed ARodrigues)
-        #         fault_data[id_column] = pandas.to_numeric(fault_data[id_column], errors='coerce')
+        # Check ID column
+        id_column = config.get("objectid_column")
+        
+        if id_column:  
+            if id_column in fault_data.columns:
+                # Check for non-integer values
+                # Attempt to coerce the ID column to integers because WA data says so (ARodrigues)
+                fault_data[id_column] = pandas.to_numeric(fault_data[id_column], errors='coerce')
 
-        #         # Check if all values are integers or null after coercion
-        #         if not fault_data[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
-        #             logger.error(
-        #                 f"Datatype FAULT: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
-        #             )
-        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains non-integer values.")
-
+                # Check if all values are integers or null after coercion
+                if not fault_data[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
+                    logger.warning(
+                        f"Datatype FAULT: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
+                    )
                 
-        #         # Check for NaN values
-        #         if fault_data[id_column].isnull().any():
-        #             logger.error(
-        #                 f"Datatype FAULT: ID column '{id_column}' contains NaN or null values. Rectify this or remove the key from the config to auto-generate IDs."
-        #             )
-        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains NaN values.")
+                # Check for NaN values
+                if fault_data[id_column].isnull().any():
+                    logger.warning(
+                        f"Datatype FAULT: ID column '{id_column}' contains NaN or null values. Rectify this or remove the key from the config to auto-generate IDs."
+                    )
 
-        #         # Check for duplicates
-        #         if fault_data[id_column].duplicated().any():
-        #             logger.error(
-        #                 f"Datatype FAULT: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
-        #             )
-        #             return (True, f"Datatype FAULT: ID column '{id_column}' contains duplicate values.")
-        #     else:
-        #         logger.error(
-        #             f"Datatype FAULT: ID column '{id_column}' is missing from the fault data. Please ensure the column name is correct or remove that key from the config."
-        #         )
-        #         return (True, f"Datatype FAULT: ID column '{id_column}' is missing from the fault data.")
+                # Check for duplicates
+                if fault_data[id_column].duplicated().any():
+                    logger.error(
+                        f"Datatype FAULT: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
+                    )
 
-        # 
         
         return (False, "")
 

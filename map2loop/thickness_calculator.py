@@ -33,11 +33,12 @@ class ThicknessCalculator(ABC):
         ABC (ABC): Derived from Abstract Base Class
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser of for ThicknessCalculator
         """
         self.thickness_calculator_label = "ThicknessCalculatorBaseClass"
+        self.max_line_length = max_line_length
 
     def type(self):
         """
@@ -84,7 +85,17 @@ class ThicknessCalculator(ABC):
             )
             return units
 
+    def _check_thickness_percentage_calculations(self, thicknesses: pandas.DataFrame):
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMean'] == -1])
+        total_units = len(thicknesses)
 
+        if total_units > 0 and (units_with_no_thickness / total_units) >= 0.75:
+            logger.warning(
+                f"More than {int(0.75 * 100)}% of units ({units_with_no_thickness}/{total_units}) "
+                f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
+                f"is not suitable for this dataset."
+            )
+            
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
@@ -176,6 +187,8 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
                 val = min(distance, thicknesses.at[idx, "ThicknessMean"])
             thicknesses.loc[idx, "ThicknessMean"] = val
 
+        self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
 
 
@@ -193,12 +206,14 @@ class InterpolatedStructure(ThicknessCalculator):
         -> pandas.DataFrame: Calculates a thickness map for the overall map area.
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser for interpolated structure version of the thickness calculator
         """
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "InterpolatedStructure"
-        self.lines = []
+        self.lines = None
+        
 
     @beartype.beartype
     def compute(
@@ -297,7 +312,11 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations[
             ["geometry", "dip", "UNITNAME"]
         ].copy()
-
+        
+        _lines = []
+        _dips = []
+        _location_tracking = []
+        
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -319,11 +338,18 @@ class InterpolatedStructure(ThicknessCalculator):
                     dip = interpolated_orientations.loc[
                         interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
+                    
                     _thickness = []
+                
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        self.lines.append(short_line)
+                        _lines.append(short_line[0])
+                        
+                        # check if the short line is 
+                        if self.max_line_length is not None and short_line.length > self.max_line_length:
+                            continue
+ 
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -336,18 +362,27 @@ class InterpolatedStructure(ThicknessCalculator):
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
-                        # get the elevation Z of the end point p2
-                        p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
                         indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within
-                        # 10% of the length of the shortest line
                         _dip = numpy.deg2rad(dip[indices])
-                        # get the end points of the shortest line
-                        # calculate the true thickness t = L . sin dip
+                        _dips.append(_dip)
+                        # calculate the true thickness t = L * sin(dip)
                         thickness = line_length * numpy.sin(_dip)
+                        
+                        # add location tracking
+                        location_tracking = pandas.DataFrame(
+                            {
+                                "p1_x": [p1[0]], "p1_y": [p1[1]], "p1_z": [p1[2]],
+                                "p2_x": [p2[0]], "p2_y": [p2[1]], "p2_z": [p2[2]],
+                                "thickness": [thickness],
+                                "unit": [stratigraphic_order[i]]
+                            }
+                        )
+                        _location_tracking.append(location_tracking)
+                        
                         # Average thickness along the shortest line
                         if all(numpy.isnan(thickness)):
                             pass
@@ -372,9 +407,21 @@ class InterpolatedStructure(ThicknessCalculator):
                 logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-
+        
+        # Combine all location_tracking DataFrames into a single DataFrame
+        combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
+        
+        # Save the combined DataFrame as an attribute of the class
+        self.location_tracking = combined_location_tracking
+        
+        # Create GeoDataFrame for lines
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines['dip'] = _dips
+        
+        # Check thickness calculation
+        self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
-
 
 class StructuralPoint(ThicknessCalculator):
     '''
@@ -390,10 +437,12 @@ class StructuralPoint(ThicknessCalculator):
 
     '''
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "StructuralPoint"
-        self.line_length = 10000
         self.strike_allowance = 30
+        self.lines = None
+        
 
     @beartype.beartype
     def compute(
@@ -474,6 +523,8 @@ class StructuralPoint(ThicknessCalculator):
         # create empty lists to store thicknesses and lithologies
         thicknesses = []
         lis = []
+        _lines = []
+        _dip = []
 
         # loop over each sampled structural measurement
         for s in range(0, len(sampled_structures)):
@@ -505,7 +556,9 @@ class StructuralPoint(ThicknessCalculator):
             )
 
             # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
-            B = calculate_endpoints(measurement_pt, strike, self.line_length, bbox_poly)
+            if self.max_line_length is None:
+                self.max_line_length = 10000
+            B = calculate_endpoints(measurement_pt, strike, self.max_line_length, bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
             # find all intersections
@@ -577,15 +630,28 @@ class StructuralPoint(ThicknessCalculator):
             if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
+            #build the debug info
+            line = shapely.geometry.LineString([int_pt1, int_pt2])
+            _lines.append(line)
+            _dip.append(measurement['DIP'])  
+
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
 
+            # if length is higher than max_line_length, skip
+            if self.max_line_length is not None and L > self.max_line_length:
+                continue
+            
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))
 
             thicknesses.append(thickness)
             lis.append(litho_in)
-
+        
+        # create the debug gdf
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines["DIP"] = _dip
+        
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
@@ -640,4 +706,6 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
+        self._check_thickness_percentage_calculations(output_units)
+        
         return output_units

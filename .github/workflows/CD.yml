@@ -185,6 +185,7 @@ jobs:
       - name: Installing dependencies
         shell: bash -l {0}
         run: |
+  
           conda install -c conda-forge conda-build anaconda-client conda-verify -y
           conda install -c loop3d -c conda-forge --file dependencies.txt -y
           pip uninstall loopprojectfile -y

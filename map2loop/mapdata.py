@@ -257,7 +257,7 @@ class MapData:
 
     @beartype.beartype
     def set_config_filename(
-        self, filename: Union[pathlib.Path, str], legacy_format: bool = False, lower: bool = False
+        self, filename: Union[pathlib.Path, str],  lower: bool = False
     ):
         """
         Set the config filename and update the config structure
@@ -265,12 +265,13 @@ class MapData:
         Args:
             filename (str):
                 The filename of the config file
-            legacy_format (bool, optional):
-                Whether the file is in m2lv2 form. Defaults to False.
+            lower (bool, optional):
+                Flag to convert the config file to lowercase. Defaults to False.
         """
         logger.info('Setting config filename to {filename}')
-        self.config_filename = filename
-        self.config.update_from_file(filename, legacy_format=legacy_format, lower=lower)
+        
+        self.config.update_from_file(filename,  lower=lower)
+        
         logger.info(f"Config is: {self.config.to_dict()}")
 
     def get_config_filename(self):
@@ -409,7 +410,7 @@ class MapData:
 
             else:
                 self.set_config_filename(
-                    AustraliaStateUrls.aus_config_urls[state], legacy_format=False, lower=lower
+                    AustraliaStateUrls.aus_config_urls[state],  lower=lower
                 )
                 self.set_colour_filename(AustraliaStateUrls.aus_clut_urls[state])
         else:

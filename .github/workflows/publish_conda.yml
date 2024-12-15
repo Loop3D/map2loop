@@ -1,0 +1,65 @@
+on:
+    push:
+      branches:
+        - master
+    workflow_dispatch:
+
+  jobs:
+    
+    linting:
+      name: Linting
+      runs-on: ubuntu-24.04
+      steps:  
+        - uses: actions/checkout@v4
+        - name: Install dependencies and run linting
+          run: |
+            python -m pip install --upgrade pip
+            pip install black ruff
+            black .
+            ruff check . --fix
+        - name: Check for local changes
+          run: |
+            if [ -n "$(git status --porcelain)" ]; then
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add .
+              git commit -m "style: style fixes by ruff and autoformatting by black"
+            fi
+        - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: style fixes by ruff and autoformatting by black"
+
+    release-please:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: GoogleCloudPlatform/release-please-action@v4
+          id: release
+          with:
+            release-type: python
+            package-name: LoopProjectFile
+        - name: Debug release_created output
+          run: |
+            echo "Release created: ${{ steps.release.outputs.release_created }}"
+      outputs:
+        release_created: ${{ steps.release.outputs.release_created }}
+  
+    pypi:
+      runs-on: ubuntu-24.04
+      needs: release-please
+      if: ${{ needs.release-please.outputs.release_created }}
+      steps:
+        - name: Trigger build for pypi and upload
+          run: |
+            curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/Loop3d/loopprojectfile/actions/workflows/pypi.yml/dispatches \
+            -d '{"ref":"master"}'
+        - name: Trigger build for conda and upload
+          run: |
+            curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/Loop3d/loopprojectfile/actions/workflows/conda.yml/dispatches \
+            -d '{"ref":"master"}'
+  

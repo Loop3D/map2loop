@@ -5,7 +5,7 @@ shapely
 networkx
 owslib
 map2model
-loopprojectfile==0.2.1
+loopprojectfile==v0.2.1
 beartype
 gdal==3.8.4
 pytest

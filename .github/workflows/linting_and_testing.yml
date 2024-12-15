@@ -14,14 +14,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install black ruff
           ruff check . --fix
-      - name: Check for local changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "style: style fixes by ruff and autoformatting by black"
-          fi
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
@@ -41,7 +34,7 @@ jobs:
         run: |
             conda install -c conda-forge -c loop3d --file dependencies.txt -y
             conda install pytest -y
-            
+
       - name: Install map2loop
         run: |
             python -m pip install .

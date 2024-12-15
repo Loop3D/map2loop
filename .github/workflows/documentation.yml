@@ -8,6 +8,9 @@ jobs:
       runs-on: ubuntu-24.04
       steps:
         - uses: actions/checkout@v4
+          with:
+            ref: ${{ github.ref }}
+            
         - run: |
             cp CHANGELOG.md docs/source/CHANGELOG.md
             docker build . -t=docs -f docs/Dockerfile 

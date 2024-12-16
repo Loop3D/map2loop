@@ -22,7 +22,8 @@ jobs:
       - name: Install conda-build
         run: |
           conda install conda-build -y
-          conda build conda
+          conda config --add channels loop3d
+          conda build conda 
 
       - name: Create environment and install package
         run: |

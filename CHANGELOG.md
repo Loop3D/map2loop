@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## [3.2.2](https://github.com/Loop3D/map2loop/compare/v3.2.1...v3.2.2) (2025-01-13)
 
 
@@ -14,6 +15,8 @@
 
 * include dependencies in site-packages  - issue [#169](https://github.com/Loop3D/map2loop/issues/169) ([#170](https://github.com/Loop3D/map2loop/issues/170)) ([b33532b](https://github.com/Loop3D/map2loop/commit/b33532b56473148433fd192e182aadee028dc875))
 
+=======
+>>>>>>> 35c54be (chore(master): release 3.2.0 (#165))
 ## [3.2.0](https://github.com/Loop3D/map2loop/compare/v3.1.13...v3.2.0) (2024-12-16)
 
 

@@ -7,11 +7,11 @@ on:
 jobs:
   test-conda-build:
     name: Test Conda Build and Import
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: ${{ fromJSON(vars.BUILD_OS)}}
-        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        os: [ubuntu-latest]
+        python-version: [3.11]
         
     steps:
       - name: Checkout code

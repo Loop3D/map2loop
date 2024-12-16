@@ -34,7 +34,13 @@ jobs:
           export C_INCLUDE_PATH=/usr/include/gdal
           python -m pip install GDAL==$(gdal-config --version)
 
-      - name: Install GDAL Windows
+      - name: Install conda Windows
+        if: runner.os == 'Windows'
+        uses: conda-incubator/setup-miniconda@v3.1.0
+        with:
+          miniforge-version: latest
+
+      - name: Install GDAL using conda
         if: runner.os == 'Windows'
         run: |
           conda install gdal -y

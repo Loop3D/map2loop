@@ -23,12 +23,11 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3.1.0
         with:
           miniforge-version: latest
-          activate-environment: test-env
 
       - name: Install conda-build
         shell: bash -l {0}
         run: |
-          conda update conda -y
+          conda update -n base conda -y
           conda install -n base conda-libmamba-solver
           conda config --set solver libmamba
           conda install conda-build -y

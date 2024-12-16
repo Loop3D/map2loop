@@ -1,5 +1,4 @@
 # internal imports
-import scipy.interpolate
 from .utils import (
     create_points,
     rebuild_sampled_basal_contacts,
@@ -11,14 +10,17 @@ from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
 from .mapdata import MapData
 
+from .logging import getLogger
+logger = getLogger(__name__)  
+
 # external imports
 from abc import ABC, abstractmethod
+import scipy.interpolate
 import beartype
 import numpy
 import scipy
 import pandas
 import geopandas
-from statistics import mean
 import shapely
 import math
 import map2loop.logging as logging
@@ -34,11 +36,12 @@ class ThicknessCalculator(ABC):
         ABC (ABC): Derived from Abstract Base Class
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser of for ThicknessCalculator
         """
         self.thickness_calculator_label = "ThicknessCalculatorBaseClass"
+        self.max_line_length = max_line_length
 
     def type(self):
         """
@@ -78,9 +81,24 @@ class ThicknessCalculator(ABC):
         If the thickness is not calculated for a given unit, the assigned thickness is -1.
         For the bottom and top units of the stratigraphic sequence, the assigned thickness is -1.
         """
-        pass
 
+        if len(stratigraphic_order) < 3:
+            logger.warning(
+                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
+            )
+            return units
 
+    def _check_thickness_percentage_calculations(self, thicknesses: pandas.DataFrame):
+        units_with_no_thickness = len(thicknesses[thicknesses['ThicknessMean'] == -1])
+        total_units = len(thicknesses)
+
+        if total_units > 0 and (units_with_no_thickness / total_units) >= 0.75:
+            logger.warning(
+                f"More than {int(0.75 * 100)}% of units ({units_with_no_thickness}/{total_units}) "
+                f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
+                f"is not suitable for this dataset."
+            )
+            
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
@@ -120,36 +138,45 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         no_distance = -1.0
         basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
         thicknesses = units.copy()
-        # Set default value
+
+        # Set default values
+        thicknesses["ThicknessMean"] = no_distance
         thicknesses["ThicknessMedian"] = no_distance
+        thicknesses["ThicknessStdDev"] = no_distance
+
         basal_unit_list = basal_contacts["basal_unit"].to_list()
+        sampled_basal_contacts = rebuild_sampled_basal_contacts(
+            basal_contacts=basal_contacts, sampled_contacts=map_data.sampled_contacts
+        )
+
         if len(stratigraphic_order) < 3:
-            print(
-                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
+            logger.warning(
+                f"ThicknessCalculatorAlpha: Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
             )
             return thicknesses
+
         for i in range(1, len(stratigraphic_order) - 1):
             # Compare basal contacts of adjacent units
             if (
                 stratigraphic_order[i] in basal_unit_list
                 and stratigraphic_order[i + 1] in basal_unit_list
             ):
-                contact1 = basal_contacts[basal_contacts["basal_unit"] == stratigraphic_order[i]][
-                    "geometry"
-                ].to_list()[0]
-                contact2 = basal_contacts[
-                    basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
+                contact1 = sampled_basal_contacts[
+                    sampled_basal_contacts["basal_unit"] == stratigraphic_order[i]
+                ]["geometry"].to_list()[0]
+                contact2 = sampled_basal_contacts[
+                    sampled_basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
                 ]["geometry"].to_list()[0]
                 if contact1 is not None and contact2 is not None:
                     distance = contact1.distance(contact2)
                 else:
-                    print(
-                        f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                    logger.warning(
+                        f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                     )
                     distance = no_distance
             else:
-                print(
-                    f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                logger.warning(
+                    f"ThicknessCalculatorAlpha: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]} \n"
                 )
 
                 distance = no_distance
@@ -157,24 +184,14 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             # Maximum thickness is the horizontal distance between the minimum of these distances
             # Find row in unit_dataframe corresponding to unit and replace thickness value if it is -1 or larger than distance
             idx = thicknesses.index[thicknesses["name"] == stratigraphic_order[i]].tolist()[0]
-            if thicknesses.loc[idx, "ThicknessMedian"] == -1:
+            if thicknesses.loc[idx, "ThicknessMean"] == -1:
                 val = distance
             else:
-                val = min(distance, thicknesses.at[idx, "ThicknessMedian"])
-            thicknesses.loc[idx, "ThicknessMedian"] = val
+                val = min(distance, thicknesses.at[idx, "ThicknessMean"])
+            thicknesses.loc[idx, "ThicknessMean"] = val
 
-        # If no thickness calculations can be made with current stratigraphic column set all units
-        # to a uniform thickness value
-        if len(thicknesses[thicknesses["ThicknessMedian"] > 0]) < 1:
-            thicknesses["ThicknessMedian"] = 100.0
-        mean_thickness = mean(thicknesses[thicknesses["ThicknessMedian"] > 0]["ThicknessMedian"])
-
-        # For any unit thickness that still hasn't been calculated (i.e. at -1) set to
-        # the mean thickness of the other units
-        thicknesses["ThicknessMedian"] = thicknesses.apply(
-            lambda row: mean_thickness if row["ThicknessMedian"] == -1 else row["ThicknessMedian"],
-            axis=1,
-        )
+        self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
 
 
@@ -192,12 +209,14 @@ class InterpolatedStructure(ThicknessCalculator):
         -> pandas.DataFrame: Calculates a thickness map for the overall map area.
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
         """
         Initialiser for interpolated structure version of the thickness calculator
         """
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "InterpolatedStructure"
-        self.lines = []
+        self.lines = None
+        
 
     @beartype.beartype
     def compute(
@@ -241,8 +260,8 @@ class InterpolatedStructure(ThicknessCalculator):
         thicknesses["ThicknessMedian"] = -1.0
         thicknesses["ThicknessMean"] = -1.0
         # thicknesses["ThicknessStdDev"] is the standard deviation of the thickness of the unit
-        thicknesses["ThicknessStdDev"] = 0
-        thicknesses["ThicknessStdDev"] = thicknesses["ThicknessStdDev"].astype("float64")
+        thicknesses["ThicknessStdDev"] = -1.0
+        thicknesses['ThicknessStdDev'] = thicknesses['ThicknessStdDev'].astype('float64')
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
@@ -264,8 +283,10 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
         contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
         bounding_box = map_data.get_bounding_box()
+
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
+        # Interpolate the dip of the contacts
         dip = interpolator(bounding_box, structure_data, interpolator=scipy.interpolate.Rbf)
         # create a GeoDataFrame of the interpolated orientations
         interpolated_orientations = geopandas.GeoDataFrame()
@@ -294,13 +315,11 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations[
             ["geometry", "dip", "UNITNAME"]
         ].copy()
-
-        if len(stratigraphic_order) < 3:
-            print(
-                f"Cannot make any thickness calculations with only {len(stratigraphic_order)} units"
-            )
-            return thicknesses
-
+        
+        _lines = []
+        _dips = []
+        _location_tracking = []
+        
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -322,11 +341,18 @@ class InterpolatedStructure(ThicknessCalculator):
                     dip = interpolated_orientations.loc[
                         interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
+                    
                     _thickness = []
+                
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        self.lines.append(short_line)
+                        _lines.append(short_line[0])
+                        
+                        # check if the short line is 
+                        if self.max_line_length is not None and short_line.length > self.max_line_length:
+                            continue
+ 
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -339,23 +365,32 @@ class InterpolatedStructure(ThicknessCalculator):
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
-                        # get the elevation Z of the end point p2
-                        p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 10% of the length of the shortest line
                         indices = shapely.dwithin(short_line, interp_points, line_length * 1)
                         # get the dip of the points that are within
-                        # 10% of the length of the shortest line
                         if all(numpy.isnan(dip[indices])):
                             pass
                         else:
                             _dip = numpy.nanmean(dip[indices])
                             _dip = numpy.deg2rad(_dip)
-                            # get the end points of the shortest line
-                            # calculate the true thickness t = L . sin dip
+                            _dips.append(_dip)
+                            # calculate the true thickness t = L * sin(dip)
                             thickness = line_length * numpy.sin(_dip)
-                            # Average thickness along the shortest line
+                            
+                        # add location tracking
+                        location_tracking = pandas.DataFrame(
+                            {
+                                "p1_x": [p1[0]], "p1_y": [p1[1]], "p1_z": [p1[2]],
+                                "p2_x": [p2[0]], "p2_y": [p2[1]], "p2_z": [p2[2]],
+                                "thickness": [thickness],
+                                "unit": [stratigraphic_order[i]]
+                            }
+                        )
+                        _location_tracking.append(location_tracking)
+                        
+                        # Average thickness along the shortest line
                             _thickness.append(thickness)
 
                     # calculate the median thickness and standard deviation for the unit
@@ -385,12 +420,24 @@ class InterpolatedStructure(ThicknessCalculator):
                         thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
 
             else:
-                logging.logger.warning(
-                    f"Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}"
+                logger.warning(
+                    f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-
+        
+        # Combine all location_tracking DataFrames into a single DataFrame
+        combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
+        
+        # Save the combined DataFrame as an attribute of the class
+        self.location_tracking = combined_location_tracking
+        
+        # Create GeoDataFrame for lines
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines['dip'] = _dips
+        
+        # Check thickness calculation
+        self._check_thickness_percentage_calculations(thicknesses)
+        
         return thicknesses
-
 
 class StructuralPoint(ThicknessCalculator):
     """
@@ -406,10 +453,12 @@ class StructuralPoint(ThicknessCalculator):
 
     """
 
-    def __init__(self):
+    def __init__(self, max_line_length: float = None):
+        super().__init__(max_line_length)
         self.thickness_calculator_label = "StructuralPoint"
-        self.line_length = 10000
         self.strike_allowance = 30
+        self.lines = None
+        
 
     @beartype.beartype
     def compute(
@@ -469,14 +518,14 @@ class StructuralPoint(ThicknessCalculator):
             crs=basal_contacts.crs,
         )
         # add unitname to the sampled structures
-        sampled_structures["unit_name"] = geopandas.sjoin(sampled_structures, geology)["UNITNAME"]
+        sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
 
         # remove nans from sampled structures
         # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
-        print(
+        logger.info(
             f"skipping row(s) {sampled_structures[sampled_structures['unit_name'].isnull()].index.to_numpy()} in sampled structures dataset, as they do not spatially coincide with a valid geology polygon \n"
         )
-        sampled_structures = sampled_structures.dropna(subset=["unit_name"])
+        sampled_structures = sampled_structures.dropna(subset=['unit_name'])
 
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
@@ -490,6 +539,8 @@ class StructuralPoint(ThicknessCalculator):
         # create empty lists to store thicknesses and lithologies
         thicknesses = []
         lis = []
+        _lines = []
+        _dip = []
 
         # loop over each sampled structural measurement
         for s in range(0, len(sampled_structures)):
@@ -506,8 +557,8 @@ class StructuralPoint(ThicknessCalculator):
 
             # check if litho_in is in geology
             # for a special case when the litho_in is not in the geology
-            if len(geology[geology["UNITNAME"] == litho_in]) == 0:
-                print(
+            if len(geology[geology['UNITNAME'] == litho_in]) == 0:
+                logger.info(
                     f"There are structural measurements in unit - {litho_in} - that are not in the geology shapefile. Skipping this structural measurement"
                 )
                 continue
@@ -518,9 +569,12 @@ class StructuralPoint(ThicknessCalculator):
             neighbor_list = list(
                 basal_contacts[GEO_SUB.intersects(basal_contacts.geometry)]["basal_unit"]
             )
+
             # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
-            B = calculate_endpoints(measurement_pt, strike, self.line_length, bbox_poly)
-            b = geopandas.GeoDataFrame({"geometry": [B]}).set_crs(basal_contacts.crs)
+            if self.max_line_length is None:
+                self.max_line_length = 10000
+            B = calculate_endpoints(measurement_pt, strike, self.max_line_length, bbox_poly)
+            b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
             # find all intersections
             all_intersections = sampled_basal_contacts.overlay(
@@ -591,14 +645,28 @@ class StructuralPoint(ThicknessCalculator):
             if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
+            #build the debug info
+            line = shapely.geometry.LineString([int_pt1, int_pt2])
+            _lines.append(line)
+            _dip.append(measurement['DIP'])  
+
             # find the lenght of the segment
             L = math.sqrt(((int_pt1.x - int_pt2.x) ** 2) + ((int_pt1.y - int_pt2.y) ** 2))
+
+            # if length is higher than max_line_length, skip
+            if self.max_line_length is not None and L > self.max_line_length:
+                continue
+            
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement["DIP"]))
 
             thicknesses.append(thickness)
             lis.append(litho_in)
-
+        
+        # create the debug gdf
+        self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
+        self.lines["DIP"] = _dip
+        
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({"unit": lis, "thickness": thicknesses})
         result = result.groupby("unit")["thickness"].agg(["median", "mean", "std"]).reset_index()
@@ -606,18 +674,24 @@ class StructuralPoint(ThicknessCalculator):
 
         output_units = units.copy()
         # remove the old thickness column
-        output_units["ThicknessMedian"] = numpy.empty((len(output_units)))
-        output_units["ThicknessMean"] = numpy.empty((len(output_units)))
-        output_units["ThicknessStdDev"] = numpy.empty((len(output_units)))
-
+        output_units['ThicknessMedian'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessMean'] = numpy.full(len(output_units), numpy.nan)
+        output_units['ThicknessStdDev'] = numpy.full(len(output_units), numpy.nan)
+        
         # find which units have no thickness calculated
         names_not_in_result = units[~units["name"].isin(result["unit"])]["name"].to_list()
         # assign the thicknesses to the each unit
         for _, unit in result.iterrows():
-            idx = units.index[units["name"] == unit["unit"]].tolist()[0]
-            output_units.loc[idx, "ThicknessMedian"] = unit["median"]
-            output_units.loc[idx, "ThicknessMean"] = unit["mean"]
-            output_units.loc[idx, "ThicknessStdDev"] = unit["std"]
+            idx = units.index[units['name'] == unit['unit']].tolist()[0]
+            output_units.loc[idx, 'ThicknessMedian'] = unit['median']
+            output_units.loc[idx, 'ThicknessMean'] = unit['mean']
+            output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
+       
+        output_units["ThicknessMean"] = output_units["ThicknessMean"].fillna(-1)
+        output_units["ThicknessMedian"] = output_units["ThicknessMedian"].fillna(-1)
+        output_units["ThicknessStdDev"] = output_units["ThicknessStdDev"].fillna(-1)
+        
+        
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
@@ -629,12 +703,12 @@ class StructuralPoint(ThicknessCalculator):
             ):
                 idx = stratigraphic_order.index(unit)
                 # throw warning to user
-                print(
-                    "It was not possible to calculate thickness between unit ",
+                logger.warning(
+                    'Thickness Calculator StructuralPoint: Cannot calculate thickness between',
                     unit,
                     "and ",
                     stratigraphic_order[idx + 1],
-                    "Assigning thickness of -1",
+                    "\n",
                 )
                 # assign -1 as thickness
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
@@ -642,9 +716,11 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
             # if top//bottom unit assign -1
-            if unit == stratigraphic_order[-1] or unit == stratigraphic_order[0]:
+            if unit in [stratigraphic_order[-1], stratigraphic_order[0]]:
                 output_units.loc[output_units["name"] == unit, "ThicknessMedian"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessMean"] = -1
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
+        self._check_thickness_percentage_calculations(output_units)
+        
         return output_units

@@ -11,7 +11,7 @@ jobs:
           with:
             python-version: 3.10
         # Runs the action with the following inputs or defaults if not specified.
-        - uses: cascode-labs/build-conda-action@v0.1.4
+        - uses: cascode-labs/build-conda-action/action.yml@v0
           with:
             recipe_path: 'conda'
             test_results_artifact_name: 'build_'

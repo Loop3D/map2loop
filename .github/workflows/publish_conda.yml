@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    
+jobs:
+  release-please:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v4
+        id: release
+        with:
+          release-type: python
+          package-name: map2loop
+      - name: Debug release_created output
+        run: |
+          echo "Release created: ${{ steps.release.outputs.release_created }}"
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+
+  pypi:
+    runs-on: ubuntu-24.04
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - name: Trigger build for pypi and upload
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/Loop3d/map2loop/actions/workflows/pypi.yml/dispatches \
+          -d '{"ref":"master"}'
+      - name: Trigger build for conda and upload
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/Loop3d/map2loop/actions/workflows/conda.yml/dispatches \
+          -d '{"ref":"master"}'

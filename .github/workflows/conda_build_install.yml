@@ -22,6 +22,6 @@ jobs:
       - name: Install conda-build
         run: |
           conda install -y conda-build
-          conda-build --version
+          conda build --version
 
 

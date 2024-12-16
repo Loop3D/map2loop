@@ -1209,7 +1209,7 @@ class MapData:
             )
 
     @beartype.beartype
-    def save_all_map_data(self, output_dir: pathlib.Path, extension: str = ".csv"):
+    def save_all_map_data(self, output_dir: Union[pathlib.Path, str], extension: str = ".csv"):
         """
         Save all the map data to file
 

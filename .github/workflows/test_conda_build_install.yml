@@ -28,7 +28,7 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "Updating version in meta.yaml..."
-          sed -i 's/^  version: .*/  version: 3.1.13local/' conda/meta.yaml
+          sed -i 's/^  version: .*/  version: 0.0.1/' conda/meta.yaml
           cat conda/meta.yaml | grep "version:"
 
       - name: Install conda-build
@@ -44,7 +44,7 @@ jobs:
         run: |
           conda build -c conda-forge -c loop3d -c anaconda --output-folder output conda 
       
-      - name: Install GDAL
+      - name: Install GDAL linux
         if : runner.os == 'Linux'
         shell: bash -l {0}
         run: |

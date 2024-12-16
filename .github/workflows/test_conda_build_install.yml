@@ -24,6 +24,13 @@ jobs:
         with:
           miniforge-version: latest
 
+      - name: temporarily modify meta.yaml version
+        shell: bash -l {0}
+        run: |
+          echo "Updating version in meta.yaml..."
+          sed -i 's/^  version: .*/  version: 3.1.13-local/' conda/meta.yaml
+          cat conda/meta.yaml | grep "version:"
+
       - name: Install conda-build
         shell: bash -l {0}
         run: |

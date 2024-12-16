@@ -28,10 +28,17 @@ jobs:
       - name: Install conda-build
         shell: bash -l {0}
         run: |
+          conda update conda -y
+          conda install -n base conda-libmamba-solver
+          conda config --set solver libmamba
           conda install conda-build -y
+
+      - name: Build conda package
+        shell: bash -l {0}
+        run: |
           conda build -c conda-forge -c loop3d -c anaconda conda 
 
-      - name: Create environment and install map2loop
+      - name: Install map2loop
         shell: bash -l {0}
         run: |
           conda install --use-local map2loop -y

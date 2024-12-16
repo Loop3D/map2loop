@@ -2,9 +2,12 @@ name: Publish Conda Package
 
 on:
   push:
-  workflow_dispatch:
-    
+    branches:
+      - master
+    workflow_dispatch:
+
 jobs:
+
   release-please:
     runs-on: ubuntu-24.04
     steps:

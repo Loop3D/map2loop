@@ -8,5 +8,6 @@ owslib
 map2model
 loopprojectfile==0.2.2
 beartype
+gdal==3.8.4
 pytest
 scikit-learn

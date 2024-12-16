@@ -1,7 +1,6 @@
 name: Test Pip Installation and Import
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:

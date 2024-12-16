@@ -21,18 +21,22 @@ jobs:
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3.1.0
-      
+        with:
+          miniforge-version: latest
+          activate-environment: test-env
 
       - name: Install conda-build
+        shell: bash -l {0}
         run: |
           conda install conda-build -y
-          conda build conda -c conda-forge -c loop3d
+          conda build -c conda-forge -c loop3d -c anaconda conda 
 
       - name: Create environment and install map2loop
+        shell: bash -l {0}
         run: |
-          conda install -y --use-local map2loop
+          conda install --use-local map2loop -y
   
       - name: Test import
+        shell: bash -l {0}
         run: |
-          source activate test-env
           python -c "import map2loop"

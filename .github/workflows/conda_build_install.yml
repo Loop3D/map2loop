@@ -24,4 +24,13 @@ jobs:
           conda install -y conda-build
           conda build --version
 
-
+      - name: Create environment and install package
+        run: |
+          conda create -y -n test-env python=3.10
+          source activate test-env
+          conda install -y --use-local $(conda build conda --output)
+  
+      - name: Test import
+        run: |
+          source activate test-env
+          python -c "import map2loop"

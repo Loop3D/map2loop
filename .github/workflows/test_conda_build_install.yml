@@ -5,6 +5,7 @@ on:
 
 jobs:
   test-conda-build:
+    name: Test Conda Build and Import
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code

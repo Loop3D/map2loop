@@ -48,7 +48,7 @@ class Sorter(ABC):
 
         Args:
             units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
-            units_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
+            unit_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -82,7 +82,7 @@ class SorterUseNetworkX(Sorter):
 
         Args:
             units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
+            unit_relationships (pandas.DataFrame): the relationships between units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -118,9 +118,7 @@ class SorterUseNetworkX(Sorter):
 
 class SorterUseHint(SorterUseNetworkX):
     def __init__(self):
-        logger.info(
-            "SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead"
-        )
+        logger.info("SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead")
         super().__init__()
 
 
@@ -147,7 +145,7 @@ class SorterAgeBased(Sorter):
 
         Args:
             units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
+            unit_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
@@ -157,20 +155,32 @@ class SorterAgeBased(Sorter):
         """
         logger.info("Calling age based sorter")
         sorted_units = units.copy()
+        # Calculate mean age
         if "minAge" in units.columns and "maxAge" in units.columns:
-            print(sorted_units["minAge"], sorted_units["maxAge"])
             sorted_units["meanAge"] = sorted_units.apply(
                 lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
             )
         else:
             sorted_units["meanAge"] = 0
+
+        unique_mean_ages = sorted_units["meanAge"].unique()
+        if len(unique_mean_ages) != len(sorted_units["meanAge"]):
+            logger.warning(
+                "Several mean unit ages are identical, so the calculated stratigraphic order may be incorrect"
+            )
         if "group" in units.columns:
+            sorted_units = sorted_units.sort_values(by=["group", "meanAge"])
+            group_mean_age = sorted_units.groupby("group")["meanAge"].mean()
+            group_order = group_mean_age.sort_values().index
+            sorted_units["group"] = pandas.Categorical(
+                sorted_units["group"], categories=group_order, ordered=True
+            )
             sorted_units = sorted_units.sort_values(by=["group", "meanAge"])
         else:
             sorted_units = sorted_units.sort_values(by=["meanAge"])
         logger.info("Stratigraphic order calculated using age based sorting")
         for _i, row in sorted_units.iterrows():
-            logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']}")
+            logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']} - {row['meanAge']}")
 
         return list(sorted_units["name"])
 
@@ -199,7 +209,7 @@ class SorterAlpha(Sorter):
 
         Args:
             units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
+            unit_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
@@ -287,7 +297,7 @@ class SorterMaximiseContacts(Sorter):
 
         Args:
             units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
+            unit_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available
@@ -369,7 +379,7 @@ class SorterObservationProjections(Sorter):
 
         Args:
             units (pandas.DataFrame): the data frame to sort
-            units_relationships (pandas.DataFrame): the relationships between units
+            unit_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
             map_data (map2loop.MapData): a catchall so that access to all map data is available

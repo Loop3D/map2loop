@@ -1,6 +1,5 @@
 name: Test Conda Build and Import
 
-
 on:
   push:
   workflow_dispatch:
@@ -8,7 +7,12 @@ on:
 jobs:
   test-conda-build:
     name: Test Conda Build and Import
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ${{ fromJSON(vars.BUILD_OS)}}
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,9 +28,8 @@ jobs:
           conda install conda-build -y
           conda build conda -c conda-forge -c loop3d
 
-      - name: Create environment and install package
+      - name: Create environment and install map2loop
         run: |
-          
           conda install -y --use-local $(conda build conda --output)
   
       - name: Test import

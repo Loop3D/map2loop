@@ -1,11 +1,10 @@
 on:
-    push:
-      branches:
-        - master
-    workflow_dispatch:
-
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    
 jobs:
-
   release-please:
     runs-on: ubuntu-24.04
     steps:

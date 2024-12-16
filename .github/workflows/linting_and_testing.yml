@@ -35,7 +35,7 @@ jobs:
             conda update -n base -c defaults conda -y 
             conda install -n base conda-libmamba-solver -c conda-forge -y
             conda install -c conda-forge -c loop3d --file dependencies.txt -y
-            conda install gdal==3.8.4 pytest -y
+            conda install gdal=3.8.4 pytest -y
 
       - name: Install map2loop
         run: |

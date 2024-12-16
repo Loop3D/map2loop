@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ${{ fromJSON(vars.BUILD_OS)}}
+        os: [ubuntu-24.04]
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
 
     steps:

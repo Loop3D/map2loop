@@ -1,16 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Any, Union
-import logging
-from .utils import strike_dip_vector, generate_grid
-
 import beartype
 import numpy
 from numpy import ndarray
 from scipy.interpolate import Rbf, LinearNDInterpolator
 from sklearn.cluster import DBSCAN
-
 import pandas
 
+
+from .utils import strike_dip_vector, generate_grid
+
+from .logging import getLogger
+logger = getLogger(__name__)  
 
 class Interpolator(ABC):
     """
@@ -345,10 +346,12 @@ class DipDipDirectionInterpolator(Interpolator):
         # Check if there are any clusters with more than one point (indicating collocated points)
         collocated_clusters = structure_data['cluster'].value_counts()
         collocated_clusters = collocated_clusters[collocated_clusters > 1]
-    
+
         if not collocated_clusters.empty:
             # Log a warning if collocated points are detected
-            logging.warning(f"Detected {len(collocated_clusters)} collocated point clusters. Aggregating these points.")
+            logger.warning(
+                f"Detected {len(collocated_clusters)} collocated point clusters. Aggregating these points.\n " 
+            )
 
         # Aggregate data for collocated points by taking the mean of X, Y, DIP, and DIPDIR within each cluster
         aggregated_data = (

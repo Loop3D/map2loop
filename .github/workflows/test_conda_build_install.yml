@@ -35,12 +35,31 @@ jobs:
       - name: Build conda package
         shell: bash -l {0}
         run: |
-          conda build -c conda-forge -c loop3d -c anaconda conda 
+          conda build -c conda-forge -c loop3d -c anaconda --output-folder output conda 
+      
+      - name: Install GDAL
+        if : runner.os == 'Linux'
+        shell: bash -l {0}
+        run: |
+          sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
+          sudo apt-get update
+          sudo apt-get install -y libgdal-dev gdal-bin python3-gdal
+          export CPLUS_INCLUDE_PATH=/usr/include/gdal
+          export C_INCLUDE_PATH=/usr/include/gdal
+          python -m pip install GDAL==$(gdal-config --version)
+
+      - name: Install GDAL windows  
+        if: runner.os == 'Windows'
+        shell: bash -l {0}
+        run: |
+          conda install -c conda-forge gdal -y
 
       - name: Install map2loop
         shell: bash -l {0}
         run: |
-          conda install -c local --use-local map2loop -y
+          PACKAGE_FILE=$(ls output/linux-64/map2loop*.tar.bz2)
+          echo "Installing package: $PACKAGE_FILE"
+          conda install $PACKAGE_FILE -y
   
       - name: Test import
         shell: bash -l {0}

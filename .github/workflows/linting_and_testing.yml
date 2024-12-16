@@ -34,12 +34,15 @@ jobs:
         run: |
             conda update -n base -c defaults conda -y 
             conda install -n base conda-libmamba-solver -c conda-forge -y
+      - name: Install dependencies 1
+        run: |
+            conda install -c conda-forge gdal -y
       - name: Install dependencies 2
         run: |
             conda install -c conda-forge -c loop3d --file dependencies.txt -y
       - name: Install 3
         run: |
-            conda install gdal pytest -y
+            conda install pytest -y
 
       - name: Install map2loop
         run: |

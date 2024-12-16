@@ -1,7 +1,7 @@
 name: Test Conda Build and Import
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   test-conda-build:

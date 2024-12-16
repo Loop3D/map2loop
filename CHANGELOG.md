@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.14](https://github.com/Loop3D/map2loop/compare/v3.1.13...v3.1.14) (2024-12-16)
+
+
+### Bug Fixes
+
+* add commit types to release config ([5c8bcb7](https://github.com/Loop3D/map2loop/commit/5c8bcb7ff149cf3246c258d2a5cfc28c460b13ad))
+* updated release context ([c334a62](https://github.com/Loop3D/map2loop/commit/c334a620b7118f651a72606cba1b1f59acffe558))
+
 ## [3.1.13](https://github.com/Loop3D/map2loop/compare/v3.1.12...v3.1.13) (2024-11-19)
 
 

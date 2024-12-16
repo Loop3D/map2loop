@@ -7,7 +7,11 @@ on:
 jobs:
   test-pip-install:
     name: Test Pip Installation and Import
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ${{ fromJSON(vars.BUILD_OS)}}
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
 
     steps:
       - name: Checkout code

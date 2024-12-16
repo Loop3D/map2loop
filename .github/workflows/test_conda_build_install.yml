@@ -40,7 +40,7 @@ jobs:
       - name: Install map2loop
         shell: bash -l {0}
         run: |
-          conda install --use-local map2loop -y
+          conda install -c local --use-local map2loop -y
   
       - name: Test import
         shell: bash -l {0}

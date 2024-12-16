@@ -30,7 +30,11 @@ class DependencyChecker:
 
     def __init__(self, package_name, dependency_file="dependencies.txt"):
         self.package_name = package_name
+<<<<<<< HEAD
         self.dependency_file = pathlib.Path(__file__).parent / dependency_file
+=======
+        self.dependency_file = pathlib.Path(__file__).parent.parent / dependency_file
+>>>>>>> 7978841 (feat: v3.2 (#153))
         self.required_version = self.get_required_version()
         self.installed_version = self.get_installed_version()
 
@@ -93,7 +97,11 @@ class DependencyChecker:
 
 
 def check_all_dependencies(dependency_file="dependencies.txt"):
+<<<<<<< HEAD
     dependencies_path = pathlib.Path(__file__).parent / dependency_file
+=======
+    dependencies_path = pathlib.Path(__file__).parent.parent / dependency_file
+>>>>>>> 7978841 (feat: v3.2 (#153))
     try:
         with dependencies_path.open("r") as file:
             for line in file:
@@ -108,7 +116,10 @@ def check_all_dependencies(dependency_file="dependencies.txt"):
 
                     checker = DependencyChecker(package_name, dependency_file=dependency_file)
                     checker.check_version()
+<<<<<<< HEAD
                     
+=======
+>>>>>>> 7978841 (feat: v3.2 (#153))
     except FileNotFoundError:
         warnings.warn(
             f"{dependency_file} not found. No dependencies checked for map2loop.",

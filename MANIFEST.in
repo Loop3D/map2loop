@@ -1,3 +1,12 @@
+include LICENSE
+include README.md 
+
 include map2loop/_datasets/clut_files/*.csv
 include map2loop/_datasets/config_files/*.json
+<<<<<<< HEAD
 include map2loop/_datasets/geodata_files/hamersley/*
+=======
+include map2loop/_datasets/geodata_files/hamersley/*
+
+recursive-include tests *.py
+>>>>>>> 7978841 (feat: v3.2 (#153))

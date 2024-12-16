@@ -6,7 +6,11 @@ jobs:
 
   sdist:
     name: Build sdist
+<<<<<<< HEAD
     runs-on: ubuntu-latest
+=======
+    runs-on: ubuntu-24.04
+>>>>>>> 7978841 (feat: v3.2 (#153))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,7 +27,11 @@ jobs:
 
   publish:
     name: Publish wheels to pypi
+<<<<<<< HEAD
     runs-on: ubuntu-latest
+=======
+    runs-on: ubuntu-24.04
+>>>>>>> 7978841 (feat: v3.2 (#153))
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write

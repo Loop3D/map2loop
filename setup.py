@@ -3,8 +3,15 @@ import shutil
 from setuptools import setup, find_packages
 from pathlib import Path
 
+<<<<<<< HEAD
 # Resolve the absolute path to the directory containing this file:
 package_root = Path(__file__).resolve().parent
+=======
+import os
+from setuptools import setup
+
+package_root = os.path.abspath(os.path.dirname(__file__))
+>>>>>>> 7978841 (feat: v3.2 (#153))
 
 # Get the version from the version.py file
 version = {}
@@ -13,6 +20,7 @@ with version_file.open() as fp:
     exec(fp.read(), version)
 
 # Read dependencies from dependencies.txt
+<<<<<<< HEAD
 requirements_file = package_root / "dependencies.txt"
 with requirements_file.open("r") as f:
     install_requires = [line.strip() for line in f if line.strip()]
@@ -47,3 +55,19 @@ setup(
         "sdist": CustomSDist,
     },
 )
+=======
+requirements_file = os.path.join(package_root, "dependencies.txt")
+with open(requirements_file, 'r') as f:
+    install_requires = [line.strip() for line in f if line.strip()]
+
+setup(
+    name="map2loop",
+    install_requires=install_requires,
+    version=version,
+    license="MIT",
+    package_data={
+        # Include test files:
+        '': ['tests/*.py'],
+    },
+)
+>>>>>>> 7978841 (feat: v3.2 (#153))

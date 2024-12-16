@@ -1,0 +1,18 @@
+on:
+  push:
+
+jobs:
+  test-conda:
+    runs-on: 'ubuntu-latest'
+    steps:
+        - uses: actions/checkout@v2
+        # Initializes Conda on a GitHub hosted Runner
+        - uses: conda-incubator/setup-miniconda@v2
+          with:
+            python-version: 3.7
+        # Runs the action with the following inputs or defaults if not specified.
+        - uses: cascode-labs/build-conda-action@v0.1.4
+          with:
+            recipe_path: 'conda'
+            test_results_artifact_name: 'build_'
+            build_options: '-c defaults -c conda-forge -c loop3d'

@@ -12,8 +12,8 @@ RUN apt-get update -qq && \
     libgl1\
     libtinfo5\
     libtiff6\
-    libgl1-mesa-glx
-
+    libgl1-mesa-glx\
+    libarchive13
 
 COPY . /map2loop 
 
@@ -23,7 +23,8 @@ COPY dependencies.txt dependencies.txt
 COPY dependencies.txt dependenciesdocs.txt
 
 RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
-RUN conda install -c conda-forge -c loop3d --file dependencies.txt -y
+RUN conda install -c conda-forge -c loop3d --file dependenciesdocs.txt -y
+RUN conda install gdal -y
 
 RUN pip install .
 

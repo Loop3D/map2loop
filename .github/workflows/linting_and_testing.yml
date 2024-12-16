@@ -32,6 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+            conda config --set solver classic
             conda install -c conda-forge -c loop3d --file dependencies.txt -y
             conda install gdal pytest -y
 

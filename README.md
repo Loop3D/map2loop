@@ -1,6 +1,9 @@
 ![GitHub Release](https://img.shields.io/github/v/release/loop3d/map2loop)
 ![License](https://img.shields.io/github/license/loop3d/map2loop)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/map2loop?label=pip%20downloads)
+![Conda Downloads](https://img.shields.io/conda/dn/loop3d/map2loop?label=Conda%20downloads)
 [![Testing](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml)
+[![Build and Deploy Documentation](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml)
 
 # Map2Loop 3.1
 

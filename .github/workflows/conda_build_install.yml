@@ -2,6 +2,7 @@ name: Test Conda Build and Import
 
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:

@@ -6,12 +6,14 @@
 ### Features
 
 * v3.2 ([#153](https://github.com/Loop3D/map2loop/issues/153)) ([7978841](https://github.com/Loop3D/map2loop/commit/7978841b7106faf478492fe20770f17d9e244fbb))
-
+* Thickness calculators can now be used simultaneously with `project.set_thickness_calculator([StructuralPoint(), InterpolatedStructure()])`
+* Minimum fault length is a key in the config dictionary, and if not provided, it is calculated from the bbox area
+* `ignore_lithology_codes()` and `ignore_fault_codes()` are new parameters in the config_dictionary
+*  legacy config files with legacy keys are not allowed
+*  `map2loop.utils.update_from_legacy_file` function may convert the hjson files into an updated config dictionary
 
 ### Bug Fixes
-
-* add commit types to release config ([5c8bcb7](https://github.com/Loop3D/map2loop/commit/5c8bcb7ff149cf3246c258d2a5cfc28c460b13ad))
-* updated release context ([c334a62](https://github.com/Loop3D/map2loop/commit/c334a620b7118f651a72606cba1b1f59acffe558))
+* all bug fixes can be checked in ([PR#153](https://github.com/Loop3D/map2loop/pull/153))
 
 ## [3.1.13](https://github.com/Loop3D/map2loop/compare/v3.1.12...v3.1.13) (2024-11-19)
 

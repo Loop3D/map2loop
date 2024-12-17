@@ -269,7 +269,7 @@ class Project(object):
 
         required_inputs = {
             "bounding_box": bounding_box,
-            "working_projection": working_projection,
+            "working_projection": working_projection, # this may be removed when fix is added for https://github.com/Loop3D/map2loop/issues/103
             "geology_filename": geology_filename,
             "structure_filename": structure_filename,
             "dtm_filename": dtm_filename,

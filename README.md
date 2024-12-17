@@ -5,7 +5,7 @@
 [![Testing](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml)
 [![Build and Deploy Documentation](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml)
 
-# Map2Loop 3.1
+# Map2Loop 3.2
 
 Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 
@@ -13,88 +13,56 @@ Generate 3D geological model inputs from geological maps — a high-level implem
 
 ## Install
 
-You will need some flavour of conda (a Python package manager, [see here](https://docs.anaconda.com/anaconda/install/index.html)), as well as Python ≥ 3.8. 
+#### Option 1: Install with Anaconda
 
-### Adding  ```conda-forge``` to Anaconda channels
-map2loop installation may run smoother if ```conda-forge``` is added to the channels. 
-To check for that, run 
+This is the simplest and recommended installation process, with:
 
 ```bash
-conda config --show channels
+conda install -c loop3d -c conda-forge map2loop
 ```
-if conda-forge is not in the output, the channel can be added with:
 
+#### Option 2: Install with pip
+Installation with pip will require that GDAL is installed on your system prior to map2loop installation. 
+This is because GDAL cannot be installed <a href='https://hackernoon.com/hn-images/1*m4cnTYJWM7Rmpsju8dSHmQ.jpeg'>via pip</a> (at least not with one line of code), and the GDAL installation process will vary depending on your OS. 
+
+For more information on installing gdal, see <a href="https://pypi.org/project/GDAL/">GDAL's Pypi</a> page.
+
+Once GDAL is available on your system, map2loop can be installed with:
 ```bash
-conda config --add channels conda-forge
+pip install map2loop
 ```
 
-### Run
-
-To just use map2loop, issue the following. <sup>*</sup>
+#### Option 3: From source
 
 ```bash
 git clone https://github.com/Loop3D/map2loop.git
 
 cd map2loop
 
-conda install -c loop3d --file dependencies.txt
+conda install gdal
+
+conda install -c loop3d -c conda-forge --file dependencies.txt
 
 pip install .
 ```
 
-<p><sup>*</sup> We're actively working towards a better approach - stay tuned! </p>
-
-### Documentation
-
-If you can call it that, is available <a href="https://loop3d.org/map2loop/">here</a>
-
-### Development
-
-If you want to tinker yourself/contribute, clone the source code with
-
+#### Option 4: From source & developer mode:
 ```bash
 git clone https://github.com/Loop3D/map2loop.git
-```
 
-Or get the source + example notebooks with
+cd map2loop
 
-```bash
-git clone https://github.com/Loop3D/map2loop.git
-git clone https://github.com/Loop3D/map2loop-3-notebooks
-```
+conda install gdal
 
-Navigate into map2loop, and issue the following to install map2loop and its dependencies. _Note_: The 'develop' flag makes your source changes take effect on saving, so you only need to run this once
+conda install -c loop3d -c conda-forge --file dependencies.txt
 
-```bash
-conda install -c loop3d --file dependencies.txt
 pip install -e .
 ```
 
-## Building with Docker
+### Documentation
 
-Fair warning, we recommend conda to almost everyone. With great software development power comes great environment setup inconvenience. You'll need to download and install the [docker containerisation software](https://docs.docker.com/get-docker/), and the docker and docker-compose CLI.
+Map2loop's documentation is available <a href="https://loop3d.org/map2loop/">here</a>
 
-### Development
-
-1. Clone this repo and navigate inside as per above
-2. Run the following and click on the Jupyter server forwarded link to access and edit the notebooks
-
-   ```bash
-   docker-compose up --build
-   ```
-
-3. To hop into a bash shell in a running container, open a terminal and issue
-
-   ```bash
-   docker ps
-   ```
-
-   Find the container name or ID and then run
-
-   ```bash
-   docker exec -it <container_NAMEorID> bash
-   # Probably -> docker exec -it  map2loop_dev_1 bash
-   ```
 
 ## Usage
 
@@ -117,8 +85,6 @@ bbox_3d = {
     'top': 1200
 }
 ```
-
-![sa example](docs/Untitled.png?raw=true)
 
 Then, specify: the state, directory for the output, the bounding box and projection from above - and hit go! That's it.
 

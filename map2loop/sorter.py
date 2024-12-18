@@ -155,10 +155,24 @@ class SorterAgeBased(Sorter):
         """
         logger.info("Calling age based sorter")
         sorted_units = units.copy()
-        # Calculate mean age
         if "minAge" in units.columns and "maxAge" in units.columns:
             sorted_units["meanAge"] = sorted_units.apply(
-                lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
+                lambda row: (
+                    row["maxAge"]
+                    if ((row["minAge"] == 0 or pandas.isna(row["minAge"])) and row["maxAge"] > 1)
+                    else (
+                        row["minAge"]
+                        if (
+                            (row["maxAge"] == 0 or pandas.isna(row["maxAge"])) and row["minAge"] > 1
+                        )
+                        else (
+                            (row["minAge"] + row["maxAge"]) / 2.0
+                            if pandas.notna(row["minAge"]) and pandas.notna(row["maxAge"])
+                            else 0
+                        )
+                    )
+                ),
+                axis=1,
             )
         else:
             sorted_units["meanAge"] = 0

@@ -16,9 +16,10 @@ source:
 build:
   number: 0
   script: |
-    cp LICENSE ${SP_DIR}/
-    cp README.md ${SP_DIR}/
-    cp dependencies.txt ${SP_DIR}/
+    echo "Listing current directory:"
+    ls -al
+    echo "Listing source directory:"
+    ls -al ${SRC_DIR}
     "{{ PYTHON }} -m pip install . --no-deps"
 
 requirements:

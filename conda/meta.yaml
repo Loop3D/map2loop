@@ -7,7 +7,10 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
   git_branch: fix/dependency_checker
-
+  include:
+    - LICENSE
+    - README.md
+    - dependencies.txt
 
 build:
   number: 0

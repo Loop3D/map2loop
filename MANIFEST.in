@@ -1,9 +1,9 @@
-include map2loop/LICENSE
-include map2loop/README.md 
-include map2loop/dependencies.txt
+include LICENSE
+include README.md 
+include dependencies.txt
 
 include map2loop/_datasets/clut_files/*.csv
 include map2loop/_datasets/config_files/*.json
 include map2loop/_datasets/geodata_files/hamersley/*
 
-recursive-include map2loop/tests *.py
+recursive-include tests *.py

@@ -15,7 +15,11 @@ source:
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps"
+  script: |
+    cp LICENSE ${SP_DIR}/
+    cp README.md ${SP_DIR}/
+    cp dependencies.txt ${SP_DIR}/
+    "{{ PYTHON }} -m pip install . --no-deps"
 
 requirements:
   host:

@@ -25,4 +25,5 @@ setup(
         # Include test files:
         '': ['tests/*.py'],
     },
+    include_package_data=True,
 )

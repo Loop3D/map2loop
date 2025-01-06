@@ -2,7 +2,7 @@
 
 package:
   name: "{{ name|lower }}"
-  version: "0.0.2"
+  version: "0.0.2"  
 
 source:
   git_url: https://github.com/Loop3D/map2loop
@@ -30,6 +30,13 @@ requirements:
     - tqdm
     - networkx
     - owslib
+
+output:
+  - name: map2loop
+    files:
+      - LICENSE
+      - README.md
+      - dependencies.txt
 
 
 about:

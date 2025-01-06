@@ -32,6 +32,14 @@ requirements:
     - networkx
     - owslib
 
+outputs:
+  - name: "{{ name|lower }}"
+    files:
+      include:
+        - LICENSE
+        - README.md
+        - dependencies.txt
+
 about:
   home: "https://github.com/Loop3D/map2loop"
   license: "MIT"

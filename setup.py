@@ -22,8 +22,7 @@ setup(
     version=version,
     license="MIT",
     package_data={
-        # Include test files:
-        '': ['tests/*.py'],
+        '': ["LICENSE", "README.md", "dependencies.txt", "tests/*.py"],
     },
     include_package_data=True,
 )

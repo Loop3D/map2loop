@@ -12,9 +12,6 @@ build:
   number: 0
   script: |
     "{{ PYTHON }} -m pip install . --no-deps"
-    cp LICENSE "$SP_DIR/map2loop/"
-    cp README.md "$SP_DIR/map2loop/"
-    cp dependencies.txt "$SP_DIR/map2loop/"
 
 requirements:
   host:

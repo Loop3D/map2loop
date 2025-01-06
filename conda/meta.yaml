@@ -10,7 +10,9 @@ source:
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps"  
+  script: |
+    {{ PYTHON }} -m pip install . --no-deps
+    cp LICENSE $SP_DIR/map2loop/
 
 requirements:
   host:
@@ -38,6 +40,9 @@ output:
       - README.md
       - dependencies.txt
 
+channels:
+  - loop3d
+  - conda-forge
 
 about:
   home: "https://github.com/Loop3D/map2loop"
@@ -49,7 +54,3 @@ about:
 extra:
   recipe-maintainers:
     - lachlangrose
-
-channels:
-  - loop3d
-  - conda-forge

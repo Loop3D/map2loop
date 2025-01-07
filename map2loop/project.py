@@ -142,6 +142,7 @@ class Project(object):
                 config_dictionary=config_dictionary,
                 config_filename=config_filename,
             )
+        
         self._error_state = ErrorState.NONE
         self._error_state_msg = ""
         self.verbose_level = verbose_level
@@ -230,12 +231,12 @@ class Project(object):
             self.map_data.set_config_filename(config_filename)
 
         if config_dictionary != {}:
+            self.map_data.config.validate_config_dictionary(config_dictionary)
             self.map_data.config.update_from_dictionary(config_dictionary)
             
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
             
-
         
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()

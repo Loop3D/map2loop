@@ -103,9 +103,6 @@ class Config:
         # make sure dictionary doesn't contain legacy keys
         self.check_for_legacy_keys(dictionary)
         
-        # make sure it has the minimum requirements
-        self.validate_config_dictionary(dictionary)
-        
         if "structure" in dictionary:
             self.structure_config.update(dictionary["structure"])
             for key in dictionary["structure"].keys():
@@ -218,25 +215,20 @@ class Config:
 
     @beartype.beartype
     def validate_config_dictionary(self, config_dict: dict) -> None:
-        """
-        Validate the structure and keys of the configuration dictionary.
-
-        Args:
-            config_dict (dict): The config dictionary to validate.
-
-        Raises:
-            ValueError: If the dictionary does not meet the minimum requirements for ma2p2loop.
-        """    
         required_keys = {
             "structure": {"dipdir_column", "dip_column"},
             "geology": {"unitname_column", "alt_unitname_column"},
         }
 
+        # Loop over "structure" and "geology"
         for section, keys in required_keys.items():
+
+            # 1) Check that "section" exists
             if section not in config_dict:
                 logger.error(f"Missing required section '{section}' in config dictionary.")
                 raise ValueError(f"Missing required section '{section}' in config dictionary.")
-            
+
+            # 2) Check that each required key is in config_dict[section]
             for key in keys:
                 if key not in config_dict[section]:
                     logger.error(
@@ -245,6 +237,7 @@ class Config:
                     raise ValueError(
                         f"Missing required key '{key}' for '{section}' section of the config dictionary."
                     )
+
 
     @beartype.beartype
     def check_for_legacy_keys(self, config_dict: dict) -> None:

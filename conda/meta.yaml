@@ -7,15 +7,16 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
   git_branch: fix/dependency_checker
-  include: 
-    - README.md
-    - LICENSE
-    - dependencies.txt
-    - map2loop
-
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps"
+  script: |
+    echo "PREFIX: ${PREFIX}"
+    echo "RECIPE_DIR: ${RECIPE_DIR}"
+
+    mkdir -p ${PREFIX}/share/map2loop
+    cp ${RECIPE_DIR}/../dependencies.txt ${PREFIX}/share/map2loop/
+
+    "{{ PYTHON }} -m pip install . --no-deps"
 
 requirements:
   host:

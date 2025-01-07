@@ -118,8 +118,8 @@ class SorterUseNetworkX(Sorter):
 
 class SorterUseHint(SorterUseNetworkX):
     def __init__(self):
-        print(
-            "SorterUseHint is deprecated and will be removed in map2loop v3.2. Use SorterUseNetworkX instead"
+        logger.info(
+            "SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead"
         )
         super().__init__()
 
@@ -158,7 +158,7 @@ class SorterAgeBased(Sorter):
         logger.info("Calling age based sorter")
         sorted_units = units.copy()
         if "minAge" in units.columns and "maxAge" in units.columns:
-            print(sorted_units["minAge"], sorted_units["maxAge"])
+            # print(sorted_units["minAge"], sorted_units["maxAge"])
             sorted_units["meanAge"] = sorted_units.apply(
                 lambda row: (row["minAge"] + row["maxAge"]) / 2.0, axis=1
             )

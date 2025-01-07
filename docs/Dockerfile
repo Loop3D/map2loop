@@ -24,11 +24,7 @@ COPY dependencies.txt dependenciesdocs.txt
 
 RUN cat ./docs/requirements.txt >> dependenciesdocs.txt
 RUN conda install -c conda-forge -c loop3d --file dependenciesdocs.txt -y
-
-#temporary code  to align with fix_thicknesses branch
-RUN pip uninstall loopprojectfile -y
-RUN pip install git+https://github.com/loop3d/loopprojectfile.git@fix_thicknesses
-####
+RUN conda install gdal -y
 
 RUN pip install .
 

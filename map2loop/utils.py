@@ -3,8 +3,13 @@ import math
 import shapely
 import geopandas
 import beartype
-from typing import Union, Optional, Dict
+from beartype.typing import Union, Optional, Dict
 import pandas
+import re
+import json
+
+from .logging import getLogger
+logger = getLogger(__name__)
 
 
 @beartype.beartype
@@ -401,3 +406,125 @@ def calculate_minimum_fault_length(
 
     # Return the square root of the threshold area as the minimum fault length
     return threshold_area**0.5
+
+
+def preprocess_hjson_to_json(hjson_content):
+    # Remove comments
+    hjson_content = re.sub(r'#.*', '', hjson_content)
+    hjson_content = re.sub(r'//.*', '', hjson_content)
+    # Replace single quotes with double quotes
+    hjson_content = re.sub(r"(?<!\\)'", '"', hjson_content)
+    # Ensure keys are enclosed in double quotes
+    hjson_content = re.sub(r'(?<!")([a-zA-Z0-9_]+)\s*:', r'"\1":', hjson_content)
+    # Fix trailing commas
+    hjson_content = re.sub(r',\s*([\]}])', r'\1', hjson_content)
+    # Remove unnecessary whitespace
+    hjson_content = re.sub(r'\s+', ' ', hjson_content.strip())
+    return hjson_content
+
+
+@beartype.beartype
+def read_hjson_with_json(file_path: str) -> dict:
+    try:
+        # Read the file
+        with open(file_path, "r", encoding="utf-8") as file:
+            hjson_content = file.read()
+        if not hjson_content.strip():
+            raise ValueError("The HJSON file is empty.")
+        # Preprocess HJSON to JSON
+        preprocessed_content = preprocess_hjson_to_json(hjson_content)
+        # Parse JSON
+        return json.loads(preprocessed_content)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"HJSON file not found: {file_path}") from e
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to decode preprocessed HJSON as JSON: {e}") from e
+    
+@beartype.beartype
+def update_from_legacy_file(
+    filename: str,
+    json_save_path: Optional[str] = None,
+    lower: bool = False
+) -> Optional[Dict[str, Dict]]:
+    """
+    Update the config dictionary from the provided old version dictionary
+    Args:
+        filename (str): the path to the legacy file
+        json_save_path (str, optional): the path to save the updated json file. Defaults to None.
+        lower (bool, optional): whether to convert all strings to lowercase. Defaults to False.
+        
+    Returns:
+        Dict[Dict]: the updated config dictionary
+    
+    Example:
+        from map2loop.utils import update_from_legacy_file
+        update_from_legacy_file(filename=r"./source_data/example.hjson")
+    """
+    # only import config if needed
+    from .config import Config
+    file_map = Config()
+    
+    code_mapping = {
+        "otype": (file_map.structure_config, "orientation_type"),
+        "dd": (file_map.structure_config, "dipdir_column"),
+        "d": (file_map.structure_config, "dip_column"),
+        "sf": (file_map.structure_config, "description_column"),
+        "bedding": (file_map.structure_config, "bedding_text"),
+        "bo": (file_map.structure_config, "overturned_column"),
+        "btype": (file_map.structure_config, "overturned_text"),
+        "gi": (file_map.structure_config, "objectid_column"),
+        "c": (file_map.geology_config, "unitname_column"),
+        "u": (file_map.geology_config, "alt_unitname_column"),
+        "g": (file_map.geology_config, "group_column"),
+        "g2": (file_map.geology_config, "supergroup_column"),
+        "ds": (file_map.geology_config, "description_column"),
+        "min": (file_map.geology_config, "minage_column"),
+        "max": (file_map.geology_config, "maxage_column"),
+        "r1": (file_map.geology_config, "rocktype_column"),
+        "r2": (file_map.geology_config, "alt_rocktype_column"),
+        "sill": (file_map.geology_config, "sill_text"),
+        "intrusive": (file_map.geology_config, "intrusive_text"),
+        "volcanic": (file_map.geology_config, "volcanic_text"),
+        "f": (file_map.fault_config, "structtype_column"),
+        "fault": (file_map.fault_config, "fault_text"),
+        "fdipnull": (file_map.fault_config, "dip_null_value"),
+        "fdipdip_flag": (file_map.fault_config, "dipdir_flag"),
+        "fdipdir": (file_map.fault_config, "dipdir_column"),
+        "fdip": (file_map.fault_config, "dip_column"),
+        "fdipest": (file_map.fault_config, "dipestimate_column"),
+        "fdipest_vals": (file_map.fault_config, "dipestimate_text"),
+        "n": (file_map.fault_config, "name_column"),
+        "ff": (file_map.fold_config, "structtype_column"),
+        "fold": (file_map.fold_config, "fold_text"),
+        "t": (file_map.fold_config, "description_column"),
+        "syn": (file_map.fold_config, "synform_text"),
+    }
+    # try and ready the file:
+    try:
+        parsed_data = read_hjson_with_json(filename)
+    except Exception as e:
+        logger.error(f"Error reading file {filename}: {e}")
+        return
+    #map the keys 
+    file_map = file_map.to_dict()
+    for legacy_key, new_mapping in code_mapping.items():
+        if legacy_key in parsed_data:
+            section, new_key = new_mapping
+            value = parsed_data[legacy_key]
+            if lower and isinstance(value, str):
+                value = value.lower()
+            section[new_key] = value
+    
+    if "o" in parsed_data:
+        object_id_value = parsed_data["o"]
+        if lower and isinstance(object_id_value, str):
+            object_id_value = object_id_value.lower()
+        file_map['structure']["objectid_column"] = object_id_value
+        file_map['geology']["objectid_column"] = object_id_value
+        file_map['fold']["objectid_column"] = object_id_value 
+        
+    if json_save_path is not None:
+        with open(json_save_path, "w") as f:
+            json.dump(parsed_data, f, indent=4)
+    
+    return file_map

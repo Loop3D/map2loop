@@ -3,13 +3,14 @@ name: Build and Deploy Documentation
 on:
   workflow_dispatch:
 
-
-
 jobs:
   documentation-test:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-24.04
       steps:
         - uses: actions/checkout@v4
+          with:
+            ref: ${{ github.ref }}
+            
         - run: |
             cp CHANGELOG.md docs/source/CHANGELOG.md
             docker build . -t=docs -f docs/Dockerfile 
@@ -19,8 +20,9 @@ jobs:
           with:
             name: docs
             path: docs/build/html
+            
   documentation-deploy:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-24.04
       if: GitHub.ref == 'refs/heads/master'
       steps:
         - uses: actions/checkout@v4

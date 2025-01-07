@@ -1,3 +1,10 @@
+![GitHub Release](https://img.shields.io/github/v/release/loop3d/map2loop)
+![License](https://img.shields.io/github/license/loop3d/map2loop)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/map2loop?label=pip%20downloads)
+![Conda Downloads](https://img.shields.io/conda/dn/loop3d/map2loop?label=Conda%20downloads)
+[![Testing](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml)
+[![Build and Deploy Documentation](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml)
+
 # Map2Loop 3.1
 
 Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:

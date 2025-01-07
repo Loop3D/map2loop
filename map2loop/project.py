@@ -299,10 +299,10 @@ class Project(object):
             )
         if config_filename and config_dictionary:
             logger.error(
-                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one."
+                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one config."
             )
             raise ValueError(
-                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one."
+                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one config."
             )
 
             

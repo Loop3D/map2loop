@@ -128,7 +128,7 @@ class Project(object):
                     f"Unexpected keyword argument '{key}' passed to Project. Allowed keywords: {', '.join(allowed_kwargs)}."
                 )
                 raise TypeError(
-                    f"Project got an unexpected keyword argument '{key}' - please double-check this before proceeding."
+                    f"Project got an unexpected keyword argument '{key}' - please double-check this before proceeding with map2loop processing"
                 )
         
         # make sure all the needed arguments are provided

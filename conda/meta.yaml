@@ -7,7 +7,7 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
   git_branch: fix/dependency_checker
-  
+
 build:
   number: 0
 
@@ -18,18 +18,17 @@ requirements:
     - setuptools
   run:
     - loopprojectfile ==0.2.2
-    - gdal
     - map2model
-    - beartype
-    - python
+    - owslib
     - numpy
-    - pandas
+    - scipy
     - geopandas
     - shapely
-    - tqdm
     - networkx
     - owslib
-
+    - beartype
+    - pytest
+    - scikit-learn
 
 about:
   home: "https://github.com/Loop3D/map2loop"

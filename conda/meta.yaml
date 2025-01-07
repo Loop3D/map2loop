@@ -29,6 +29,7 @@ requirements:
     - beartype
     - pytest
     - scikit-learn
+    - gdal
 
 about:
   home: "https://github.com/Loop3D/map2loop"

@@ -9,14 +9,7 @@ source:
   git_branch: fix/dependency_checker
 build:
   number: 0
-  script: |
-    echo "PREFIX: ${PREFIX}"
-    echo "RECIPE_DIR: ${RECIPE_DIR}"
-
-    mkdir -p ${PREFIX}/share/map2loop
-    cp ${RECIPE_DIR}/../dependencies.txt ${PREFIX}/share/map2loop/
-
-    "{{ PYTHON }} -m pip install . --no-deps"
+  script: $RECIPE_DIR/build.sh
 
 requirements:
   host:

@@ -17,8 +17,6 @@ build:
   number: 0
   script: |
     "{{ PYTHON }} -m pip install . --no-deps"
-    mkdir -p ${PREFIX}/share/map2loop
-    cp ${SRC_DIR}/LICENSE ${PREFIX}/share/map2loop/
 
 requirements:
   host:

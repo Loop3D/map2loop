@@ -16,11 +16,9 @@ source:
 build:
   number: 0
   script: |
-    echo "Listing current directory:"
-    ls -al
-    echo "Listing source directory:"
-    ls -al ${SRC_DIR}
     "{{ PYTHON }} -m pip install . --no-deps"
+    mkdir -p ${PREFIX}/share/map2loop
+    cp ${SRC_DIR}/LICENSE ${PREFIX}/share/map2loop/
 
 requirements:
   host:

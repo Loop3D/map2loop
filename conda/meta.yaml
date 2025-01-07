@@ -10,6 +10,9 @@ source:
 
 build:
   number: 0
+  script:
+  - build.sh 
+  - build.bat  
 
 requirements:
   host:

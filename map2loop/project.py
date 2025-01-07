@@ -132,15 +132,16 @@ class Project(object):
                 )
         
         # make sure all the needed arguments are provided
-        self.validate_required_inputs(
-            bounding_box=bounding_box,
-            working_projection=working_projection,
-            geology_filename=geology_filename,
-            structure_filename=structure_filename,
-            dtm_filename=dtm_filename,
-            config_dictionary=config_dictionary,
-            config_filename=config_filename,
-        )
+        if not use_australian_state_data: # this check has to skip if using Loop server data
+            self.validate_required_inputs(
+                bounding_box=bounding_box,
+                working_projection=working_projection,
+                geology_filename=geology_filename,
+                structure_filename=structure_filename,
+                dtm_filename=dtm_filename,
+                config_dictionary=config_dictionary,
+                config_filename=config_filename,
+            )
         self._error_state = ErrorState.NONE
         self._error_state_msg = ""
         self.verbose_level = verbose_level

@@ -292,10 +292,10 @@ class Project(object):
         # Either config_filename or config_dictionary must be provided (but not both or neither)
         if not config_filename and not config_dictionary:
             logger.error(
-                "Either 'config_filename' or 'config_dictionary' must be provided to initialize the Project."
+                "A config file is required to run map2loop - use either 'config_filename' or 'config_dictionary' to initialise the project."
             )
             raise ValueError(
-                "Either 'config_filename' or 'config_dictionary' must be provided to initialize the Project."
+                 "A config file is required to run map2loop - use either 'config_filename' or 'config_dictionary' to initialise the project."
             )
         if config_filename and config_dictionary:
             logger.error(

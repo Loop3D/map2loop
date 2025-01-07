@@ -7,9 +7,9 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
   git_branch: fix/dependency_checker
+  
 build:
   number: 0
-  script: $RECIPE_DIR/build.sh
 
 requirements:
   host:

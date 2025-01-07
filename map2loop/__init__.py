@@ -30,7 +30,7 @@ class DependencyChecker:
 
     def __init__(self, package_name, dependency_file="dependencies.txt"):
         self.package_name = package_name
-        self.dependency_file = pathlib.Path(__file__).parent.parent / dependency_file
+        self.dependency_file = pathlib.Path(__file__).parent / dependency_file
         self.required_version = self.get_required_version()
         self.installed_version = self.get_installed_version()
 

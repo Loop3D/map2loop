@@ -442,3 +442,30 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
                 )
     
     return (False, "")
+
+
+@beartype.beartype
+def validate_config_dictionary(config_dict: dict) -> None:
+    
+    required_keys = {
+        "structure": {"dipdir_column", "dip_column"},
+        "geology": {"unitname_column", "alt_unitname_column"},
+    }
+
+    # Loop over "structure" and "geology"
+    for section, keys in required_keys.items():
+
+        # 1) Check that "section" exists
+        if section not in config_dict:
+            logger.error(f"Missing required section '{section}' in config dictionary.")
+            raise ValueError(f"Missing required section '{section}' in config dictionary.")
+
+        # 2) Check that each required key is in config_dict[section]
+        for key in keys:
+            if key not in config_dict[section]:
+                logger.error(
+                    f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                )
+                raise ValueError(
+                    f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                )

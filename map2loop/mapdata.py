@@ -694,24 +694,24 @@ class MapData:
         if datatype == Datatype.GEOLOGY:
             validity_check, message = check_geology_fields_validity(mapdata = self)
             if validity_check:
-                logger.error(f"Datatype GEOLOGY data validation failed: {message}")
-                return
+                logger.error(f"Datatype GEOLOGY - data validation failed: {message}")
+                raise ValueError(f"Datatype GEOLOGY - data validation failed: {message}")
             func = self.parse_geology_map
             
         #check and parse structure data
         elif datatype == Datatype.STRUCTURE:
             validity_check, message = check_structure_fields_validity(mapdata = self)
             if validity_check:
-                logger.error(f"Datatype STRUCTURE data validation failed: {message}")
-                return
+                logger.error(f"Datatype STRUCTURE - data validation failed: {message}")
+                raise ValueError(f"Datatype STRUCTURE - data validation failed: {message}")
             func = self.parse_structure_map
         
         #check and parse fault data
         elif datatype == Datatype.FAULT:
             validity_check, message = check_fault_fields_validity(mapdata = self)
             if validity_check:
-                logger.error(f"Datatype FAULT data validation failed: {message}")
-                return
+                logger.error(f"Datatype FAULT - data validation failed: {message}")
+                raise ValueError(f"Datatype FAULT - data validation failed: {message}")
             func = self.parse_fault_map
         
         elif datatype == Datatype.FAULT_ORIENTATION:

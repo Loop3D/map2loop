@@ -447,6 +447,7 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
 @beartype.beartype
 def validate_config_dictionary(config_dict: dict) -> None:
     
+    # 1)  check mandatory keys for "structure" and "geology"
     required_keys = {
         "structure": {"dipdir_column", "dip_column"},
         "geology": {"unitname_column", "alt_unitname_column"},
@@ -463,9 +464,71 @@ def validate_config_dictionary(config_dict: dict) -> None:
         # 2) Check that each required key is in config_dict[section]
         for key in keys:
             if key not in config_dict[section]:
+                logger.error(f"Missing required key '{key}' for '{section}' section of the config dictionary.")
+                raise ValueError(f"Missing required key '{key}' for '{section}' section of the config dictionary.")
+    
+    # 2) check for legacy keys first:
+    legacy_keys = {
+        "otype", "dd", "d", "sf", "bedding", "bo", "btype", "gi", "c", "u",
+        "g", "g2", "ds", "min", "max", "r1", "r2", "sill", "intrusive", "volcanic",
+        "f", "fdipnull", "fdipdip_flag", "fdipdir", "fdip", "fdipest",
+        "fdipest_vals", "n", "ff", "t", "syn"
+    }
+
+    def check_keys(d: dict, parent_key=""):
+        for key, value in d.items():
+            if key in legacy_keys:
                 logger.error(
-                    f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                    f"Legacy key found in config - '{key}' at '{parent_key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
                 )
                 raise ValueError(
-                    f"Missing required key '{key}' for '{section}' section of the config dictionary."
+                    f"Legacy key found in config - '{key}' at '{parent_key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
                 )
+            if isinstance(value, dict):
+                check_keys(value, parent_key=f"{parent_key}{key}.")
+    
+    check_keys(config_dict)
+
+    # 3) check if all keys are valid:
+    allowed_keys_by_section = {
+        "structure": {
+            "orientation_type", "dipdir_column", "dip_column",
+            "description_column", "bedding_text", "overturned_column", "overturned_text",
+            "objectid_column", "desciption_column",
+        },
+        "geology": {
+            "unitname_column", "alt_unitname_column", "group_column",
+            "supergroup_column", "description_column", "minage_column",
+            "maxage_column", "rocktype_column",  "alt_rocktype_column",
+            "sill_text", "intrusive_text",  "volcanic_text",   "objectid_column", "ignore_lithology_codes",
+        },
+        "fault": {
+            "structtype_column",  "fault_text",  "dip_null_value",
+            "dipdir_flag", "dipdir_column",  "dip_column",  "orientation_type",
+            "dipestimate_column",  "dipestimate_text",  "name_column",
+            "objectid_column", "minimum_fault_length", "ignore_fault_codes",
+        },
+        "fold": {
+            "structtype_column", "fold_text", "description_column",
+            "synform_text", "foldname_column","objectid_column",
+        },
+    }
+    
+    for section_name, section_dict in config_dict.items():
+        # check section
+        if section_name not in allowed_keys_by_section:
+            logger.error(f"Unrecognized section '{section_name}' in config dictionary.")
+            raise ValueError(f"Unrecognized section '{section_name}' in config dictionary.")
+
+        # check keys
+        allowed_keys = allowed_keys_by_section[section_name]
+        for key in section_dict.keys():
+            if key not in allowed_keys:
+                logger.error(f"Key '{key}' is not an allowed key in the '{section_name}' section.")
+                raise ValueError(f"Key '{key}' is not an allowed key in the '{section_name}' section.")
+    
+    # 4) check if minimum fault length is a number
+    mfl = config_dict.get("fault", {}).get("minimum_fault_length", None)
+    if mfl is not None and not isinstance(mfl, (int, float)):
+        logger.error("minimum_fault_length must be a number.")
+        raise ValueError(f"minimum_fault_length must be a number, instead got: {type(mfl)}")

@@ -100,8 +100,6 @@ class Config:
         Args:
             dictionary (dict): The dictionary to update from
         """
-        # make sure dictionary doesn't contain legacy keys
-        self.check_for_legacy_keys(dictionary)
         
         if "structure" in dictionary:
             self.structure_config.update(dictionary["structure"])
@@ -212,29 +210,3 @@ class Config:
                 err_string += "Please check the file exists and is accessible then\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)
-
-
-    @beartype.beartype
-    def check_for_legacy_keys(self, config_dict: dict) -> None:
-
-        legacy_keys = {
-            "otype", "dd", "d", "sf", "bedding", "bo", "btype", "gi", "c", "u",
-            "g", "g2", "ds", "min", "max", "r1", "r2", "sill", "intrusive", "volcanic",
-            "f", "fdipnull", "fdipdip_flag", "fdipdir", "fdip", "fdipest",
-            "fdipest_vals", "n", "ff", "t", "syn"
-        }
-
-        # Recursively search for keys in the dictionary
-        def check_keys(d: dict, parent_key=""):
-            for key, value in d.items():
-                if key in legacy_keys:
-                    logger.error(
-                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
-                    )
-                    raise ValueError(
-                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
-                    )
-                if isinstance(value, dict):
-                    check_keys(value, parent_key=f"{parent_key}{key}.")
-        
-        check_keys(config_dict)

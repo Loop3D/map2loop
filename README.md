@@ -1,10 +1,11 @@
 ![GitHub Release](https://img.shields.io/github/v/release/loop3d/map2loop)
+[![DOI](https://img.shields.io/static/v1?label=DOI&message=10.5194/gmd-14-5063-2021&color=blue)](https://doi.org/10.5194/gmd-14-5063-2021)
 ![License](https://img.shields.io/github/license/loop3d/map2loop)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/map2loop?label=pip%20downloads)
 ![Conda Downloads](https://img.shields.io/conda/dn/loop3d/map2loop?label=Conda%20downloads)
 [![Testing](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/linting_and_testing.yml)
 [![Build and Deploy Documentation](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml)
-[![DOI](https://img.shields.io/static/v1?label=DOI&message=10.5194/gmd-14-5063-2021&color=blue)](https://doi.org/10.5194/gmd-14-5063-2021)
+
 
 # Map2Loop 3.2
 

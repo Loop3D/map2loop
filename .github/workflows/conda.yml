@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ${{ fromJSON(vars.BUILD_OS)}}
-        python-version: [3.8] # temp for testing purposes ${{ fromJSON(vars.PYTHON_VERSIONS)
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS) }}
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:

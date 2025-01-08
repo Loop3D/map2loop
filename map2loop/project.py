@@ -18,7 +18,7 @@ from osgeo import gdal
 gdal.UseExceptions()
 import geopandas
 import beartype
-from beartype.typing import Union, List
+from beartype.typing import Union, List, Dict, Any
 import pathlib
 import numpy
 import pandas
@@ -75,7 +75,7 @@ class Project(object):
         loop_project_filename: str = "",
         overwrite_loopprojectfile: bool = False,
         **kwargs,
-    ):
+    ):  
         """
         The initialiser for the map2loop project
 
@@ -119,6 +119,30 @@ class Project(object):
             TypeError: Type of bounding_box not a dict or tuple
             ValueError: use_australian_state_data not in state list ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']
         """
+        
+        # Throw error if unexpected keyword arguments are passed to project
+        allowed_kwargs = {"metadata_filename"}
+        for key in kwargs.keys():
+            if key not in allowed_kwargs:
+                logger.error(
+                    f"Unexpected keyword argument '{key}' passed to Project. Allowed keywords: {', '.join(allowed_kwargs)}."
+                )
+                raise TypeError(
+                    f"Project got an unexpected keyword argument '{key}' - please double-check this before proceeding with map2loop processing"
+                )
+        
+        # make sure all the needed arguments are provided
+        if not use_australian_state_data: # this check has to skip if using Loop server data
+            self.validate_required_inputs(
+                bounding_box=bounding_box,
+                working_projection=working_projection,
+                geology_filename=geology_filename,
+                structure_filename=structure_filename,
+                dtm_filename=dtm_filename,
+                config_dictionary=config_dictionary,
+                config_filename=config_filename,
+            )
+        
         self._error_state = ErrorState.NONE
         self._error_state_msg = ""
         self.verbose_level = verbose_level
@@ -207,12 +231,12 @@ class Project(object):
             self.map_data.set_config_filename(config_filename)
 
         if config_dictionary != {}:
+            self.map_data.config.validate_config_dictionary(config_dictionary)
             self.map_data.config.update_from_dictionary(config_dictionary)
             
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)
             
-
         
         # Load all data (both shape and raster)
         self.map_data.load_all_map_data()
@@ -233,6 +257,58 @@ class Project(object):
         if len(kwargs):
             logger.warning(f"Unused keyword arguments: {kwargs}")
 
+    @beartype.beartype
+    def validate_required_inputs(
+        self,
+        bounding_box: Dict[str, Union[float, int]],
+        working_projection: str,
+        geology_filename: str,
+        structure_filename: str,
+        dtm_filename: str,
+        config_filename: str = None,
+        config_dictionary: Dict[str, Any] = {},
+    ) -> None:
+
+        required_inputs = {
+            "bounding_box": bounding_box,
+            "working_projection": working_projection, # this may be removed when fix is added for https://github.com/Loop3D/map2loop/issues/103
+            "geology_filename": geology_filename,
+            "structure_filename": structure_filename,
+            "dtm_filename": dtm_filename,
+        }
+
+        # Check for missing required inputs in project
+        missing_inputs = [key for key, value in required_inputs.items() if not value]
+
+        if missing_inputs:
+            missing_list = ", ".join(missing_inputs)
+            logger.error(
+                f"Project construction is missing required inputs: {missing_list}. "
+                "Please add them to the Project()."
+            )
+            raise ValueError(
+                f"Project construction is missing required inputs: {missing_list}. "
+                "Please add them to the Project()."
+            )
+
+        # Either config_filename or config_dictionary must be provided (but not both or neither)
+        if not config_filename and not config_dictionary:
+            logger.error(
+                "A config file is required to run map2loop - use either 'config_filename' or 'config_dictionary' to initialise the project."
+            )
+            raise ValueError(
+                 "A config file is required to run map2loop - use either 'config_filename' or 'config_dictionary' to initialise the project."
+            )
+        if config_filename and config_dictionary:
+            logger.error(
+                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one config."
+            )
+            raise ValueError(
+                "Both 'config_filename' and 'config_dictionary' were provided. Please specify only one config."
+            )
+
+            
+    
     # Getters and Setters
     @beartype.beartype
     def set_ignore_lithology_codes(self, codes: list):
@@ -734,9 +810,10 @@ class Project(object):
         logger.info('Saving data into loop project file')
         if not self.loop_filename:
             logger.info('No loop project file specified, creating a new one')
-            self.loop_filename = os.path.join(
-                self.map_data.tmp_path, os.path.basename(self.map_data.tmp_path) + ".loop3d"
-            )
+            output_dir = pathlib.Path.cwd()  
+            output_dir.mkdir(parents=True, exist_ok=True) 
+            filename = "new_project.loop3d"
+            self.loop_filename = str(output_dir / filename)
 
         file_exists = os.path.isfile(self.loop_filename)
 

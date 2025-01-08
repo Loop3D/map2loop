@@ -2,6 +2,7 @@ import pathlib
 from map2loop.project import Project
 from map2loop.m2l_enums import Datatype
 import map2loop
+from unittest.mock import patch
 
 
 # Sample test function for lithology and fault ignore codes
@@ -21,24 +22,25 @@ def test_set_get_ignore_codes():
         "structure": {"dipdir_column": "azimuth2", "dip_column": "dip"},
         "geology": {"unitname_column": "unitname", "alt_unitname_column": "code"},
     }
-
-    project = Project(
-        working_projection='EPSG:28350',
-        bounding_box=bbox_3d,
-        geology_filename=str(
-            pathlib.Path(map2loop.__file__).parent
-            / pathlib.Path('_datasets/geodata_files/hamersley/geology.geojson')
-        ),
-        fault_filename=str(
-            pathlib.Path(map2loop.__file__).parent
-            / pathlib.Path('_datasets/geodata_files/hamersley/faults.geojson')
-        ),
-        dtm_filename=str(
-            pathlib.Path(map2loop.__file__).parent
-            / pathlib.Path('_datasets/geodata_files/hamersley/dtm_rp.tif')
-        ),
-        config_dictionary=config_dictionary,
-    )
+    with patch.object(Project, 'validate_required_inputs', return_value=None):
+        project = Project(
+            working_projection='EPSG:28350',
+            bounding_box=bbox_3d,
+            geology_filename=str(
+                pathlib.Path(map2loop.__file__).parent
+                / pathlib.Path('_datasets/geodata_files/hamersley/geology.geojson')
+            ),
+            fault_filename=str(
+                pathlib.Path(map2loop.__file__).parent
+                / pathlib.Path('_datasets/geodata_files/hamersley/faults.geojson')
+            ),
+            dtm_filename=str(
+                pathlib.Path(map2loop.__file__).parent
+                / pathlib.Path('_datasets/geodata_files/hamersley/dtm_rp.tif')
+            ),
+            config_dictionary=config_dictionary,
+            structure_filename="", 
+        )
 
     # Define test ignore codes for lithology and faults
     lithology_codes = ["cover", "Fortescue_Group", "A_FO_od"]

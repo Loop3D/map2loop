@@ -20,7 +20,7 @@ from uuid import uuid4
 import beartype
 import os
 from io import BytesIO
-from typing import Union, Tuple
+from typing import Union
 import tempfile
 
 

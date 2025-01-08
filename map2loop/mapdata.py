@@ -3,7 +3,7 @@ from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .utils import generate_random_hex_colors, calculate_minimum_fault_length
-from .data_checks import check_geology_fields_validity, check_structure_fields_validity, check_fault_fields_validity
+from .data_checks import check_geology_fields_validity, check_structure_fields_validity, check_fault_fields_validity, check_fold_fields_validity
 
 # external imports
 import geopandas
@@ -719,6 +719,10 @@ class MapData:
             
         #check and parse fold data
         elif datatype == Datatype.FOLD:
+            validity_check, message = check_fold_fields_validity(mapdata = self)
+            if validity_check:
+                logger.error(f"Datatype FOLD - data validation failed: {message}")
+                raise ValueError(f"Datatype FOLD - data validation failed: {message}")
             func = self.parse_fold_map
 
         if func:
@@ -1103,12 +1107,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded fold map
-        if (
-            self.raw_data[Datatype.FOLD] is None
-            or type(self.raw_data[Datatype.FOLD]) is not geopandas.GeoDataFrame
-        ):
-            return (True, "Fold map is not loaded or valid")
 
         # Create new geodataframe
         folds = geopandas.GeoDataFrame(self.raw_data[Datatype.FOLD]["geometry"])

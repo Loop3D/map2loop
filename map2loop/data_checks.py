@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 
 @beartype.beartype
 def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
-    #TODO (AR) - add check for gaps in geology data
+    #TODO (AR) - add check for gaps in geology data (inspo here: https://medium.com/@achm.firmansyah/an-approach-for-checking-overlaps-and-gaps-in-polygons-using-geopandas-ebd6606e7f70 )
     """
     Validate the columns in GEOLOGY geodataframe
 
@@ -42,7 +42,16 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
     if not geology_data.geometry.is_valid.all():
         logger.error("Invalid geometries found. Please fix those before proceeding with map2loop processing")
         return (True, "Invalid geometries found in datatype GEOLOGY")
+    
+    # Check if all geometries are Polygon or MultiPolygon
+    if not geology_data.geometry.apply(lambda geom: isinstance(geom, (shapely.Polygon, shapely.MultiPolygon))).all():
+        invalid_types = geology_data[~geology_data.geometry.apply(lambda geom: isinstance(geom, (shapely.Polygon, shapely.MultiPolygon)))]
+        logger.error(
+            f"datatype GEOLOGY: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
+        )
+        return (True, "Invalid geometry types found in datatype GEOLOGY. All geometries must be Polygon or MultiPolygon.")
 
+    
     # # 2. Required Columns & are they str, and then empty or null? 
     required_columns = [config["unitname_column"], config["alt_unitname_column"]]
     for col in required_columns:
@@ -170,6 +179,14 @@ def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
         logger.error("datatype STRUCTURE: Invalid geometries found. Please fix those before proceeding with map2loop processing")
         return (True, "Invalid geometries found in datatype STRUCTURE")
 
+    #  Check if all geometries are Points
+    if not structure_data.geometry.apply(lambda geom: isinstance(geom, shapely.Point)).all():
+        invalid_types = structure_data[~structure_data.geometry.apply(lambda geom: isinstance(geom, shapely.Point))]
+        logger.error(
+            f"datatype STRUCTURE: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
+        )
+        return (True, "Invalid geometry types found in datatype STRUCTURE. All geometries must be Points.")
+    
     # 2. Check mandatory numeric columns
     required_columns = [config["dipdir_column"], config["dip_column"]]
     for col in required_columns:
@@ -441,6 +458,141 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
                     f"Datatype FAULT: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
                 )
     
+    return (False, "")
+
+@beartype.beartype
+def check_fold_fields_validity(mapdata) -> Tuple[bool, str]:
+    # Check type of loaded fold map
+    if (
+        mapdata.raw_data[Datatype.FOLD] is None
+        or type(mapdata.raw_data[Datatype.FOLD]) is not geopandas.GeoDataFrame
+    ):
+        logger.warning("Fold map is not loaded or valid")
+        return (True, "Fold map is not loaded or valid")
+
+    folds = mapdata.raw_data[Datatype.FOLD]
+    config = mapdata.config.fold_config
+
+    # Debugging: Print column names in the fold_data
+    logger.debug(f"Fold data columns: {folds.columns.tolist()}")
+
+    # Check geometry
+    if not folds.geometry.is_valid.all():
+        logger.error("datatype FOLD: Invalid geometries found. Please fix those before proceeding with map2loop processing")
+        return (True, "Invalid geometries found in FOLD data.")
+    
+    # Check for LineString or MultiLineString geometries
+    if not folds.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString))).all():
+        invalid_types = folds[~folds.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString)))]
+        logger.error(
+            f"datatype FOLD: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
+        )
+        return (True, "Invalid geometry types found in FOLD data.")
+    
+    # Check "structtype_column" if it exists
+    if "structtype_column" in config:
+        structtype_column = config["structtype_column"]
+
+        # Ensure the column exists in the data
+        if structtype_column not in folds.columns:
+            logger.warning(
+                f"Datatype FOLD: '{structtype_column}' (config key: 'structtype_column') is missing from the fold data. Consider removing that key from the config"
+            )
+            return (True, f"Column '{structtype_column}' is missing from the fold data.")
+        else:
+            # Check if all entries in the column are strings
+            if not folds[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+                logger.error(
+                    f"Datatype FOLD: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
+                )
+                return (True, f"Datatype FOLD: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
+
+            # Warn about empty or null cells
+            if folds[structtype_column].isnull().any() or folds[structtype_column].str.strip().eq("").any():
+                logger.warning(
+                    f"Datatype FOLD: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
+                )
+            
+            # Check if "fold_text" is defined and contained in the column
+            fold_text = config.get("fold_text", None)
+            if fold_text:
+                
+                # check if fold text is a string
+                if not isinstance(fold_text, str):
+                    logger.error("Datatype FOLD: 'fold_text' must be a string. Please ensure it is defined correctly in the config.")
+                    return (True, "Datatype FOLD: 'fold_text' must be a string.")
+                #check if it exists in the column strtype
+                if not folds[structtype_column].str.contains(fold_text, na=False).any():
+                    logger.error(f"Datatype FOLD: The 'fold_text' value '{fold_text}' is not found in column '{structtype_column}'. This may impact processing.")
+                    return (True, f"Datatype FOLD: The 'fold_text' value '{fold_text}' is not found in column '{structtype_column}'.")
+
+            # check synform_text
+            synform_text = config.get("synform_text", None)
+            if synform_text:
+                # Check if synform_text is a string
+                if not isinstance(synform_text, str):
+                    logger.error("Datatype FOLD: 'synform_text' must be a string. Please ensure it is defined correctly in the config.")
+                    return (True, "Datatype FOLD: 'synform_text' must be a string.")
+                # Check if it exists in the structtype_column
+                if not folds[structtype_column].str.contains(synform_text, na=False).any():
+                    logger.warning(
+                        f"Datatype FOLD: The 'synform_text' value '{synform_text}' is not found in column '{structtype_column}'. This may impact processing."
+                    )
+                        
+    # check description column
+    description_column = config.get("description_column", None)
+    if description_column:
+        # Ensure the column exists in the data
+        if description_column not in folds.columns:
+            logger.warning(
+                f"Datatype FOLD: Column '{description_column}' (config key: 'description_column') is missing from the fold data. Consider removing that key from the config."
+            )
+        else:
+            # Check if all entries in the column are strings
+            if not folds[description_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+                logger.error(
+                    f"Datatype FOLD: Column '{description_column}' (config key: 'description_column') contains non-string values. Please ensure all values in this column are strings."
+                )
+                return (True, f"Datatype FOLD: Column '{description_column}' (config key: 'description_column') contains non-string values.")
+
+            # Warn about empty or null cells
+            if folds[description_column].isnull().any() or folds[description_column].str.strip().eq("").any():
+                logger.warning(
+                    f"Datatype FOLD: Column '{description_column}' contains NaN, empty, or blank values. Processing might not work as expected."
+                )
+
+
+    # Check ID column
+    id_column = config.get("objectid_column")
+    
+    if id_column:
+        if id_column in folds.columns:
+            # Attempt to coerce the ID column to numeric
+            folds[id_column] = pandas.to_numeric(folds[id_column], errors='coerce')
+            
+            # Check if all values are integers or null after coercion
+            if not folds[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
+                logger.warning(
+                    f"Datatype FOLD: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
+                )
+            
+            # Check for NaN values
+            if folds[id_column].isnull().any():
+                logger.warning(
+                    f"Datatype FOLD: ID column '{id_column}' contains NaN or null or str values. Rectify this or remove the key from the config to auto-generate IDs."
+                )
+            
+            # Check for duplicate values
+            if folds[id_column].duplicated().any():
+                logger.error(
+                    f"Datatype FOLD: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
+                )
+                return (True, f"Datatype FOLD: ID column '{id_column}' contains duplicate values.")
+        else:
+            logger.warning(
+                f"Datatype FOLD: ID column '{id_column}' is missing from the fold data. Ensure the column name is correct or remove the key from the config."
+            )
+
     return (False, "")
 
 

@@ -11,6 +11,7 @@ from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, Sort
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
+from .data_checks import validate_config_dictionary
 
 # external imports
 import LoopProjectFile as LPF
@@ -231,8 +232,10 @@ class Project(object):
             self.map_data.set_config_filename(config_filename)
 
         if config_dictionary != {}:
-            self.map_data.config.validate_config_dictionary(config_dictionary)
+            validate_config_dictionary(config_dictionary)
             self.map_data.config.update_from_dictionary(config_dictionary)
+            # print(self.map_data.config)
+            # self.map_data.config.validate_config_dictionary(config_dictionary)
             
         if clut_filename != "":
             self.map_data.set_colour_filename(clut_filename)

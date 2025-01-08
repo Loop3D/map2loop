@@ -1,8 +1,12 @@
 ![GitHub Release](https://img.shields.io/github/v/release/loop3d/map2loop)
 <<<<<<< HEAD
+<<<<<<< HEAD
 [![DOI](https://img.shields.io/static/v1?label=DOI&message=10.5194/gmd-14-5063-2021&color=blue)](https://doi.org/10.5194/gmd-14-5063-2021)
 =======
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+[![DOI](https://img.shields.io/static/v1?label=DOI&message=10.5194/gmd-14-5063-2021&color=blue)](https://doi.org/10.5194/gmd-14-5063-2021)
+>>>>>>> c1060e5 (chore: update readme)
 ![License](https://img.shields.io/github/license/loop3d/map2loop)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/map2loop?label=pip%20downloads)
 ![Conda Downloads](https://img.shields.io/conda/dn/loop3d/map2loop?label=Conda%20downloads)
@@ -10,11 +14,16 @@
 [![Build and Deploy Documentation](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml/badge.svg)](https://github.com/Loop3D/map2loop/actions/workflows/documentation.yml)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Map2Loop 3.2
 =======
 # Map2Loop 3.1
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+
+# Map2Loop 3.2
+>>>>>>> c1060e5 (chore: update readme)
 
 Generate 3D geological model inputs from geological maps — a high-level implementation and extension of the original map2loop code developed by Prof. Mark Jessell at UWA. To see an example interactive model built with map2loop and LoopStructural, follow this link:
 
@@ -35,6 +44,9 @@ Installation with pip will require that GDAL is installed on your system prior t
 This is because GDAL cannot be installed <a href='https://hackernoon.com/hn-images/1*m4cnTYJWM7Rmpsju8dSHmQ.jpeg'>via pip</a> (at least not with one line of code), and the GDAL installation process will vary depending on your OS. 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c1060e5 (chore: update readme)
 For more information on installing gdal, see <a href="https://pypi.org/project/GDAL/">GDAL's Pypi</a> page.
 
 Once GDAL is available on your system, map2loop can be installed with:
@@ -43,15 +55,19 @@ pip install map2loop
 ```
 
 #### Option 3: From source
+<<<<<<< HEAD
 =======
 To just use map2loop, issue the following. <sup>*</sup>
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+>>>>>>> c1060e5 (chore: update readme)
 
 ```bash
 git clone https://github.com/Loop3D/map2loop.git
 
 cd map2loop
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 conda install gdal
 
@@ -73,12 +89,32 @@ conda install -c loop3d -c conda-forge --file dependencies.txt
 pip install -e .
 =======
 conda install -c loop3d --file dependencies.txt
+=======
+conda install gdal
+
+conda install -c loop3d -c conda-forge --file dependencies.txt
+>>>>>>> c1060e5 (chore: update readme)
 
 pip install .
 >>>>>>> 7978841 (feat: v3.2 (#153))
 ```
 
+<<<<<<< HEAD
 <p><sup>*</sup> We're actively working towards a better approach - stay tuned! </p>
+=======
+#### Option 4: From source & developer mode:
+```bash
+git clone https://github.com/Loop3D/map2loop.git
+
+cd map2loop
+
+conda install gdal
+
+conda install -c loop3d -c conda-forge --file dependencies.txt
+
+pip install -e .
+```
+>>>>>>> c1060e5 (chore: update readme)
 
 ### Documentation
 

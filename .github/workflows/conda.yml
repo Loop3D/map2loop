@@ -33,7 +33,7 @@ jobs:
           conda install -c conda-forge conda-build scikit-build-core numpy anaconda-client conda-libmamba-solver -y
           conda config --set solver libmamba
           conda build --output-folder conda conda  --python ${{matrix.python-version}}
-
+          anaconda upload --label main conda/*/*.tar.bz2
           
       - name: upload artifacts
         uses: actions/upload-artifact@v4

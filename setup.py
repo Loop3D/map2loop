@@ -34,13 +34,13 @@ class CustomSDist(_sdist):
 
             # If the source file exists in base_dir, move it to map2loop/.
             if src.exists():
-                shutil.move(str(src), str(dst))
+                shutil.copy(str(src), str(dst))
 
 setup(
     name="map2loop",
     install_requires=install_requires,        
     packages=find_packages(exclude=["tests", "tests.*"]),
-    package_data={"map2loop": ['dependencies.txt']},
+    package_data={"": ['dependencies.txt']},
     include_package_data=True,
     license="MIT",
     cmdclass={

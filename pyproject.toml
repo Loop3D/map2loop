@@ -40,7 +40,6 @@ include = ['map2loop', 'map2loop.*']
 
 [tool.setuptools.package-data]
 map2loop = [
-    "dependencies.txt",
     "_datasets/geodata_files/hamersley/*"
 ]
 

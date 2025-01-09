@@ -40,6 +40,7 @@ setup(
     name="map2loop",
     install_requires=install_requires,        
     packages=find_packages(exclude=["tests", "tests.*"]),
+    package_data={"map2loop": ['dependencies.txt']},
     include_package_data=True,
     license="MIT",
     cmdclass={

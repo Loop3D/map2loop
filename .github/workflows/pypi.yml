@@ -21,23 +21,23 @@ jobs:
           name: dist
           path: ./dist/*.tar.gz
 
-  publish:
-    name: Publish wheels to pypi
-    runs-on: ubuntu-24.04
-    permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
-      id-token: write
-    needs: sdist
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-      - name: copy to wheelhouse
-        run: |
-          # cp -r wheelhouse/*/*.whl dist
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          skip-existing: true
-          verbose: true
-          packages-dir: dist/
+  # publish:
+  #   name: Publish wheels to pypi
+  #   runs-on: ubuntu-24.04
+  #   permissions:
+  #     # IMPORTANT: this permission is mandatory for trusted publishing
+  #     id-token: write
+  #   needs: sdist
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist
+  #     - name: copy to wheelhouse
+  #       run: |
+  #         # cp -r wheelhouse/*/*.whl dist
+  #     - uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         skip-existing: true
+  #         verbose: true
+  #         packages-dir: dist/

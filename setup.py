@@ -12,6 +12,12 @@ version_file = package_root / "map2loop" / "version.py"
 with version_file.open() as fp:
     exec(fp.read(), version)
 
+# Read dependencies from dependencies.txt
+requirements_file = package_root / "dependencies.txt"
+with requirements_file.open("r") as f:
+    install_requires = [line.strip() for line in f if line.strip()]
+
+
 class CustomSDist(_sdist):
 
     def make_release_tree(self, base_dir, files):
@@ -32,6 +38,7 @@ class CustomSDist(_sdist):
 
 setup(
     name="map2loop",
+    install_requires=install_requires,        
     packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
     license="MIT",

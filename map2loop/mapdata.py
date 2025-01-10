@@ -952,7 +952,15 @@ class MapData:
 
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
-            faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
+               # Check if the string contains commas indicating multiple substrings
+            if ',' in config["fault_text"]:
+                import re
+                fault_text = config["fault_text"].split(',')
+                search_terms = [term.strip().strip("'").strip('"') for term in fault_text]
+                escaped_terms = [re.escape(term) for term in search_terms]
+                # Combine the escaped terms using the pipe '|' symbol for alternation
+                fault_text_pattern = '|'.join(escaped_terms)
+                faults = faults[faults["FEATURE"].astype(str).str.contains(fault_text_pattern, case=False, regex=True, na=False)]
             if self.verbose_level > VerboseLevel.NONE:
                 if len(faults) < len(self.raw_data[Datatype.GEOLOGY]) and len(faults) == 0:
                     msg = f"Fault map reduced to 0 faults as structtype_column ({config['structtype_column']}) does not contains as row with fault_text \"{config['fault_text']}\""
@@ -1066,9 +1074,16 @@ class MapData:
             folds[config["structtype_column"]] = self.raw_data[Datatype.FOLD][
                 config["structtype_column"]
             ]
-            folds = folds[
-                folds[config["structtype_column"]].astype(str).str.contains(config["fold_text"])
-            ]
+            if ',' in config["fold_text"]:
+                import re
+                fold_text = config["fold_text"].split(',')
+                search_terms = [term.strip().strip("'").strip('"') for term in fold_text]
+                escaped_terms = [re.escape(term) for term in search_terms]
+                # Combine the escaped terms using the pipe '|' symbol for alternation
+                fold_text_pattern = '|'.join(escaped_terms)
+                folds = folds[
+                    folds[config["structtype_column"]].astype(str).str.contains(fold_text_pattern,  case=False, regex=True, na=False)
+                ]
             if self.verbose_level > VerboseLevel.NONE:
                 if len(folds) < len(self.raw_data[Datatype.GEOLOGY]) and len(folds) == 0:
                     msg = f"Fold map reduced to 0 folds as structtype_column ({config['structtype_column']}) does not contains any row with fold_text \"{config['fold_text']}\""

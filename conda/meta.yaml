@@ -20,17 +20,16 @@ requirements:
   run:
     - loopprojectfile ==0.2.2
     - gdal
-    - map2model
-    - beartype
-    - python
     - numpy
-    - pandas
+    - scipy
     - geopandas
     - shapely
-    - tqdm
     - networkx
     - owslib
-
+    - map2model
+    - beartype
+    - pytest
+    - scikit-learn
 
 about:
   home: "https://github.com/Loop3D/map2loop"

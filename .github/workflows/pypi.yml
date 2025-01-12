@@ -7,10 +7,14 @@ jobs:
   sdist:
     name: Build sdist
 <<<<<<< HEAD
+<<<<<<< HEAD
     runs-on: ubuntu-latest
 =======
     runs-on: ubuntu-24.04
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+    runs-on: ubuntu-latest
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,10 +32,14 @@ jobs:
   publish:
     name: Publish wheels to pypi
 <<<<<<< HEAD
+<<<<<<< HEAD
     runs-on: ubuntu-latest
 =======
     runs-on: ubuntu-24.04
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+    runs-on: ubuntu-latest
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write

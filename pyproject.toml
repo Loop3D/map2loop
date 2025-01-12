@@ -39,14 +39,20 @@ version = { attr = "map2loop.version.__version__" }
 include = ['map2loop', 'map2loop.*']
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
 [tool.setuptools.package-data]
 map2loop = [
     "dependencies.txt",
     "_datasets/geodata_files/hamersley/*"
 ]
+<<<<<<< HEAD
 =======
 
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
 
 [tool.black]
 line-length = 100

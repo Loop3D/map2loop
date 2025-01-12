@@ -24,11 +24,14 @@ requirements:
     - loopprojectfile ==0.2.2
     - gdal
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     - map2model
     - beartype
 >>>>>>> 7978841 (feat: v3.2 (#153))
     - python
+=======
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
     - numpy
     - scipy
     - geopandas
@@ -36,13 +39,19 @@ requirements:
     - networkx
     - owslib
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
     - map2model
     - beartype
     - pytest
     - scikit-learn
+<<<<<<< HEAD
 =======
 
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
 
 about:
   home: "https://github.com/Loop3D/map2loop"

@@ -19,11 +19,16 @@ jobs:
         with:
           commit_message: "style: style fixes by ruff and autoformatting by black"
 <<<<<<< HEAD
+<<<<<<< HEAD
  
           
 =======
 
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+ 
+          
+>>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
   testing:
     name: Testing
     runs-on: ubuntu-24.04

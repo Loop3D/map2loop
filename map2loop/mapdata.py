@@ -1043,7 +1043,7 @@ class MapData:
 
         return (False, "")
 
-        @beartype.beartype
+    @beartype.beartype
     def parse_fault_orientations(self) -> tuple:
         """
         Parse the fault orientations shapefile data into a consistent format

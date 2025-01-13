@@ -38,7 +38,11 @@ version = { attr = "map2loop.version.__version__" }
 [tool.setuptools.packages.find]
 include = ['map2loop', 'map2loop.*']
 
-
+[tool.setuptools.package-data]
+map2loop = [
+    "dependencies.txt",
+    "_datasets/geodata_files/hamersley/*"
+]
 
 [tool.black]
 line-length = 100

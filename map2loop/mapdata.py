@@ -763,6 +763,14 @@ class MapData:
         else:
             fault_orientations["ID"] = numpy.arange(len(fault_orientations))
         self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        
+        if config["featureid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["featureId"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["featureid_column"]
+            ]
+        else:
+            fault_orientations["featureId"] = numpy.arange(len(fault_orientations))
+            
         return (False, "")
 
     @beartype.beartype

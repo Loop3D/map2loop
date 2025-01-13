@@ -2,6 +2,9 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 17a58cd (chore(master): release 3.2.2 (#178))
 ## [3.2.2](https://github.com/Loop3D/map2loop/compare/v3.2.1...v3.2.2) (2025-01-13)
 
 
@@ -9,8 +12,11 @@
 
 * add featureId when parsing fault_orientations ([#177](https://github.com/Loop3D/map2loop/issues/177)) ([924c2cf](https://github.com/Loop3D/map2loop/commit/924c2cf696688abe3dc1c8579753daeb2f1b45e4))
 
+<<<<<<< HEAD
 =======
 >>>>>>> 3c16a8c (chore(master): release 3.2.1 (#174))
+=======
+>>>>>>> 17a58cd (chore(master): release 3.2.2 (#178))
 ## [3.2.1](https://github.com/Loop3D/map2loop/compare/v3.2.0...v3.2.1) (2025-01-12)
 
 

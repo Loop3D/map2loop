@@ -6,7 +6,7 @@ package:
 
 source:
   git_url: https://github.com/Loop3D/map2loop
-
+  git_branch: chore--add-back-conda-build-config
 build:
   number: 0
 

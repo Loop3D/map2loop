@@ -11,9 +11,12 @@ source:
 build:
   number: 0
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   script: "{{ PYTHON }} -m pip install . --no-deps"  
 >>>>>>> 7978841 (feat: v3.2 (#153))
+=======
+>>>>>>> 0e6dfe7 (chore: typo in conda build (#175))
 
 requirements:
   host:

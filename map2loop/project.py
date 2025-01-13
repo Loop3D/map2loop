@@ -35,7 +35,7 @@ class Project(object):
     """
     The main entry point into using map2loop
 
-    Attiributes
+    Attributes
     -----------
     verbose_level: m2l_enums.VerboseLevel
         A selection that defines how much console logging is output
@@ -75,7 +75,6 @@ class Project(object):
         save_pre_checked_map_data: bool = False,
         loop_project_filename: str = "",
         overwrite_loopprojectfile: bool = False,
-        **kwargs,
     ):  
         """
         The initialiser for the map2loop project
@@ -121,17 +120,6 @@ class Project(object):
             ValueError: use_australian_state_data not in state list ['WA', 'SA', 'QLD', 'NSW', 'TAS', 'VIC', 'ACT', 'NT']
         """
         
-        # Throw error if unexpected keyword arguments are passed to project
-        allowed_kwargs = {"metadata_filename"}
-        for key in kwargs.keys():
-            if key not in allowed_kwargs:
-                logger.error(
-                    f"Unexpected keyword argument '{key}' passed to Project. Allowed keywords: {', '.join(allowed_kwargs)}."
-                )
-                raise TypeError(
-                    f"Project got an unexpected keyword argument '{key}' - please double-check this before proceeding with map2loop processing"
-                )
-        
         # make sure all the needed arguments are provided
         if not use_australian_state_data: # this check has to skip if using Loop server data
             self.validate_required_inputs(
@@ -169,11 +157,6 @@ class Project(object):
         self.fault_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.fold_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
         self.geology_samples = pandas.DataFrame(columns=["ID", "X", "Y", "Z", "featureId"])
-
-        
-        # Check for alternate config filenames in kwargs
-        if "metadata_filename" in kwargs and config_filename == "":
-            config_filename = kwargs["metadata_filename"]
 
         # Sanity check on working projection parameter
         if issubclass(type(working_projection), str) or issubclass(type(working_projection), int):
@@ -257,8 +240,6 @@ class Project(object):
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
 
-        if len(kwargs):
-            logger.warning(f"Unused keyword arguments: {kwargs}")
 
     @beartype.beartype
     def validate_required_inputs(

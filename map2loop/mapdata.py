@@ -731,6 +731,147 @@ class MapData:
                 logger.error(message)
 
     @beartype.beartype
+    def parse_fault_orientations(self) -> tuple:
+        """
+        Parse the fault orientations shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
+        """
+        # Check type and size of loaded structure map
+        if (
+            self.raw_data[Datatype.FAULT_ORIENTATION] is None
+            or type(self.raw_data[Datatype.FAULT_ORIENTATION]) is not geopandas.GeoDataFrame
+        ):
+            logger.warning("Fault orientation shapefile is not loaded or valid")
+            return (True, "Fault orientation shapefile is not loaded or valid")
+
+        # Create new geodataframe
+        fault_orientations = geopandas.GeoDataFrame(
+            self.raw_data[Datatype.FAULT_ORIENTATION]["geometry"]
+        )
+
+        config = self.config.fault_config
+
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            if config["orientation_type"] == "strike":
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                    config["dipdir_column"]
+                ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dipdir_column '{config['dipdir_column']}'"
+            )
+
+        if config["dip_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["DIP"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["dip_column"]
+            ]
+        else:
+            print(
+                f"Fault orientation shapefile does not contain dip_column '{config['dip_column']}'"
+            )
+
+        # TODO LG would it be worthwhile adding a description column for faults?
+        # it would be possible to parse out the fault displacement, type, slip direction
+        # if this was stored in the descriptions?
+
+        # Add object id
+        if config["objectid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["ID"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["objectid_column"]
+            ]
+        else:
+            fault_orientations["ID"] = numpy.arange(len(fault_orientations))
+        self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        
+        if config["featureid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["featureId"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["featureid_column"]
+            ]
+        else:
+            fault_orientations["featureId"] = numpy.arange(len(fault_orientations))
+            
+        return (False, "")
+
+    @beartype.beartype
+    def parse_structure_map(self) -> tuple:
+        """
+        Parse the structure shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
+        """
+        # Check type and size of loaded structure map
+        if (
+            self.raw_data[Datatype.STRUCTURE] is None
+            or type(self.raw_data[Datatype.STRUCTURE]) is not geopandas.GeoDataFrame
+        ):
+            logger.warning("Structure map is not loaded or valid")
+            return (True, "Structure map is not loaded or valid")
+
+        if len(self.raw_data[Datatype.STRUCTURE]) < 2:
+            logger.warning(
+                "Stucture map does not enough orientations to complete calculations (need at least 2), projection may be inconsistent"
+            )
+
+        # Create new geodataframe
+        structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])
+        config = self.config.structure_config
+
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.STRUCTURE]:
+            if config["orientation_type"] == "strike":
+                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
+        else:
+            print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
+
+        # Ensure all DIPDIR values are within [0, 360]
+        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
+
+        if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
+        else:
+            print(f"Structure map does not contain dip_column '{config['dip_column']}'")
+
+        # Add bedding and overturned booleans
+        if config["overturned_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["OVERTURNED"] = (
+                self.raw_data[Datatype.STRUCTURE][config["overturned_column"]]
+                .astype(str)
+                .str.contains(config["overturned_text"])
+            )
+        else:
+            structure["OVERTURNED"] = False
+
+        if config["description_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["BEDDING"] = (
+                self.raw_data[Datatype.STRUCTURE][config["description_column"]]
+                .astype(str)
+                .str.contains(config["bedding_text"])
+            )
+        else:
+            structure["BEDDING"] = False
+
+        # Add object id
+        if config["objectid_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["ID"] = self.raw_data[Datatype.STRUCTURE][config["objectid_column"]]
+        else:
+            structure["ID"] = numpy.arange(len(structure))
+
+        self.data[Datatype.STRUCTURE] = structure
+        return (False, "")
+
+    @beartype.beartype
     def parse_geology_map(self) -> tuple:
         """
         Parse the geology shapefile data into a consistent format

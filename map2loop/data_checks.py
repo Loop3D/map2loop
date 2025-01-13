@@ -3,7 +3,7 @@ from .m2l_enums import Datatype
 
 #external imports
 import beartype as beartype
-from beartype.typing import Tuple
+from beartype.typing import Tuple, List
 import geopandas
 import shapely
 import pandas
@@ -38,21 +38,16 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
     geology_data = mapdata.raw_data[Datatype.GEOLOGY]
     config = mapdata.config.geology_config
     
-    # 1. Check geometry validity - tested & working
-    if not geology_data.geometry.is_valid.all():
-        logger.error("Invalid geometries found. Please fix those before proceeding with map2loop processing")
-        return (True, "Invalid geometries found in datatype GEOLOGY")
+    # 2. Validate geometry
+    failed, message = validate_geometry(
+        geodata=geology_data,
+        expected_geom_types=[shapely.Polygon, shapely.MultiPolygon],
+        datatype_name="GEOLOGY"
+    )
+    if failed:
+        return (failed, message)
     
-    # Check if all geometries are Polygon or MultiPolygon
-    if not geology_data.geometry.apply(lambda geom: isinstance(geom, (shapely.Polygon, shapely.MultiPolygon))).all():
-        invalid_types = geology_data[~geology_data.geometry.apply(lambda geom: isinstance(geom, (shapely.Polygon, shapely.MultiPolygon)))]
-        logger.error(
-            f"datatype GEOLOGY: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
-        )
-        return (True, "Invalid geometry types found in datatype GEOLOGY. All geometries must be Polygon or MultiPolygon.")
-
-    
-    # # 2. Required Columns & are they str, and then empty or null? 
+    # # 3. Required Columns & are they str, and then empty or null? 
     required_columns = [config["unitname_column"], config["alt_unitname_column"]]
     for col in required_columns:
         if col not in geology_data.columns:
@@ -141,6 +136,7 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
     logger.info("Geology fields validation passed.")
     return (False, "")
 
+
 @beartype.beartype
 def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
     """
@@ -174,18 +170,14 @@ def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
     structure_data = mapdata.raw_data[Datatype.STRUCTURE]
     config = mapdata.config.structure_config
 
-    # 1. Check geometry validity
-    if not structure_data.geometry.is_valid.all():
-        logger.error("datatype STRUCTURE: Invalid geometries found. Please fix those before proceeding with map2loop processing")
-        return (True, "Invalid geometries found in datatype STRUCTURE")
-
-    #  Check if all geometries are Points
-    if not structure_data.geometry.apply(lambda geom: isinstance(geom, shapely.Point)).all():
-        invalid_types = structure_data[~structure_data.geometry.apply(lambda geom: isinstance(geom, shapely.Point))]
-        logger.error(
-            f"datatype STRUCTURE: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
-        )
-        return (True, "Invalid geometry types found in datatype STRUCTURE. All geometries must be Points.")
+    # 2. Validate geometry
+    failed, message = validate_geometry(
+        geodata=structure_data,
+        expected_geom_types=[shapely.Point, shapely.MultiPoint],
+        datatype_name="STRUCTURE"
+    )
+    if failed:
+        return (failed, message)
     
     # 2. Check mandatory numeric columns
     required_columns = [config["dipdir_column"], config["dip_column"]]
@@ -273,18 +265,14 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
     fault_data = mapdata.raw_data[Datatype.FAULT]
     config = mapdata.config.fault_config
     
-    # Check geometry
-    if not fault_data.geometry.is_valid.all():
-        logger.error("datatype FAULT: Invalid geometries found. Please fix those before proceeding with map2loop processing")
-        return (True, "Invalid geometries found in FAULT data.")
-
-    # Check for LineString or MultiLineString geometries
-    if not fault_data.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString))).all():
-        invalid_types = fault_data[~fault_data.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString)))]
-        logger.error(
-            f"FAULT data contains invalid geometry types. Rows with invalid geometry types: {invalid_types.index.tolist()}"
-        )
-        return (True, "FAULT data contains geometries that are not LineString or MultiLineString.")
+    # 2. Validate geometry
+    failed, message = validate_geometry(
+        geodata=fault_data,
+        expected_geom_types=[shapely.LineString, shapely.MultiLineString],
+        datatype_name="FAULT"
+    )
+    if failed:
+        return (failed, message)
     
     # Check "structtype_column" if it exists
     if "structtype_column" in config:
@@ -476,18 +464,14 @@ def check_fold_fields_validity(mapdata) -> Tuple[bool, str]:
     # Debugging: Print column names in the fold_data
     logger.debug(f"Fold data columns: {folds.columns.tolist()}")
 
-    # Check geometry
-    if not folds.geometry.is_valid.all():
-        logger.error("datatype FOLD: Invalid geometries found. Please fix those before proceeding with map2loop processing")
-        return (True, "Invalid geometries found in FOLD data.")
-    
-    # Check for LineString or MultiLineString geometries
-    if not folds.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString))).all():
-        invalid_types = folds[~folds.geometry.apply(lambda geom: isinstance(geom, (shapely.LineString, shapely.MultiLineString)))]
-        logger.error(
-            f"datatype FOLD: Invalid geometry types found. Rows with invalid types: {invalid_types.index.tolist()}"
-        )
-        return (True, "Invalid geometry types found in FOLD data.")
+    # 2. Validate geometry
+    failed, message = validate_geometry(
+        geodata=folds,
+        expected_geom_types=[shapely.LineString, shapely.MultiLineString],
+        datatype_name="FOLD"
+    )
+    if failed:
+        return (failed, message)
     
     # Check "structtype_column" if it exists
     if "structtype_column" in config:
@@ -684,3 +668,44 @@ def validate_config_dictionary(config_dict: dict) -> None:
     if mfl is not None and not isinstance(mfl, (int, float)):
         logger.error("minimum_fault_length must be a number.")
         raise ValueError(f"minimum_fault_length must be a number, instead got: {type(mfl)}")
+    
+
+def validate_geometry(
+    geodata: geopandas.GeoDataFrame,
+    expected_geom_types: List[type],
+    datatype_name: str
+) -> Tuple[bool, str]:
+    """
+    Validates the geometry column of a GeoDataFrame.
+
+    Parameters:
+        geodata (gpd.GeoDataFrame): The GeoDataFrame to validate.
+        expected_geom_types (List[type]): A list of expected Shapely geometry types.
+        datatype_name (str): A string representing the datatype being validated (e.g., "GEOLOGY").
+
+    Returns:
+        Tuple[bool, str]: A tuple where the first element is a boolean indicating if validation failed,
+                          and the second element is an error message if failed.
+    """
+    # 1. Check if all geometries are valid
+    if not geodata.geometry.is_valid.all():
+        logger.error(f"Invalid geometries found in datatype {datatype_name}. Please fix them before proceeding.")
+        return True, f"Invalid geometries found in datatype {datatype_name}."
+    
+    # 2. Check if all geometries are of the expected types
+    if not geodata.geometry.apply(lambda geom: isinstance(geom, tuple(expected_geom_types))).all():
+        invalid_types = geodata[~geodata.geometry.apply(lambda geom: isinstance(geom, tuple(expected_geom_types)))]
+        invalid_indices = invalid_types.index.tolist()
+        expected_types_names = ', '.join([geom_type.__name__ for geom_type in expected_geom_types])
+        logger.error(
+            f"Datatype {datatype_name}: Invalid geometry types found. Expected types: {expected_types_names}. "
+            f"Rows with invalid types: {invalid_indices}"
+        )
+        return True, (
+            f"Invalid geometry types found in datatype {datatype_name}. "
+            f"All geometries must be {expected_types_names}."
+        )
+    
+    # If all checks pass
+    logger.debug(f"Geometry validation passed for datatype {datatype_name}.")
+    return False, ""

@@ -14,11 +14,11 @@ build:
 requirements:
   host:
     - pip
-    - python
     - setuptools
   run:
     - loopprojectfile ==0.2.2
     - gdal
+    - python
     - numpy
     - scipy
     - geopandas

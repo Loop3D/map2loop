@@ -34,7 +34,7 @@ from map2loop.data_checks import check_fault_fields_validity
             },
             {"structtype_column": "FEATURE", "fault_text": "Fault", "objectid_column": "ID"},
             True,
-            "Invalid geometries found in FAULT data."
+            "Invalid geometries found in datatype FAULT"
         ),
 
         # Non-string FEATURE column

@@ -27,7 +27,7 @@ from map2loop.data_checks import check_fold_fields_validity
         (
             {
                 "geometry": [
-                    shapely.geometry.Point(0, 0),  # Invalid type
+                    shapely.geometry.LineString([(0,0), (0,0)]),  # Invalid type
                     shapely.geometry.LineString([(0, 0), (1, 1)])
                 ],
                 "FEATURE": ["fold A", "fold B"],
@@ -36,7 +36,7 @@ from map2loop.data_checks import check_fold_fields_validity
             },
             {"structtype_column": "FEATURE", "fold_text": "fold", "objectid_column": "ID", "description_column": "description"},
             True,
-            "Invalid geometry types found in FOLD data."
+            "Invalid geometries found in datatype FOLD"
         ),
         # Non-string FEATURE column
         (

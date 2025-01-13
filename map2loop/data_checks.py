@@ -669,7 +669,7 @@ def validate_config_dictionary(config_dict: dict) -> None:
         logger.error("minimum_fault_length must be a number.")
         raise ValueError(f"minimum_fault_length must be a number, instead got: {type(mfl)}")
     
-
+@beartype.beartype
 def validate_geometry(
     geodata: geopandas.GeoDataFrame,
     expected_geom_types: List[type],
@@ -690,7 +690,7 @@ def validate_geometry(
     # 1. Check if all geometries are valid
     if not geodata.geometry.is_valid.all():
         logger.error(f"Invalid geometries found in datatype {datatype_name}. Please fix them before proceeding.")
-        return True, f"Invalid geometries found in datatype {datatype_name}."
+        return True, f"Invalid geometries found in datatype {datatype_name}"
     
     # 2. Check if all geometries are of the expected types
     if not geodata.geometry.apply(lambda geom: isinstance(geom, tuple(expected_geom_types))).all():
@@ -707,5 +707,5 @@ def validate_geometry(
         )
     
     # If all checks pass
-    logger.debug(f"Geometry validation passed for datatype {datatype_name}.")
+    logger.debug(f"Geometry validation passed for datatype {datatype_name}")
     return False, ""

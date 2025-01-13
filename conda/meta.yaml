@@ -7,7 +7,6 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
 
-
 build:
   number: 0
 <<<<<<< HEAD
@@ -28,6 +27,7 @@ requirements:
     - gdal
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     - map2model
     - beartype
@@ -35,6 +35,9 @@ requirements:
     - python
 =======
 >>>>>>> b33532b (fix: include dependencies in site-packages  - issue #169 (#170))
+=======
+    - python
+>>>>>>> 9ca260f (chore: typo in conda build (#176))
     - numpy
     - scipy
     - geopandas

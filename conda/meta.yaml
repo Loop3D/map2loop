@@ -7,7 +7,6 @@ package:
 source:
   git_url: https://github.com/Loop3D/map2loop
 
-
 build:
   number: 0
 
@@ -19,6 +18,7 @@ requirements:
   run:
     - loopprojectfile ==0.2.2
     - gdal
+    - python
     - numpy
     - scipy
     - geopandas

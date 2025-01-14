@@ -85,31 +85,16 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
                     "Map2loop processing might not work as expected."
         )
     
-    # # 4. Check for duplicates in ID
-    if "objectid_column" in config and config["objectid_column"] in geology_data.columns:
-        objectid_values = geology_data[config["objectid_column"]]
+    # # 4. check ID column
+    if "objectid_column" in config:
+        id_validation_failed, id_message = validate_id_column(
+            geodata=geology_data,
+            config=config,
+            id_config_key="objectid_column", 
+            geodata_name="GEOLOGY")
         
-        # Check for None, NaN, or other null-like values
-        if objectid_values.isnull().any():
-            logger.error(
-                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values. Ensure all values are valid and non-null."
-            )
-            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains NaN or null values.")
-        
-        # Check for duplicate values
-        if objectid_values.duplicated().any():
-            logger.error(
-                f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column'). Please make sure that the column contains unique values."
-            )
-            return (True, f"Datatype GEOLOGY: Duplicate values found in column '{config['objectid_column']}' (config key: 'objectid_column').")
-        
-        # Check for uniqueness
-        if not objectid_values.is_unique:
-            logger.error(
-                f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values. Ensure all values are unique."
-            )
-            return (True, f"Datatype GEOLOGY: Column '{config['objectid_column']}' (config key: 'objectid_column') contains non-unique values.")
-
+        if id_validation_failed:
+            return (id_validation_failed, id_message)
 
     # 5. Check for NaNs/blanks in optional fields with warnings
     warning_fields = [
@@ -224,31 +209,17 @@ def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
                     "Map2loop processing might not work as expected."
         )
 
-    # check ID column for type, null values, and duplicates
-    optional_numeric_column_key = "objectid_column"
-    optional_numeric_column = config.get(optional_numeric_column_key)
-
-    if optional_numeric_column:
-        if optional_numeric_column in structure_data.columns:
-            # Check for non-integer values
-            if not structure_data[optional_numeric_column].apply(lambda x: isinstance(x, int) or pandas.isnull(x)).all():
-                logger.error(
-                    f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains non-integer values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
-                )
-                return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains non-integer values.")
-            # Check for NaN
-            if structure_data[optional_numeric_column].isnull().any():
-                logger.error(
-                    f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains NaN values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
-                )
-                return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains NaN values.")
-            # Check for duplicates
-            if structure_data[optional_numeric_column].duplicated().any():
-                logger.error(
-                    f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values. Rectify this, or remove this column from the config - map2loop will generate a new ID."
-                )
-                return (True, f"Datatype STRUCTURE: ID column '{optional_numeric_column}' (config key: '{optional_numeric_column_key}') contains duplicate values.")
-
+    # check ID column 
+    if "objectid_column" in config:
+        id_validation_failed, id_message = validate_id_column(
+            geodata=structure_data,
+            config=config,
+            id_config_key="objectid_column", 
+            geodata_name="STRUCTURE")
+        
+        if id_validation_failed:
+            return (id_validation_failed, id_message)
+        
     return (False, "")
 
 @beartype.beartype
@@ -419,32 +390,17 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
             )
             return (True, f"Datatype FAULT: Column '{dip_estimate_column}' is missing from the fault data.")
 
-    # Check ID column
-    id_column = config.get("objectid_column")
     
-    if id_column:  
-        if id_column in fault_data.columns:
-            # Check for non-integer values
-            # Attempt to coerce the ID column to integers because WA data says so (ARodrigues)
-            fault_data[id_column] = pandas.to_numeric(fault_data[id_column], errors='coerce')
-
-            # Check if all values are integers or null after coercion
-            if not fault_data[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
-                logger.warning(
-                    f"Datatype FAULT: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
-            
-            # Check for NaN values
-            if fault_data[id_column].isnull().any():
-                logger.warning(
-                    f"Datatype FAULT: ID column '{id_column}' contains NaN or null values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
-
-            # Check for duplicates
-            if fault_data[id_column].duplicated().any():
-                logger.error(
-                    f"Datatype FAULT: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
+    # # 4. check ID column
+    if "objectid_column" in config:
+        id_validation_failed, id_message = validate_id_column(
+            geodata=fault_data,
+            config=config,
+            id_config_key="objectid_column", 
+            geodata_name="FAULT")
+        
+        if id_validation_failed:
+            return (id_validation_failed, id_message)
     
     return (False, "")
 
@@ -546,36 +502,16 @@ def check_fold_fields_validity(mapdata) -> Tuple[bool, str]:
                 )
 
 
-    # Check ID column
-    id_column = config.get("objectid_column")
-    
-    if id_column:
-        if id_column in folds.columns:
-            # Attempt to coerce the ID column to numeric
-            folds[id_column] = pandas.to_numeric(folds[id_column], errors='coerce')
-            
-            # Check if all values are integers or null after coercion
-            if not folds[id_column].apply(lambda x: pandas.isnull(x) or isinstance(x, int)).all():
-                logger.warning(
-                    f"Datatype FOLD: ID column '{id_column}' must contain only integer values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
-            
-            # Check for NaN values
-            if folds[id_column].isnull().any():
-                logger.warning(
-                    f"Datatype FOLD: ID column '{id_column}' contains NaN or null or str values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
-            
-            # Check for duplicate values
-            if folds[id_column].duplicated().any():
-                logger.error(
-                    f"Datatype FOLD: ID column '{id_column}' contains duplicate values. Rectify this or remove the key from the config to auto-generate IDs."
-                )
-                return (True, f"Datatype FOLD: ID column '{id_column}' contains duplicate values.")
-        else:
-            logger.warning(
-                f"Datatype FOLD: ID column '{id_column}' is missing from the fold data. Ensure the column name is correct or remove the key from the config."
-            )
+    # # 4. check ID column
+    if "objectid_column" in config:
+        id_validation_failed, id_message = validate_id_column(
+            geodata=folds,
+            config=config,
+            id_config_key="objectid_column", 
+            geodata_name="FOLD")
+        
+        if id_validation_failed:
+            return (id_validation_failed, id_message)
 
     return (False, "")
 
@@ -709,3 +645,60 @@ def validate_geometry(
     # If all checks pass
     logger.debug(f"Geometry validation passed for datatype {datatype_name}")
     return False, ""
+
+
+@beartype.beartype
+def validate_id_column(
+    geodata: geopandas.GeoDataFrame,
+    config: dict,
+    id_config_key: str, 
+    geodata_name: str
+) -> Tuple[bool, str]:
+
+    # Retrieve the ID column name from the configuration
+    id_column = config.get(id_config_key)
+    
+    if not id_column:
+        error_msg = f"Configuration key '{id_config_key}' is missing."
+        logger.error(error_msg)
+        return (True, error_msg)
+    
+    if id_column in geodata.columns:
+        geodata[id_column] = pandas.to_numeric(geodata[id_column], errors='coerce')
+    
+        # Check for non-numeric values (which are now NaN after coercion)
+        if geodata[id_column].isnull().any():
+            error_msg = (
+                f"Datatype {geodata_name}: Column '{id_column}' "
+                f"(config key: '{id_config_key}') contains non-numeric or NaN values. "
+                "Please rectify the values, or remove this key from the config dictionary to let map2loop assign IDs."
+            )
+            logger.error(error_msg)
+            return (True, error_msg)
+        
+        if not (geodata[id_column] == geodata[id_column].astype(int)).all():
+            error_msg = (
+                f"Datatype {geodata_name}: Column '{id_column}' "
+                f"(config key: '{id_config_key}') contains non-integer values."
+            )
+            logger.error(error_msg)
+            return (True, error_msg)
+
+        if geodata[id_column].duplicated().any():
+            error_msg = (
+                f"Datatype {geodata_name}: Column '{id_column}' "
+                f"(config key: '{id_config_key}') contains duplicate values."
+            )
+            logger.error(error_msg)
+            return (True, error_msg)
+    
+    
+    elif id_column not in geodata.columns:
+        msg = (
+            f"Datatype {geodata_name}: Column '{id_column}' "
+            f"(config key: '{id_config_key}') is missing from the data. "
+            "Map2loop will automatically generate IDs."
+        )
+        logger.warning(msg)
+
+    return (False, "")

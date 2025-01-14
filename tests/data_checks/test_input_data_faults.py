@@ -49,7 +49,7 @@ from map2loop.data_checks import check_fault_fields_validity
             },
             {"structtype_column": "FEATURE", "fault_text": "Fault", "objectid_column": "ID"},
             True,
-            "Datatype FAULT: Column 'FEATURE' (config key: 'structtype_column') contains non-string values."
+            "Datatype FAULT: Column 'FEATURE' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
         ),
         # Invalid values in DIP estimate column
         (

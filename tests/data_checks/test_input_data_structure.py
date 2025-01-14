@@ -68,7 +68,7 @@ class MockConfig:
                 "ID": [1, 2]
             },
             True,
-            "Datatype STRUCTURE: Required column with config key: 'dipdir_column' is missing from structure data.",
+            "Datatype STRUCTURE: Required column with config key 'dipdir_column' (column: 'DIPDIR')  is missing from the data.",
         ),
         # Non-numeric value in numeric column
         (
@@ -84,7 +84,7 @@ class MockConfig:
                 "ID": [1, 2]
             },
             True,
-            "Datatype STRUCTURE: Column 'dipdir_column' must contain only numeric values. Please check that the column contains only numeric values.",
+            "Datatype STRUCTURE: Column 'dipdir_column' (column: 'DIPDIR') must contain only numeric values.",
         ),
         # NaN or blank value in required column
         (
@@ -100,7 +100,7 @@ class MockConfig:
                 "ID": [1, 2]
             },
             True,
-            "Datatype STRUCTURE: NaN or blank values found in required column 'dipdir_column'. Please double check the column for blank values.",
+            "Datatype STRUCTURE: Column 'dipdir_column' (column: 'DIPDIR')  contains null values. Please ensure all values are present.",
         ),
         # Duplicate ID column
         (

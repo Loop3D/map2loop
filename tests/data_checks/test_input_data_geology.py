@@ -80,7 +80,7 @@ class MockConfig:
                 "ID": [1],
             },
             True,
-            "Datatype GEOLOGY: Required column with config key: 'alt_unitname_column' is missing from geology data.",
+            "Datatype GEOLOGY: Required column with config key 'alt_unitname_column' (column: 'CODE')  is missing from the data.",
         ),
         # Non-string value in required column
         (
@@ -98,7 +98,7 @@ class MockConfig:
                 "ID": [1],
             },
             True,
-            "Datatype GEOLOGY: Column 'alt_unitname_column' must contain only string values. Please check that the column contains only string values.",
+            "Datatype GEOLOGY: Column 'alt_unitname_column' (column: 'CODE') must contain only <class 'str'> values.",
         ),
         # NaN or blank value in required column
         (
@@ -116,7 +116,7 @@ class MockConfig:
                 "ID": [1],
             },
             True,
-            "Datatype GEOLOGY: NaN or blank values found in required column 'unitname_column'. Please double check the column for blank values.",
+            "Datatype GEOLOGY: Column 'unitname_column' (column: 'UNITNAME') contains blank (empty) values. Please ensure all values are populated.",
         ),
         # Duplicate ID values
         (
@@ -179,7 +179,7 @@ class MockConfig:
                 "ID": [1, 1],  # Duplicate ID
             },
             True,
-            "Datatype GEOLOGY: Column 'unitname_column' must contain only string values. Please check that the column contains only string values.",
+            "Datatype GEOLOGY: Column 'unitname_column' (column: 'UNITNAME') must contain only <class 'str'> values.",
         ),
     ],
 )

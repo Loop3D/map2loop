@@ -21,6 +21,7 @@ def test_set_get_ignore_codes():
     config_dictionary = {
         "structure": {"dipdir_column": "azimuth2", "dip_column": "dip"},
         "geology": {"unitname_column": "unitname", "alt_unitname_column": "code"},
+        "fault": {'structtype_column': 'feature', 'fault_text': 'Fault'},
     }
     with patch.object(Project, 'validate_required_inputs', return_value=None):
         project = Project(

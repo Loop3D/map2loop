@@ -51,7 +51,7 @@ from map2loop.data_checks import check_fold_fields_validity
             },
             {"structtype_column": "FEATURE", "fold_text": "fold", "objectid_column": "ID", "description_column": "description"},
             True,
-            "Datatype FAULT: Column 'FOLD' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
+            "Datatype FOLD: Column 'FEATURE' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
         ),
         # Missing ID column
         (

@@ -3,7 +3,7 @@ from .m2l_enums import Datatype
 
 #external imports
 import beartype as beartype
-from beartype.typing import Tuple, List
+from beartype.typing import Tuple, Optional, List, Dict, Type, Union
 import geopandas
 import shapely
 import pandas
@@ -51,7 +51,7 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
     # check required columns in geology
     required_columns = ["unitname_column", "alt_unitname_column"]
     
-    validation_failed, message = validate_required_columns(
+    failed, message = validate_required_columns(
         geodata=geology_data,
         config=config,
         required_columns=required_columns,
@@ -59,66 +59,52 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
         check_blank=True,
         datatype_name="GEOLOGY"
     )
-    if validation_failed:
-        return (validation_failed, message)
+    if failed:
+        return (failed, message)
     
-    
-
-    # # 3. Optional Columns
+    # check optional columns
     optional_string_columns = [
         "group_column", "supergroup_column", "description_column",
         "rocktype_column", "alt_rocktype_column",
     ]
     
-    for key in optional_string_columns:
-        if key in config and config[key] in geology_data.columns:
-            if not geology_data[config[key]].apply(lambda x: isinstance(x, str)).all():
-                logger.warning(
-                    f"Datatype GEOLOGY: Optional column '{config[key]}' (config key: '{key}') contains non-string values. "
-                    "Map2loop processing might not work as expected."
-                )
-
-    optional_numeric_columns = ["minage_column", "maxage_column", "objectid_column"]
-    for key in optional_numeric_columns:
-        if key in config and config[key] in geology_data.columns:
-            if not geology_data[config[key]].apply(lambda x: isinstance(x, (int, float))).all():
-                logger.warning(
-                    f"Datatype GEOLOGY: Optional column '{config[key]}' (config key: '{key}') contains non-numeric values. "
-                    "Map2loop processing might not work as expected."
-        )
+    string_warnings = validate_optional_columns(
+        geodata=geology_data,
+        config=config,
+        optional_columns=optional_string_columns,
+        expected_type=str,
+        check_blank=True,  
+        datatype_name="GEOLOGY"
+    )
+    ### only emit warnings for optional columns
+    for warning in string_warnings:
+        logger.warning(warning)
+    
+    # 5. Validate Optional Numeric Columns
+    optional_numeric_columns = ["minage_column", "maxage_column"]
+    numeric_warnings = validate_optional_columns(
+        geodata=geology_data,
+        config=config,
+        optional_columns=optional_numeric_columns,
+        expected_type=(int, float),
+        check_blank=False,
+        datatype_name="GEOLOGY"
+    )
+    
+    ### only emit warnings for optional columns
+    for warning in numeric_warnings:
+        logger.warning(warning)
     
     # # 4. check ID column
     if "objectid_column" in config:
-        id_validation_failed, id_message = validate_id_column(
+        failed, message = validate_id_column(
             geodata=geology_data,
             config=config,
             id_config_key="objectid_column", 
             geodata_name="GEOLOGY")
         
-        if id_validation_failed:
-            return (id_validation_failed, id_message)
-
-    # 5. Check for NaNs/blanks in optional fields with warnings
-    warning_fields = [
-        "group_column", "supergroup_column", "description_column",
-        "rocktype_column", "minage_column", "maxage_column",
-    ]
-    for key in warning_fields:
-        col = config.get(key)
-        if col and col in geology_data.columns:
-            # Check if column contains string values before applying `.str`
-            if pandas.api.types.is_string_dtype(geology_data[col]):
-                if geology_data[col].isnull().any() or geology_data[col].str.strip().eq("").any():
-                    logger.warning(
-                        f"Datatype GEOLOGY: NaN or blank values found in optional column '{col}' (config key: '{key}')."
-                    )
-            else:
-                # Non-string columns, check only for NaN values
-                if geology_data[col].isnull().any():
-                    logger.warning(
-                        f"Datatype GEOLOGY: NaN values found in optional column '{col}' (config key: '{key}')."
-                    )
-
+        if failed:
+            return (failed, message)
 
     logger.info("Geology fields validation passed.")
     return (False, "")
@@ -169,7 +155,7 @@ def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
     
     # check required columns in structure (numeric dips & dip dir)
     required_columns = ["dipdir_column", "dip_column"]
-    validation_failed, message = validate_required_columns(
+    failed, message = validate_required_columns(
         geodata=structure_data,
         config=config,
         required_columns=required_columns,
@@ -177,49 +163,46 @@ def check_structure_fields_validity(mapdata) -> Tuple[bool, str]:
         check_blank=False,
         datatype_name="STRUCTURE"
     )
-    if validation_failed:
-        return (validation_failed, message)
+    if failed:
+        return (failed, message)
 
-    if config["dip_column"] in structure_data.columns:
-        invalid_dip = ~((structure_data[config["dip_column"]] >= 0) & (structure_data[config["dip_column"]] <= 90))
-        if invalid_dip.any():
-            logger.warning(
-                f"Datatype STRUCTURE: Column '{config['dip_column']}' has values that are not between 0 and 90 degrees. Is this intentional?"
-            )
-
-    if config["dipdir_column"] in structure_data.columns:
-        invalid_dipdir = ~((structure_data[config["dipdir_column"]] >= 0) & (structure_data[config["dipdir_column"]] <= 360))
-        if invalid_dipdir.any():
-            logger.warning(
-                f"Datatype STRUCTURE: Column '{config['dipdir_column']}' has values that are not between 0 and 360 degrees. Is this intentional?"
-            )
+    # 4. Validate Dip and Dip Direction value ranges
+    dip_columns = ["dip_column", "dipdir_column"]
+    dip_validation_failed, dip_message = validate_dip_columns(
+        geodata=structure_data,
+        config=config,
+        dip_columns=dip_columns,
+        datatype_name="STRUCTURE",
+        allow_nulls=False  # Dip and dipdir cannot have nulls in structure data
+    )
+    if dip_validation_failed:
+        logger.warning(dip_message)
     
-    # check validity of optional string columns
+    # check optional columns
     optional_string_columns = ["description_column", "overturned_column"]
-    for key in optional_string_columns:
-        if key in config and config[key] in structure_data.columns:
-            column_name = config[key]
-            if not structure_data[column_name].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
-                logger.warning(
-                    f"Datatype STRUCTURE: Optional column with config key: '{key}' contains non-string values. "
-                    "Map2loop processing might not work as expected."
-                )
-            if structure_data[column_name].isnull().any() or structure_data[column_name].str.strip().eq("").any():
-                logger.warning(
-                    f"Datatype STRUCTURE: Optional column config key: '{key}' contains NaN, empty, or null values. "
-                    "Map2loop processing might not work as expected."
-        )
+    string_warnings = validate_optional_columns(
+        geodata=structure_data,
+        config=config,
+        optional_columns=optional_string_columns,
+        expected_type=str,
+        check_blank=True,  
+        datatype_name="STRUCTURE"
+    )
+    
+    ## only emit warnings for optional columns
+    for warning in string_warnings:
+        logger.warning(warning)
 
     # check ID column 
     if "objectid_column" in config:
-        id_validation_failed, id_message = validate_id_column(
+        failed, id_message = validate_id_column(
             geodata=structure_data,
             config=config,
             id_config_key="objectid_column", 
             geodata_name="STRUCTURE")
         
-        if id_validation_failed:
-            return (id_validation_failed, id_message)
+        if failed:
+            return (failed, id_message)
         
     return (False, "")
 
@@ -246,43 +229,21 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
     if failed:
         return (failed, message)
     
-    # Check "structtype_column" if it exists
-    if "structtype_column" in config:
-        structtype_column = config["structtype_column"]
-
-        # Ensure the column exists in the data
-        if structtype_column not in fault_data.columns:
-            logger.warning(
-                f"Datatype FAULT: '{structtype_column}' (config key: 'structtype_column') is missing from the fault data. Consider removing that key from the config"
-            )
-        else:
-        # Check if all entries in the column are strings
-            if not fault_data[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
-                logger.error(
-                    f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
-                )
-                return (True, f"Datatype FAULT: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
-
-            # Warn about empty or null cells
-            if fault_data[structtype_column].isnull().any() or fault_data[structtype_column].str.strip().eq("").any():
-                logger.warning(
-                    f"Datatype FAULT: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
-                )
-
-    # Check if "fault_text" is defined and contained in the column
-    fault_text = config.get("fault_text", None)
-
-    # Check if the structtype_column exists in the fault_data
-    if structtype_column not in fault_data.columns:
-        logger.warning(
-            f"Datatype FAULT: The column '{structtype_column}' is not present in the fault data."
-        )
-
-    else:
-        if not fault_data[structtype_column].str.contains(fault_text).any():
-            logger.error(
-                f"Datatype FAULT: The 'fault_text' value '{fault_text}' is not found in column '{structtype_column}'. Project might end up with no faults"
-            )
+    # # Check "structtype_column" if it exists
+    text_keys = {
+        "fault_text": "fault_text"
+    }
+    structtype_validation_failed, structtype_message = validate_structtype_column(
+        geodata=fault_data,
+        config=config,
+        datatype_name="FAULT",
+        required=True,  # Assuming structtype_column is required in FAULT
+        text_keys=text_keys
+    )
+    if structtype_validation_failed:
+        return (structtype_validation_failed, structtype_message)
+    
+    
     
     #checks on name column
     name_column = config.get("name_column")
@@ -312,50 +273,17 @@ def check_fault_fields_validity(mapdata) -> Tuple[bool, str]:
                 f"Datatype FAULT: Column '{name_column}' contains duplicate values. This may affect processing."
             )
 
-    # dips & strikes
-    # Check for dips and dip directions
-    strike_dips_columns = ["dip_column", "dipdir_column"]
-
-    for key in strike_dips_columns:
-        column_name = config.get(key)
-        if column_name:  # Only proceed if the config has this key
-            if column_name in fault_data.columns:
-                
-                #coerce to numeric
-                fault_data[column_name] = pandas.to_numeric(fault_data[column_name], errors='coerce')
-                
-                # Check if the column contains only numeric values                    
-                if not fault_data[column_name].apply(lambda x: isinstance(x, (int, float)) or pandas.isnull(x)).all():
-                    logger.warning(
-                        f"Datatype FAULT: Column '{column_name}' (config key {key}) must contain only numeric values. Please ensure the column is numeric."
-                    )
-
-                # Check for NaN or empty values
-                if fault_data[column_name].isnull().any():
-                    logger.warning(
-                        f"Datatype FAULT: Column '{column_name}' (config key {key}) contains NaN or empty values. This may affect processing."
-                    )
-
-                # Check range constraints
-                if key == "dip_column":
-                    # Dips must be between 0 and 90
-                    invalid_values = ~((fault_data[column_name] >= 0) & (fault_data[column_name] <= 90))
-                    if invalid_values.any():
-                        logger.warning(
-                            f"Datatype FAULT: Column '{column_name}' (config key {key}) contains values outside the range [0, 90]. Was this intentional?"
-                        )
-                elif key == "dipdir_column":
-                    # Dip directions must be between 0 and 360
-                    invalid_values = ~((fault_data[column_name] >= 0) & (fault_data[column_name] <= 360))
-                    if invalid_values.any():
-                        logger.warning(
-                            f"Datatype FAULT: Column '{column_name}' (config key {key}) contains values outside the range [0, 360]. Was this intentional?"
-                        )
-            else:
-                logger.warning(
-                    f"Datatype FAULT: Column '{column_name}' (config key {key}) is missing from the fault data. Please ensure the column name is correct, or otherwise remove that key from the config."
-                )
-                
+    # # dips & strikes
+    dip_columns = ["dip_column", "dipdir_column"]
+    dip_validation_failed, dip_message = validate_dip_columns(
+        geodata=fault_data,
+        config=config,
+        dip_columns=dip_columns,
+        datatype_name="FAULT",
+        allow_nulls=True  # Dip fields can be empty
+    )
+    if dip_validation_failed:
+        logger.warning(dip_message)
     
     # dip estimates
     dip_estimate_column = config.get("dip_estimate_column")
@@ -430,55 +358,20 @@ def check_fold_fields_validity(mapdata) -> Tuple[bool, str]:
     if failed:
         return (failed, message)
     
-    # Check "structtype_column" if it exists
-    if "structtype_column" in config:
-        structtype_column = config["structtype_column"]
-
-        # Ensure the column exists in the data
-        if structtype_column not in folds.columns:
-            logger.warning(
-                f"Datatype FOLD: '{structtype_column}' (config key: 'structtype_column') is missing from the fold data. Consider removing that key from the config"
-            )
-            return (True, f"Column '{structtype_column}' is missing from the fold data.")
-        else:
-            # Check if all entries in the column are strings
-            if not folds[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
-                logger.error(
-                    f"Datatype FOLD: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values. Please ensure all values in this column are strings."
-                )
-                return (True, f"Datatype FOLD: Column '{structtype_column}' (config key: 'structtype_column') contains non-string values.")
-
-            # Warn about empty or null cells
-            if folds[structtype_column].isnull().any() or folds[structtype_column].str.strip().eq("").any():
-                logger.warning(
-                    f"Datatype FOLD: Column '{structtype_column}' contains NaN, empty, or blank values. Processing might not work as expected."
-                )
-            
-            # Check if "fold_text" is defined and contained in the column
-            fold_text = config.get("fold_text", None)
-            if fold_text:
-                
-                # check if fold text is a string
-                if not isinstance(fold_text, str):
-                    logger.error("Datatype FOLD: 'fold_text' must be a string. Please ensure it is defined correctly in the config.")
-                    return (True, "Datatype FOLD: 'fold_text' must be a string.")
-                #check if it exists in the column strtype
-                if not folds[structtype_column].str.contains(fold_text, na=False).any():
-                    logger.error(f"Datatype FOLD: The 'fold_text' value '{fold_text}' is not found in column '{structtype_column}'. This may impact processing.")
-                    return (True, f"Datatype FOLD: The 'fold_text' value '{fold_text}' is not found in column '{structtype_column}'.")
-
-            # check synform_text
-            synform_text = config.get("synform_text", None)
-            if synform_text:
-                # Check if synform_text is a string
-                if not isinstance(synform_text, str):
-                    logger.error("Datatype FOLD: 'synform_text' must be a string. Please ensure it is defined correctly in the config.")
-                    return (True, "Datatype FOLD: 'synform_text' must be a string.")
-                # Check if it exists in the structtype_column
-                if not folds[structtype_column].str.contains(synform_text, na=False).any():
-                    logger.warning(
-                        f"Datatype FOLD: The 'synform_text' value '{synform_text}' is not found in column '{structtype_column}'. This may impact processing."
-                    )
+    ## check structtype column if it exists
+    text_keys = {
+        "fold_text": "fold_text",
+        "synform_text": "synform_text"
+    }
+    structtype_validation_failed, structtype_message = validate_structtype_column(
+        geodata=folds,
+        config=config,
+        datatype_name="FOLD",
+        required=True,  # Assuming structtype_column is required in FOLD
+        text_keys=text_keys
+    )
+    if structtype_validation_failed:
+        return (structtype_validation_failed, structtype_message)
                         
     # check description column
     description_column = config.get("description_column", None)
@@ -612,18 +505,7 @@ def validate_geometry(
     expected_geom_types: List[type],
     datatype_name: str
 ) -> Tuple[bool, str]:
-    """
-    Validates the geometry column of a GeoDataFrame.
 
-    Parameters:
-        geodata (gpd.GeoDataFrame): The GeoDataFrame to validate.
-        expected_geom_types (List[type]): A list of expected Shapely geometry types.
-        datatype_name (str): A string representing the datatype being validated (e.g., "GEOLOGY").
-
-    Returns:
-        Tuple[bool, str]: A tuple where the first element is a boolean indicating if validation failed,
-                          and the second element is an error message if failed.
-    """
     # 1. Check if all geometries are valid
     if not geodata.geometry.is_valid.all():
         logger.error(f"Invalid geometries found in datatype {datatype_name}. Please fix them before proceeding.")
@@ -704,8 +586,7 @@ def validate_id_column(
 
     return (False, "")
 
-from beartype.typing import List, Type, Tuple, Union
-
+@beartype.beartype
 def validate_required_columns(
     geodata: geopandas.GeoDataFrame,
     config: dict,
@@ -714,23 +595,7 @@ def validate_required_columns(
     check_blank: bool = False,
     datatype_name: str = "UNKNOWN"
 ) -> Tuple[bool, str]:
-    """
-    Validate required columns in a GeoDataFrame.
 
-    This function checks whether required columns exist, have the expected data types,
-    and contain no null or (optionally) blank values.
-
-    Args:
-        geodata (geopandas.GeoDataFrame): The GeoDataFrame to validate.
-        config (dict): Configuration dictionary mapping config keys to column names.
-        required_columns (List[str]): List of config keys for required columns.
-        expected_type (Type or Tuple[Type, ...]): Expected data type(s) for the columns.
-        check_blank (bool, optional): Whether to check for blank (empty) strings. Defaults to False.
-        datatype_name (str, optional): Name of the datatype being validated (for logging). Defaults to "UNKNOWN".
-
-    Returns:
-        Tuple[bool, str]: (True, error_message) if validation fails, else (False, "").
-    """
     for config_key in required_columns:
         column_name = config.get(config_key)
         
@@ -779,4 +644,239 @@ def validate_required_columns(
     
     # If all required columns pass validation
     logger.info(f"Datatype {datatype_name.upper()}: All required columns validated successfully.")
+    return (False, "")
+
+
+
+def validate_optional_columns(
+    geodata: geopandas.GeoDataFrame,
+    config: Dict[str, str],
+    optional_columns: List[str],
+    expected_type: Union[Type, Tuple[Type, ...]],
+    check_blank: bool = False,
+    datatype_name: str = "UNKNOWN"
+) -> List[str]:
+
+    warnings = []
+
+    for config_key in optional_columns:
+        column_name = config.get(config_key)
+
+        if not column_name:
+            warning_msg = (
+                f"Configuration key '{config_key}' is missing for datatype '{datatype_name}'. "
+                f"Optional column validation for this key is skipped."
+            )
+            logger.warning(warning_msg)
+            warnings.append(warning_msg)
+            continue  
+
+        if column_name in geodata.columns:
+            # Type Check
+            if not geodata[column_name].apply(lambda x: isinstance(x, expected_type) or pandas.isnull(x)).all():
+                warning_msg = (
+                    f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
+                    f"(config key: '{config_key}') contains values that are not of type "
+                    f"{expected_type if isinstance(expected_type, type) else expected_type}. "
+                    "Map2loop processing might not work as expected."
+                )
+                logger.warning(warning_msg)
+                warnings.append(warning_msg)
+
+            # Blank String Check (if applicable)
+            if check_blank and issubclass(expected_type, str):
+                if geodata[column_name].str.strip().eq("").any():
+                    warning_msg = (
+                        f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
+                        f"(config key: '{config_key}') contains blank (empty) string values. "
+                        "Map2loop processing might not work as expected."
+                    )
+                    logger.warning(warning_msg)
+                    warnings.append(warning_msg)
+
+            # Null Value Check
+            if geodata[column_name].isnull().any():
+                warning_msg = (
+                    f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
+                    f"(config key: '{config_key}') contains NaN or null values. "
+                    "Map2loop processing might not work as expected."
+                )
+                logger.warning(warning_msg)
+                warnings.append(warning_msg)
+                
+        # else:
+        #     warning_msg = (
+        #         f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
+        #         f"(config key: '{config_key}') is missing from the data. "
+        #     )
+        ####### this might be taking it a bit too far
+        
+            # logger.info(warning_msg)
+            # warnings.append(warning_msg)
+
+    return warnings
+
+
+@beartype.beartype
+def validate_dip_columns(
+    geodata: geopandas.GeoDataFrame,
+    config: Dict[str, str],
+    dip_columns: List[str],
+    datatype_name: str = "UNKNOWN",
+    allow_nulls: bool = False
+) -> Tuple[bool, str]:
+
+    validation_failed = False
+    messages = []
+    
+    # Define fixed ranges
+    fixed_ranges = {
+        "dip_column": (0, 90),
+        "dipdir_column": (0, 360)
+    }
+    
+    for key in dip_columns:
+        column_name = config.get(key)
+        if not column_name and datatype_name == "STRUCTURE": # noly mandatory for structure, not faults!
+            warning_msg = (
+                f"Configuration key '{key}' is missing for datatype '{datatype_name}'. "
+                f"Dip column validation for this key is skipped."
+            )
+            logger.warning(warning_msg)
+            messages.append(warning_msg)
+            validation_failed = True
+            continue
+
+        if column_name in geodata.columns:
+            # Coerce to numeric
+            geodata[column_name] = pandas.to_numeric(geodata[column_name], errors='coerce')
+
+            # Check for non-numeric or NaN values
+            if geodata[column_name].isnull().any():
+                if not allow_nulls:
+                    warning_msg = (
+                        f"Datatype {datatype_name.upper()}: Column '{column_name}' "
+                        f"(config key: '{key}') contains non-numeric or NaN values."
+                    )
+                    logger.warning(warning_msg)
+                    messages.append(warning_msg)
+                    validation_failed = True
+
+            # Check if all values are numeric
+            if not geodata[column_name].apply(lambda x: isinstance(x, (int, float)) or pandas.isnull(x)).all():
+                warning_msg = (
+                    f"Datatype {datatype_name.upper()}: Column '{column_name}' "
+                    f"(config key: '{key}') must contain only numeric values."
+                )
+                logger.warning(warning_msg)
+                messages.append(warning_msg)
+                validation_failed = True
+
+            # Range validation
+            min_val, max_val = fixed_ranges.get(key, (None, None))
+            if min_val is not None and max_val is not None:
+                invalid_values = ~geodata[column_name].between(min_val, max_val, inclusive='both')
+                if invalid_values.any():
+                    warning_msg = (
+                        f"Datatype {datatype_name.upper()}: Column '{column_name}' "
+                        f"(config key: '{key}') contains values outside the range [{min_val}, {max_val}]. "
+                        "Is this intentional?"
+                    )
+                    logger.warning(warning_msg)
+                    messages.append(warning_msg)
+
+    summary_message = "\n".join(messages)
+    return (validation_failed, summary_message)
+
+
+@beartype.beartype
+def validate_structtype_column(
+    geodata: geopandas.GeoDataFrame,
+    config: Dict[str, str],
+    datatype_name: str,
+    required: bool = True,
+    text_keys: Optional[Dict[str, str]] = None
+) -> Tuple[bool, str]:
+
+    structtype_key = "structtype_column"
+    structtype_column = config.get(structtype_key)
+
+    if not structtype_column:
+        if required:
+            error_msg = (
+                f"Configuration key '{structtype_key}' is missing for datatype '{datatype_name}'. "
+                f"Validation for 'structtype_column' is skipped."
+            )
+            logger.warning(error_msg)
+            return (True, error_msg)
+        else:
+            warning_msg = (
+                f"Configuration key '{structtype_key}' is missing for datatype '{datatype_name}'. "
+                f"Optional 'structtype_column' validation is skipped."
+            )
+            logger.warning(warning_msg)
+            return (False, "")
+    
+    if structtype_column not in geodata.columns:
+        if required:
+            error_msg = (
+                f"Datatype {datatype_name.upper()}: '{structtype_column}' (config key: '{structtype_key}') "
+                f"is missing from the data. Consider removing that key from the config."
+            )
+            logger.error(error_msg)
+            return (True, error_msg)
+        else:
+            warning_msg = (
+                f"Datatype {datatype_name.upper()}: '{structtype_column}' (config key: '{structtype_key}') "
+                f"is missing from the data. Consider removing that key from the config."
+            )
+            logger.warning(warning_msg)
+            return (False, "")
+    
+    # Check if all entries are strings or nulls
+    if not geodata[structtype_column].apply(lambda x: isinstance(x, str) or pandas.isnull(x)).all():
+        error_msg = (
+            f"Datatype {datatype_name.upper()}: Column '{structtype_column}' "
+            f"(config key: '{structtype_key}') contains non-string values. "
+            "Please ensure all values in this column are strings."
+        )
+        logger.error(error_msg)
+        return (True, error_msg)
+    
+    # Warn about empty or null cells
+    if geodata[structtype_column].isnull().any() or geodata[structtype_column].str.strip().eq("").any():
+        warning_msg = (
+            f"Datatype {datatype_name.upper()}: Column '{structtype_column}' contains NaN, empty, or blank values. "
+            "Processing might not work as expected."
+        )
+        logger.warning(warning_msg)
+    
+    # Check for specific text keys
+    if text_keys:
+        for text_key, config_key in text_keys.items():
+            text_value = config.get(config_key, None)
+            if text_value:
+                if not isinstance(text_value, str):
+                    error_msg = (
+                        f"Datatype {datatype_name.upper()}: '{config_key}' must be a string. "
+                        "Please ensure it is defined correctly in the config."
+                    )
+                    logger.error(error_msg)
+                    return (True, error_msg)
+                
+                if not geodata[structtype_column].str.contains(text_value, na=False).any():
+                    if text_key == "synform_text":
+                        warning_msg = (
+                            f"Datatype {datatype_name.upper()}: The '{text_key}' value '{text_value}' is not found in column '{structtype_column}'. "
+                            "This may impact processing."
+                        )
+                        logger.warning(warning_msg)
+                    else:
+                        error_msg = (
+                            f"Datatype {datatype_name.upper()}: The '{text_key}' value '{text_value}' is not found in column '{structtype_column}'. "
+                            "Project might end up with no faults."
+                        )
+                        logger.error(error_msg)
+                        return (True, error_msg)
+    
     return (False, "")

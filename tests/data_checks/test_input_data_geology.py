@@ -137,7 +137,7 @@ class MockConfig:
                 "ID": [1, 1],  # Duplicate ID
             },
             True,
-            "Datatype GEOLOGY: Duplicate values found in column 'ID' (config key: 'objectid_column').",
+            "Datatype GEOLOGY: Column 'ID' (config key: 'objectid_column') contains duplicate values.",
         ),
         # nan in id
         (
@@ -158,7 +158,7 @@ class MockConfig:
                 "ID": [1, None],  
             },
             True,
-            "Datatype GEOLOGY: Column 'ID' (config key: 'objectid_column') contains NaN or null values.",
+            "Datatype GEOLOGY: Column 'ID' (config key: 'objectid_column') contains non-numeric or NaN values. Please rectify the values, or remove this key from the config dictionary to let map2loop assign IDs.",
         ),
         # nan in unit name
         (

@@ -116,7 +116,7 @@ class MockConfig:
                 "ID": [1, 1]  # Duplicate ID
             },
             True,
-            "Datatype STRUCTURE: ID column 'ID' (config key: 'objectid_column') contains duplicate values.",
+            "Datatype STRUCTURE: Column 'ID' (config key: 'objectid_column') contains duplicate values.",
         ),
     ],
 )

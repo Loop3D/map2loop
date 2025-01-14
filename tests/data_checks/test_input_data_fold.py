@@ -80,7 +80,7 @@ from map2loop.data_checks import check_fold_fields_validity
             },
             {"structtype_column": "FEATURE", "fold_text": "fold", "objectid_column": "ID", "description_column": "description"},
             True,
-            "Datatype FOLD: ID column 'ID' contains duplicate values."
+            "Datatype FOLD: Column 'ID' (config key: 'objectid_column') contains duplicate values."
         ),
     ],
     ids=[

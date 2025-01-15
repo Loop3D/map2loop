@@ -730,7 +730,7 @@ class MapData:
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
             if config["orientation_type"] == "strike":
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION].apply(
                     lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
                 )
             else:

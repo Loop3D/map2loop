@@ -737,7 +737,7 @@ def validate_dip_columns(
     
     for key in dip_columns:
         column_name = config.get(key)
-        if not column_name and datatype_name == "STRUCTURE": # noly mandatory for structure, not faults!
+        if not column_name and datatype_name == "STRUCTURE": # only mandatory for structure, not faults!
             warning_msg = (
                 f"Configuration key '{key}' is missing for datatype '{datatype_name}'. "
                 f"Dip column validation for this key is skipped."

@@ -567,7 +567,7 @@ class MapData:
 
         if filename.lower() == "aus" or filename.lower() == "au":
             logger.info('Using Geoscience Australia DEM')
-            url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
+            url = "https://services.ga.gov.au/gis/services/Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
             coverage = wcs.getCoverage(

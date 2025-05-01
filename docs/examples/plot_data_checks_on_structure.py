@@ -1,6 +1,5 @@
 # %%
 import geopandas as gpd
-import pandas as pd
 from map2loop.mapdata import MapData
 from map2loop import data_checks
 import shapely.geometry

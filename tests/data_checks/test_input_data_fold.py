@@ -36,7 +36,7 @@ from map2loop.data_checks import check_fold_fields_validity
             },
             {"structtype_column": "FEATURE", "fold_text": "fold", "objectid_column": "ID", "description_column": "description"},
             True,
-            "Invalid geometries found in datatype FOLD"
+            "Invalid geometry types found in datatype FOLD. All geometries must be LineString, MultiLineString."
         ),
         # Non-string FEATURE column
         (

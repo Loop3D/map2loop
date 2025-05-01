@@ -121,6 +121,4 @@ def test_check_structure_fields_validity(structure_data, expected_validity, expe
     # Test the check_structure_fields_validity function
     validity_check, message = check_structure_fields_validity(map_data)
     assert validity_check == expected_validity
-    print(expected_message)
-    print(message)
     assert message == expected_message

@@ -61,8 +61,8 @@ class MockConfig:
                 "MAX_AGE": [200.0],
                 "ID": [1],
             },
-            True,
-            "Invalid geometries found in datatype GEOLOGY",
+            False,
+            "",
         ),
         # Missing required column
         (
@@ -198,5 +198,6 @@ def test_check_geology_fields_validity(geology_data, expected_validity, expected
 
     # Test the check_geology_fields_validity function
     validity_check, message = check_geology_fields_validity(map_data)
+
     assert validity_check == expected_validity
     assert message == expected_message

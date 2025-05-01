@@ -505,7 +505,7 @@ def validate_geometry(
     expected_geom_types: List[type],
     datatype_name: str
 ) -> Tuple[bool, str]:
-
+    geodata.geometry = geodata.geometry.make_valid()
     # 1. Check if all geometries are valid
     if not geodata.geometry.is_valid.all():
         logger.error(f"Invalid geometries found in datatype {datatype_name}. Please fix them before proceeding.")

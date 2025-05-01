@@ -710,7 +710,6 @@ class MapData:
         elif datatype == Datatype.FAULT:
             validity_check, message = check_fault_fields_validity(mapdata = self)
             if validity_check:
-                logger.error(f"Datatype FAULT - data validation failed: {message}")
                 raise ValueError(f"Datatype FAULT - data validation failed: {message}")
             func = self.parse_fault_map
         

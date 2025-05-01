@@ -1,6 +1,5 @@
 # %%
 import geopandas as gpd
-import pandas as pd
 import shapely.geometry
 from map2loop import data_checks
 
@@ -167,7 +166,6 @@ validity_check, message = data_checks.check_geology_fields_validity(map_data)
 print(f"Validity Check: {validity_check}, Message: {message}")
 
 # %%
-import numpy as np
 
 geology_data = {
     "geometry": [shapely.geometry.Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
@@ -200,7 +198,6 @@ validity_check, message = data_checks.check_geology_fields_validity(map_data)
 print(f"Validity Check: {validity_check}, Message: {message}")
 
 # %%
-import numpy as np
 
 geology_data = {
     "geometry": [shapely.geometry.Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
@@ -237,7 +234,6 @@ print(f"Validity Check: {validity_check}, Message: {message}")
 message
 
 # %%
-import numpy as np
 
 geology_data = {
     "geometry": [
@@ -273,7 +269,6 @@ validity_check, message = data_checks.check_geology_fields_validity(map_data)
 print(f"Validity Check: {validity_check}, Message: {message}")
 
 # %%
-import numpy as np
 
 geology_data = {
     "geometry": [
@@ -309,7 +304,6 @@ validity_check, message = data_checks.check_geology_fields_validity(map_data)
 print(f"Validity Check: {validity_check}, Message: {message}")
 
 # %%
-import numpy as np
 
 geology_data = {
     "geometry": [

@@ -19,21 +19,19 @@ class MockConfig:
             "objectid_column": "ID",
         }
 
+
 @pytest.mark.parametrize(
     "structure_data, expected_validity, expected_message",
     [
         # Valid data
         (
             {
-                "geometry": [
-                    shapely.geometry.Point(0, 0),
-                    shapely.geometry.Point(1, 1)
-                ],
+                "geometry": [shapely.geometry.Point(0, 0), shapely.geometry.Point(1, 1)],
                 "DIPDIR": [45.0, 135.0],
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 2]
+                "ID": [1, 2],
             },
             False,
             "",
@@ -43,29 +41,28 @@ class MockConfig:
             {
                 "geometry": [
                     shapely.geometry.Point(0, 0),
-                    shapely.geometry.Polygon([(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)])  # Invalid geometry
+                    shapely.geometry.Polygon(
+                        [(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)]
+                    ),  # Invalid geometry
                 ],
                 "DIPDIR": [45.0, 135.0],
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 2]
+                "ID": [1, 2],
             },
             True,
-            "Invalid geometries found in datatype STRUCTURE",
+            "Invalid geometry types found in datatype STRUCTURE. All geometries must be Point, MultiPoint.",
         ),
         # Missing required column
         (
             {
-                "geometry": [
-                    shapely.geometry.Point(0, 0),
-                    shapely.geometry.Point(1, 1)
-                ],
+                "geometry": [shapely.geometry.Point(0, 0), shapely.geometry.Point(1, 1)],
                 # "DIPDIR": [45.0, 135.0],  # Missing required column
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 2]
+                "ID": [1, 2],
             },
             True,
             "Datatype STRUCTURE: Required column with config key 'dipdir_column' (column: 'DIPDIR')  is missing from the data.",
@@ -73,15 +70,12 @@ class MockConfig:
         # Non-numeric value in numeric column
         (
             {
-                "geometry": [
-                    shapely.geometry.Point(0, 0),
-                    shapely.geometry.Point(1, 1)
-                ],
+                "geometry": [shapely.geometry.Point(0, 0), shapely.geometry.Point(1, 1)],
                 "DIPDIR": ["A", "B"],  # Non-numeric value
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 2]
+                "ID": [1, 2],
             },
             True,
             "Datatype STRUCTURE: Column 'dipdir_column' (column: 'DIPDIR') must contain only numeric values.",
@@ -89,15 +83,12 @@ class MockConfig:
         # NaN or blank value in required column
         (
             {
-                "geometry": [
-                    shapely.geometry.Point(0, 0),
-                    shapely.geometry.Point(1, 1)
-                ],
+                "geometry": [shapely.geometry.Point(0, 0), shapely.geometry.Point(1, 1)],
                 "DIPDIR": [None, 3],  # NaN value
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 2]
+                "ID": [1, 2],
             },
             True,
             "Datatype STRUCTURE: Column 'dipdir_column' (column: 'DIPDIR')  contains null values. Please ensure all values are present.",
@@ -105,15 +96,12 @@ class MockConfig:
         # Duplicate ID column
         (
             {
-                "geometry": [
-                    shapely.geometry.Point(0, 0),
-                    shapely.geometry.Point(1, 1)
-                ],
+                "geometry": [shapely.geometry.Point(0, 0), shapely.geometry.Point(1, 1)],
                 "DIPDIR": [45.0, 135.0],
                 "DIP": [30.0, 45.0],
                 "DESCRIPTION": ["Description1", "Description2"],
                 "OVERTURNED": ["Yes", "No"],
-                "ID": [1, 1]  # Duplicate ID
+                "ID": [1, 1],  # Duplicate ID
             },
             True,
             "Datatype STRUCTURE: Column 'ID' (config key: 'objectid_column') contains duplicate values.",
@@ -133,4 +121,6 @@ def test_check_structure_fields_validity(structure_data, expected_validity, expe
     # Test the check_structure_fields_validity function
     validity_check, message = check_structure_fields_validity(map_data)
     assert validity_check == expected_validity
+    print(expected_message)
+    print(message)
     assert message == expected_message

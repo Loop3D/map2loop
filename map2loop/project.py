@@ -1012,7 +1012,7 @@ class Project(object):
         gdf.plot(ax=base, marker="o", color="red", markersize=5)
 
     @beartype.beartype
-    def save_mapdata_to_files(self, save_path: str = ".", extension: str = ".shp.zip"):
+    def save_mapdata_to_files(self, save_path: Union[pathlib.Path,str], extension: str = ".shp.zip"):
         """
         Saves the map data frames to csv files
 
@@ -1022,8 +1022,10 @@ class Project(object):
             extension (str, optional):
                 An alternate extension to save the GeoDataFrame in. Defaults to ".csv".
         """
-        if not os.path.exists(save_path):
-            os.mkdir(save_path)
+        
+        save_path=pathlib.Path(save_path)
+        if not save_path.exists():
+            os.makedirs(save_path)
         self.map_data.save_all_map_data(save_path, extension)
 
     @beartype.beartype

@@ -317,7 +317,7 @@ class InterpolatedStructure(ThicknessCalculator):
         _dips = []
         _location_tracking = []
         
-        for i in reversed(range(1, len(stratigraphic_order) )):
+        for i in (range(1, len(stratigraphic_order) )):
             if (
                 stratigraphic_order[i] in basal_unit_list
                 and stratigraphic_order[i - 1] in basal_unit_list
@@ -397,7 +397,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
 
                     idx = thicknesses.index[
-                        thicknesses["name"] == stratigraphic_order[i + 1]
+                        thicknesses["name"] == stratigraphic_order[i]
                     ].tolist()[0]
                     thicknesses.loc[idx, "ThicknessMean"] = mean
                     thicknesses.loc[idx, "ThicknessMedian"] = median

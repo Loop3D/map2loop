@@ -1,7 +1,7 @@
-#internal imports
+# internal imports
 from .m2l_enums import Datatype
 
-#external imports
+# external imports
 import beartype as beartype
 from beartype.typing import Tuple, Optional, List, Dict, Type, Union
 import geopandas
@@ -498,7 +498,7 @@ def validate_config_dictionary(config_dict: dict) -> None:
     if mfl is not None and not isinstance(mfl, (int, float)):
         logger.error("minimum_fault_length must be a number.")
         raise ValueError(f"minimum_fault_length must be a number, instead got: {type(mfl)}")
-    
+
 @beartype.beartype
 def validate_geometry(
     geodata: geopandas.GeoDataFrame,
@@ -647,7 +647,6 @@ def validate_required_columns(
     return (False, "")
 
 
-
 def validate_optional_columns(
     geodata: geopandas.GeoDataFrame,
     config: Dict[str, str],
@@ -703,16 +702,15 @@ def validate_optional_columns(
                 )
                 logger.warning(warning_msg)
                 warnings.append(warning_msg)
-                
-        # else:
-        #     warning_msg = (
-        #         f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
-        #         f"(config key: '{config_key}') is missing from the data. "
-        #     )
-        ####### this might be taking it a bit too far
-        
-            # logger.info(warning_msg)
-            # warnings.append(warning_msg)
+
+        else:
+            info_msg = (
+                f"Datatype {datatype_name.upper()}: Optional column '{column_name}' "
+                f"(config key: '{config_key}') is missing from the data. "
+            )
+            ###### this might be taking it a bit too far
+
+            logger.info(info_msg)
 
     return warnings
 

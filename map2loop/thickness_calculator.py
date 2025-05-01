@@ -317,16 +317,16 @@ class InterpolatedStructure(ThicknessCalculator):
         _dips = []
         _location_tracking = []
         
-        for i in range(0, len(stratigraphic_order) - 1):
+        for i in reversed(range(1, len(stratigraphic_order) )):
             if (
                 stratigraphic_order[i] in basal_unit_list
-                and stratigraphic_order[i + 1] in basal_unit_list
+                and stratigraphic_order[i - 1] in basal_unit_list
             ):
                 basal_contact = contacts.loc[
-                    contacts["basal_unit"] == stratigraphic_order[i]
+                    contacts["basal_unit"] == stratigraphic_order[i-1]
                 ].copy()
                 top_contact = basal_contacts.loc[
-                    basal_contacts["basal_unit"] == stratigraphic_order[i + 1]
+                    basal_contacts["basal_unit"] == stratigraphic_order[i]
                 ].copy()
                 top_contact_geometry = [
                     shapely.geometry.shape(geom.__geo_interface__) for geom in top_contact.geometry
@@ -405,7 +405,7 @@ class InterpolatedStructure(ThicknessCalculator):
 
             else:
                 logger.warning(
-                    f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
+                    f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i - 1]}\n"
                 )
         
         # Combine all location_tracking DataFrames into a single DataFrame

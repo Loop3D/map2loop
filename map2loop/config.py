@@ -100,11 +100,6 @@ class Config:
         Args:
             dictionary (dict): The dictionary to update from
         """
-        # make sure dictionary doesn't contain legacy keys
-        self.check_for_legacy_keys(dictionary)
-        
-        # make sure it has the minimum requirements
-        self.validate_config_dictionary(dictionary)
         
         if "structure" in dictionary:
             self.structure_config.update(dictionary["structure"])
@@ -215,58 +210,3 @@ class Config:
                 err_string += "Please check the file exists and is accessible then\n"
             err_string += "Check the contents for mismatched quotes or brackets!"
             raise Exception(err_string)
-
-    @beartype.beartype
-    def validate_config_dictionary(self, config_dict: dict) -> None:
-        """
-        Validate the structure and keys of the configuration dictionary.
-
-        Args:
-            config_dict (dict): The config dictionary to validate.
-
-        Raises:
-            ValueError: If the dictionary does not meet the minimum requirements for ma2p2loop.
-        """    
-        required_keys = {
-            "structure": {"dipdir_column", "dip_column"},
-            "geology": {"unitname_column", "alt_unitname_column"},
-        }
-
-        for section, keys in required_keys.items():
-            if section not in config_dict:
-                logger.error(f"Missing required section '{section}' in config dictionary.")
-                raise ValueError(f"Missing required section '{section}' in config dictionary.")
-            
-            for key in keys:
-                if key not in config_dict[section]:
-                    logger.error(
-                        f"Missing required key '{key}' for '{section}' section of the config dictionary."
-                    )
-                    raise ValueError(
-                        f"Missing required key '{key}' for '{section}' section of the config dictionary."
-                    )
-
-    @beartype.beartype
-    def check_for_legacy_keys(self, config_dict: dict) -> None:
-
-        legacy_keys = {
-            "otype", "dd", "d", "sf", "bedding", "bo", "btype", "gi", "c", "u",
-            "g", "g2", "ds", "min", "max", "r1", "r2", "sill", "intrusive", "volcanic",
-            "f", "fdipnull", "fdipdip_flag", "fdipdir", "fdip", "fdipest",
-            "fdipest_vals", "n", "ff", "t", "syn"
-        }
-
-        # Recursively search for keys in the dictionary
-        def check_keys(d: dict, parent_key=""):
-            for key, value in d.items():
-                if key in legacy_keys:
-                    logger.error(
-                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
-                    )
-                    raise ValueError(
-                        f"Legacy key found in config - '{key}' at '{parent_key + key}'. Please use the new config format. Use map2loop.utils.update_from_legacy_file to convert between the formats if needed"
-                    )
-                if isinstance(value, dict):
-                    check_keys(value, parent_key=f"{parent_key}{key}.")
-        
-        check_keys(config_dict)

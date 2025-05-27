@@ -7,6 +7,7 @@ from beartype.typing import Union, Optional, Dict
 import pandas
 import re
 import json
+from osgeo import gdal
 
 from .logging import getLogger
 logger = getLogger(__name__)
@@ -528,3 +529,61 @@ def update_from_legacy_file(
             json.dump(parsed_data, f, indent=4)
     
     return file_map
+
+@beartype.beartype
+def value_from_raster(inv_geotransform, data, x: float, y: float):
+    """
+    Get the value from a raster dataset at the specified point
+
+    Args:
+        inv_geotransform (gdal.GeoTransform):
+            The inverse of the data's geotransform
+        data (numpy.array):
+            The raster data
+        x (float):
+            The easting coordinate of the value
+        y (float):
+            The northing coordinate of the value
+
+    Returns:
+        float or int: The value at the point specified
+    """
+    px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
+    py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
+    # Clamp values to the edges of raster if past boundary, similiar to GL_CLIP
+    px = max(px, 0)
+    px = min(px, data.shape[0] - 1)
+    py = max(py, 0)
+    py = min(py, data.shape[1] - 1)
+    return data[px][py]
+
+@beartype.beartype
+def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
+    """
+    Add a 'Z' column to a dataframe with the heights from the 'X' and 'Y' coordinates
+
+    Args:
+        dtm_data (gdal.Dataset):
+            Dtm data from raster map
+        df (pandas.DataFrame):
+            The original dataframe with 'X' and 'Y' columns
+
+    Returns:
+        pandas.DataFrame: The modified dataframe
+    """
+    if len(df) <= 0:
+        df["Z"] = []
+        return df
+    
+    if dtm_data is None:
+        logger.warning("Cannot get value from data as data is not loaded")
+        return None
+
+    inv_geotransform = gdal.InvGeoTransform(dtm_data.GetGeoTransform())
+    data_array = numpy.array(dtm_data.GetRasterBand(1).ReadAsArray().T)
+
+    df["Z"] = df.apply(
+        lambda row: value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),
+        axis=1,
+    )
+    return df

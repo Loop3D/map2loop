@@ -5,6 +5,7 @@ from .utils import (
     calculate_endpoints,
     multiline_to_line,
     find_segment_strike_from_pt,
+    set_z_values_from_raster_df
 )
 from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
@@ -272,7 +273,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = contacts.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the contacts
         dtm_data = map_data.get_map_data(Datatype.DTM)
-        contacts = map_data.get_value_from_raster_df(dtm_data, contacts)
+        contacts = set_z_values_from_raster_df(dtm_data, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
             lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
@@ -301,7 +302,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations.set_crs(crs=basal_contacts.crs)
         # get the elevation Z of the interpolated points
         dtm_data = map_data.get_map_data(Datatype.DTM)
-        interpolated = map_data.get_value_from_raster_df(dtm_data, interpolated_orientations)
+        interpolated = set_z_values_from_raster_df(dtm_data, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
             lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1

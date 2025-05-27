@@ -1,6 +1,7 @@
 # internal imports
 from .m2l_enums import Datatype
 from .mapdata import MapData
+from .utils import set_z_values_from_raster_df
 
 # external imports
 from abc import ABC, abstractmethod
@@ -85,10 +86,9 @@ class SamplerDecimator(Sampler):
             pandas.DataFrame: the sampled data points
         """
         data = spatial_data.copy()
-        map_data = MapData()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
-        data["Z"] = map_data.get_value_from_raster_df(dtm_data, data)["Z"]
+        data["Z"] = set_z_values_from_raster_df(dtm_data, data)["Z"]
         data["layerID"] = geopandas.sjoin(
             data, geology_data, how='left'
         )['index_right']

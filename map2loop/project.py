@@ -1,6 +1,6 @@
 # internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
-from .utils import hex_to_rgb
+from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
@@ -536,7 +536,7 @@ class Project(object):
             self.map_data.basal_contacts
         )
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
-        self.map_data.get_value_from_raster_df(dtm_data, self.map_data.sampled_contacts)
+        set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -715,7 +715,7 @@ class Project(object):
                 self.map_data,
             )
             dtm_data = self.map_data.get_map_data(Datatype.DTM)
-            self.map_data.get_value_from_raster_df(dtm_data, self.fault_orientations)
+            set_z_values_from_raster_df(dtm_data, self.fault_orientations)
         else:
             logger.warning(
                 "No fault orientation data found, skipping fault orientation calculation"
@@ -741,7 +741,7 @@ class Project(object):
         Use the fault shapefile to make a summary of each fault by name
         """
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
-        self.map_data.get_value_from_raster_df(dtm_data, self.fault_samples)
+        set_z_values_from_raster_df(dtm_data, self.fault_samples)
 
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(

@@ -38,7 +38,7 @@ class Sampler(ABC):
     @beartype.beartype
     @abstractmethod
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
@@ -73,7 +73,7 @@ class SamplerDecimator(Sampler):
 
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the decimated points
@@ -85,11 +85,12 @@ class SamplerDecimator(Sampler):
             pandas.DataFrame: the sampled data points
         """
         data = spatial_data.copy()
+        map_data = MapData()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
-        data["Z"] = map_data.get_value_from_raster_df(Datatype.DTM, data)["Z"]
+        data["Z"] = map_data.get_value_from_raster_df(dtm_data, data)["Z"]
         data["layerID"] = geopandas.sjoin(
-            data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
+            data, geology_data, how='left'
         )['index_right']
         data.reset_index(drop=True, inplace=True)
 
@@ -118,7 +119,7 @@ class SamplerSpacing(Sampler):
 
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points

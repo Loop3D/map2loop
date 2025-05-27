@@ -1461,13 +1461,13 @@ class MapData:
         return data[px][py]
 
     @beartype.beartype
-    def get_value_from_raster_df(self, datatype: Datatype, df: pandas.DataFrame):
+    def get_value_from_raster_df(self, dtm_data: gdal.Dataset, df: pandas.DataFrame):
         """
         Add a 'Z' column to a dataframe with the heights from the 'X' and 'Y' coordinates
 
         Args:
-            datatype (Datatype):
-                The datatype of the raster map to retrieve from
+            dtm_data (gdal.Dataset):
+                Dtm data from raster map
             df (pandas.DataFrame):
                 The original dataframe with 'X' and 'Y' columns
 
@@ -1477,13 +1477,13 @@ class MapData:
         if len(df) <= 0:
             df["Z"] = []
             return df
-        data = self.get_map_data(datatype)
-        if data is None:
+        
+        if dtm_data is None:
             logger.warning("Cannot get value from data as data is not loaded")
             return None
 
-        inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
-        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray().T)
+        inv_geotransform = gdal.InvGeoTransform(dtm_data.GetGeoTransform())
+        data_array = numpy.array(dtm_data.GetRasterBand(1).ReadAsArray().T)
 
         df["Z"] = df.apply(
             lambda row: self.__value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),

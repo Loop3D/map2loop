@@ -506,23 +506,19 @@ class Project(object):
         logger.info(
             f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
         )
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
-        )
-        logger.info(
-            f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}"
-        )
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
-        )
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+
+        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
+        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
+
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE), dtm_data, geology_data)
         logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT), self.map_data
-        )
+
+        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
         logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD), self.map_data
-        )
+        
+        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
 
     def extract_geology_contacts(self):
         """
@@ -532,9 +528,7 @@ class Project(object):
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.basal_contacts
-        )
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 

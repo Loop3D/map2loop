@@ -1,6 +1,4 @@
 # internal imports
-from .m2l_enums import Datatype
-from .mapdata import MapData
 from .utils import set_z_values_from_raster_df
 
 # external imports

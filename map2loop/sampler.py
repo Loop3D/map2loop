@@ -1,6 +1,7 @@
 # internal imports
 from .m2l_enums import Datatype
 from .mapdata import MapData
+from .utils import set_z_values_from_raster_df
 
 # external imports
 from abc import ABC, abstractmethod
@@ -10,6 +11,7 @@ import pandas
 import shapely
 import numpy
 from typing import Optional
+from osgeo import gdal
 
 
 class Sampler(ABC):
@@ -38,7 +40,7 @@ class Sampler(ABC):
     @beartype.beartype
     @abstractmethod
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
@@ -73,7 +75,7 @@ class SamplerDecimator(Sampler):
 
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the decimated points
@@ -87,10 +89,16 @@ class SamplerDecimator(Sampler):
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
-        data["Z"] = map_data.get_value_from_raster_df(Datatype.DTM, data)["Z"]
-        data["layerID"] = geopandas.sjoin(
-            data, map_data.get_map_data(Datatype.GEOLOGY), how='left'
-        )['index_right']
+        if dtm_data is not None:
+            data["Z"] = set_z_values_from_raster_df(dtm_data, data)["Z"]
+        else:
+            data["Z"] = None
+        if geology_data is not None:
+            data["layerID"] = geopandas.sjoin(
+                data, geology_data, how='left'
+            )['index_right']
+        else:
+            data["layerID"] = None
         data.reset_index(drop=True, inplace=True)
 
         return pandas.DataFrame(data[:: self.decimation].drop(columns="geometry"))
@@ -118,7 +126,7 @@ class SamplerSpacing(Sampler):
 
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, map_data: Optional[MapData] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points

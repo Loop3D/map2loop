@@ -6,7 +6,7 @@ name = 'map2loop'
 description = 'Generate 3D model data from 2D maps.'
 authors = [{name = 'Loop team'}]
 readme = 'README.md'
-requires-python = '>=3.8'
+requires-python = '>=3.8,<3.13'
 keywords = [ "earth sciences",
     "geology",
     "3-D modelling",

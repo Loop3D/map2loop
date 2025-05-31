@@ -46,7 +46,6 @@ jobs:
           miniforge-version: latest
           activate-environment: test-env
           use-mamba: true
-          environment-file: false
           auto-activate-base: false
 
       - name: Install dependencies

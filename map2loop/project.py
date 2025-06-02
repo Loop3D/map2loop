@@ -5,7 +5,7 @@ from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
-from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
+from .throw_calculator import calculate_throw, get_throw_calculator
 from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
 from .stratigraphic_column import StratigraphicColumn
@@ -140,7 +140,7 @@ class Project(object):
         self.bounding_box = bounding_box
         self.sorter = SorterUseHint()
         self.thickness_calculator = [InterpolatedStructure()]
-        self.throw_calculator = ThrowCalculatorAlpha()
+        self.throw_calculator = "alpha"
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
         self.map2model = Map2ModelWrapper(self.map_data)
@@ -372,7 +372,7 @@ class Project(object):
         return self.fault_orientation.label
 
     @beartype.beartype
-    def set_throw_calculator(self, throw_calculator: ThrowCalculator):
+    def set_throw_calculator(self, throw_calculator: str):
         """
         Set the throw calculator that estimates fault throw values for all faults
 
@@ -380,7 +380,8 @@ class Project(object):
             throw_calculator (ThrowCalculator):
                 The calculator to use. Must be of base class ThrowCalculator
         """
-        logger.info(f"Setting throw calculator to {throw_calculator.throw_calculator_label}")
+        get_throw_calculator(throw_calculator)
+        logger.info(f"Setting throw calculator to {throw_calculator}")
         self.throw_calculator = throw_calculator
 
     def get_throw_calculator(self):
@@ -390,7 +391,7 @@ class Project(object):
         Returns:
             str: The name of the throw calculator used
         """
-        return self.throw_calculator.throw_calculator_label
+        return self.throw_calculator
 
     def set_default_samplers(self):
         """
@@ -742,11 +743,11 @@ class Project(object):
         self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
 
         self.deformation_history.summarise_data(self.fault_samples)
-        self.deformation_history.faults = self.throw_calculator.compute(
+        self.deformation_history.faults = calculate_throw(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
             self.map_data.basal_contacts,
-            self.map_data,
+            throw_calculator_name=self.throw_calculator
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')
 

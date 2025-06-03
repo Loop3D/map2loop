@@ -14,7 +14,6 @@ from .logging import getLogger
 logger = getLogger(__name__)  
 
 # external imports
-from abc import ABC, abstractmethod
 import scipy.interpolate
 import beartype
 import numpy

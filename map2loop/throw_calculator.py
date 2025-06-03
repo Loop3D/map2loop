@@ -1,6 +1,5 @@
 import beartype
 import pandas
-import geopandas
 
 _THROW_CALCULATOR_REGISTRY = {}
 

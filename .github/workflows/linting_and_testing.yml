@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -25,25 +29,39 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
       - name: Install GDAL
         run: |
           sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
           sudo apt-get install -y libgdal-dev gdal-bin
 
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.12'
+          miniforge-version: latest
+          activate-environment: test-env
+          use-mamba: true
+          auto-activate-base: false
+
       - name: Install dependencies
+        shell: bash -l {0}
         run: |
-            conda update -n base -c defaults conda -y 
-            conda install -n base conda-libmamba-solver -c conda-forge -y
-            conda install -c conda-forge gdal -y
-            conda install -c conda-forge -c loop3d --file dependencies.txt -y
-            conda install pytest -y
+            mamba install python=3.12 -y
+            mamba install -c conda-forge gdal geopandas shapely networkx owslib beartype pytest scikit-learn -y
+            pip install map2model loopprojectfile==0.2.2
 
       - name: Install map2loop
+        shell: bash -l {0}
         run: |
             python -m pip install .
 
       - name: Run tests
+        shell: bash -l {0}
         run: |
-            pytest
-
+            python -c "import map2model" || echo "map2model not available, tests will use fallback mode"
+            pytest -v

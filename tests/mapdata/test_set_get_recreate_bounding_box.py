@@ -48,7 +48,7 @@ def test_bounding_box_polygon(md):
     expected_polygon = geopandas.GeoDataFrame(
         index=[0],
         crs=md.working_projection,
-        geometry=[shapely.Polygon(zip(lon_point_list, lat_point_list))],
+        geometry=[shapely.geometry.Polygon(zip(lon_point_list, lat_point_list))],
     )
 
     assert md.bounding_box_polygon.equals(

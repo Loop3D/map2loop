@@ -42,4 +42,4 @@ def load_hamersley_dtm():
         gdal.Dataset: The DTM data
     """
     path = files("map2loop._datasets.geodata_files.hamersley").joinpath("dtm_rp.tif")
-    return gdal.Open(path)
+    return gdal.Open(str(path))

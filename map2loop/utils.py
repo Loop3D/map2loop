@@ -130,15 +130,15 @@ def create_points(xy: Union[list, tuple, numpy.ndarray]) -> numpy.ndarray:
         where each coordinate contains two elements representing the x and y coordinates of a point.
 
     Returns:
-        shapely.points: A list of Point objects created from the input list of coordinates.
+        shapely.geometry.Points: A list of Point objects created from the input list of coordinates.
     """
-    points = shapely.points(xy)
+    points = shapely.geometry.Points(xy)
     return points
 
 
 @beartype.beartype
 def find_segment_strike_from_pt(
-    line: shapely.LineString, point: shapely.Point, measurement: pandas.Series
+    line: shapely.geometry.LineString, point: shapely.geometry.Point, measurement: pandas.Series
 ) -> float:
     """
     Finds the strike of a line segment (contact) closest to a given point (structural measurement).
@@ -154,7 +154,7 @@ def find_segment_strike_from_pt(
 
     lines = []
     for c1, c2 in zip(line.coords, line.coords[1:]):
-        lines.append(shapely.LineString([c1, c2]))
+        lines.append(shapely.geometry.LineString([c1, c2]))
     distances = [segment.distance(point) for segment in lines]
     nearest_line = lines[distances.index(min(distances))]
 
@@ -183,7 +183,7 @@ def find_segment_strike_from_pt(
 
 @beartype.beartype
 def calculate_endpoints(
-    start_point: shapely.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
+    start_point: shapely.geometry.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
 ) -> shapely.geometry.LineString:
     """
     Calculate the endpoints of a line segment given a start point, azimuth angle, distance, and bounding box.
@@ -195,7 +195,7 @@ def calculate_endpoints(
     bbox (dict): The bounding box coordinates (minx, miny, maxx, maxy).
 
     Returns:
-    shapely.LineString: A LineString object representing the line segment with endpoints clipped by the bounding box.
+    shapely.geometry.LineString: A LineString object representing the line segment with endpoints clipped by the bounding box.
     """
     bbox = numpy.array(bbox)[0]
     minx, miny, maxx, maxy = bbox[0], bbox[1], bbox[2], bbox[3]
@@ -216,7 +216,7 @@ def calculate_endpoints(
     dy_left = distance * math.sin(left_azimuth_rad)
     left_endpoint = (x + dx_left, y + dy_left)
 
-    line = shapely.LineString([left_endpoint, right_endpoint])
+    line = shapely.geometry.LineString([left_endpoint, right_endpoint])
 
     new_line = shapely.ops.clip_by_rect(line, minx, miny, maxx, maxy)
 
@@ -236,11 +236,11 @@ def multiline_to_line(
     Returns:
         LineString: The converted line geometry.
     """
-    if isinstance(geometry, shapely.LineString):
+    if isinstance(geometry, shapely.geometry.LineString):
         return geometry
     coords = [list(part.coords) for part in geometry.geoms]
-    flat_coords = [shapely.Point(*point) for segment in coords for point in segment]
-    return shapely.LineString(flat_coords)
+    flat_coords = [shapely.geometry.Point(*point) for segment in coords for point in segment]
+    return shapely.geometry.LineString(flat_coords)
 
 
 @beartype.beartype
@@ -280,7 +280,7 @@ def rebuild_sampled_basal_contacts(
 
         if len(unique_segments) == 1:
             # make a linestring with all the points in subset
-            line = shapely.LineString(subset.geometry)
+            line = shapely.geometry.LineString(subset.geometry)
             r.append(line)
 
         else:
@@ -289,7 +289,7 @@ def rebuild_sampled_basal_contacts(
             for featureId in unique_segments:
                 seg_subset = subset[subset['featureId'] == featureId]
                 if len(seg_subset) > 1:  # Ensure each segment has at least two points
-                    line_ = shapely.LineString(seg_subset.geometry.tolist())
+                    line_ = shapely.geometry.LineString(seg_subset.geometry.tolist())
                     lines.append(line_)
 
             # If multiple lines were created, combine them into a MultiLineString
@@ -439,7 +439,7 @@ def read_hjson_with_json(file_path: str) -> dict:
         raise FileNotFoundError(f"HJSON file not found: {file_path}") from e
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to decode preprocessed HJSON as JSON: {e}") from e
-    
+
 @beartype.beartype
 def update_from_legacy_file(
     filename: str,

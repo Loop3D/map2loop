@@ -130,9 +130,9 @@ def create_points(xy: Union[list, tuple, numpy.ndarray]) -> numpy.ndarray:
         where each coordinate contains two elements representing the x and y coordinates of a point.
 
     Returns:
-        shapely.geometry.Points: A list of Point objects created from the input list of coordinates.
+        shapely.geometry.Point: A list of Point objects created from the input list of coordinates.
     """
-    points = shapely.geometry.Points(xy)
+    points = shapely.points(xy)
     return points
 
 

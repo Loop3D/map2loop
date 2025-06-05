@@ -41,6 +41,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(vars.BUILD_OS)}}
         python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -51,6 +52,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+            conda info
             conda update -n base -c defaults conda -y 
             conda install -n base conda-libmamba-solver -c conda-forge -y
             conda install -c conda-forge gdal -y

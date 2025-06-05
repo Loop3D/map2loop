@@ -364,14 +364,18 @@ class InterpolatedStructure(ThicknessCalculator):
                         p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
-                        # find the indices of the points that are within 5% of the length of the shortest line
-                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
+                        # find the indices of the points that are within 10% of the length of the shortest line
+                        indices = shapely.dwithin(short_line, interp_points, line_length * 1)
                         # get the dip of the points that are within
-                        _dip = numpy.deg2rad(dip[indices])
-                        _dips.append(_dip)
-                        # calculate the true thickness t = L * sin(dip)
-                        thickness = line_length * numpy.sin(_dip)
-                        
+                        if all(numpy.isnan(dip[indices])):
+                            pass
+                        else:
+                            _dip = numpy.nanmean(dip[indices])
+                            _dip = numpy.deg2rad(_dip)
+                            _dips.append(_dip)
+                            # calculate the true thickness t = L * sin(dip)
+                            thickness = line_length * numpy.sin(_dip)
+                            
                         # add location tracking
                         location_tracking = pandas.DataFrame(
                             {
@@ -384,24 +388,33 @@ class InterpolatedStructure(ThicknessCalculator):
                         _location_tracking.append(location_tracking)
                         
                         # Average thickness along the shortest line
-                        if all(numpy.isnan(thickness)):
-                            pass
-                        else:
-                            _thickness.append(numpy.nanmean(thickness))
+                        _thickness.append(thickness)
 
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
-
-                    median = numpy.nanmedian(_thickness)
-                    mean = numpy.nanmean(_thickness)
-                    std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
-
-                    idx = thicknesses.index[
-                        thicknesses["name"] == stratigraphic_order[i]
+                    
+                    if all(numpy.isnan(_thickness)):
+                        logging.logger.warning(
+                    f"Cannot calculate thickness of {stratigraphic_order[i + 1]}. Near dip data not found. Assign NaN to thickness."
+                        )
+                        idx = thicknesses.index[
+                        thicknesses["name"] == stratigraphic_order[i + 1]
                     ].tolist()[0]
-                    thicknesses.loc[idx, "ThicknessMean"] = mean
-                    thicknesses.loc[idx, "ThicknessMedian"] = median
-                    thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
+                        thicknesses.loc[idx, "ThicknessMean"] = numpy.nan
+                        thicknesses.loc[idx, "ThicknessMedian"] = numpy.nan
+                        thicknesses.loc[idx, "ThicknessStdDev"] = numpy.nan
+                        
+                    else:
+                        median = numpy.nanmedian(_thickness)
+                        mean = numpy.nanmean(_thickness)
+                        std_dev = numpy.nanstd(_thickness, dtype=numpy.float64)
+
+                        idx = thicknesses.index[
+                            thicknesses["name"] == stratigraphic_order[i + 1]
+                        ].tolist()[0]
+                        thicknesses.loc[idx, "ThicknessMean"] = mean
+                        thicknesses.loc[idx, "ThicknessMedian"] = median
+                        thicknesses.loc[idx, "ThicknessStdDev"] = std_dev
 
             else:
                 logger.warning(

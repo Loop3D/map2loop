@@ -394,7 +394,7 @@ class InterpolatedStructure(ThicknessCalculator):
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)
                     
                     if all(numpy.isnan(_thickness)):
-                        logging.logger.warning(
+                        logger.warning(
                     f"Cannot calculate thickness of {stratigraphic_order[i + 1]}. Near dip data not found. Assign NaN to thickness."
                         )
                         idx = thicknesses.index[

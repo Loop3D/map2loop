@@ -567,7 +567,7 @@ class MapData:
 
         if filename.lower() == "aus" or filename.lower() == "au":
             logger.info('Using Geoscience Australia DEM')
-            url = "http://services.ga.gov.au/gis/services/DEM_SRTM_1Second_over_Bathymetry_Topography/MapServer/WCSServer?"
+            url = "https://services.ga.gov.au/gis/services/Bathymetry_Topography/MapServer/WCSServer?"
             wcs = WebCoverageService(url, version="1.0.0")
 
             coverage = wcs.getCoverage(
@@ -730,7 +730,7 @@ class MapData:
         # Parse dip direction and dip columns
         if config["dipdir_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
             if config["orientation_type"] == "strike":
-                fault_orientations["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                fault_orientations["DIPDIR"] = self.raw_data[Datatype.FAULT_ORIENTATION].apply(
                     lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
                 )
             else:
@@ -763,6 +763,14 @@ class MapData:
         else:
             fault_orientations["ID"] = numpy.arange(len(fault_orientations))
         self.data[Datatype.FAULT_ORIENTATION] = fault_orientations
+        
+        if config["featureid_column"] in self.raw_data[Datatype.FAULT_ORIENTATION]:
+            fault_orientations["featureId"] = self.raw_data[Datatype.FAULT_ORIENTATION][
+                config["featureid_column"]
+            ]
+        else:
+            fault_orientations["featureId"] = numpy.arange(len(fault_orientations))
+            
         return (False, "")
 
     @beartype.beartype

@@ -59,9 +59,9 @@ jobs:
 
       - name: Install map2loop
         run: |
-            python -m pip install .
+            conda run -n test python -m pip install .
 
       - name: Run tests
         run: |
-            pytest
+            conda run -n test  pytest
 

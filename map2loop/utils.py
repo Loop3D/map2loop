@@ -294,7 +294,7 @@ def rebuild_sampled_basal_contacts(
 
             # If multiple lines were created, combine them into a MultiLineString
             if lines:
-                line = shapely.MultiLineString(lines)
+                line = shapely.geometry.MultiLineString(lines)
                 r.append(line)
 
     sampled_basal_contacts = geopandas.GeoDataFrame(

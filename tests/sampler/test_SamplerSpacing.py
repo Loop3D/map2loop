@@ -20,7 +20,7 @@ def correct_geodata():
         'geometry': [
             shapely.geometry.LineString([(0, 0), (1, 1), (2, 2)]),
             shapely.geometry.Polygon([(0, 0), (1, 1), (1, 0), (0, 0)]),
-            shapely.MultiLineString(
+            shapely.geometry.MultiLineString(
                 [shapely.geometry.LineString([(0, 0), (1, 1)]), shapely.geometry.LineString([(2, 2), (3, 3)])]
             ),
         ],

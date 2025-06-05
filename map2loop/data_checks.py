@@ -41,7 +41,7 @@ def check_geology_fields_validity(mapdata) -> tuple[bool, str]:
     # 2. Validate geometry
     failed, message = validate_geometry(
         geodata=geology_data,
-        expected_geom_types=[shapely.Polygon, shapely.MultiPolygon],
+        expected_geom_types=[shapely.geometry.Polygon, shapely.geometry.MultiPolygon],
         datatype_name="GEOLOGY"
     )
     if failed:

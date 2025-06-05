@@ -18,10 +18,10 @@ def sampler_spacing():
 def correct_geodata():
     data = {
         'geometry': [
-            shapely.LineString([(0, 0), (1, 1), (2, 2)]),
-            shapely.Polygon([(0, 0), (1, 1), (1, 0), (0, 0)]),
-            shapely.MultiLineString(
-                [shapely.LineString([(0, 0), (1, 1)]), shapely.LineString([(2, 2), (3, 3)])]
+            shapely.geometry.LineString([(0, 0), (1, 1), (2, 2)]),
+            shapely.geometry.Polygon([(0, 0), (1, 1), (1, 0), (0, 0)]),
+            shapely.geometry.MultiLineString(
+                [shapely.geometry.LineString([(0, 0), (1, 1)]), shapely.geometry.LineString([(2, 2), (3, 3)])]
             ),
         ],
         'ID': ['1', '2', '3'],
@@ -31,7 +31,7 @@ def correct_geodata():
 
 @pytest.fixture
 def incorrect_geodata():
-    data = {'geometry': [shapely.Point(0, 0), "Not a geometry"], 'ID': ['1', '2']}
+    data = {'geometry': [shapely.geometry.Point(0, 0), "Not a geometry"], 'ID': ['1', '2']}
     return pandas.DataFrame(data)
 
 
@@ -54,7 +54,7 @@ def test_sample_function_incorrect_data(sampler_spacing, incorrect_geodata):
 def test_sample_function_target_less_than_or_equal_to_2():
     sampler_spacing = SamplerSpacing(spacing=1.0)
     data = {
-        'geometry': [shapely.LineString([(0, 0), (0, 1)]), shapely.LineString([(0, 0), (1, 0)])],
+        'geometry': [shapely.geometry.LineString([(0, 0), (0, 1)]), shapely.geometry.LineString([(0, 0), (1, 0)])],
         'ID': ['1', '2'],
     }
     gdf = geopandas.GeoDataFrame(data, geometry='geometry')

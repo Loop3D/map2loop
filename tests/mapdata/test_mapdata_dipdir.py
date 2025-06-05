@@ -28,7 +28,7 @@ def test_if_m2l_returns_all_sampled_structures_with_DIPDIR_lower_than_360():
 
     # create mock data
     data = {
-        'geometry': [shapely.Point(1, 1), shapely.Point(2, 2), shapely.Point(3, 3)],
+        'geometry': [shapely.geometry.Point(1, 1), shapely.geometry.Point(2, 2), shapely.geometry.Point(3, 3)],
         'DIPDIR': [45.0, 370.0, 420.0],
         'DIP': [30.0, 60.0, 50],
         'OVERTURNED': ["False", "True", "True"],

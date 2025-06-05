@@ -1,11 +1,11 @@
 numpy
 scipy
 geopandas
-shapely
+shapely>=2
 networkx
 owslib
-map2model
 loopprojectfile==0.2.2
 beartype
 pytest
 scikit-learn
+gdal

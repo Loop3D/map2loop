@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c conda-forge gdal -y
+            conda run -n test conda install -c conda-forge gdal python=${{ matrix.python-version }} -y
             conda run -n test conda install -c conda-forge -c loop3d --file dependencies.txt -y
             conda run -n test conda install pytest -y
 

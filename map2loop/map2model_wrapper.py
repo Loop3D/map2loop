@@ -2,14 +2,9 @@
 from .m2l_enums import VerboseLevel
 
 # external imports
-import map2model
-import pandas
-import numpy
 import geopandas as gpd
 import pandas as pd
 import numpy as np
-import os
-import re
 
 from .logging import getLogger
 

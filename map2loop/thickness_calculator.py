@@ -391,7 +391,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         _location_tracking.append(location_tracking)
                         
                         # Average thickness along the shortest line
-                            _thickness.append(thickness)
+                        _thickness.append(thickness)
 
                     # calculate the median thickness and standard deviation for the unit
                     _thickness = numpy.asarray(_thickness, dtype=numpy.float64)

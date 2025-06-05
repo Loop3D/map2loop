@@ -2,7 +2,6 @@
 from .m2l_enums import VerboseLevel
 
 # external imports
-import map2model
 import pandas
 import numpy
 import geopandas as gpd

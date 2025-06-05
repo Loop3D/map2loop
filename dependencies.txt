@@ -8,3 +8,4 @@ loopprojectfile==0.2.2
 beartype
 pytest
 scikit-learn
+gdal

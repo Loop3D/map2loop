@@ -1,7 +1,20 @@
 name: Linting and Testing
 
 on:
-    [push]
+  push:
+    branches:
+      - master
+    paths:
+      - '**.py'
+      - .github/workflows/linting_and_testing.yml
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.py'
+      - .github/workflows/linting_and_testing.yml
+  workflow_dispatch:
 
 jobs:
   linting:

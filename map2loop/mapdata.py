@@ -3,6 +3,7 @@ from .m2l_enums import Datatype, Datastate, VerboseLevel
 from .config import Config
 from .aus_state_urls import AustraliaStateUrls
 from .utils import generate_random_hex_colors, calculate_minimum_fault_length
+from .data_checks import check_geology_fields_validity, check_structure_fields_validity, check_fault_fields_validity, check_fold_fields_validity
 
 # external imports
 import geopandas
@@ -689,16 +690,40 @@ class MapData:
                 The datatype to check
         """
         func = None
+        #check and parse geology data
         if datatype == Datatype.GEOLOGY:
+            validity_check, message = check_geology_fields_validity(mapdata = self)
+            if validity_check:
+                logger.error(f"Datatype GEOLOGY - data validation failed: {message}")
+                raise ValueError(f"Datatype GEOLOGY - data validation failed: {message}")
             func = self.parse_geology_map
+            
+        #check and parse structure data
         elif datatype == Datatype.STRUCTURE:
+            validity_check, message = check_structure_fields_validity(mapdata = self)
+            if validity_check:
+                logger.error(f"Datatype STRUCTURE - data validation failed: {message}")
+                raise ValueError(f"Datatype STRUCTURE - data validation failed: {message}")
             func = self.parse_structure_map
+        
+        #check and parse fault data
         elif datatype == Datatype.FAULT:
+            validity_check, message = check_fault_fields_validity(mapdata = self)
+            if validity_check:
+                raise ValueError(f"Datatype FAULT - data validation failed: {message}")
             func = self.parse_fault_map
-        elif datatype == Datatype.FOLD:
-            func = self.parse_fold_map
+        
         elif datatype == Datatype.FAULT_ORIENTATION:
             func = self.parse_fault_orientations
+            
+        #check and parse fold data
+        elif datatype == Datatype.FOLD:
+            validity_check, message = check_fold_fields_validity(mapdata = self)
+            if validity_check:
+                logger.error(f"Datatype FOLD - data validation failed: {message}")
+                raise ValueError(f"Datatype FOLD - data validation failed: {message}")
+            func = self.parse_fold_map
+
         if func:
             error, message = func()
             if error:
@@ -773,77 +798,7 @@ class MapData:
             
         return (False, "")
 
-    @beartype.beartype
-    def parse_structure_map(self) -> tuple:
-        """
-        Parse the structure shapefile data into a consistent format
-
-        Returns:
-            tuple: A tuple of (bool: success/fail, str: failure message)
-        """
-        # Check type and size of loaded structure map
-        if (
-            self.raw_data[Datatype.STRUCTURE] is None
-            or type(self.raw_data[Datatype.STRUCTURE]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Structure map is not loaded or valid")
-            return (True, "Structure map is not loaded or valid")
-
-        if len(self.raw_data[Datatype.STRUCTURE]) < 2:
-            logger.warning(
-                "Stucture map does not enough orientations to complete calculations (need at least 2), projection may be inconsistent"
-            )
-
-        # Create new geodataframe
-        structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])
-        config = self.config.structure_config
-
-        # Parse dip direction and dip columns
-        if config["dipdir_column"] in self.raw_data[Datatype.STRUCTURE]:
-            if config["orientation_type"] == "strike":
-                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
-                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
-                )
-            else:
-                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
-        else:
-            print(f"Structure map does not contain dipdir_column '{config['dipdir_column']}'")
-
-        # Ensure all DIPDIR values are within [0, 360]
-        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
-
-        if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
-            structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
-        else:
-            print(f"Structure map does not contain dip_column '{config['dip_column']}'")
-
-        # Add bedding and overturned booleans
-        if config["overturned_column"] in self.raw_data[Datatype.STRUCTURE]:
-            structure["OVERTURNED"] = (
-                self.raw_data[Datatype.STRUCTURE][config["overturned_column"]]
-                .astype(str)
-                .str.contains(config["overturned_text"])
-            )
-        else:
-            structure["OVERTURNED"] = False
-
-        if config["description_column"] in self.raw_data[Datatype.STRUCTURE]:
-            structure["BEDDING"] = (
-                self.raw_data[Datatype.STRUCTURE][config["description_column"]]
-                .astype(str)
-                .str.contains(config["bedding_text"])
-            )
-        else:
-            structure["BEDDING"] = False
-
-        # Add object id
-        if config["objectid_column"] in self.raw_data[Datatype.STRUCTURE]:
-            structure["ID"] = self.raw_data[Datatype.STRUCTURE][config["objectid_column"]]
-        else:
-            structure["ID"] = numpy.arange(len(structure))
-
-        self.data[Datatype.STRUCTURE] = structure
-        return (False, "")
+    
 
     @beartype.beartype
     def parse_geology_map(self) -> tuple:
@@ -853,13 +808,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded geology map
-        if (
-            self.raw_data[Datatype.GEOLOGY] is None
-            or type(self.raw_data[Datatype.GEOLOGY]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Geology map is not loaded or valid")
-            return (True, "Geology map is not loaded or valid")
 
         # Create new geodataframe
         geology = geopandas.GeoDataFrame(self.raw_data[Datatype.GEOLOGY]["geometry"])
@@ -870,22 +818,11 @@ class MapData:
             geology["UNITNAME"] = self.raw_data[Datatype.GEOLOGY][config["unitname_column"]].astype(
                 str
             )
-        else:
-            msg = f"Geology map does not contain unitname_column {config['unitname_column']}"
-            print(msg)
-            logger.warning(msg)
-            return (True, msg)
+
         if config["alt_unitname_column"] in self.raw_data[Datatype.GEOLOGY]:
             geology["CODE"] = self.raw_data[Datatype.GEOLOGY][config["alt_unitname_column"]].astype(
                 str
             )
-        else:
-            msg = (
-                f"Geology map does not contain alt_unitname_column {config['alt_unitname_column']}"
-            )
-            print(msg)
-            logger.warning(msg)
-            return (True, msg)
 
         # Parse group and supergroup columns
         if config["group_column"] in self.raw_data[Datatype.GEOLOGY]:
@@ -955,11 +892,9 @@ class MapData:
         else:
             geology["ID"] = numpy.arange(len(geology))
 
-        # TODO: Check for duplicates in "ID"
         # TODO: Check that the exploded geology has more than 1 unit
         #       Do we need to explode the geometry at this stage for geology/faults/folds???
         #       If not subsequent classes will need to be able to deal with them
-        # TODO: Check for Nans or blanks in "UNITNAME", "GROUP", "SUPERGROUP", "DESCRIPTION", "CODE", "ROCKTYPE"
         # Strip out whitespace (/n <space> /t) and '-', ',', '?' from "UNITNAME", "CODE" "GROUP" "SUPERGROUP"
         geology["UNITNAME"] = geology["UNITNAME"].str.replace("[ -/?]", "_", regex=True)
         geology["CODE"] = geology["CODE"].str.replace("[ -/?]", "_", regex=True)
@@ -978,12 +913,62 @@ class MapData:
         return (False, "")
 
     @beartype.beartype
-    def get_minimum_fault_length(self) -> Union[float, int, None]:
+    def parse_structure_map(self) -> tuple:
         """
-        Get the minimum fault length
+        Parse the structure shapefile data into a consistent format
+
+        Returns:
+            tuple: A tuple of (bool: success/fail, str: failure message)
         """
 
-        return self.minimum_fault_length
+        # Create new geodataframe
+        structure = geopandas.GeoDataFrame(self.raw_data[Datatype.STRUCTURE]["geometry"])
+        config = self.config.structure_config
+
+        # Parse dip direction and dip columns
+        if config["dipdir_column"] in self.raw_data[Datatype.STRUCTURE]:
+            if config["orientation_type"] == "strike":
+                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE].apply(
+                    lambda row: (row[config["dipdir_column"]] + 90.0) % 360.0, axis=1
+                )
+            else:
+                structure["DIPDIR"] = self.raw_data[Datatype.STRUCTURE][config["dipdir_column"]]
+
+        # Ensure all DIPDIR values are within [0, 360]
+        structure["DIPDIR"] = structure["DIPDIR"] % 360.0
+
+        if config["dip_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["DIP"] = self.raw_data[Datatype.STRUCTURE][config["dip_column"]]
+
+
+        # Add bedding and overturned booleans
+        if config["overturned_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["OVERTURNED"] = (
+                self.raw_data[Datatype.STRUCTURE][config["overturned_column"]]
+                .astype(str)
+                .str.contains(config["overturned_text"])
+            )
+        else:
+            structure["OVERTURNED"] = False
+
+        if config["description_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["BEDDING"] = (
+                self.raw_data[Datatype.STRUCTURE][config["description_column"]]
+                .astype(str)
+                .str.contains(config["bedding_text"])
+            )
+        else:
+            structure["BEDDING"] = False
+
+        # Add object id
+        if config["objectid_column"] in self.raw_data[Datatype.STRUCTURE]:
+            structure["ID"] = self.raw_data[Datatype.STRUCTURE][config["objectid_column"]]
+        else:
+            structure["ID"] = numpy.arange(len(structure))
+
+        self.data[Datatype.STRUCTURE] = structure
+        return (False, "")
+
 
     @beartype.beartype
     def parse_fault_map(self) -> tuple:
@@ -993,14 +978,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded fault map
-        if (
-            self.raw_data[Datatype.FAULT] is None
-            or type(self.raw_data[Datatype.FAULT]) is not geopandas.GeoDataFrame
-        ):
-            logger.warning("Fault map is not loaded or valid")
-            return (True, "Fault map is not loaded or valid")
-
         # Create a new geodataframe
         faults = geopandas.GeoDataFrame(self.raw_data[Datatype.FAULT]["geometry"])
 
@@ -1013,13 +990,22 @@ class MapData:
             self.minimum_fault_length = calculate_minimum_fault_length(
                 bbox=self.bounding_box, area_percentage=0.05
             )
-
+        logger.info(f"Calculated minimum fault length - {self.minimum_fault_length}")
+        
         # crop
         faults = faults.loc[faults.geometry.length >= self.minimum_fault_length]
-
+        
         if config["structtype_column"] in self.raw_data[Datatype.FAULT]:
             faults["FEATURE"] = self.raw_data[Datatype.FAULT][config["structtype_column"]]
-            faults = faults[faults["FEATURE"].astype(str).str.contains(config["fault_text"])]
+               # Check if the string contains commas indicating multiple substrings
+            if ',' in config["fault_text"]:
+                import re
+                fault_text = config["fault_text"].split(',')
+                search_terms = [term.strip().strip("'").strip('"') for term in fault_text]
+                escaped_terms = [re.escape(term) for term in search_terms]
+                # Combine the escaped terms using the pipe '|' symbol for alternation
+                fault_text_pattern = '|'.join(escaped_terms)
+                faults = faults[faults["FEATURE"].astype(str).str.contains(fault_text_pattern, case=False, regex=True, na=False)]
             if self.verbose_level > VerboseLevel.NONE:
                 if len(faults) < len(self.raw_data[Datatype.GEOLOGY]) and len(faults) == 0:
                     msg = f"Fault map reduced to 0 faults as structtype_column ({config['structtype_column']}) does not contains as row with fault_text \"{config['fault_text']}\""
@@ -1047,7 +1033,7 @@ class MapData:
         # Filter the DataFrame to remove rows where 'NAME' is in the existing_codes
         if existing_codes:
             faults = faults[~faults["NAME"].isin(existing_codes)]
-            logger.info(f"The following codes were found and removed: {existing_codes}")
+            logger.info(f"The following faults were found and removed as per the config: {existing_codes}")
         else:
             logger.info("None of the fault ignore codes exist in the original fault data.")
             pass
@@ -1134,6 +1120,9 @@ class MapData:
 
         return (False, "")
 
+   
+
+    
     @beartype.beartype
     def parse_fold_map(self) -> tuple:
         """
@@ -1142,12 +1131,6 @@ class MapData:
         Returns:
             tuple: A tuple of (bool: success/fail, str: failure message)
         """
-        # Check type of loaded fold map
-        if (
-            self.raw_data[Datatype.FOLD] is None
-            or type(self.raw_data[Datatype.FOLD]) is not geopandas.GeoDataFrame
-        ):
-            return (True, "Fold map is not loaded or valid")
 
         # Create new geodataframe
         folds = geopandas.GeoDataFrame(self.raw_data[Datatype.FOLD]["geometry"])
@@ -1157,9 +1140,16 @@ class MapData:
             folds[config["structtype_column"]] = self.raw_data[Datatype.FOLD][
                 config["structtype_column"]
             ]
-            folds = folds[
-                folds[config["structtype_column"]].astype(str).str.contains(config["fold_text"])
-            ]
+            if ',' in config["fold_text"]:
+                import re
+                fold_text = config["fold_text"].split(',')
+                search_terms = [term.strip().strip("'").strip('"') for term in fold_text]
+                escaped_terms = [re.escape(term) for term in search_terms]
+                # Combine the escaped terms using the pipe '|' symbol for alternation
+                fold_text_pattern = '|'.join(escaped_terms)
+                folds = folds[
+                    folds[config["structtype_column"]].astype(str).str.contains(fold_text_pattern,  case=False, regex=True, na=False)
+                ]
             if self.verbose_level > VerboseLevel.NONE:
                 if len(folds) < len(self.raw_data[Datatype.GEOLOGY]) and len(folds) == 0:
                     msg = f"Fold map reduced to 0 folds as structtype_column ({config['structtype_column']}) does not contains any row with fold_text \"{config['fold_text']}\""

@@ -1,6 +1,6 @@
 # internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
-from .utils import hex_to_rgb
+from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
@@ -506,23 +506,19 @@ class Project(object):
         logger.info(
             f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
         )
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
-        )
-        logger.info(
-            f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}"
-        )
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
-        )
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+
+        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
+        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
+
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE), dtm_data, geology_data)
         logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT), self.map_data
-        )
+
+        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
         logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD), self.map_data
-        )
+        
+        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
 
     def extract_geology_contacts(self):
         """
@@ -532,11 +528,9 @@ class Project(object):
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.basal_contacts
-        )
-
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -714,7 +708,8 @@ class Project(object):
                 self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
                 self.map_data,
             )
-            self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
+            dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            set_z_values_from_raster_df(dtm_data, self.fault_orientations)
         else:
             logger.warning(
                 "No fault orientation data found, skipping fault orientation calculation"
@@ -739,7 +734,8 @@ class Project(object):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        set_z_values_from_raster_df(dtm_data, self.fault_samples)
 
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(

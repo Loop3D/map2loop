@@ -21,10 +21,18 @@ jobs:
  
           
   testing:
-    name: Testing
-    runs-on: ubuntu-24.04
+    name: Testing${{ matrix.os }} python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(vars.BUILD_OS)}}
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
     steps:
       - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+            python-version: ${{ matrix.python }}
       - name: Install GDAL
         run: |
           sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable

@@ -44,6 +44,12 @@ jobs:
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
+      - name: displace gdal owslib version
+        run: |
+            echo "${{ matrix.os }} ${{ matrix.python-version }}"
+            conda run -n test conda list gdal
+            conda run -n test conda list owslib
+            
       - name: Install map2loop
         run: |
             conda run -n test python -m pip install .

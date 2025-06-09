@@ -40,7 +40,9 @@ jobs:
       - name: Install dependencies
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c conda-forge -c loop3d --file dependencies.txt gdal python=${{ matrix.python-version }} pytest -y
+            conda run -n test conda install -c loop3d -c conda-forge gdal python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
+            conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
       - name: Install map2loop
         run: |

@@ -1,7 +1,7 @@
 numpy
 scipy
 geopandas
-shapely>=2
+shapely>=2.0.2
 networkx
 owslib
 loopprojectfile==0.2.2

@@ -23,7 +23,6 @@ import pandas
 import geopandas
 import shapely
 import math
-from shapely.errors import UnsupportedGEOSVersionError
 
 class ThicknessCalculator(ABC):
     """
@@ -365,11 +364,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
-                        try:
-                            # GEOS 3.10.0+
-                            indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
-                        except UnsupportedGEOSVersionError:
-                            indices= numpy.array([shapely.distance(short_line[0],point)<= (line_length * 0.25) for point in interp_points])
+                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
                         # get the dip of the points that are within
                         _dip = numpy.deg2rad(dip[indices])
                         _dips.append(_dip)

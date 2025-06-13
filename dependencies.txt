@@ -2,7 +2,7 @@ gdal>=3.6.2
 numpy
 scipy
 geopandas
-shapely>=2.0.2
+shapely>=2
 networkx
 owslib
 loopprojectfile==0.2.2

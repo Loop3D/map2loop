@@ -3,7 +3,7 @@ from map2loop.fault_orientation import FaultOrientationNearest
 from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
-from .sampler import Sampler, SamplerDecimator, SamplerSpacing
+from .sampler import sample_data, get_sampler
 from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation
@@ -39,8 +39,8 @@ class Project(object):
     -----------
     verbose_level: m2l_enums.VerboseLevel
         A selection that defines how much console logging is output
-    samplers: Sampler
-        A list of samplers used to extract point samples from polyonal or line segments. Indexed by m2l_enum.Dataype
+    samplers: dict
+        A dictionary to store sampler names and parameters
     sorter: Sorter
         The sorting algorithm to use for calculating the stratigraphic column
     loop_filename: str
@@ -135,7 +135,7 @@ class Project(object):
         self._error_state = ErrorState.NONE
         self._error_state_msg = ""
         self.verbose_level = verbose_level
-        self.samplers = [SamplerDecimator()] * len(Datatype)
+        self.samplers = {}  # Dictionary to store sampler names and parameters
         self.set_default_samplers()
         self.bounding_box = bounding_box
         self.sorter = SorterUseHint()
@@ -397,41 +397,44 @@ class Project(object):
         Initialisation function to set or reset the point samplers
         """
         logger.info("Setting default samplers")
-        self.samplers[Datatype.STRUCTURE] = SamplerDecimator(1)
-        self.samplers[Datatype.GEOLOGY] = SamplerSpacing(50.0)
-        self.samplers[Datatype.FAULT] = SamplerSpacing(50.0)
-        self.samplers[Datatype.FOLD] = SamplerSpacing(50.0)
-        self.samplers[Datatype.DTM] = SamplerSpacing(50.0)
+        self.samplers = {
+            Datatype.STRUCTURE: {"name": "decimator", "params": {"decimation": 1}},
+            Datatype.GEOLOGY: {"name": "spacing", "params": {"spacing": 50.0}},
+            Datatype.FAULT: {"name": "spacing", "params": {"spacing": 50.0}},
+            Datatype.FOLD: {"name": "spacing", "params": {"spacing": 50.0}},
+            Datatype.DTM: {"name": "spacing", "params": {"spacing": 50.0}}
+        }
 
     @beartype.beartype
-    def set_sampler(self, datatype: Datatype, sampler: Sampler):
+    def set_sampler(self, datatype: Datatype, sampler_name: str, **kwargs):
         """
         Set the point sampler for a specific datatype
 
         Args:
             datatype (Datatype):
                 The datatype to use this sampler on
-            sampler (Sampler):
-                The sampler to use
+            sampler_name (str):
+                The name of the sampler to use
+            **kwargs:
+                Additional parameters for the sampler
         """
         allowed_samplers = {
-            Datatype.STRUCTURE: SamplerDecimator,
-            Datatype.GEOLOGY: SamplerSpacing,
-            Datatype.FAULT: SamplerSpacing,
-            Datatype.FOLD: SamplerSpacing,
-            Datatype.DTM: SamplerSpacing,
+            Datatype.STRUCTURE: ["decimator"],
+            Datatype.GEOLOGY: ["spacing"],
+            Datatype.FAULT: ["spacing"],
+            Datatype.FOLD: ["spacing"],
+            Datatype.DTM: ["spacing"],
         }
 
         # Check for wrong sampler
         if datatype in allowed_samplers:
-            allowed_sampler_type = allowed_samplers[datatype]
-            if not isinstance(sampler, allowed_sampler_type):
+            if sampler_name not in allowed_samplers[datatype]:
                 raise ValueError(
-                    f"Got wrong argument for this datatype: {type(sampler).__name__}, please use {allowed_sampler_type.__name__} instead"
+                    f"Invalid sampler {sampler_name} for datatype {datatype}, please use {allowed_samplers[datatype]} instead"
                 )
-        ## does the enum print the number or the label?
-        logger.info(f"Setting sampler for {datatype} to {sampler.sampler_label}")
-        self.samplers[datatype] = sampler
+        
+        logger.info(f"Setting sampler for {datatype} to {sampler_name}")
+        self.samplers[datatype] = {"name": sampler_name, "params": kwargs}
 
     @beartype.beartype
     def get_sampler(self, datatype: Datatype):
@@ -444,7 +447,7 @@ class Project(object):
         Returns:
             str: The name of the sampler being used on the specified datatype
         """
-        return self.samplers[datatype].sampler_label
+        return self.samplers[datatype]["name"]
 
     @beartype.beartype
     def set_minimum_fault_length(self, length: Union[float, int]):
@@ -503,22 +506,53 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
-        logger.info(
-            f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
-        )
+
         geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
-
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
-        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
-
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE), dtm_data, geology_data)
-        logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
-
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
-        logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
         
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
+        try:
+            logger.info(f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY]['name']}")
+            self.geology_samples = sample_data(
+                geology_data,self.samplers[Datatype.GEOLOGY]["name"],
+                **self.samplers[Datatype.GEOLOGY]["params"]
+            )
+        except Exception as e:
+            logger.error(f"Error sampling geology map data: {str(e)}")
+            raise 
+        try:
+            logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE]['name']}")
+            self.structure_samples = sample_data(
+                self.map_data.get_map_data(Datatype.STRUCTURE),
+                self.samplers[Datatype.STRUCTURE]["name"],
+                dtm_data=dtm_data,
+                geology_data=geology_data,
+                **self.samplers[Datatype.STRUCTURE]["params"]
+            )
+        except Exception as e:
+            logger.error(f"Error sampling structure map data: {str(e)}")
+            raise
+        
+        try:
+            logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT]['name']}")
+            self.fault_samples = sample_data(
+                self.map_data.get_map_data(Datatype.FAULT),
+                self.samplers[Datatype.FAULT]["name"],
+                **self.samplers[Datatype.FAULT]["params"]
+            )
+        except Exception as e:
+            logger.error(f"Error sampling fault map data: {str(e)}")
+            raise
+        
+        try:
+            logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD]['name']}")
+            self.fold_samples = sample_data(
+                self.map_data.get_map_data(Datatype.FOLD),
+                self.samplers[Datatype.FOLD]["name"],
+                **self.samplers[Datatype.FOLD]["params"]
+            )
+        except Exception as e:
+            logger.error(f"Error sampling fold map data: {str(e)}")
+            raise
 
     def extract_geology_contacts(self):
         """
@@ -528,7 +562,11 @@ class Project(object):
         self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
+        self.map_data.sampled_contacts = sample_data(
+            self.map_data.basal_contacts,
+            self.samplers[Datatype.GEOLOGY]["name"],
+            **self.samplers[Datatype.GEOLOGY]["params"]
+        )
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
@@ -775,7 +813,11 @@ class Project(object):
 
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
-        self.sample_map_data()
+        try:
+            self.sample_map_data()
+        except Exception as e:
+            logger.error(f"Error during map data sampling in run_all: {str(e)}")
+            raise
         self.calculate_unit_thicknesses()
         self.calculate_fault_orientations()
         self.summarise_fault_data()

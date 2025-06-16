@@ -65,14 +65,6 @@ jobs:
             conda run -n test conda install -c loop3d -c conda-forge gdal python=${{ matrix.python-version }} -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
-
-      - name: displace gdal owslib version
-        run: |
-            echo "${{ matrix.os }} ${{ matrix.python-version }}"
-            conda run -n test conda list gdal
-            conda run -n test conda list owslib
-            conda run -n test python -c "from shapely import geos_version; print('geos_version: ', geos_version)"
-            conda run -n test python -c "import shapely; print('shapely version: ',shapely.__version__)"
             
       - name: Install map2loop
         run: |

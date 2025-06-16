@@ -30,7 +30,7 @@ class DependencyChecker:
 
     def __init__(self, package_name, dependency_file="dependencies.txt"):
         self.package_name = package_name
-        self.dependency_file = pathlib.Path(__file__).parent / dependency_file
+        self.dependency_file = pathlib.Path(__file__).parent.parent / dependency_file
         self.required_version = self.get_required_version()
         self.installed_version = self.get_installed_version()
 
@@ -93,7 +93,7 @@ class DependencyChecker:
 
 
 def check_all_dependencies(dependency_file="dependencies.txt"):
-    dependencies_path = pathlib.Path(__file__).parent / dependency_file
+    dependencies_path = pathlib.Path(__file__).parent.parent / dependency_file
     try:
         with dependencies_path.open("r") as file:
             for line in file:
@@ -103,6 +103,8 @@ def check_all_dependencies(dependency_file="dependencies.txt"):
                 if line:
                     if "==" in line:
                         package_name, _ = line.split("==")
+                    elif ">=" in line:
+                        package_name, _ = line.split(">=")
                     else:
                         package_name = line
 

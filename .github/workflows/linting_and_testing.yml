@@ -3,11 +3,11 @@ name: Linting and Testing
 on:
   push:
     branches:
-      - master
+    - master
     paths:
       - '**.py'
       - .github/workflows/linting_and_testing.yml
-
+  
   pull_request:
     branches:
       - master
@@ -50,11 +50,22 @@ jobs:
             conda-remove-defaults: "true"
 
 
-      - name: Install dependencies
+      - name: Install dependencies for windows python 3.10
+        if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.10' }}
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c conda-forge -c loop3d --file dependencies.txt gdal python=${{ matrix.python-version }} pytest -y
+            conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
+            conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
+      - name: Install dependencies for other environments
+        if: ${{ matrix.os != 'windows-latest' || matrix.python-version != '3.10' }}
+        run: |
+            conda run -n test conda info
+            conda run -n test conda install -c loop3d -c conda-forge gdal python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
+            conda run -n test conda install pytest python=${{ matrix.python-version }} -y
+            
       - name: Install map2loop
         run: |
             conda run -n test python -m pip install .
@@ -62,4 +73,3 @@ jobs:
       - name: Run tests
         run: |
             conda run -n test  pytest
-

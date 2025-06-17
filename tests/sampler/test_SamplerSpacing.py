@@ -1,5 +1,5 @@
 import pandas
-from map2loop.sampler import SamplerSpacing
+from map2loop.sampler import sample_data
 from beartype.roar import BeartypeCallHintParamViolation
 import pytest
 import shapely
@@ -11,7 +11,7 @@ import numpy
 
 @pytest.fixture
 def sampler_spacing():
-    return SamplerSpacing(spacing=1.0)
+    return 1.0
 
 
 @pytest.fixture
@@ -37,7 +37,11 @@ def incorrect_geodata():
 
 # test if correct outputs are generated from the right input
 def test_sample_function_correct_data(sampler_spacing, correct_geodata):
-    result = sampler_spacing.sample(correct_geodata)
+    result = sample_data(
+        spatial_data = correct_geodata,
+        sampler_name = 'spacing',
+        spacing = sampler_spacing
+    )
     assert isinstance(result, pandas.DataFrame)
     assert 'X' in result.columns
     assert 'Y' in result.columns
@@ -47,25 +51,36 @@ def test_sample_function_correct_data(sampler_spacing, correct_geodata):
 # add test for incorrect inputs - does it raise a BeartypeCallHintParamViolation error?
 def test_sample_function_incorrect_data(sampler_spacing, incorrect_geodata):
     with pytest.raises(BeartypeCallHintParamViolation):
-        sampler_spacing.sample(spatial_data=incorrect_geodata)
+        sample_data(
+            spatial_data = incorrect_geodata,
+            sampler_name = 'spacing',
+            spacing = sampler_spacing
+        )
 
 
 # for a specific >2 case
-def test_sample_function_target_less_than_or_equal_to_2():
-    sampler_spacing = SamplerSpacing(spacing=1.0)
+def test_sample_function_target_less_than_or_equal_to_2(sampler_spacing):
     data = {
         'geometry': [shapely.LineString([(0, 0), (0, 1)]), shapely.LineString([(0, 0), (1, 0)])],
         'ID': ['1', '2'],
     }
     gdf = geopandas.GeoDataFrame(data, geometry='geometry')
-    result = sampler_spacing.sample(spatial_data=gdf)
+    result = sample_data(
+        spatial_data = gdf,
+        sampler_name = 'spacing',
+        spacing = sampler_spacing
+    )
     assert len(result) == 0  # No points should be sampled from the linestring
 
 
 # Test if the extracted points are correct
 def test_sample_function_extracted_points(sampler_spacing, correct_geodata):
 
-    result = sampler_spacing.sample(correct_geodata)
+    result = sample_data(
+        spatial_data=correct_geodata,
+        sampler_name = 'spacing',
+        spacing = sampler_spacing
+    )
 
     expected_points = [
         (0.0, 0.0),

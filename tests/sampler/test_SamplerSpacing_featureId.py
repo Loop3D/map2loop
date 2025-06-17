@@ -1,5 +1,5 @@
 import pandas
-from map2loop.sampler import SamplerSpacing
+from map2loop.sampler import sample_data
 import shapely
 import geopandas
 
@@ -9,8 +9,11 @@ geology_original = geopandas.GeoDataFrame(geology_original, crs='epsg:7854')
 
 sampler_space = 700.0
 
-sampler = SamplerSpacing(spacing=sampler_space)
-geology_samples = sampler.sample(geology_original)
+geology_samples = sample_data(
+    spatial_data = geology_original,
+    sampler_name = 'spacing',
+    spacing = sampler_space
+)
 
 
 # the actual test:

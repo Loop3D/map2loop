@@ -1,7 +1,20 @@
 name: Linting and Testing
 
 on:
-    [push]
+  push:
+    branches:
+      - master
+    paths:
+      - '**.py'
+      - .github/workflows/linting_and_testing.yml
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.py'
+      - .github/workflows/linting_and_testing.yml
+  workflow_dispatch:
 
 jobs:
   linting:
@@ -9,10 +22,6 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -25,43 +34,32 @@ jobs:
  
           
   testing:
-    name: Testing
-    runs-on: ubuntu-24.04
+    name: Testing${{ matrix.os }} python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(vars.BUILD_OS)}}
+        python-version: ${{ fromJSON(vars.PYTHON_VERSIONS)}}
+        
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: '3.12'
-      - name: Install GDAL
-        run: |
-          sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
-          sudo apt-get update
-          sudo apt-get install -y libgdal-dev gdal-bin
+            python-version: ${{ matrix.python-version }}
+            conda-remove-defaults: "true"
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: '3.12'
-          miniforge-version: latest
-          activate-environment: test-env
-          use-mamba: true
-          auto-activate-base: false
 
       - name: Install dependencies
-        shell: bash -l {0}
         run: |
-            mamba install python=3.12 -y
-            mamba install -c conda-forge gdal geopandas shapely networkx owslib beartype pytest scikit-learn -y
-            pip install map2model loopprojectfile==0.2.2
+            conda run -n test conda info
+            conda run -n test conda install -c conda-forge -c loop3d --file dependencies.txt gdal python=${{ matrix.python-version }} pytest -y
 
       - name: Install map2loop
-        shell: bash -l {0}
         run: |
-            python -m pip install .
+            conda run -n test python -m pip install .
 
       - name: Run tests
-        shell: bash -l {0}
         run: |
-            python -c "import map2model" || echo "map2model not available, tests will use fallback mode"
-            pytest -v
+            conda run -n test  pytest
+

@@ -10,6 +10,7 @@ import shapely
 import numpy
 from typing import Optional
 from osgeo import gdal
+import osgeo
 
 
 _SAMPLER_REGISTRY = {}
@@ -34,6 +35,9 @@ def get_sampler(name: str):
 
     Args:
         name (str): the name of the sampler to retrieve
+
+    Returns:
+        function: the sampler function
     """
     if name not in _SAMPLER_REGISTRY:
         raise ValueError(f"Sampler {name} not found")
@@ -43,15 +47,19 @@ def get_sampler(name: str):
 def sample_data(
     spatial_data: geopandas.GeoDataFrame,
     sampler_name: str,
-    dtm_data: Optional[geopandas.GeoDataFrame] = None,
+    dtm_data: Optional[osgeo.gdal.Dataset] = None,
     geology_data: Optional[geopandas.GeoDataFrame] = None,
     **kwargs
 )-> pandas.DataFrame:
     """
-    Execute sampling method (abstract method)
+    Execute sampling method based on the provided sampler name
 
     Args:
         spatial_data (geopandas.GeoDataFrame): data frame to sample
+        sampler_name (str): the name of the sampler to use
+        dtm_data (Optional[osgeo.gdal.Dataset]): dtm data required for decimator sampler
+        geology_data (Optional[geopandas.GeoDataFrame]): geology data required for decimator sampler
+        **kwargs: additional arguments to pass to the sampler
 
     Returns:
         pandas.DataFrame: data frame containing samples
@@ -68,7 +76,7 @@ def sample_data(
 @beartype.beartype
 def sample_decimator(
     spatial_data: geopandas.GeoDataFrame, 
-    dtm_data: gdal.Dataset, 
+    dtm_data: osgeo.gdal.Dataset,
     geology_data: geopandas.GeoDataFrame,
     decimation: int = 1
 ) -> pandas.DataFrame:
@@ -76,7 +84,10 @@ def sample_decimator(
     Execute sample method takes full point data, samples the data and returns the decimated points
 
     Args:
-        spatial_data (geopandas.GeoDataFrame): the data frame to sample
+        spatial_data (geopandas.GeoDataFrame): data frame to sample
+        dtm_data (osgeo.gdal.Dataset): dtm data
+        geology_data (geopandas.GeoDataFrame): geology data
+        decimation (int, optional): the decimation factor. Default to 1
 
     Returns:
         pandas.DataFrame: the sampled data points
@@ -106,6 +117,7 @@ def sample_spacing(
 
     Args:
         spatial_data (geopandas.GeoDataFrame): the data frame to sample (must contain column ["ID"])
+        spacing (float, optional): the spacing between points. Default to 50.0
 
     Returns:
         pandas.DataFrame: the sampled data points

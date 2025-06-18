@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.2.3](https://github.com/Loop3D/map2loop/compare/v3.2.2...v3.2.3) (2025-06-18)
+
+
+### Bug Fixes
+
+* accept pathlib.Path for save_path ([4e2e799](https://github.com/Loop3D/map2loop/commit/4e2e7990eebaf0b47146632ac1311d1f96d9e9c3))
+* allow str and pathlib.Path ([ff23f45](https://github.com/Loop3D/map2loop/commit/ff23f451b244d8bce05dafbd27a91c64fd9dcbe0))
+* fold filtering to support multiple search terms ([c6d0b7a](https://github.com/Loop3D/map2loop/commit/c6d0b7aa2773bbe551fd71ec02d47f31417696f4))
+* remove duplicate functions ([f629b2d](https://github.com/Loop3D/map2loop/commit/f629b2df62bc9da7ea1409e619107e580a8d052d))
+* support multiple search terms for faults ([ad0289f](https://github.com/Loop3D/map2loop/commit/ad0289fa6de5af9e311a9e21efa13e949ff8867a))
+* use pathlib.Path for save_path ([628040d](https://github.com/Loop3D/map2loop/commit/628040d42780086f4ee1ff39e258545ef53171b9))
+
+
+### Documentation
+
+* comment typo ([1c42d2e](https://github.com/Loop3D/map2loop/commit/1c42d2e450793c40abd7ad3b0c60843089f9a7e8))
+
 ## [3.2.2](https://github.com/Loop3D/map2loop/compare/v3.2.1...v3.2.2) (2025-01-13)
 
 

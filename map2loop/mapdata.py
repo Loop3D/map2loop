@@ -53,7 +53,7 @@ class MapData:
         A string containing the projection e.g. "EPSG:28350"
     bounding_box: dict
         The bounding box in cartesian coordinates with 6 elements
-    bounding_box_polygon: shapely.Polygon
+    bounding_box_polygon: shapely.geometry.Polygon
         The bounding box in polygonal form
     bounding_box_str: str
         The bounding box in string form (used for url requests)
@@ -183,7 +183,7 @@ class MapData:
         self.bounding_box_polygon = geopandas.GeoDataFrame(
             index=[0],
             crs=self.working_projection,
-            geometry=[shapely.Polygon(zip(lon_point_list, lat_point_list))],
+            geometry=[shapely.geometry.Polygon(zip(lon_point_list, lat_point_list))],
         )
         self.recreate_bounding_box_str()
 
@@ -210,7 +210,7 @@ class MapData:
             polygon (bool, optional): Flag to get the bounding box in polygon form. Defaults to False.
 
         Returns:
-            dict or shapely.Polygon: The bounding box in the requested form
+            dict or shapely.geometry.Polygon: The bounding box in the requested form
         """
         if polygon:
             return self.bounding_box_polygon

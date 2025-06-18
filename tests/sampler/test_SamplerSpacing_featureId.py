@@ -30,7 +30,7 @@ def test_featureId():
 
             # check if in the right place
             for _, sample in corresponding_rows.iterrows():
-                point = shapely.Point(sample['X'], sample['Y']).buffer(1)
+                point = shapely.geometry.Point(sample['X'], sample['Y']).buffer(1)
                 assert point.intersects(
                     poly.geometry
                 ), f"Point from featureId 0 is not in the correct polygon segment of ID {poly['ID']}."
@@ -48,7 +48,7 @@ def test_featureId():
                 polygon_samples = corresponding_rows[corresponding_rows['featureId'] == str(i)]
                 print(polygon_samples)
                 for _, sample in polygon_samples.iterrows():
-                    point = shapely.Point(sample['X'], sample['Y']).buffer(
+                    point = shapely.geometry.Point(sample['X'], sample['Y']).buffer(
                         1
                     )  # buffer just to make sure
                     assert point.intersects(

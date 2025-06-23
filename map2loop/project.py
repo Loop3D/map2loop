@@ -12,6 +12,7 @@ from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model_wrapper import Map2ModelWrapper
 from .data_checks import validate_config_dictionary
+from .contacts import extract_all_contacts,extract_basal_contacts
 
 # external imports
 import LoopProjectFile as LPF
@@ -143,6 +144,8 @@ class Project(object):
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
+        self.basal_contacts = None
+        self.sampled_contacts = None
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory(project=self)
@@ -554,23 +557,24 @@ class Project(object):
             logger.error(f"Error sampling fold map data: {str(e)}")
             raise
 
-    def extract_geology_contacts(self):
+    def extract_geology_contacts(self, contact_data):
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
-        self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column,filter_type='basal')
 
         # sample the contacts
-        self.map_data.sampled_contacts = sample_data(
-            self.map_data.basal_contacts,
+        self.sampled_contacts = sample_data(
+            basal_contacts_data,
             self.samplers[Datatype.GEOLOGY]["name"],
             **self.samplers[Datatype.GEOLOGY]["params"]
         )
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
-        set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
+        set_z_values_from_raster_df(dtm_data, self.sampled_contacts)
+        return basal_contacts_data
 
-    def calculate_stratigraphic_order(self, take_best=False):
+    def calculate_stratigraphic_order(self, contact_data, take_best=False):
         """
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
@@ -584,13 +588,13 @@ class Project(object):
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
                     self.map2model.get_unit_unit_relationships(),
-                    self.map_data.contacts,
+                    contact_data,
                     self.map_data,
                 )
                 for sorter in sorters
             ]
             basal_contacts = [
-                self.map_data.extract_basal_contacts(column, save_contacts=False)
+                extract_basal_contacts(contact_data, column, save_contacts=False)
                 for column in columns
             ]
             basal_lengths = [
@@ -614,7 +618,7 @@ class Project(object):
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.map2model.get_unit_unit_relationships(),
-                self.map_data.contacts,
+                contact_data,
                 self.map_data,
             )
 
@@ -681,7 +685,7 @@ class Project(object):
                 "self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute"
             )
 
-    def calculate_unit_thicknesses(self):
+    def calculate_unit_thicknesses(self, basal_contacts_data):
         """
         Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
         in the stratigraphic column using the provided thickness calculators.
@@ -712,7 +716,7 @@ class Project(object):
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
-                self.map_data.basal_contacts,
+                basal_contacts_data,
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
@@ -768,7 +772,7 @@ class Project(object):
         logger.info('Sorting stratigraphic column')
         self.stratigraphic_column.sort_from_relationship_list(self.stratigraphic_column.column)
 
-    def summarise_fault_data(self):
+    def summarise_fault_data(self, basal_contacts_data):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
@@ -779,7 +783,7 @@ class Project(object):
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
+            basal_contacts_data,
             self.map_data,
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')
@@ -797,7 +801,9 @@ class Project(object):
             logger.info(f'User defined stratigraphic column: {user_defined_stratigraphic_column}')
 
         # Calculate contacts before stratigraphic column
-        self.map_data.extract_all_contacts()
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        fault_data = self.map_data.get_map_data(Datatype.FAULT)
+        contact_data = extract_all_contacts(geology_data,fault_data)
 
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
@@ -808,19 +814,19 @@ class Project(object):
                 logger.warning(
                     f"user_defined_stratigraphic_column is not of type list and is {type(user_defined_stratigraphic_column)}. Attempting to calculate column"
                 )  # why not try casting to a list?
-            self.calculate_stratigraphic_order(take_best)
+            self.calculate_stratigraphic_order(contact_data, take_best)
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        self.extract_geology_contacts()
+        basal_contacts_data = self.extract_geology_contacts(contact_data)
         try:
             self.sample_map_data()
         except Exception as e:
             logger.error(f"Error during map data sampling in run_all: {str(e)}")
             raise
-        self.calculate_unit_thicknesses()
+        self.calculate_unit_thicknesses(basal_contacts_data)
         self.calculate_fault_orientations()
-        self.summarise_fault_data()
+        self.summarise_fault_data(basal_contacts_data)
         self.apply_colour_to_units()
         self.save_into_projectfile()
 
@@ -976,12 +982,12 @@ class Project(object):
                 verbose=False)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.map_data.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.map_data.sampled_contacts["ID"]
-        contacts_data["easting"] = self.map_data.sampled_contacts["X"]
-        contacts_data["northing"] = self.map_data.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.map_data.sampled_contacts["Z"]
-        contacts_data["featureId"] = self.map_data.sampled_contacts["featureId"]
+        contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
+        contacts_data["layerId"] = self.sampled_contacts["ID"]
+        contacts_data["easting"] = self.sampled_contacts["X"]
+        contacts_data["northing"] = self.sampled_contacts["Y"]
+        contacts_data["altitude"] = self.sampled_contacts["Z"]
+        contacts_data["featureId"] = self.sampled_contacts["featureId"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -1091,13 +1097,13 @@ class Project(object):
             base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
+                self.basal_contacts[self.basal_contacts["type"] == "BASAL"].plot(
                     ax=base
                 )
 
                 return
             elif overlay == "contacts":
-                points = self.map_data.sampled_contacts
+                points = self.sampled_contacts
             elif overlay == "orientations":
                 points = self.structure_samples
             elif overlay == "faults":

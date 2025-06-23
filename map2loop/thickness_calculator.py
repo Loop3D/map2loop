@@ -24,7 +24,7 @@ import pandas
 import geopandas
 import shapely
 import math
-
+from shapely.errors import UnsupportedGEOSVersionError
 
 class ThicknessCalculator(ABC):
     """
@@ -276,7 +276,7 @@ class InterpolatedStructure(ThicknessCalculator):
         contacts = set_z_values_from_raster_df(dtm_data, contacts)
         # update the geometry of the contact points to include the Z value
         contacts["geometry"] = contacts.apply(
-            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
@@ -305,7 +305,7 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated = set_z_values_from_raster_df(dtm_data, interpolated_orientations)
         # update the geometry of the interpolated points to include the Z value
         interpolated["geometry"] = interpolated.apply(
-            lambda row: shapely.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
         )
         # for each interpolated point, assign name of unit using spatial join
         units = map_data.get_map_data(Datatype.GEOLOGY)
@@ -368,7 +368,11 @@ class InterpolatedStructure(ThicknessCalculator):
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line
-                        indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
+                        try:
+                            # GEOS 3.10.0+
+                            indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
+                        except UnsupportedGEOSVersionError:
+                            indices= numpy.array([shapely.distance(short_line[0],point)<= (line_length * 0.25) for point in interp_points])
                         # get the dip of the points that are within
                         _dip = numpy.deg2rad(dip[indices])
                         _dips.append(_dip)
@@ -534,7 +538,7 @@ class StructuralPoint(ThicknessCalculator):
 
             # make a shapely point from the measurement
             measurement = sampled_structures.iloc[s]
-            measurement_pt = shapely.Point(measurement.X, measurement.Y)
+            measurement_pt = shapely.geometry.Point(measurement.X, measurement.Y)
 
             # find unit and strike
             litho_in = measurement['unit_name']

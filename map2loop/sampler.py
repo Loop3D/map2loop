@@ -2,14 +2,12 @@
 from .utils import set_z_values_from_raster_df
 
 # external imports
-from abc import ABC, abstractmethod
 import beartype
 import geopandas
 import pandas
 import shapely
 import numpy
 from typing import Optional
-from osgeo import gdal
 import osgeo
 
 

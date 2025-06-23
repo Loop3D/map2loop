@@ -3,7 +3,7 @@ from map2loop.fault_orientation import FaultOrientationNearest
 from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
-from .sampler import sample_data, get_sampler
+from .sampler import sample_data
 from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
 from .fault_orientation import FaultOrientation

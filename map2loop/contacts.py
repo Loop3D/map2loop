@@ -12,9 +12,16 @@ logger = getLogger(__name__)
 def extract_all_contacts(
     geology_data: geopandas.GeoDataFrame,
     fault_data: Optional[geopandas.GeoDataFrame] = None,
-):
+)-> geopandas.GeoDataFrame:
     """
     Extract the contacts between units in the geology GeoDataFrame
+
+    Args:
+        geology_data (geopandas.GeoDataFrame)
+        fault_data (geopandas.GeoDataFrame, optional)
+
+    Returns:
+        contacts (geopandas.GeoDataFrame)
     """
     logger.info("Extracting contacts")
     geology = geology_data.copy()
@@ -57,25 +64,30 @@ def extract_all_contacts(
 def extract_basal_contacts(
     contact_data:geopandas.GeoDataFrame, 
     stratigraphic_column: list,
-    filter_type:str, 
-):
+)-> tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
     """
     Identify the basal unit of the contacts based on the stratigraphic column
 
     Args:
+        contact_data (geopandas.GeoDataFrame)
         stratigraphic_column (list):
             The stratigraphic column to use
+
+    Returns:
+        tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
+        - all_contacts_with_basal_info: all contacts with added stratigraphic information
+        - basal_contacts: only basal type contacts filtered from all_contacts_with_basal_info
     """
     logger.info("Extracting basal contacts")
     
     units = stratigraphic_column
-    basal_contacts = contact_data.copy()
+    all_contacts = contact_data.copy()
 
     # check if the units in the strati colum are in the geology dataset, so that basal contacts can be built
     # if not, stop the project
-    if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
+    if any(unit not in units for unit in all_contacts["UNITNAME_1"].unique()):
         missing_units = (
-            basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
+            all_contacts[~all_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
             .unique()
             .tolist()
         )
@@ -91,31 +103,28 @@ def extract_basal_contacts(
         )
 
     # apply minimum lithological id between the two units
-    basal_contacts["ID"] = basal_contacts.apply(
+    all_contacts["ID"] = all_contacts.apply(
         lambda row: min(units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])), axis=1
     )
     # match the name of the unit with the minimum id
-    basal_contacts["basal_unit"] = basal_contacts.apply(lambda row: units[row["ID"]], axis=1)
+    all_contacts["basal_unit"] = all_contacts.apply(lambda row: units[row["ID"]], axis=1)
     # how many units apart are the two units?
-    basal_contacts["stratigraphic_distance"] = basal_contacts.apply(
+    all_contacts["stratigraphic_distance"] = all_contacts.apply(
         lambda row: abs(units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])), axis=1
     )
     # if the units are more than 1 unit apart, the contact is abnormal (meaning that there is one (or more) unit(s) missing in between the two)
-    basal_contacts["type"] = basal_contacts.apply(
+    all_contacts["type"] = all_contacts.apply(
         lambda row: "ABNORMAL" if abs(row["stratigraphic_distance"]) > 1 else "BASAL", axis=1
     )
 
-    basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
+    all_contacts = all_contacts[["ID", "basal_unit", "type", "geometry"]]
 
     # added code to make sure that multi-line that touch each other are snapped and merged.
     # necessary for the reconstruction based on featureId
-    basal_contacts["geometry"] = [
-        shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]
+    all_contacts["geometry"] = [
+        shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in all_contacts["geometry"]
     ]
+    all_contacts_with_basal_info = all_contacts
+    basal_contacts = all_contacts[all_contacts["type"] == "BASAL"]
 
-    if filter_type == 'basal':
-        return basal_contacts[basal_contacts["type"] == "BASAL"]
-    elif filter_type == 'abnormal':
-        return basal_contacts[basal_contacts["type"] == "ABNORMAL"]
-    else:
-        return basal_contacts
+    return all_contacts_with_basal_info, basal_contacts

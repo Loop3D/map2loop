@@ -146,7 +146,6 @@ class Project(object):
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
         self.basal_contacts = None
-        self.sampled_contacts = None
         self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory(project=self)
@@ -558,22 +557,34 @@ class Project(object):
             logger.error(f"Error sampling fold map data: {str(e)}")
             raise
 
-    def extract_geology_contacts(self, contact_data):
+    def extract_geology_contacts(
+            self, 
+            contact_data:geopandas.GeoDataFrame,
+    )-> tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
+
+        Args:
+            contact_data (geopandas.GeoDataFrame):
+
+        
+        Returns:
+            tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
+                - basal_contacts_data (geopandas.GeoDataFrame): Basal type contacts
+                - sampled_contacts_data (pandas.DataFrame): Sampled points along the basal contacts
         """
         # Use stratigraphic column to determine basal contacts
         all_contacts_with_basal_info, basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column)
 
         # sample the contacts
-        self.sampled_contacts = sample_data(
+        sampled_contacts_data = sample_data(
             basal_contacts_data,
             self.samplers[Datatype.GEOLOGY]["name"],
             **self.samplers[Datatype.GEOLOGY]["params"]
         )
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
-        set_z_values_from_raster_df(dtm_data, self.sampled_contacts)
-        return basal_contacts_data
+        set_z_values_from_raster_df(dtm_data, sampled_contacts_data)
+        return basal_contacts_data, sampled_contacts_data
 
     def calculate_stratigraphic_order(self, contact_data, take_best=False):
         """
@@ -819,7 +830,7 @@ class Project(object):
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        all_contacts_with_basal_info, basal_contacts_data = self.extract_geology_contacts(contact_data)
+        basal_contacts_data, sampled_contacts_data = self.extract_geology_contacts(contact_data)
         try:
             self.sample_map_data()
         except Exception as e:
@@ -829,9 +840,9 @@ class Project(object):
         self.calculate_fault_orientations()
         self.summarise_fault_data(basal_contacts_data)
         self.apply_colour_to_units()
-        self.save_into_projectfile()
+        self.save_into_projectfile(sampled_contacts_data)
 
-    def save_into_projectfile(self):
+    def save_into_projectfile(self, sampled_contacts_data):
         """
         Creates or updates a loop project file with all the data extracted from the map2loop process
         """
@@ -983,12 +994,12 @@ class Project(object):
                 verbose=False)
 
         # Save contacts
-        contacts_data = numpy.zeros(len(self.sampled_contacts), LPF.contactObservationType)
-        contacts_data["layerId"] = self.sampled_contacts["ID"]
-        contacts_data["easting"] = self.sampled_contacts["X"]
-        contacts_data["northing"] = self.sampled_contacts["Y"]
-        contacts_data["altitude"] = self.sampled_contacts["Z"]
-        contacts_data["featureId"] = self.sampled_contacts["featureId"]
+        contacts_data = numpy.zeros(len(sampled_contacts_data), LPF.contactObservationType)
+        contacts_data["layerId"] = sampled_contacts_data["ID"]
+        contacts_data["easting"] = sampled_contacts_data["X"]
+        contacts_data["northing"] = sampled_contacts_data["Y"]
+        contacts_data["altitude"] = sampled_contacts_data["Z"]
+        contacts_data["featureId"] = sampled_contacts_data["featureId"]
         LPF.Set(self.loop_filename, "contacts", data=contacts_data)
 
         # Save fault trace information
@@ -1077,7 +1088,8 @@ class Project(object):
         self,
         points: Optional[pandas.DataFrame] = None,
         overlay: str = "",
-        basal_contacts_data: Optional[geopandas.GeoDataFrame] = None
+        basal_contacts_data: Optional[geopandas.GeoDataFrame] = None,
+        sampled_contacts_data: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
         Plots the geology map with optional points or specific data
@@ -1087,6 +1099,10 @@ class Project(object):
                 A dataframe to overlay on the geology map (must contains "X" and "Y" columns). Defaults to None.
             overlay (str, optional):
                 Layer of points to overlay (options are "contacts", "basal_contacts", "orientations", "faults"). Defaults to "".
+            basal_contacts_data (geopandas.GeoDataFrame, optional):
+                Basal contacts to plot when overlay is "basal_contacts".
+            sampled_contacts_data (pandas.DataFrame, optional):
+                Sampled points along the basal contacts to plot when overlay is "contacts".
         """
         colour_lookup = (
             self.stratigraphic_column.stratigraphicUnits[["name", "colour"]]
@@ -1107,7 +1123,7 @@ class Project(object):
 
                 return
             elif overlay == "contacts":
-                points = self.sampled_contacts
+                points = sampled_contacts_data
             elif overlay == "orientations":
                 points = self.structure_samples
             elif overlay == "faults":

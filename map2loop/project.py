@@ -26,6 +26,7 @@ import numpy
 import pandas
 import os
 import re
+from typing import Optional
 
 from .logging import getLogger
 
@@ -562,7 +563,7 @@ class Project(object):
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
-        basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column,filter_type='basal')
+        all_contacts_with_basal_info, basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column)
 
         # sample the contacts
         self.sampled_contacts = sample_data(
@@ -593,8 +594,8 @@ class Project(object):
                 )
                 for sorter in sorters
             ]
-            basal_contacts = [
-                extract_basal_contacts(contact_data, column, save_contacts=False)
+            _, basal_contacts = [
+                extract_basal_contacts(contact_data, column)
                 for column in columns
             ]
             basal_lengths = [
@@ -818,7 +819,7 @@ class Project(object):
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        basal_contacts_data = self.extract_geology_contacts(contact_data)
+        all_contacts_with_basal_info, basal_contacts_data = self.extract_geology_contacts(contact_data)
         try:
             self.sample_map_data()
         except Exception as e:
@@ -1072,7 +1073,12 @@ class Project(object):
             LPF.Set(self.loop_filename, "eventRelationships", data=relationships)
 
     @beartype.beartype
-    def draw_geology_map(self, points: pandas.DataFrame = None, overlay: str = ""):
+    def draw_geology_map(
+        self,
+        points: Optional[pandas.DataFrame] = None,
+        overlay: str = "",
+        basal_contacts_data: Optional[geopandas.GeoDataFrame] = None
+    ):
         """
         Plots the geology map with optional points or specific data
 
@@ -1097,9 +1103,7 @@ class Project(object):
             base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.basal_contacts[self.basal_contacts["type"] == "BASAL"].plot(
-                    ax=base
-                )
+                basal_contacts_data.plot(ax=base)
 
                 return
             elif overlay == "contacts":

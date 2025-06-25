@@ -45,7 +45,7 @@ class Map2LoopAPI:
     def _register_classes(self, module: ModuleType) -> None:
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
-            if inspect.isclass(attr):
+            if inspect.isclass(attr) and attr.__module__ == module.__name__:
                 self._class_map[attr.__name__] = attr
 
     # ------------------------------------------------------------------

@@ -1,5 +1,4 @@
 import pathlib
-import pytest
 from map2loop.project import Project
 
 from map2loop.api import Map2LoopAPI

@@ -557,7 +557,7 @@ class Project(object):
     def extract_geology_contacts(
             self, 
             contact_data:geopandas.GeoDataFrame,
-    )-> tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
+    )-> tuple[geopandas.GeoDataFrame,pandas.DataFrame]:
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
 
@@ -566,7 +566,7 @@ class Project(object):
 
         
         Returns:
-            tuple[geopandas.GeoDataFrame, geopandas.GeoDataFrame]:
+            tuple[geopandas.GeoDataFrame, pandas.DataFrame]:
                 - basal_contacts_data (geopandas.GeoDataFrame): Basal type contacts
                 - sampled_contacts_data (pandas.DataFrame): Sampled points along the basal contacts
         """

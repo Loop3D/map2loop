@@ -87,7 +87,7 @@ def test_calculate_fault_fault_relationships():
 def test_calculate_unit_fault_relationships():
     md = _create_basic_mapdata()
     df = calculate_unit_fault_relationships(md, buffer_radius=0.1)
-    pairs = set(tuple(row) for row in df[["Unit", "Fault"]].to_records(index=False))
+    pairs = {tuple(row) for row in df[["Unit", "Fault"]].to_records(index=False)}
     assert pairs == {("U1", "F1"), ("U1", "F2"), ("U2", "F1")}
 
 

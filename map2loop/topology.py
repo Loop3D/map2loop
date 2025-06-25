@@ -14,6 +14,22 @@ logger = getLogger(__name__)
 _TOPOLOGY_REGISTRY = {}
 
 @beartype.beartype
+def register_topology(name: str):
+    """Register a topology function with a given name."""
+    def decorator(func):
+        _TOPOLOGY_REGISTRY[name] = func
+        return func
+    return decorator
+
+@beartype.beartype
+def get_topology(name: str):
+    """Retrieve a registered topology function."""
+    if name not in _TOPOLOGY_REGISTRY:
+        raise ValueError(f"Topology {name} not found")
+    return _TOPOLOGY_REGISTRY[name]
+
+@register_topology("fault_fault_relationships")
+@beartype.beartype
 def calculate_fault_fault_relationships(
     map_data: MapData,
     buffer_radius: float = 500,
@@ -45,6 +61,7 @@ def calculate_fault_fault_relationships(
     df["Type"] = "T"
     return df
 
+@register_topology("unit_fault_relationships")
 @beartype.beartype
 def calculate_unit_fault_relationships(
     map_data: MapData,
@@ -66,28 +83,13 @@ def calculate_unit_fault_relationships(
     u_idx, f_idx = np.where(adjacency_matrix)
     df = pd.DataFrame({"Unit": units[u_idx].tolist(), "Fault": faults.loc[f_idx, "ID"].to_list()})
     return df
-
+@register_topology("unit_unit_relationships")
 @beartype.beartype
 def calculate_unit_unit_relationships(map_data: MapData) -> pd.DataFrame:
     """Calculate unit to unit relationships."""
     if map_data.contacts is None:
         map_data.extract_all_contacts()
     return map_data.contacts.copy().drop(columns=["length", "geometry"])
-
-@beartype.beartype
-def register_topology(name: str):
-    """Register a topology function with a given name."""
-    def decorator(func):
-        _TOPOLOGY_REGISTRY[name] = func
-        return func
-    return decorator
-
-@beartype.beartype
-def get_topology(name: str):
-    """Retrieve a registered topology function."""
-    if name not in _TOPOLOGY_REGISTRY:
-        raise ValueError(f"Topology {name} not found")
-    return _TOPOLOGY_REGISTRY[name]
 
 @beartype.beartype
 def run_topology(

@@ -802,7 +802,10 @@ class Project(object):
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
-            self.topology_results = run_topology(self.map_data)
+            self.topology_results = run_topology(
+                self.map_data.FAULT,
+                self.map_data.GEOLOGY,
+            )
         else:
             if user_defined_stratigraphic_column is not None:
                 logger.warning(

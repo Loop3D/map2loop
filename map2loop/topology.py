@@ -1,8 +1,8 @@
 # internal imports
-from .mapdata import MapData
 from .logging import getLogger
 
 # external imports
+import inspect
 import geopandas as gpd
 import pandas as pd
 import numpy as np
@@ -31,11 +31,11 @@ def get_topology(name: str):
 @register_topology("fault_fault_relationships")
 @beartype.beartype
 def calculate_fault_fault_relationships(
-    map_data: MapData,
+    fault_layer: gpd.GeoDataFrame,
     buffer_radius: float = 500,
 ) -> pd.DataFrame:
     """Calculate fault to fault relationships."""
-    faults = map_data.FAULT.copy()
+    faults = fault_layer.copy()
     faults.reset_index(inplace=True)
     buffers = faults.buffer(buffer_radius)
     intersection = gpd.sjoin(
@@ -64,15 +64,16 @@ def calculate_fault_fault_relationships(
 @register_topology("unit_fault_relationships")
 @beartype.beartype
 def calculate_unit_fault_relationships(
-    map_data: MapData,
+    fault_layer: gpd.GeoDataFrame,
+    geology_layer: gpd.GeoDataFrame,
     buffer_radius: float = 500,
 ) -> pd.DataFrame:
     """Calculate unit to fault relationships."""
-    units = map_data.GEOLOGY["UNITNAME"].unique()
-    faults = map_data.FAULT.copy().reset_index().drop(columns=["index"])
+    units = geology_layer["UNITNAME"].unique()
+    faults = fault_layer.copy().reset_index().drop(columns=["index"])
     adjacency_matrix = np.zeros((len(units), faults.shape[0]), dtype=bool)
     for i, u in enumerate(units):
-        unit = map_data.GEOLOGY[map_data.GEOLOGY["UNITNAME"] == u]
+        unit = geology_layer[geology_layer["UNITNAME"] == u]
         intersection = gpd.sjoin(
             gpd.GeoDataFrame(geometry=faults["geometry"]),
             gpd.GeoDataFrame(geometry=unit["geometry"]),
@@ -85,32 +86,51 @@ def calculate_unit_fault_relationships(
     return df
 @register_topology("unit_unit_relationships")
 @beartype.beartype
-def calculate_unit_unit_relationships(map_data: MapData) -> pd.DataFrame:
+def calculate_unit_unit_relationships(
+    geology_layer: gpd.GeoDataFrame,
+) -> pd.DataFrame:
     """Calculate unit to unit relationships."""
-    if map_data.contacts is None:
-        map_data.extract_all_contacts()
-    return map_data.contacts.copy().drop(columns=["length", "geometry"])
+    geology = geology_layer.dissolve(by="UNITNAME", as_index=False)
+    units = geology["UNITNAME"].unique()
+    contacts = []
+    for i, unit1 in enumerate(units[:-1]):
+        geom1 = geology.loc[geology["UNITNAME"] == unit1, "geometry"].unary_union
+        for unit2 in units[i + 1 :]:
+            geom2 = geology.loc[geology["UNITNAME"] == unit2, "geometry"].unary_union
+            if not geom1.intersection(geom2).is_empty or geom1.touches(geom2):
+                contacts.append((unit1, unit2))
+    df = pd.DataFrame(contacts, columns=["UNITNAME_1", "UNITNAME_2"])
+    return df
 
 @beartype.beartype
 def run_topology(
-    map_data: MapData,
+    fault_layer: gpd.GeoDataFrame,
+    geology_layer: gpd.GeoDataFrame,
     topology_name: str = "default",
     **kwargs,
 ) -> Dict[str, pd.DataFrame]:
     """Execute a topology function by name."""
     runner = get_topology(topology_name)
-    return runner(map_data=map_data, **kwargs)
+    signature = inspect.signature(runner)
+    call_args = {}
+    if "fault_layer" in signature.parameters:
+        call_args["fault_layer"] = fault_layer
+    if "geology_layer" in signature.parameters:
+        call_args["geology_layer"] = geology_layer
+    call_args.update(kwargs)
+    return runner(**call_args)
 
 @register_topology("default")
 @beartype.beartype
 def topology_default(
-    map_data: MapData,
+    fault_layer: gpd.GeoDataFrame,
+    geology_layer: gpd.GeoDataFrame,
     buffer_radius: float = 500,
 ) -> Dict[str, pd.DataFrame]:
     """Calculate topology relationships using basic geopandas operations."""
-    ff_df = calculate_fault_fault_relationships(map_data, buffer_radius)
-    uf_df = calculate_unit_fault_relationships(map_data, buffer_radius)
-    uu_df = calculate_unit_unit_relationships(map_data)
+    ff_df = calculate_fault_fault_relationships(fault_layer, buffer_radius)
+    uf_df = calculate_unit_fault_relationships(fault_layer, geology_layer, buffer_radius)
+    uu_df = calculate_unit_unit_relationships(geology_layer)
 
     return {
         "fault_fault_relationships": ff_df,

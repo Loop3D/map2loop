@@ -21,9 +21,6 @@ sys.modules.setdefault("osgeo.osr", osgeo_stub.osr)
 import geopandas as gpd
 from shapely.geometry import LineString, Polygon
 import pandas as pd
-
-from map2loop.mapdata import MapData
-from map2loop.m2l_enums import Datatype, Datastate
 from map2loop.topology import (
     calculate_fault_fault_relationships,
     calculate_unit_fault_relationships,
@@ -33,8 +30,7 @@ from map2loop.topology import (
 )
 
 
-def _create_basic_mapdata():
-    md = MapData()
+def _create_basic_layers():
     faults = gpd.GeoDataFrame(
         {
             "geometry": [
@@ -46,9 +42,6 @@ def _create_basic_mapdata():
         geometry="geometry",
         crs="EPSG:4326",
     )
-    md.data[Datatype.FAULT] = faults
-    md.data_states[Datatype.FAULT] = Datastate.COMPLETE
-    md.dirtyflags[Datatype.FAULT] = False
 
     geology = gpd.GeoDataFrame(
         {
@@ -61,39 +54,27 @@ def _create_basic_mapdata():
         geometry="geometry",
         crs="EPSG:4326",
     )
-    md.data[Datatype.GEOLOGY] = geology
-    md.data_states[Datatype.GEOLOGY] = Datastate.COMPLETE
-    md.dirtyflags[Datatype.GEOLOGY] = False
 
-    contacts = pd.DataFrame(
-        {
-            "UNITNAME_1": ["U1"],
-            "UNITNAME_2": ["U2"],
-            "length": [1.0],
-            "geometry": [LineString([(1, 0), (1, 1)])],
-        }
-    )
-    md.contacts = contacts
-    return md
+    return faults, geology
 
 
 def test_calculate_fault_fault_relationships():
-    md = _create_basic_mapdata()
-    df = calculate_fault_fault_relationships(md, buffer_radius=0.1)
+    faults, geology = _create_basic_layers()
+    df = calculate_fault_fault_relationships(faults, buffer_radius=0.1)
     assert len(df) == 1
     assert set(df.iloc[0][["Fault1", "Fault2"]]) == {"F1", "F2"}
 
 
 def test_calculate_unit_fault_relationships():
-    md = _create_basic_mapdata()
-    df = calculate_unit_fault_relationships(md, buffer_radius=0.1)
+    faults, geology = _create_basic_layers()
+    df = calculate_unit_fault_relationships(faults, geology, buffer_radius=0.1)
     pairs = {tuple(row) for row in df[["Unit", "Fault"]].to_records(index=False)}
     assert pairs == {("U1", "F1"), ("U1", "F2"), ("U2", "F1")}
 
 
 def test_calculate_unit_unit_relationships():
-    md = _create_basic_mapdata()
-    df = calculate_unit_unit_relationships(md)
+    faults, geology = _create_basic_layers()
+    df = calculate_unit_unit_relationships(geology)
     assert list(df.columns) == ["UNITNAME_1", "UNITNAME_2"]
     assert df.iloc[0]["UNITNAME_1"] == "U1"
     assert df.iloc[0]["UNITNAME_2"] == "U2"
@@ -103,12 +84,12 @@ def test_registry_and_runner():
     called = {}
 
     @register_topology("test")
-    def run_test(map_data: MapData):
+    def run_test(fault_layer: gpd.GeoDataFrame, geology_layer: gpd.GeoDataFrame):
         called["executed"] = True
         return {"dummy": pd.DataFrame()}
 
-    md = _create_basic_mapdata()
-    result = run_topology(md, "test")
+    faults, geology = _create_basic_layers()
+    result = run_topology(faults, geology, "test")
     assert "executed" in called
     assert list(result.keys()) == ["dummy"]
     assert isinstance(result["dummy"], pd.DataFrame)

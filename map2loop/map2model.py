@@ -38,11 +38,11 @@ def run_map2model(
     """
 
     result = {}
-    if fault_data:
+    if fault_data is not None and not fault_data.empty:
         result["fault_fault_relationships"] = calculate_fault_fault_relationships(fault_data)
-        if geology_data:
+        if geology_data is not None and not geology_data.empty:
             result["unit_fault_relationships"] = calculate_unit_fault_relationships(geology_data, fault_data)
-    if contact_data:
+    if contact_data is not None and not contact_data.empty:
         result["unit_unit_relationships"] = calculate_unit_unit_relationships(contact_data)
     
     return result

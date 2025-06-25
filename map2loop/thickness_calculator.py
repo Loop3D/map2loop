@@ -57,7 +57,7 @@ class ThicknessCalculator(ABC):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -68,7 +68,7 @@ class ThicknessCalculator(ABC):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            sampled_contacts (geopandas.GeoDataFrame):
+            sampled_contacts (pandas.DataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -116,7 +116,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -128,7 +128,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            sampled_contacts (geopandas.GeoDataFrame):
+            sampled_contacts (pandas.DataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -226,7 +226,7 @@ class InterpolatedStructure(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -246,7 +246,7 @@ class InterpolatedStructure(ThicknessCalculator):
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
             the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            sampled_contacts (geopandas.GeoDataFrame):
+            sampled_contacts (pandas.DataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -463,7 +463,7 @@ class StructuralPoint(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -485,7 +485,7 @@ class StructuralPoint(ThicknessCalculator):
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
             the contacts (columns must contain ["ID","basal_unit","type","geometry"])
-            sampled_contacts (geopandas.GeoDataFrame):
+            sampled_contacts (pandas.DataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 

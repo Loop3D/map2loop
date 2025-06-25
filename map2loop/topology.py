@@ -1,11 +1,12 @@
 # internal imports
-from .mapdata import MapData
 from .logging import getLogger
+from map2loop.map_data import MapData
 
 # external imports
-import geopandas as gpd
-import pandas as pd
-import numpy as np
+import inspect
+import geopandas
+import pandas
+import numpy
 import beartype
 from beartype.typing import Dict
 
@@ -31,27 +32,27 @@ def get_topology(name: str):
 @register_topology("fault_fault_relationships")
 @beartype.beartype
 def calculate_fault_fault_relationships(
-    map_data: MapData,
+    fault_layer: geopandas.GeoDataFrame,
     buffer_radius: float = 500,
-) -> pd.DataFrame:
+) -> pandas.DataFrame:
     """Calculate fault to fault relationships."""
-    faults = map_data.FAULT.copy()
+    faults = fault_layer.copy()
     faults.reset_index(inplace=True)
     buffers = faults.buffer(buffer_radius)
-    intersection = gpd.sjoin(
-        gpd.GeoDataFrame(geometry=buffers),
-        gpd.GeoDataFrame(geometry=faults["geometry"]),
+    intersection = geopandas.sjoin(
+        geopandas.GeoDataFrame(geometry=buffers),
+        geopandas.GeoDataFrame(geometry=faults["geometry"]),
     )
     intersection["index_left"] = intersection.index
     intersection.reset_index(inplace=True)
 
-    adjacency_matrix = np.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
+    adjacency_matrix = numpy.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
     adjacency_matrix[
         intersection.loc[:, "index_left"],
         intersection.loc[:, "index_right"],
     ] = True
-    f1, f2 = np.where(np.tril(adjacency_matrix, k=-1))
-    df = pd.DataFrame(
+    f1, f2 = numpy.where(numpy.tril(adjacency_matrix, k=-1))
+    df = pandas.DataFrame(
         {
             "Fault1": faults.loc[f1, "ID"].to_list(),
             "Fault2": faults.loc[f2, "ID"].to_list(),
@@ -64,53 +65,69 @@ def calculate_fault_fault_relationships(
 @register_topology("unit_fault_relationships")
 @beartype.beartype
 def calculate_unit_fault_relationships(
-    map_data: MapData,
+    fault_layer: geopandas.GeoDataFrame,
+    geology_layer: geopandas.GeoDataFrame,
     buffer_radius: float = 500,
-) -> pd.DataFrame:
+) -> pandas.DataFrame:
     """Calculate unit to fault relationships."""
-    units = map_data.GEOLOGY["UNITNAME"].unique()
-    faults = map_data.FAULT.copy().reset_index().drop(columns=["index"])
-    adjacency_matrix = np.zeros((len(units), faults.shape[0]), dtype=bool)
+    units = geology_layer["UNITNAME"].unique()
+    faults = fault_layer.copy().reset_index().drop(columns=["index"])
+    adjacency_matrix = numpy.zeros((len(units), faults.shape[0]), dtype=bool)
     for i, u in enumerate(units):
-        unit = map_data.GEOLOGY[map_data.GEOLOGY["UNITNAME"] == u]
-        intersection = gpd.sjoin(
-            gpd.GeoDataFrame(geometry=faults["geometry"]),
-            gpd.GeoDataFrame(geometry=unit["geometry"]),
+        unit = geology_layer[geology_layer["UNITNAME"] == u]
+        intersection = geopandas.sjoin(
+            geopandas.GeoDataFrame(geometry=faults["geometry"]),
+            geopandas.GeoDataFrame(geometry=unit["geometry"]),
         )
         intersection["index_left"] = intersection.index
         intersection.reset_index(inplace=True)
         adjacency_matrix[i, intersection.loc[:, "index_left"]] = True
-    u_idx, f_idx = np.where(adjacency_matrix)
-    df = pd.DataFrame({"Unit": units[u_idx].tolist(), "Fault": faults.loc[f_idx, "ID"].to_list()})
+    u_idx, f_idx = numpy.where(adjacency_matrix)
+    df = pandas.DataFrame({"Unit": units[u_idx].tolist(), "Fault": faults.loc[f_idx, "ID"].to_list()})
     return df
 @register_topology("unit_unit_relationships")
 @beartype.beartype
-def calculate_unit_unit_relationships(map_data: MapData) -> pd.DataFrame:
+def calculate_unit_unit_relationships(
+    geology_layer: geopandas.GeoDataFrame,
+    contacts: pandas.DataFrame = None,
+    map_data: MapData = None,
+) -> pandas.DataFrame:
     """Calculate unit to unit relationships."""
-    if map_data.contacts is None:
+    if contacts is None:
         map_data.extract_all_contacts()
     return map_data.contacts.copy().drop(columns=["length", "geometry"])
 
 @beartype.beartype
 def run_topology(
-    map_data: MapData,
+    fault_layer: geopandas.GeoDataFrame,
+    geology_layer: geopandas.GeoDataFrame,
     topology_name: str = "default",
     **kwargs,
-) -> Dict[str, pd.DataFrame]:
+) -> Dict[str, pandas.DataFrame]:
     """Execute a topology function by name."""
     runner = get_topology(topology_name)
-    return runner(map_data=map_data, **kwargs)
+    signature = inspect.signature(runner)
+    call_args = {}
+    if "fault_layer" in signature.parameters:
+        call_args["fault_layer"] = fault_layer
+    if "geology_layer" in signature.parameters:
+        call_args["geology_layer"] = geology_layer
+    call_args.update(kwargs)
+    return runner(**call_args)
 
 @register_topology("default")
 @beartype.beartype
 def topology_default(
-    map_data: MapData,
+    fault_layer: geopandas.GeoDataFrame,
+    geology_layer: geopandas.GeoDataFrame,
+    contacts: pandas.DataFrame = None,
+    map_data: MapData = None,
     buffer_radius: float = 500,
-) -> Dict[str, pd.DataFrame]:
+) -> Dict[str, pandas.DataFrame]:
     """Calculate topology relationships using basic geopandas operations."""
-    ff_df = calculate_fault_fault_relationships(map_data, buffer_radius)
-    uf_df = calculate_unit_fault_relationships(map_data, buffer_radius)
-    uu_df = calculate_unit_unit_relationships(map_data)
+    ff_df = calculate_fault_fault_relationships(fault_layer, buffer_radius)
+    uf_df = calculate_unit_fault_relationships(fault_layer, geology_layer, buffer_radius)
+    uu_df = calculate_unit_unit_relationships(geology_layer, contacts, map_data)
 
     return {
         "fault_fault_relationships": ff_df,

@@ -57,6 +57,7 @@ class ThicknessCalculator(ABC):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -67,6 +68,7 @@ class ThicknessCalculator(ABC):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            sampled_contacts (geopandas.GeoDataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -114,6 +116,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -125,6 +128,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
             units (pandas.DataFrame): the data frame of units to add thicknesses to
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            sampled_contacts (geopandas.GeoDataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -144,7 +148,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
 
         basal_unit_list = basal_contacts["basal_unit"].to_list()
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
-            basal_contacts=basal_contacts, sampled_contacts=map_data.sampled_contacts
+            basal_contacts=basal_contacts, sampled_contacts=sampled_contacts
         )
 
         if len(stratigraphic_order) < 3:
@@ -222,6 +226,7 @@ class InterpolatedStructure(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -241,6 +246,7 @@ class InterpolatedStructure(ThicknessCalculator):
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
             the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            sampled_contacts (geopandas.GeoDataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -264,7 +270,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
         # get the sampled contacts
-        contacts = geopandas.GeoDataFrame(basal_contacts)
+        contacts = geopandas.GeoDataFrame(sampled_contacts)
         # build points from x and y coordinates
         geometry2 = geopandas.points_from_xy(contacts['X'], contacts['Y'])
         contacts.set_geometry(geometry2, inplace=True)
@@ -457,6 +463,7 @@ class StructuralPoint(ThicknessCalculator):
         units: pandas.DataFrame,
         stratigraphic_order: list,
         basal_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         map_data: MapData,
     ) -> pandas.DataFrame:
@@ -478,6 +485,7 @@ class StructuralPoint(ThicknessCalculator):
             stratigraphic_order (list): a list of unit names sorted from youngest to oldest
             basal_contacts (geopandas.GeoDataFrame): basal contact geo data with locations and unit names of
             the contacts (columns must contain ["ID","basal_unit","type","geometry"])
+            sampled_contacts (geopandas.GeoDataFrame):
             structure_data (pandas.DataFrame): sampled structural data
             map_data (map2loop.MapData): a catchall so that access to all map data is available
 
@@ -520,7 +528,7 @@ class StructuralPoint(ThicknessCalculator):
 
         # rebuild basal contacts lines based on sampled dataset
         sampled_basal_contacts = rebuild_sampled_basal_contacts(
-            basal_contacts, map_data.sampled_contacts
+            basal_contacts, sampled_contacts
         )
 
         # calculate map dimensions

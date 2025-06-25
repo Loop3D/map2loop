@@ -694,7 +694,7 @@ class Project(object):
                 "self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute"
             )
 
-    def calculate_unit_thicknesses(self, basal_contacts_data):
+    def calculate_unit_thicknesses(self, basal_contacts_data, sampled_contacts_data):
         """
         Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
         in the stratigraphic column using the provided thickness calculators.
@@ -726,6 +726,7 @@ class Project(object):
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
                 basal_contacts_data,
+                sampled_contacts_data,
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
@@ -840,7 +841,7 @@ class Project(object):
         except Exception as e:
             logger.error(f"Error during map data sampling in run_all: {str(e)}")
             raise
-        self.calculate_unit_thicknesses(basal_contacts_data)
+        self.calculate_unit_thicknesses(basal_contacts_data, sampled_contacts_data)
         self.calculate_fault_orientations()
         self.summarise_fault_data(basal_contacts_data)
         self.apply_colour_to_units()

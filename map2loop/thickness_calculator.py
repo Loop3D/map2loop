@@ -264,7 +264,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # increase buffer around basal contacts to ensure that the points are included as intersections
         basal_contacts["geometry"] = basal_contacts["geometry"].buffer(0.01)
         # get the sampled contacts
-        contacts = geopandas.GeoDataFrame(map_data.sampled_contacts)
+        contacts = geopandas.GeoDataFrame(basal_contacts)
         # build points from x and y coordinates
         geometry2 = geopandas.points_from_xy(contacts['X'], contacts['Y'])
         contacts.set_geometry(geometry2, inplace=True)

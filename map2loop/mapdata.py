@@ -1360,11 +1360,10 @@ class MapData:
     def export_wkt_format_files(self):
         """
         Save out the geology and fault GeoDataFrames in WKT format
-        This is used by map2model
+        This is used by topology
         """
-        # TODO: - Move away from tab seperators entirely (topology and map2model)
-
-        self.map2model_tmp_path = pathlib.Path(tempfile.mkdtemp())
+        # TODO: - Move away from tab seperators entirely (topology)
+        self.topology_tmp_path = pathlib.Path(tempfile.mkdtemp())
 
         # Check geology data status and export to a WKT format file
         self.load_map_data(Datatype.GEOLOGY)
@@ -1398,7 +1397,7 @@ class MapData:
             geology["ROCKTYPE1"] = geology["ROCKTYPE1"].replace("", "None")
             geology["ROCKTYPE2"] = geology["ROCKTYPE2"].replace("", "None")
             geology.to_csv(
-                pathlib.Path(self.map2model_tmp_path) / "geology_wkt.csv", sep="\t", index=False
+                pathlib.Path(self.topology_tmp_path) / "geology_wkt.csv", sep="\t", index=False
             )
 
         # Check faults data status and export to a WKT format file
@@ -1413,7 +1412,7 @@ class MapData:
             faults = self.get_map_data(Datatype.FAULT).copy()
             faults.rename(columns={"geometry": "WKT"}, inplace=True)
             faults.to_csv(
-                pathlib.Path(self.map2model_tmp_path) / "faults_wkt.csv", sep="\t", index=False
+                pathlib.Path(self.topology_tmp_path) / "faults_wkt.csv", sep="\t", index=False
             )
 
     @beartype.beartype

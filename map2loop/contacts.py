@@ -121,7 +121,7 @@ class ContactExtractor:
             shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in all_contacts["geometry"]
         ]
 
-        all_contacts_with_basal_info = all_contacts
+        self.contacts = all_contacts
         basal_contacts = all_contacts[all_contacts["type"] == "BASAL"]
 
-        return all_contacts_with_basal_info, basal_contacts
+        return all_contacts, basal_contacts

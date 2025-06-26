@@ -12,7 +12,7 @@ from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model import run_map2model, calculate_unit_unit_relationships
 from .data_checks import validate_config_dictionary
-from .contacts import extract_all_contacts,extract_basal_contacts
+from .contacts import ContactExtractor
 
 # external imports
 import LoopProjectFile as LPF
@@ -555,14 +555,14 @@ class Project(object):
             raise
 
     def extract_geology_contacts(
-            self, 
-            contact_data:geopandas.GeoDataFrame,
-    )-> tuple[geopandas.GeoDataFrame,pandas.DataFrame]:
+            self,
+            contact_extractor: ContactExtractor,
+    ) -> tuple[geopandas.GeoDataFrame, pandas.DataFrame]:
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
 
         Args:
-            contact_data (geopandas.GeoDataFrame):
+            contact_extractor (ContactExtractor):
 
         
         Returns:
@@ -571,7 +571,9 @@ class Project(object):
                 - sampled_contacts_data (pandas.DataFrame): Sampled points along the basal contacts
         """
         # Use stratigraphic column to determine basal contacts
-        all_contacts_with_basal_info, basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column)
+        _, basal_contacts_data = contact_extractor.extract_basal_contacts(
+            self.stratigraphic_column.column
+        )
 
         # sample the contacts
         sampled_contacts_data = sample_data(
@@ -583,7 +585,9 @@ class Project(object):
         set_z_values_from_raster_df(dtm_data, sampled_contacts_data)
         return basal_contacts_data, sampled_contacts_data
 
-    def calculate_stratigraphic_order(self, contact_data, take_best=False):
+    def calculate_stratigraphic_order(
+        self, contact_extractor: ContactExtractor, take_best: bool = False
+    ):
         """
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
@@ -593,6 +597,7 @@ class Project(object):
                 f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}"
             )
 
+            contact_data = contact_extractor.contacts
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
@@ -603,7 +608,7 @@ class Project(object):
                 for sorter in sorters
             ]
             _, basal_contacts = [
-                extract_basal_contacts(contact_data, column)
+                contact_extractor.extract_basal_contacts(column, contact_data)
                 for column in columns
             ]
             basal_lengths = [
@@ -624,6 +629,7 @@ class Project(object):
             self.stratigraphic_column.column = column
         else:
             logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
+            contact_data = contact_extractor.contacts
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 calculate_unit_unit_relationships(contact_data),
@@ -813,7 +819,8 @@ class Project(object):
         # Calculate contacts before stratigraphic column
         geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
         fault_data = self.map_data.get_map_data(Datatype.FAULT)
-        contact_data = extract_all_contacts(geology_data,fault_data)
+        contact_extractor = ContactExtractor(geology_data, fault_data)
+        contact_data = contact_extractor.extract_all_contacts()
 
         fault_fault_relationships = None
         unit_fault_relationships = None
@@ -831,11 +838,11 @@ class Project(object):
                 logger.warning(
                     f"user_defined_stratigraphic_column is not of type list and is {type(user_defined_stratigraphic_column)}. Attempting to calculate column"
                 )  # why not try casting to a list?
-            self.calculate_stratigraphic_order(contact_data, take_best)
+            self.calculate_stratigraphic_order(contact_extractor, take_best)
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        basal_contacts_data, sampled_contacts_data = self.extract_geology_contacts(contact_data)
+        basal_contacts_data, sampled_contacts_data = self.extract_geology_contacts(contact_extractor)
         try:
             self.sample_map_data()
         except Exception as e:

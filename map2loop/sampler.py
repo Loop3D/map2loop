@@ -40,7 +40,7 @@ class Sampler(ABC):
     @beartype.beartype
     @abstractmethod
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
@@ -126,7 +126,7 @@ class SamplerSpacing(Sampler):
 
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[geopandas.GeoDataFrame] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
+        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points

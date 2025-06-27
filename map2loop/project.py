@@ -706,7 +706,8 @@ class Project(object):
                 self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
                 self.map_data,
             )
-            self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
+            dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            set_z_values_from_raster_df(dtm_data, self.fault_orientations)
         else:
             logger.warning(
                 "No fault orientation data found, skipping fault orientation calculation"
@@ -731,7 +732,8 @@ class Project(object):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        set_z_values_from_raster_df(dtm_data, self.fault_samples)
 
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(

@@ -11,7 +11,7 @@ import pandas
 import shapely
 import numpy
 from typing import Optional
-from .utils import set_z_values_from_raster_df
+from osgeo import gdal
 
 
 class Sampler(ABC):

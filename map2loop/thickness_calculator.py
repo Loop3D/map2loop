@@ -9,7 +9,7 @@ from .utils import (
 )
 from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
-from .mapdata import MapData, get_value_from_raster
+from .mapdata import MapData
 
 from .logging import getLogger
 logger = getLogger(__name__)  
@@ -358,13 +358,13 @@ class InterpolatedStructure(ThicknessCalculator):
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
                         p1[1] = numpy.asarray(short_line[0].coords[0][1])
                         # get the elevation Z of the end point p1
-                        p1[2] = get_value_from_raster(Datatype.DTM, p1[0], p1[1])
+                        p1[2] = map_data.get_value_from_raster(Datatype.DTM, p1[0], p1[1])
                         # create array to store xyz coordinates of the end point p2
                         p2 = numpy.zeros(3)
                         p2[0] = numpy.asarray(short_line[0].coords[-1][0])
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
-                        p2[2] = get_value_from_raster(Datatype.DTM, p2[0], p2[1])
+                        p2[2] = map_data.get_value_from_raster(Datatype.DTM, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line

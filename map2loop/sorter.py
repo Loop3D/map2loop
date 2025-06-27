@@ -3,7 +3,7 @@ import beartype
 import pandas
 import numpy as np
 import math
-from .mapdata import MapData, get_value_from_raster
+from .mapdata import MapData
 from typing import Union
 
 from .logging import getLogger
@@ -434,9 +434,9 @@ class SorterObservationProjections(Sorter):
                         continue
 
                     # Get heights for intersection point and start of ray
-                    height = get_value_from_raster(Datatype.DTM, start.x, start.y)
+                    height = map_data.get_value_from_raster(Datatype.DTM, start.x, start.y)
                     first_intersect_point = Point(start.x, start.y, height)
-                    height = get_value_from_raster(
+                    height = map_data.get_value_from_raster(
                         Datatype.DTM, second_intersect_point.x, second_intersect_point.y
                     )
                     second_intersect_point = Point(second_intersect_point.x, start.y, height)

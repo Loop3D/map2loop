@@ -1448,63 +1448,6 @@ class MapData:
         val = data.ReadAsArray(px, py, 1, 1)[0][0]
         return val
 
-    @beartype.beartype
-    def __value_from_raster(self, inv_geotransform, data, x: float, y: float):
-        """
-        Get the value from a raster dataset at the specified point
-
-        Args:
-            inv_geotransform (gdal.GeoTransform):
-                The inverse of the data's geotransform
-            data (numpy.array):
-                The raster data
-            x (float):
-                The easting coordinate of the value
-            y (float):
-                The northing coordinate of the value
-
-        Returns:
-            float or int: The value at the point specified
-        """
-        px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
-        py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
-        # Clamp values to the edges of raster if past boundary, similiar to GL_CLIP
-        px = max(px, 0)
-        px = min(px, data.shape[0] - 1)
-        py = max(py, 0)
-        py = min(py, data.shape[1] - 1)
-        return data[px][py]
-
-    @beartype.beartype
-    def get_value_from_raster_df(self, datatype: Datatype, df: pandas.DataFrame):
-        """
-        Add a 'Z' column to a dataframe with the heights from the 'X' and 'Y' coordinates
-
-        Args:
-            datatype (Datatype):
-                The datatype of the raster map to retrieve from
-            df (pandas.DataFrame):
-                The original dataframe with 'X' and 'Y' columns
-
-        Returns:
-            pandas.DataFrame: The modified dataframe
-        """
-        if len(df) <= 0:
-            df["Z"] = []
-            return df
-        data = self.get_map_data(datatype)
-        if data is None:
-            logger.warning("Cannot get value from data as data is not loaded")
-            return None
-
-        inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
-        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray().T)
-
-        df["Z"] = df.apply(
-            lambda row: self.__value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),
-            axis=1,
-        )
-        return df
 
     @beartype.beartype
     def extract_all_contacts(self, save_contacts=True):

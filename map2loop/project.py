@@ -1,6 +1,6 @@
 # internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
-from .utils import hex_to_rgb
+from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
@@ -503,26 +503,20 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
-        logger.info(
-            f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
-        )
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
-        )
-        logger.info(
-            f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}"
-        )
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
-        )
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        
+        logger.info(f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}")
+        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
+
+        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE), dtm_data, geology_data)
+
         logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT), self.map_data
-        )
+        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
+
         logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD), self.map_data
-        )
+        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
 
     def extract_geology_contacts(self):
         """

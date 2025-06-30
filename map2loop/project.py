@@ -12,7 +12,7 @@ from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
 from .map2model import run_map2model, calculate_unit_unit_relationships
 from .data_checks import validate_config_dictionary
-from .contacts import extract_all_contacts,extract_basal_contacts
+from .contacts import ContactExtractor
 
 # external imports
 import LoopProjectFile as LPF
@@ -571,7 +571,10 @@ class Project(object):
                 - sampled_contacts_data (pandas.DataFrame): Sampled points along the basal contacts
         """
         # Use stratigraphic column to determine basal contacts
-        all_contacts_with_basal_info, basal_contacts_data = extract_basal_contacts(contact_data, self.stratigraphic_column.column)
+        extractor = ContactExtractor(self.map_data.get_map_data(Datatype.GEOLOGY))
+        all_contacts_with_basal_info, basal_contacts_data = extractor.extract_basal_contacts(
+            contact_data, self.stratigraphic_column.column
+        )
 
         # sample the contacts
         sampled_contacts_data = sample_data(
@@ -602,8 +605,9 @@ class Project(object):
                 )
                 for sorter in sorters
             ]
+            extractor = ContactExtractor(self.map_data.get_map_data(Datatype.GEOLOGY))
             _, basal_contacts = [
-                extract_basal_contacts(contact_data, column)
+                extractor.extract_basal_contacts(contact_data, column)
                 for column in columns
             ]
             basal_lengths = [
@@ -813,7 +817,7 @@ class Project(object):
         # Calculate contacts before stratigraphic column
         geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
         fault_data = self.map_data.get_map_data(Datatype.FAULT)
-        contact_data = extract_all_contacts(geology_data,fault_data)
+        contact_data = ContactExtractor(geology_data, fault_data).extract_all_contacts()
 
         fault_fault_relationships = None
         unit_fault_relationships = None

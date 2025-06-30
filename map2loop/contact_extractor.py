@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional
 
 import geopandas
 import pandas
@@ -16,19 +16,24 @@ logger = getLogger(__name__)
 class ContactExtractor:
     """Encapsulates contact extraction logic."""
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, 
+        geology_data: geopandas.GeoDataFrame,
+        fault_data: Optional[geopandas.GeoDataFrame] = None) -> None:
+        
+        self.geology_data = geology_data
+        self.fault_data = fault_data
+        self.contacts = None
 
     # ------------------------------------------------------------------
-    def extract_all_contacts(
-        self,
-        geology: geopandas.GeoDataFrame,
-        faults: geopandas.GeoDataFrame | None = None,
-    ) -> geopandas.GeoDataFrame:
-        """Extract all contacts between units in ``geology``."""
+    def extract_all_contacts(self) -> geopandas.GeoDataFrame:
+        """Extract all contacts between units in ``geology_data``."""
 
         logger.info("Extracting contacts")
-        geology = geology.copy()
+        if self.fault_data is not None:
+            faults = self.fault_data.copy() 
+        else:
+            faults = None
+        geology = self.geology_data.copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
 
         # Remove intrusions
@@ -63,6 +68,7 @@ class ContactExtractor:
                         contacts = pandas.concat([contacts, end], ignore_index=True)
 
         contacts["length"] = [row.length for row in contacts["geometry"]]
+        self.contacts = contacts
 
         return contacts
 

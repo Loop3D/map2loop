@@ -97,7 +97,7 @@ class MapData:
         self.colour_filename = None
         self.verbose_level = verbose_level
         self.config = Config()
-        self.contact_extractor = ContactExtractor(self)
+        self.contact_extractor = ContactExtractor()
 
     @property
     @beartype.beartype
@@ -1515,13 +1515,33 @@ class MapData:
 
     @beartype.beartype
     def extract_all_contacts(self, save_contacts=True):
-        """Delegate contact extraction to the ContactExtractor."""
-        return self.contact_extractor.extract_all_contacts(save_contacts)
+        """Extract contacts from the loaded geology and fault data."""
+
+        geology = self.get_map_data(Datatype.GEOLOGY)
+        faults = self.get_map_data(Datatype.FAULT)
+
+        contacts = self.contact_extractor.extract_all_contacts(geology, faults)
+
+        if save_contacts:
+            self.contacts = contacts
+        return contacts
 
     @beartype.beartype
     def extract_basal_contacts(self, stratigraphic_column: list, save_contacts=True):
-        """Delegate basal contact extraction to the ContactExtractor."""
-        return self.contact_extractor.extract_basal_contacts(stratigraphic_column, save_contacts)
+        """Identify basal contacts using the loaded contacts."""
+
+        if self.contacts is None:
+            raise ValueError("Contacts must be extracted before extracting basal contacts")
+
+        basal_contacts = self.contact_extractor.extract_basal_contacts(
+            self.contacts, stratigraphic_column
+        )
+
+        if save_contacts:
+            self.all_basal_contacts = basal_contacts
+            self.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
+
+        return basal_contacts
 
     @beartype.beartype
     def colour_units(

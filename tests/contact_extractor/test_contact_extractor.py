@@ -1,17 +1,41 @@
 import geopandas as gpd
 import shapely.geometry
 import pytest
+import importlib.util
+import pathlib
+import types
+import sys
 
-from map2loop.mapdata import MapData
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+PACKAGE_NAME = "map2loop"
+
+if PACKAGE_NAME not in sys.modules:
+    pkg = types.ModuleType(PACKAGE_NAME)
+    pkg.__path__ = [str(ROOT / PACKAGE_NAME)]
+    import logging
+    pkg.loggers = {}
+    pkg.ch = logging.StreamHandler()
+    pkg.ch.setLevel(logging.WARNING)
+    sys.modules[PACKAGE_NAME] = pkg
+
+spec = importlib.util.spec_from_file_location(
+    f"{PACKAGE_NAME}.contact_extractor",
+    ROOT / PACKAGE_NAME / "contact_extractor.py",
+)
+module = importlib.util.module_from_spec(spec)
+sys.modules[f"{PACKAGE_NAME}.contact_extractor"] = module
+spec.loader.exec_module(module)
+ContactExtractor = module.ContactExtractor
 
 
 @pytest.fixture
-def simple_mapdata():
-    # Create two adjacent square polygons representing two units
+def simple_geology():
+    """Create a minimal geology dataset for testing."""
+
     poly1 = shapely.geometry.Polygon([(0, 0), (2, 0), (2, 2), (0, 2)])
     poly2 = shapely.geometry.Polygon([(2, 0), (4, 0), (4, 2), (2, 2)])
 
-    data = gpd.GeoDataFrame(
+    return gpd.GeoDataFrame(
         {
             "UNITNAME": ["unit1", "unit2"],
             "INTRUSIVE": [False, False],
@@ -21,24 +45,17 @@ def simple_mapdata():
         crs="EPSG:4326",
     )
 
-    md = MapData()
-    md.data[0] = data  # Datatype.GEOLOGY == 0
-    md.data_states[0] = 5  # Datastate.COMPLETE
-    md.dirtyflags[0] = False
-    return md
 
-
-def test_extract_all_contacts(simple_mapdata):
-    result = simple_mapdata.contact_extractor.extract_all_contacts()
+def test_extract_all_contacts(simple_geology):
+    extractor = ContactExtractor()
+    result = extractor.extract_all_contacts(simple_geology)
     assert len(result) == 1
-    assert simple_mapdata.contacts is not None
 
 
-def test_extract_basal_contacts(simple_mapdata):
-    simple_mapdata.contact_extractor.extract_all_contacts()
-    contacts = simple_mapdata.contact_extractor.extract_basal_contacts([
-        "unit1",
-        "unit2",
-    ])
-    assert list(contacts["basal_unit"]) == ["unit1"]
-    assert simple_mapdata.basal_contacts is not None
+def test_extract_basal_contacts(simple_geology):
+    extractor = ContactExtractor()
+    contacts = extractor.extract_all_contacts(simple_geology)
+    basal = extractor.extract_basal_contacts(contacts, ["unit1", "unit2"])
+    assert list(basal["basal_unit"]) == ["unit1"]
+
+

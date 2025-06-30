@@ -8,24 +8,27 @@ import geopandas
 import pandas
 import shapely
 
-from .m2l_enums import Datatype
 from .logging import getLogger
 
 logger = getLogger(__name__)
 
 
 class ContactExtractor:
-    """Encapsulates contact extraction logic used by :class:`MapData`."""
+    """Encapsulates contact extraction logic."""
 
-    def __init__(self, map_data: "MapData") -> None:
-        self.map_data = map_data
+    def __init__(self) -> None:
+        pass
 
     # ------------------------------------------------------------------
-    def extract_all_contacts(self, save_contacts: bool = True) -> geopandas.GeoDataFrame:
-        """Extract all contacts between units in the geology GeoDataFrame."""
+    def extract_all_contacts(
+        self,
+        geology: geopandas.GeoDataFrame,
+        faults: geopandas.GeoDataFrame | None = None,
+    ) -> geopandas.GeoDataFrame:
+        """Extract all contacts between units in ``geology``."""
 
         logger.info("Extracting contacts")
-        geology = self.map_data.get_map_data(Datatype.GEOLOGY).copy()
+        geology = geology.copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
 
         # Remove intrusions
@@ -33,8 +36,8 @@ class ContactExtractor:
         geology = geology[~geology["SILL"]]
 
         # Remove faults from contact geometry
-        if self.map_data.get_map_data(Datatype.FAULT) is not None:
-            faults = self.map_data.get_map_data(Datatype.FAULT).copy()
+        if faults is not None:
+            faults = faults.copy()
             faults["geometry"] = faults.buffer(50)
             geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
 
@@ -61,21 +64,20 @@ class ContactExtractor:
 
         contacts["length"] = [row.length for row in contacts["geometry"]]
 
-        if save_contacts:
-            self.map_data.contacts = contacts
-
         return contacts
 
     # ------------------------------------------------------------------
     def extract_basal_contacts(
-        self, stratigraphic_column: List[str], save_contacts: bool = True
+        self,
+        contacts: geopandas.GeoDataFrame,
+        stratigraphic_column: List[str],
     ) -> geopandas.GeoDataFrame:
-        """Identify the basal unit of the contacts based on the stratigraphic column."""
+        """Identify the basal unit of ``contacts`` based on ``stratigraphic_column``."""
 
         logger.info("Extracting basal contacts")
 
         units = stratigraphic_column
-        basal_contacts = self.map_data.contacts.copy()
+        basal_contacts = contacts.copy()
 
         # verify units exist in the geology dataset
         if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
@@ -120,10 +122,6 @@ class ContactExtractor:
         basal_contacts["geometry"] = [
             shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]
         ]
-
-        if save_contacts:
-            self.map_data.all_basal_contacts = basal_contacts
-            self.map_data.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
 
         return basal_contacts
 

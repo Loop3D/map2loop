@@ -47,15 +47,15 @@ def simple_geology():
 
 
 def test_extract_all_contacts(simple_geology):
-    extractor = ContactExtractor()
-    result = extractor.extract_all_contacts(simple_geology)
+    extractor = ContactExtractor(simple_geology)
+    result = extractor.extract_all_contacts()
     assert len(result) == 1
 
 
 def test_extract_basal_contacts(simple_geology):
-    extractor = ContactExtractor()
-    contacts = extractor.extract_all_contacts(simple_geology)
-    basal = extractor.extract_basal_contacts(contacts, ["unit1", "unit2"])
+    extractor = ContactExtractor(simple_geology)
+    contacts = extractor.extract_all_contacts()
+    basal = extractor.extract_basal_contacts(["unit1", "unit2"])
     assert list(basal["basal_unit"]) == ["unit1"]
 
 

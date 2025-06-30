@@ -23,8 +23,9 @@ class ContactExtractor:
         self.geology_data = geology_data
         self.fault_data = fault_data
         self.contacts = None
-
-    # ------------------------------------------------------------------
+        self.basal_contacts = None
+        
+    
     def extract_all_contacts(self) -> geopandas.GeoDataFrame:
         """Extract all contacts between units in ``geology_data``."""
 
@@ -75,7 +76,6 @@ class ContactExtractor:
     # ------------------------------------------------------------------
     def extract_basal_contacts(
         self,
-        contacts: geopandas.GeoDataFrame,
         stratigraphic_column: List[str],
     ) -> geopandas.GeoDataFrame:
         """Identify the basal unit of ``contacts`` based on ``stratigraphic_column``."""
@@ -83,7 +83,7 @@ class ContactExtractor:
         logger.info("Extracting basal contacts")
 
         units = stratigraphic_column
-        basal_contacts = contacts.copy()
+        basal_contacts = self.contacts.copy()
 
         # verify units exist in the geology dataset
         if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):

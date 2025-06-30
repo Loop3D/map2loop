@@ -43,7 +43,7 @@ def test_extract_all_contacts_basic():
     assert len(contacts) > 0
 
 def test_extract_basal_contacts_basic():
-    ce = ContactExtractor()
+    ce = ContactExtractor(simple_geology())
     gdf = simple_geology()
     contacts = ce.extract_all_contacts(gdf)
     allc, basal = ce.extract_basal_contacts(contacts, ["A", "B"])

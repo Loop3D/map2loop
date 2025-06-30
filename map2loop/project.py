@@ -529,7 +529,7 @@ class Project(object):
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
-        self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        self.map_data.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
@@ -558,7 +558,7 @@ class Project(object):
                 for sorter in sorters
             ]
             basal_contacts = [
-                self.map_data.extract_basal_contacts(column, save_contacts=False)
+                self.map_data.contact_extractor.extract_basal_contacts(column, save_contacts=False)
                 for column in columns
             ]
             basal_lengths = [
@@ -763,7 +763,7 @@ class Project(object):
             logger.info(f'User defined stratigraphic column: {user_defined_stratigraphic_column}')
 
         # Calculate contacts before stratigraphic column
-        self.map_data.extract_all_contacts()
+        self.map_data.contact_extractor.extract_all_contacts()
 
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):

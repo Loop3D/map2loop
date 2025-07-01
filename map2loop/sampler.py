@@ -20,11 +20,13 @@ class Sampler(ABC):
         ABC (ABC): Derived from Abstract Base Class
     """
 
-    def __init__(self):
+    def __init__(self, dtm_data=None, geology_data=None):
         """
         Initialiser of for Sampler
         """
         self.sampler_label = "SamplerBaseClass"
+        self.dtm_data = dtm_data
+        self.geology_data = geology_data
 
     def type(self):
         """
@@ -38,7 +40,7 @@ class Sampler(ABC):
     @beartype.beartype
     @abstractmethod
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
+        self, spatial_data: geopandas.GeoDataFrame
     ) -> pandas.DataFrame:
         """
         Execute sampling method (abstract method)
@@ -60,20 +62,24 @@ class SamplerDecimator(Sampler):
     """
 
     @beartype.beartype
-    def __init__(self, decimation: int = 1):
+    def __init__(self, decimation: int = 1, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None):
         """
         Initialiser for decimator sampler
 
         Args:
             decimation (int, optional): stride of the points to sample. Defaults to 1.
+            dtm_data (Optional[gdal.Dataset], optional): digital terrain map data. Defaults to None.
+            geology_data (Optional[geopandas.GeoDataFrame], optional): geology data. Defaults to None.
         """
+        super().__init__(dtm_data, geology_data)
         self.sampler_label = "SamplerDecimator"
         decimation = max(decimation, 1)
         self.decimation = decimation
 
+
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
+        self, spatial_data: geopandas.GeoDataFrame
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the decimated points
@@ -87,13 +93,17 @@ class SamplerDecimator(Sampler):
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
-        if dtm_data is not None:
-            data["Z"] = set_z_values_from_raster_df(dtm_data, data)["Z"]
+        if self.dtm_data is not None:
+            result = set_z_values_from_raster_df(self.dtm_data, data)
+            if result is not None:
+                data["Z"] = result["Z"]
+            else:
+                data["Z"] = None
         else:
             data["Z"] = None
-        if geology_data is not None:
+        if self.geology_data is not None:
             data["layerID"] = geopandas.sjoin(
-                data, geology_data, how='left'
+                data, self.geology_data, how='left'
             )['index_right']
         else:
             data["layerID"] = None
@@ -111,20 +121,24 @@ class SamplerSpacing(Sampler):
     """
 
     @beartype.beartype
-    def __init__(self, spacing: float = 50.0):
+    def __init__(self, spacing: float = 50.0, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None):
         """
         Initialiser for spacing sampler
 
         Args:
             spacing (float, optional): The distance between samples. Defaults to 50.0.
+            dtm_data (Optional[gdal.Dataset], optional): digital terrain map data. Defaults to None.
+            geology_data (Optional[geopandas.GeoDataFrame], optional): geology data. Defaults to None.
         """
+        super().__init__(dtm_data, geology_data)
         self.sampler_label = "SamplerSpacing"
         spacing = max(spacing, 1.0)
         self.spacing = spacing
 
+
     @beartype.beartype
     def sample(
-        self, spatial_data: geopandas.GeoDataFrame, dtm_data: Optional[gdal.Dataset] = None, geology_data: Optional[geopandas.GeoDataFrame] = None
+        self, spatial_data: geopandas.GeoDataFrame
     ) -> pandas.DataFrame:
         """
         Execute sample method takes full point data, samples the data and returns the sampled points

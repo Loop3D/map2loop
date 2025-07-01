@@ -510,7 +510,9 @@ class Project(object):
         self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
 
         logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE), dtm_data, geology_data)
+        self.samplers[Datatype.STRUCTURE].dtm_data = dtm_data
+        self.samplers[Datatype.STRUCTURE].geology_data = geology_data
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE))
 
         logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
         self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))

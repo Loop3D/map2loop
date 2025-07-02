@@ -47,15 +47,18 @@ class ContactExtractor:
             self.contacts = contacts
         return contacts
 
-    def extract_basal_contacts(self, stratigraphic_column: list, contacts: geopandas.GeoDataFrame | None = None, save_contacts: bool = True) -> geopandas.GeoDataFrame:
+    def extract_basal_contacts(self, 
+                               stratigraphic_column: list, 
+                               save_contacts: bool = True) -> geopandas.GeoDataFrame:
+        
         logger.info("Extracting basal contacts")
         units = stratigraphic_column
-        if contacts is None:
-            if self.contacts is None:
-                raise ValueError("Contacts have not been calculated")
+        
+        if self.contacts is None:
+            self.extract_all_contacts(save_contacts=True)
             basal_contacts = self.contacts.copy()
         else:
-            basal_contacts = contacts.copy()
+            basal_contacts = self.contacts.copy()
         if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
             missing_units = (
                 basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]

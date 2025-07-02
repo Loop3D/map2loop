@@ -139,6 +139,7 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.bounding_box = bounding_box
+        self.contact_extractor = None
         self.sorter = SorterUseHint()
         self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
@@ -150,7 +151,7 @@ class Project(object):
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
         self.active_thickness = None
-        self.contact_extractor = None
+        
         
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
@@ -532,14 +533,14 @@ class Project(object):
                 self.map_data.get_map_data(Datatype.GEOLOGY),
                 self.map_data.get_map_data(Datatype.FAULT),
             )
-            self.map_data.contacts = self.contact_extractor.extract_all_contacts()
+            self.contact_extractor.extract_all_contacts()
 
         self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
-        self.map_data.basal_contacts = self.contact_extractor.basal_contacts
-        self.map_data.all_basal_contacts = self.contact_extractor.all_basal_contacts
+        self.contact_extractor.basal_contacts
+        # self.map_data.all_basal_contacts = self.contact_extractor.all_basal_contacts
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.contact_extractor.basal_contacts)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
@@ -547,7 +548,7 @@ class Project(object):
         """
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
-        if self.map_data.contacts is None:
+        if self.contact_extractor is None:
             self.contact_extractor = ContactExtractor(
                 self.map_data.get_map_data(Datatype.GEOLOGY),
                 self.map_data.get_map_data(Datatype.FAULT),

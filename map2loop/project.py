@@ -536,8 +536,6 @@ class Project(object):
             self.contact_extractor.extract_all_contacts()
 
         self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
-        self.contact_extractor.basal_contacts
-        # self.map_data.all_basal_contacts = self.contact_extractor.all_basal_contacts
 
         # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.contact_extractor.basal_contacts)
@@ -553,7 +551,7 @@ class Project(object):
                 self.map_data.get_map_data(Datatype.GEOLOGY),
                 self.map_data.get_map_data(Datatype.FAULT),
             )
-            self.map_data.contacts = self.contact_extractor.extract_all_contacts()
+            self.contact_extractor.extract_all_contacts()
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
             logger.info(
@@ -564,14 +562,14 @@ class Project(object):
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
                     self.map2model.get_unit_unit_relationships(),
-                    self.map_data.contacts,
+                    self.contact_extractor.contacts,
                     self.map_data,
                 )
                 for sorter in sorters
             ]
             basal_contacts = [
                 self.contact_extractor.extract_basal_contacts(
-                    column, contacts=self.map_data.contacts, save_contacts=False
+                    column, save_contacts=False
                 )
                 for column in columns
             ]
@@ -596,7 +594,7 @@ class Project(object):
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.map2model.get_unit_unit_relationships(),
-                self.map_data.contacts,
+                self.contact_extractor.contacts,
                 self.map_data,
             )
 

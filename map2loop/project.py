@@ -692,7 +692,7 @@ class Project(object):
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
-                self.map_data.basal_contacts,
+                self.contact_extractor.all_basal_contacts,
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
@@ -759,7 +759,7 @@ class Project(object):
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
+            self.contact_extractor.basal_contacts,
             self.map_data,
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')

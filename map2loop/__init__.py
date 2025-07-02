@@ -6,6 +6,7 @@ formatter = logging.Formatter("%(levelname)s: %(asctime)s: %(filename)s:%(lineno
 ch.setFormatter(formatter)
 ch.setLevel(logging.WARNING)
 from .project import Project
+from .contact_extractor import ContactExtractor
 from .version import __version__
 
 import warnings  # TODO: convert warnings to logging

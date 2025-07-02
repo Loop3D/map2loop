@@ -1,5 +1,6 @@
 # internal imports
-from .m2l_enums import VerboseLevel
+from .m2l_enums import VerboseLevel, Datatype
+from .contact_extractor import ContactExtractor
 
 # external imports
 import geopandas as gpd
@@ -169,7 +170,11 @@ class Map2ModelWrapper:
 
     def _calculate_unit_unit_relationships(self):
         if self.map_data.contacts is None:
-            self.map_data.extract_all_contacts()
+            extractor = ContactExtractor(
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.FAULT),
+            )
+            self.map_data.contacts = extractor.extract_all_contacts()
         self._unit_unit_relationships = self.map_data.contacts.copy().drop(
             columns=['length', 'geometry']
         )

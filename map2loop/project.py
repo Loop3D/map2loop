@@ -3,6 +3,7 @@ from map2loop.fault_orientation import FaultOrientationNearest
 from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
+from .contact_extractor import ContactExtractor
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
@@ -138,6 +139,7 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.bounding_box = bounding_box
+        self.contact_extractor = None
         self.sorter = SorterUseHint()
         self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
@@ -149,6 +151,7 @@ class Project(object):
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
         self.active_thickness = None
+        
         
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
@@ -525,10 +528,17 @@ class Project(object):
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
-        self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        if self.contact_extractor is None:
+            self.contact_extractor = ContactExtractor(
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.FAULT),
+            )
+            self.contact_extractor.extract_all_contacts()
+
+        self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.map_data.basal_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.contact_extractor.basal_contacts)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
@@ -536,6 +546,12 @@ class Project(object):
         """
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
+        if self.contact_extractor is None:
+            self.contact_extractor = ContactExtractor(
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.FAULT),
+            )
+            self.contact_extractor.extract_all_contacts()
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
             logger.info(
@@ -546,13 +562,15 @@ class Project(object):
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
                     self.map2model.get_unit_unit_relationships(),
-                    self.map_data.contacts,
+                    self.contact_extractor.contacts,
                     self.map_data,
                 )
                 for sorter in sorters
             ]
             basal_contacts = [
-                self.map_data.extract_basal_contacts(column, save_contacts=False)
+                self.contact_extractor.extract_basal_contacts(
+                    column, save_contacts=False
+                )
                 for column in columns
             ]
             basal_lengths = [
@@ -576,7 +594,7 @@ class Project(object):
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.map2model.get_unit_unit_relationships(),
-                self.map_data.contacts,
+                self.contact_extractor.contacts,
                 self.map_data,
             )
 
@@ -674,7 +692,7 @@ class Project(object):
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
-                self.map_data.basal_contacts,
+                self.contact_extractor.all_basal_contacts,
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
@@ -741,7 +759,7 @@ class Project(object):
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
+            self.contact_extractor.basal_contacts,
             self.map_data,
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')
@@ -759,7 +777,11 @@ class Project(object):
             logger.info(f'User defined stratigraphic column: {user_defined_stratigraphic_column}')
 
         # Calculate contacts before stratigraphic column
-        self.map_data.extract_all_contacts()
+        self.contact_extractor = ContactExtractor(
+            self.map_data.get_map_data(Datatype.GEOLOGY),
+            self.map_data.get_map_data(Datatype.FAULT),
+        )
+        self.map_data.contacts = self.contact_extractor.extract_all_contacts()
 
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
@@ -1049,7 +1071,7 @@ class Project(object):
             base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
+                self.contact_extractor.basal_contacts[self.contact_extractor.basal_contacts["type"] == "BASAL"].plot(
                     ax=base
                 )
 

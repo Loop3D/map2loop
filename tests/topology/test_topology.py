@@ -6,21 +6,6 @@ from map2loop.topology import Topology
 from map2loop.m2l_enums import Datatype
 
 
-class DummyMapData:
-    """Minimal MapData replacement used for testing."""
-
-    def __init__(self, geology, faults=None):
-        self.GEOLOGY = geology
-        self.FAULT = faults
-        self.contacts = None
-
-    def get_map_data(self, datatype):
-        if datatype == Datatype.GEOLOGY:
-            return self.GEOLOGY
-        if datatype == Datatype.FAULT:
-            return self.FAULT
-        raise ValueError("Unexpected datatype")
-
 
 def simple_geology():
     poly1 = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
@@ -37,7 +22,7 @@ def simple_geology():
     )
 
 
-def crossing_faults():
+def faults():
     line1 = LineString([(0, 0), (2, 1)])
     line2 = LineString([(0, 1), (2, 0)])
     return gpd.GeoDataFrame(
@@ -47,7 +32,7 @@ def crossing_faults():
 
 def test_initialisation_defaults():
     geology = simple_geology()
-    faults = crossing_faults()
+    faults = faults()
     topo = Topology(geology, faults)
 
     assert topo.sorted_units is None
@@ -59,10 +44,8 @@ def test_initialisation_defaults():
 
 def test_calculate_fault_fault_relationships():
     geology = simple_geology()
-    faults = crossing_faults()
-    md = DummyMapData(geology, faults)
+    faults = faults()
     topo = Topology(geology, faults)
-    topo.map_data = md
     topo.buffer_radius = 0.1
 
     df = topo.get_fault_fault_relationships()
@@ -75,10 +58,8 @@ def test_calculate_fault_fault_relationships():
 
 def test_calculate_unit_fault_relationships():
     geology = simple_geology()
-    faults = crossing_faults()
-    md = DummyMapData(geology, faults)
+    faults = faults()
     topo = Topology(geology, faults)
-    topo.map_data = md
     topo.buffer_radius = 0.1
 
     df = topo.get_unit_fault_relationships()
@@ -90,10 +71,7 @@ def test_calculate_unit_fault_relationships():
 
 def test_calculate_unit_unit_relationships_with_contacts():
     geology = simple_geology()
-    md = DummyMapData(geology, None)
     topo = Topology(geology, None)
-    topo.map_data = md
-
     df = topo.get_unit_unit_relationships()
     assert list(df.columns) == ["UNITNAME_1", "UNITNAME_2"]
     assert len(df) == 1
@@ -102,10 +80,8 @@ def test_calculate_unit_unit_relationships_with_contacts():
 
 def test_reset_raises_attribute_error():
     geology = simple_geology()
-    faults = crossing_faults()
-    md = DummyMapData(geology, faults)
+    faults = faults()
     topo = Topology(geology, faults)
-    topo.map_data = md
     topo.buffer_radius = 0.1
     topo.get_fault_fault_relationships()
 

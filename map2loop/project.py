@@ -11,7 +11,7 @@ from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
-from .map2model_wrapper import Map2ModelWrapper
+from .topology import Topology
 from .data_checks import validate_config_dictionary
 
 # external imports
@@ -48,7 +48,7 @@ class Project(object):
         The name of the loop project file used in this project
     map_data: MapData
         The structure that holds all map and dtm data
-    map2model: Map2ModelWrapper
+    map2model: Topology
         A wrapper around the map2model module that extracts unit and fault adjacency
     stratigraphic_column: StratigraphicColumn
         The structure that holds the unit information and ordering
@@ -145,7 +145,6 @@ class Project(object):
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
-        self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory(project=self)
         self.loop_filename = loop_project_filename
@@ -242,6 +241,10 @@ class Project(object):
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
+        self.topology = Topology(
+            self.map_data.get_map_data(Datatype.GEOLOGY), 
+            self.map_data.get_map_data(Datatype.FAULT)
+            )
 
 
     @beartype.beartype
@@ -561,7 +564,7 @@ class Project(object):
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
-                    self.map2model.get_unit_unit_relationships(),
+                    self.topology.get_unit_unit_relationships(),
                     self.contact_extractor.contacts,
                     self.map_data,
                 )
@@ -593,7 +596,7 @@ class Project(object):
             logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
-                self.map2model.get_unit_unit_relationships(),
+                self.topology.get_unit_unit_relationships(),
                 self.contact_extractor.contacts,
                 self.map_data,
             )
@@ -786,7 +789,7 @@ class Project(object):
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
-            self.map2model.run()  # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
+            self.topology.run()  # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
         else:
             if user_defined_stratigraphic_column is not None:
                 logger.warning(
@@ -1030,9 +1033,9 @@ class Project(object):
         observations["dipPolarity"] = self.structure_samples["OVERTURNED"]
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations)
 
-        if self.map2model.fault_fault_relationships is not None:
+        if self.topology.fault_fault_relationships is not None:
             ff_relationships = self.deformation_history.get_fault_relationships_with_ids(
-                self.map2model.fault_fault_relationships
+                self.topology.fault_fault_relationships
             )
             relationships = numpy.zeros(len(ff_relationships), LPF.eventRelationshipType)
 

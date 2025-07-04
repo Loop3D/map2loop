@@ -1071,7 +1071,7 @@ class Project(object):
             base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
+                self.contact_extractor.basal_contacts[self.contact_extractor.basal_contacts["type"] == "BASAL"].plot(
                     ax=base
                 )
 

@@ -31,9 +31,9 @@ def faults():
 
 
 def test_initialisation_defaults():
-    geology = simple_geology()
-    faults = faults()
-    topo = Topology(geology, faults)
+    geology_data = simple_geology()
+    faults_data = faults()
+    topo = Topology(geology_data, faults_data)
 
     assert topo.sorted_units is None
     assert topo._fault_fault_relationships is None
@@ -43,9 +43,9 @@ def test_initialisation_defaults():
 
 
 def test_calculate_fault_fault_relationships():
-    geology = simple_geology()
-    faults = faults()
-    topo = Topology(geology, faults)
+    geology_data = simple_geology()
+    faults_data = faults()
+    topo = Topology(geology_data, faults_data)
     topo.buffer_radius = 0.1
 
     df = topo.get_fault_fault_relationships()
@@ -57,9 +57,9 @@ def test_calculate_fault_fault_relationships():
 
 
 def test_calculate_unit_fault_relationships():
-    geology = simple_geology()
-    faults = faults()
-    topo = Topology(geology, faults)
+    geology_data = simple_geology()
+    faults_data = faults()
+    topo = Topology(geology_data, faults_data)
     topo.buffer_radius = 0.1
 
     df = topo.get_unit_fault_relationships()
@@ -70,8 +70,8 @@ def test_calculate_unit_fault_relationships():
 
 
 def test_calculate_unit_unit_relationships_with_contacts():
-    geology = simple_geology()
-    topo = Topology(geology, None)
+    geology_data = simple_geology()
+    topo = Topology(geology_data, None)
     df = topo.get_unit_unit_relationships()
     assert list(df.columns) == ["UNITNAME_1", "UNITNAME_2"]
     assert len(df) == 1
@@ -79,9 +79,9 @@ def test_calculate_unit_unit_relationships_with_contacts():
 
 
 def test_reset_raises_attribute_error():
-    geology = simple_geology()
-    faults = faults()
-    topo = Topology(geology, faults)
+    geology_data = simple_geology()
+    faults_data = faults()
+    topo = Topology(geology_data, faults_data)
     topo.buffer_radius = 0.1
     topo.get_fault_fault_relationships()
 

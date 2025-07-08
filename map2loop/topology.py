@@ -129,7 +129,7 @@ class Topology:
 
     def _calculate_fault_fault_relationships(self):
 
-        faults = self.map_data.FAULT.copy()
+        faults = self.fault_data.copy()
         # reset index so that we can index the adjacency matrix with the index
         faults.reset_index(inplace=True)
         buffers = faults.buffer(self.buffer_radius)
@@ -156,11 +156,11 @@ class Topology:
         """Calculate unit/fault relationships using geopandas sjoin.
         This will return
         """
-        units = self.map_data.GEOLOGY["UNITNAME"].unique()
-        faults = self.map_data.FAULT.copy().reset_index().drop(columns=['index'])
+        units = self.geology_data["UNITNAME"].unique()
+        faults = self.fault_data.copy().reset_index().drop(columns=['index'])
         adjacency_matrix = numpy.zeros((len(units), faults.shape[0]), dtype=bool)
         for i, u in enumerate(units):
-            unit = self.map_data.GEOLOGY[self.map_data.GEOLOGY["UNITNAME"] == u]
+            unit = self.geology_data[self.geology_data["UNITNAME"] == u]
             intersection = geopandas.sjoin(
                 geopandas.GeoDataFrame(geometry=faults["geometry"]),
                 geopandas.GeoDataFrame(geometry=unit["geometry"]),
@@ -173,13 +173,12 @@ class Topology:
         self._unit_fault_relationships = df
 
     def _calculate_unit_unit_relationships(self):
-        if self.map_data.contacts is None:
-            extractor = ContactExtractor(
-                self.map_data.get_map_data(Datatype.GEOLOGY),
-                self.map_data.get_map_data(Datatype.FAULT),
-            )
-            self.map_data.contacts = extractor.extract_all_contacts()
-        self._unit_unit_relationships = self.map_data.contacts.copy().drop(
+        extractor = ContactExtractor(
+            self.geology_data,
+            self.fault_data,
+        )
+        contacts = extractor.extract_all_contacts()
+        self._unit_unit_relationships = contacts.copy().drop(
             columns=['length', 'geometry']
         )
         return self._unit_unit_relationships

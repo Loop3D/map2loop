@@ -78,12 +78,15 @@ def test_calculate_unit_unit_relationships_with_contacts():
     assert set(df.loc[0]) == {"A", "B"}
 
 
-def test_reset_raises_attribute_error():
+def test_reset():
     geology_data = simple_geology()
     faults_data = faults()
     topo = Topology(geology_data, faults_data)
     topo.buffer_radius = 0.1
-    topo.get_fault_fault_relationships()
+    ffr = topo.get_fault_fault_relationships()
+    assert ffr is not None
 
-    with pytest.raises(AttributeError):
-        topo.reset()
+    topo.reset()
+    assert topo._fault_fault_relationships is None
+    assert topo._unit_fault_relationships is None
+    assert topo._unit_unit_relationships is None

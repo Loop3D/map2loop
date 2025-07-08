@@ -83,9 +83,9 @@ class Topology:
         """
         logger.info("Resetting topology calculator")
         self.sorted_units = None
-        self.fault_fault_relationships = None
-        self.unit_fault_relationships = None
-        self.unit_unit_relationships = None
+        self._fault_fault_relationships = None
+        self._unit_fault_relationships = None
+        self._unit_unit_relationships = None
 
     def get_sorted_units(self):
         """

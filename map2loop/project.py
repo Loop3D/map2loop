@@ -538,12 +538,13 @@ class Project(object):
             )
             self.contact_extractor.extract_all_contacts()
 
-        self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
+        basal_contacts = self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
         self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.contact_extractor.basal_contacts)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
+        return basal_contacts
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -664,7 +665,7 @@ class Project(object):
                 "self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute"
             )
 
-    def calculate_unit_thicknesses(self):
+    def calculate_unit_thicknesses(self, basal_contacts):
         """
         Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
         in the stratigraphic column using the provided thickness calculators.
@@ -695,7 +696,7 @@ class Project(object):
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
-                self.contact_extractor.all_basal_contacts,
+                basal_contacts,
                 self.structure_samples,
                 self.map_data,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
@@ -799,9 +800,9 @@ class Project(object):
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        self.extract_geology_contacts()
+        basal_contacts = self.extract_geology_contacts()
         self.sample_map_data()
-        self.calculate_unit_thicknesses()
+        self.calculate_unit_thicknesses(basal_contacts)
         self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()

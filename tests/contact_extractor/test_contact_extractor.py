@@ -29,7 +29,7 @@ def test_extract_basal_contacts():
     geology = simple_geology()
     extractor = ContactExtractor(geology, None)
     contacts = extractor.extract_all_contacts()
-    basal = extractor.extract_basal_contacts(["A", "B"], contacts=contacts)
+    basal = extractor.extract_basal_contacts(["A", "B"], save_contacts=True)
     assert len(basal) == 1
     assert basal.loc[0, "basal_unit"] == "A"
     assert basal.loc[0, "type"] == "BASAL"

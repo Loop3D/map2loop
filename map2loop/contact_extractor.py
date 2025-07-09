@@ -2,11 +2,12 @@ import geopandas
 import pandas
 import shapely
 from .logging import getLogger
+from typing import Optional
 
 logger = getLogger(__name__)
 
 class ContactExtractor:
-    def __init__(self, geology: geopandas.GeoDataFrame, faults: geopandas.GeoDataFrame | None = None):
+    def __init__(self, geology: geopandas.GeoDataFrame, faults: Optional[geopandas.GeoDataFrame] = None):
         self.geology = geology
         self.faults = faults
         self.contacts = None

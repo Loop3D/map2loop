@@ -15,7 +15,6 @@ from osgeo import gdal, osr
 gdal.UseExceptions()
 from owslib.wcs import WebCoverageService
 import urllib
-import requests
 from gzip import GzipFile
 from uuid import uuid4
 import beartype

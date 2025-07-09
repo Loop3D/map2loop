@@ -23,13 +23,15 @@ def test_extract_all_contacts():
     extractor = ContactExtractor(geology, None)
     contacts = extractor.extract_all_contacts()
     assert len(contacts) == 1
-    assert set([contacts.loc[0, "UNITNAME_1"], contacts.loc[0, "UNITNAME_2"]]) == {"A", "B"}
+    assert {contacts.loc[0, "UNITNAME_1"], contacts.loc[0, "UNITNAME_2"]} == {"A", "B"}
 
 def test_extract_basal_contacts():
     geology = simple_geology()
     extractor = ContactExtractor(geology, None)
-    contacts = extractor.extract_all_contacts()
+    extractor.extract_all_contacts()
     basal = extractor.extract_basal_contacts(["A", "B"], save_contacts=True)
     assert len(basal) == 1
     assert basal.loc[0, "basal_unit"] == "A"
     assert basal.loc[0, "type"] == "BASAL"
+    assert extractor.basal_contacts is not None
+    assert extractor.all_basal_contacts is not None

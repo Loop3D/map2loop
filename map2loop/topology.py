@@ -1,6 +1,6 @@
-from typing import Optional, List
+from typing import Optional
 # internal imports
-from .m2l_enums import VerboseLevel, Datatype
+from .m2l_enums import VerboseLevel
 from .contact_extractor import ContactExtractor
 
 # external imports

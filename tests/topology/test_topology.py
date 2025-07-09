@@ -1,9 +1,7 @@
 import geopandas as gpd
 from shapely.geometry import Polygon, LineString
-import pytest
 
 from map2loop.topology import Topology
-from map2loop.m2l_enums import Datatype
 
 
 

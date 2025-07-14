@@ -1,6 +1,13 @@
 name: Build conda packages
 
 on:
+  push:
+    branches:
+    - '**'
+  
+  pull_request:
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:
@@ -33,7 +40,8 @@ jobs:
           conda install -c conda-forge conda-build scikit-build-core numpy anaconda-client conda-libmamba-solver -y
           conda config --set solver libmamba
           conda build --output-folder conda conda  --python ${{matrix.python-version}}
-          anaconda upload --label main conda/*/*.tar.bz2
+          ls conda/*/
+          anaconda upload --label main conda/*/*.*
           
       - name: upload artifacts
         uses: actions/upload-artifact@v4

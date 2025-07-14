@@ -41,7 +41,7 @@ jobs:
           conda config --set solver libmamba
           conda build --output-folder conda conda  --python ${{matrix.python-version}}
           ls conda/*/
-          anaconda upload --label main conda/*/*.*
+          anaconda upload --label main conda/*/*.conda
           
       - name: upload artifacts
         uses: actions/upload-artifact@v4

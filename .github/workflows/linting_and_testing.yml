@@ -54,7 +54,6 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.10' }}
         run: |
             conda run -n test conda info
-            conda run -n test conda list
             conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
@@ -63,7 +62,6 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' || matrix.python-version != '3.10' }}
         run: |
             conda run -n test conda info
-            conda run -n test conda list
             conda run -n test conda install -c loop3d -c conda-forge gdal python=${{ matrix.python-version }} -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
@@ -71,7 +69,9 @@ jobs:
       - name: Install map2loop
         run: |
             conda run -n test python -m pip install .
-
+      - name: print packages
+        run: |
+            conda run -n test conda list
       - name: Run tests
         run: |
             conda run -n test  pytest

@@ -3,7 +3,7 @@ name: Linting and Testing
 on:
   push:
     branches:
-    - master
+    - '**'
     paths:
       - '**.py'
       - .github/workflows/linting_and_testing.yml

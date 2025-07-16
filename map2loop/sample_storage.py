@@ -1,6 +1,7 @@
 
-
-
+from .m2l_enums import Datatype, SampleType, StateType
+from .sampler import SamplerDecimator, SamplerSpacing, Sampler
+import beartype
 
 
 class SampleSupervisor:
@@ -79,54 +80,24 @@ class SampleSupervisor:
             str: The name of the sampler being used on the specified datatype
         """
         return self.samplers[sampletype].sampler_label
-
+    
     @beartype.beartype
-    def store(self, sampletype: SampleType, data):
+    def get_sample(self, sampletype: SampleType):
         """
-        Stores the sample data.
+        Get a sample given a sample type
 
         Args:
-            sampletype (SampleType): The type of the sample.
-            data: The sample data to store.
-        """
+            sampletype: The sample type of the sampler
 
-        # store the sample data
-        self.samples[sampletype] = data
-        self.sampler_dirtyflags[sampletype] = False
+        Returns:
+            str: The name of the sampler being used on the specified datatype
+        """
+        return self.samples[sampletype]
 
     @beartype.beartype
-    def check_state(self, sampletype: SampleType):
+    def sample(self, sampletype: SampleType, ):
         """
-        Checks the state of the data, sample and sampler.
-
-        Args:
-            sampletype (SampleType): The type of the sample.
-        """
-
-        self.dirtyflags[StateType.DATA] = self.map_data.dirtyflags[sampletype]
-        self.dirtyflags[StateType.SAMPLER] = self.sampler_dirtyflags[sampletype]
-
-    @beartype.beartype
-    def load(self, sampletype: SampleType):
-        """
-        Loads the map data or raster map data based on the sample type.
-
-        Args:
-            sampletype (SampleType): The type of the sample.
-        """
-        datatype = Datatype(sampletype)
-
-        if datatype == Datatype.DTM:
-            self.map_data.load_raster_map_data(datatype)
-
-        else:
-            # load map data
-            self.map_data.load_map_data(datatype)
-
-    @beartype.beartype
-    def process(self, sampletype: SampleType):
-        """
-        Processes the sample based on the sample type.
+        sample sample based on the sample type.
 
         Args:
             sampletype (SampleType): The type of the sample.
@@ -148,79 +119,3 @@ class SampleSupervisor:
                     self.map_data.get_map_data(datatype), self.map_data
                 ),
             )
-
-    @beartype.beartype
-    def reprocess(self, sampletype: SampleType):
-        """
-        Reprocesses the data based on the sample type.
-
-        Args:
-            sampletype (SampleType): The type of the sample.
-        """
-
-        if sampletype == SampleType.GEOLOGY or sampletype == SampleType.CONTACT:
-            self.map_data.extract_all_contacts()
-
-            if self.project.stratigraphic_column.column is None:
-                self.project.calculate_stratigraphic_order()
-
-            else:
-                self.project.sort_stratigraphic_column()
-
-            self.project.extract_geology_contacts()
-            self.process(SampleType.GEOLOGY)
-
-        elif sampletype == SampleType.STRUCTURE:
-            self.process(SampleType.STRUCTURE)
-
-        elif sampletype == SampleType.FAULT:
-            self.project.calculate_fault_orientations()
-            self.project.summarise_fault_data()
-            self.process(SampleType.FAULT)
-
-        elif sampletype == SampleType.FOLD:
-            self.process(SampleType.FOLD)
-
-    @beartype.beartype
-    def __call__(self, sampletype: SampleType):
-        """
-        Checks the state of the data, sample and sampler, and returns
-        the requested sample after reprocessing if necessary.
-
-        Args:
-            sampletype (SampleType): The type of the sample.
-
-        Returns:
-            The requested sample.
-        """
-
-        # check the state of the data, sample and sampler
-        self.check_state(sampletype)
-
-        # run the sampler only if no sample was generated before
-        if self.samples[sampletype] is None:
-            # if the data is changed, load and reprocess the data and generate a new sample
-            if self.dirtyflags[StateType.DATA] is True:
-                self.load(sampletype)
-                self.reprocess(sampletype)
-                return self.samples[sampletype]
-
-            if self.dirtyflags[StateType.DATA] is False:
-                self.process(sampletype)
-                return self.samples[sampletype]
-
-        # return the requested sample after reprocessing if the data is changed
-        elif self.samples[sampletype] is not None:
-            if self.dirtyflags[StateType.DATA] is False:
-                if self.dirtyflags[StateType.SAMPLER] is True:
-                    self.reprocess(sampletype)
-                    return self.samples[sampletype]
-
-                if self.dirtyflags[StateType.SAMPLER] is False:
-                    return self.samples[sampletype]
-
-            if self.dirtyflags[StateType.DATA] is True:
-
-                self.load(sampletype)
-                self.reprocess(sampletype)
-                return self.samples[sampletype]

@@ -51,7 +51,7 @@ jobs:
 
 
       - name: Install dependencies for windows python 3.10
-        if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.10' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
             conda run -n test conda info
             conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} -y
@@ -59,7 +59,7 @@ jobs:
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
       - name: Install dependencies for other environments
-        if: ${{ matrix.os != 'windows-latest' || matrix.python-version != '3.10' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
             conda run -n test conda info
             conda run -n test conda install -c loop3d -c conda-forge gdal python=${{ matrix.python-version }} -y

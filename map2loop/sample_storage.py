@@ -32,9 +32,6 @@ class SampleSupervisor:
         self.samplers = [None] * len(SampleType)
         self.sampler_dirtyflags = [True] * len(SampleType)
         self.dirtyflags = [True] * len(StateType)
-        self.set_default_samplers()
-        self.project = project
-        self.map_data = project.map_data
 
     def type(self):
         return self.storage_label
@@ -82,7 +79,7 @@ class SampleSupervisor:
         return self.samplers[sampletype].sampler_label
     
     @beartype.beartype
-    def get_sample(self, sampletype: SampleType):
+    def get_samples(self, sampletype: SampleType):
         """
         Get a sample given a sample type
 
@@ -95,7 +92,7 @@ class SampleSupervisor:
         return self.samples[sampletype]
 
     @beartype.beartype
-    def sample(self, sampletype: SampleType, ):
+    def sample(self, sampletype: SampleType):
         """
         sample sample based on the sample type.
 

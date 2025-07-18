@@ -53,7 +53,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.9' }}
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c loop3d -c conda-forge gdal "netcdf4=*=nompi_py39*" python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
             

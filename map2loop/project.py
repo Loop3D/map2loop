@@ -541,10 +541,9 @@ class Project(object):
         basal_contacts = self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(self.contact_extractor.basal_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(basal_contacts)
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
-        return basal_contacts
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
@@ -800,9 +799,9 @@ class Project(object):
         self.sort_stratigraphic_column()
 
         # Calculate basal contacts based on stratigraphic column
-        basal_contacts = self.extract_geology_contacts()
+        self.extract_geology_contacts()
         self.sample_map_data()
-        self.calculate_unit_thicknesses(basal_contacts)
+        self.calculate_unit_thicknesses(self.contact_extractor.basal_contacts)
         self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()

@@ -1713,7 +1713,7 @@ def test_calculate_unit_thicknesses():
     ], "Setter method for thickness calculator not working"  ## default is InterpolatedStructure
 
     # Run the calculate_unit_thicknesses
-    project.calculate_unit_thicknesses()
+    project.calculate_unit_thicknesses(bc_gdf)
 
     # # Check if all thicknesses have been calculated
     columns_to_check = [

@@ -1,7 +1,16 @@
 
-from .m2l_enums import Datatype, SampleType, StateType
+from .m2l_enums import Datatype, SampleType
 from .sampler import SamplerDecimator, SamplerSpacing, Sampler
 import beartype
+from .mapdata import MapData
+from .stratigraphic_column import StratigraphicColumn
+from .fault_orientation_sampler import FaultOrientationSampler
+from .contact_sampler import ContactSampler
+from .structure_sampler import StructureSampler
+
+from .logging import getLogger
+
+logger = getLogger(__name__)
 
 
 class SampleSupervisor:
@@ -19,7 +28,7 @@ class SampleSupervisor:
         map_data (MapData): The map data associated with the project.
     """
 
-    def __init__(self, project: "Project"):
+    def __init__(self, project: "Project", map_data: MapData, stratigraphic_column: StratigraphicColumn ):
         """
         The constructor for the SampleSupervisor class.
 
@@ -28,10 +37,12 @@ class SampleSupervisor:
         """
 
         self.storage_label = "SampleSupervisor"
+        self.map_data = map_data
+        self.stratigraphic_column = stratigraphic_column
         self.samples = [None] * len(SampleType)
         self.samplers = [None] * len(SampleType)
         self.sampler_dirtyflags = [True] * len(SampleType)
-        self.dirtyflags = [True] * len(StateType)
+        self.set_default_samplers()
 
     def type(self):
         return self.storage_label
@@ -40,13 +51,19 @@ class SampleSupervisor:
         """
         Initialisation function to set or reset the point samplers
         """
-        self.samplers[SampleType.STRUCTURE] = SamplerDecimator(1)
-        self.samplers[SampleType.FAULT_ORIENTATION] = SamplerDecimator(1)
-        self.samplers[SampleType.GEOLOGY] = SamplerSpacing(50.0)
-        self.samplers[SampleType.FAULT] = SamplerSpacing(50.0)
-        self.samplers[SampleType.FOLD] = SamplerSpacing(50.0)
-        self.samplers[SampleType.CONTACT] = SamplerSpacing(50.0)
-        self.samplers[SampleType.DTM] = SamplerSpacing(50.0)
+
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        fault_data = self.map_data.get_map_data(Datatype.FAULT)
+
+        self.samplers[SampleType.STRUCTURE] = StructureSampler(decimation=1,dtm_data=dtm_data,geology_data=geology_data)
+        self.samplers[SampleType.GEOLOGY] = SamplerSpacing(spacing=50.0)
+        self.samplers[SampleType.FAULT] = SamplerSpacing(spacing=50.0)
+        self.samplers[SampleType.FOLD] = SamplerSpacing(spacing=50.0)
+        self.samplers[SampleType.DTM] = SamplerSpacing(spacing=50.0)
+        self.samplers[SampleType.CONTACT] = ContactSampler(spacing=50.0,geology_data=geology_data,fault_data=fault_data, stratigraphic_column=self.stratigraphic_column.column)
+        self.samplers[SampleType.FAULT_ORIENTATION] = FaultOrientationSampler(dtm_data=dtm_data, geology_data=geology_data, 
+        fault_data=fault_data, map_data=self.map_data)
         # dirty flags to false after initialisation
         self.sampler_dirtyflags = [False] * len(SampleType)
 
@@ -56,7 +73,7 @@ class SampleSupervisor:
         Set the point sampler for a specific datatype
 
         Args:
-            sampletype (Datatype):
+            sampletype (SampleType):
                 The sample type (SampleType) to use this sampler on
             sampler (Sampler):
                 The sampler to use
@@ -89,7 +106,21 @@ class SampleSupervisor:
         Returns:
             str: The name of the sampler being used on the specified datatype
         """
+        if sampletype == SampleType.BASAL_CONTACT:
+            if self.samples[sampletype] is None:
+                contact_sampler = self.samplers[SampleType.CONTACT]
+                basal_contacts = contact_sampler.extract_basal_contacts()
+                self.store(SampleType.BASAL_CONTACT, basal_contacts)
+            return self.samples[sampletype]
+    
+        if self.samples[sampletype] is None or self.sampler_dirtyflags[sampletype]:
+            self.sample(sampletype)
         return self.samples[sampletype]
+    
+    @beartype.beartype
+    def store(self, sampletype: SampleType, sample_data):
+        self.samples[sampletype] = sample_data
+        self.sampler_dirtyflags[sampletype] = False
 
     @beartype.beartype
     def sample(self, sampletype: SampleType):
@@ -100,19 +131,7 @@ class SampleSupervisor:
             sampletype (SampleType): The type of the sample.
         """
 
-        if sampletype == SampleType.CONTACT:
-            self.store(
-                SampleType.CONTACT,
-                self.samplers[SampleType.CONTACT].sample(
-                    self.map_data.basal_contacts, self.map_data
-                ),
-            )
-
-        else:
-            datatype = Datatype(sampletype)
-            self.store(
-                sampletype,
-                self.samplers[sampletype].sample(
-                    self.map_data.get_map_data(datatype), self.map_data
-                ),
-            )
+        datatype = Datatype(sampletype)
+        spatial_data = self.map_data.get_map_data(datatype)
+        sampled_data = self.samplers[sampletype].sample(spatial_data)
+        self.store(sampletype, sampled_data)

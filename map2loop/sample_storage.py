@@ -6,7 +6,6 @@ from .mapdata import MapData
 from .stratigraphic_column import StratigraphicColumn
 from .fault_orientation_sampler import FaultOrientationSampler
 from .contact_sampler import ContactSampler
-from .structure_sampler import StructureSampler
 
 from .logging import getLogger
 
@@ -56,7 +55,7 @@ class SampleSupervisor:
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         fault_data = self.map_data.get_map_data(Datatype.FAULT)
 
-        self.samplers[SampleType.STRUCTURE] = StructureSampler(decimation=1,dtm_data=dtm_data,geology_data=geology_data)
+        self.samplers[SampleType.STRUCTURE] = SamplerDecimator(decimation=1, dtm_data=dtm_data, geology_data=geology_data)
         self.samplers[SampleType.GEOLOGY] = SamplerSpacing(spacing=50.0)
         self.samplers[SampleType.FAULT] = SamplerSpacing(spacing=50.0)
         self.samplers[SampleType.FOLD] = SamplerSpacing(spacing=50.0)

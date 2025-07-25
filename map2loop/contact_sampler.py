@@ -1,7 +1,7 @@
 from .sampler import SamplerSpacing
 from .m2l_enums import Datatype, SampleType
 from .contact_extractor import ContactExtractor
-from .utils import hex_to_rgb, set_z_values_from_raster_df
+from .utils import set_z_values_from_raster_df
 
 class ContactSampler(SamplerSpacing):
     def __init__(self, spacing=50.0,
@@ -41,11 +41,7 @@ class ContactSampler(SamplerSpacing):
         return basal_contacts
     
     def sample(self, spatial_data):
-        if spatial_data is None:
-            basal_contacts = self.extract_basal_contacts()
-        else:
-            basal_contacts = spatial_data
-        
+        basal_contacts = self.extract_basal_contacts()
         sampled_contacts = super().sample(basal_contacts)
         
         set_z_values_from_raster_df(self.dtm_data, sampled_contacts)

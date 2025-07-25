@@ -112,6 +112,13 @@ class SampleSupervisor:
                 self.store(SampleType.BASAL_CONTACT, basal_contacts)
             return self.samples[sampletype]
     
+        if sampletype == SampleType.CONTACT:
+            if self.samples[sampletype] is None or self.sampler_dirtyflags[sampletype]:
+                contact_sampler = self.samplers[SampleType.CONTACT]
+                sampled_contacts = contact_sampler.sample(None)
+                self.store(SampleType.CONTACT, sampled_contacts)
+            return self.samples[sampletype]
+    
         if self.samples[sampletype] is None or self.sampler_dirtyflags[sampletype]:
             self.sample(sampletype)
         return self.samples[sampletype]

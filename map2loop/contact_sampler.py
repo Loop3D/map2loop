@@ -40,7 +40,7 @@ class ContactSampler(SamplerSpacing):
         
         return basal_contacts
     
-    def sample(self, spatial_data):
+    def sample(self, spatial_data=None):
         basal_contacts = self.extract_basal_contacts()
         sampled_contacts = super().sample(basal_contacts)
         

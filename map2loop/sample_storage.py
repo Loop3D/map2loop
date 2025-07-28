@@ -103,24 +103,8 @@ class SampleSupervisor:
             sampletype: The sample type of the sampler
 
         Returns:
-            str: The name of the sampler being used on the specified datatype
+            The sample data associated with the specified sample type
         """
-        if sampletype == SampleType.BASAL_CONTACT:
-            if self.samples[sampletype] is None:
-                contact_sampler = self.samplers[SampleType.CONTACT]
-                basal_contacts = contact_sampler.extract_basal_contacts()
-                self.store(SampleType.BASAL_CONTACT, basal_contacts)
-            return self.samples[sampletype]
-    
-        if sampletype == SampleType.CONTACT:
-            if self.samples[sampletype] is None or self.sampler_dirtyflags[sampletype]:
-                contact_sampler = self.samplers[SampleType.CONTACT]
-                sampled_contacts = contact_sampler.sample(None)
-                self.store(SampleType.CONTACT, sampled_contacts)
-            return self.samples[sampletype]
-    
-        if self.samples[sampletype] is None or self.sampler_dirtyflags[sampletype]:
-            self.sample(sampletype)
         return self.samples[sampletype]
     
     @beartype.beartype
@@ -135,8 +119,35 @@ class SampleSupervisor:
 
         Args:
             sampletype (SampleType): The type of the sample.
+        
+        Returns:
+            The sample data for the specified sample type
         """
+        if self.samples[sampletype] is not None and not self.sampler_dirtyflags[sampletype]:
+            return self.samples[sampletype]
+        if sampletype == SampleType.BASAL_CONTACT:
+            self._sample_basal_contact()
+        elif sampletype == SampleType.CONTACT:
+            self._sample_contact()
+        else:
+            self._sample_other_types(sampletype)
 
+        return self.samples[sampletype]
+    
+    @beartype.beartype
+    def _sample_basal_contact(self):
+        contact_sampler = self.samplers[SampleType.CONTACT]
+        basal_contacts = contact_sampler.extract_basal_contacts()
+        self.store(SampleType.BASAL_CONTACT, basal_contacts)
+    
+    @beartype.beartype
+    def _sample_contact(self):
+        contact_sampler = self.samplers[SampleType.CONTACT]
+        sampled_contacts = contact_sampler.sample()
+        self.store(SampleType.CONTACT, sampled_contacts)
+    
+    @beartype.beartype
+    def _sample_other_types(self, sampletype: SampleType):
         datatype = Datatype(sampletype)
         spatial_data = self.map_data.get_map_data(datatype)
         sampled_data = self.samplers[sampletype].sample(spatial_data)

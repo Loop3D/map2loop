@@ -132,7 +132,7 @@ class SamplerSpacing(Sampler):
         """
         super().__init__(dtm_data, geology_data)
         self.sampler_label = "SamplerSpacing"
-        spacing = max(spacing, 50.0)
+        spacing = max(spacing, 1.0)
         self.spacing = spacing
 
 

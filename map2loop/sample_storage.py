@@ -66,6 +66,21 @@ class SampleSupervisor:
         # dirty flags to false after initialisation
         self.sampler_dirtyflags = [False] * len(SampleType)
 
+    def _verify_sampler_type(self, sampletype: SampleType, sampler_type: str):
+        allowed_samplers = {
+            SampleType.STRUCTURE: ["SamplerDecimator"],
+            SampleType.GEOLOGY: ["SamplerSpacing"],
+            SampleType.FAULT: ["SamplerSpacing"],
+            SampleType.FOLD: ["SamplerSpacing"],
+            SampleType.DTM: ["SamplerSpacing"],
+            SampleType.CONTACT: ["ContactSampler"],
+            SampleType.FAULT_ORIENTATION: ["FaultOrientationSampler"]
+        }
+        
+        if sampletype in allowed_samplers and sampler_type not in allowed_samplers[sampletype]:
+            allowed = ", ".join(allowed_samplers[sampletype])
+            raise ValueError(f"Invalid sampler type '{sampler_type}' for sample '{sampletype}', please use {allowed}")
+
     @beartype.beartype
     def set_sampler(self, sampletype: SampleType, sampler_type: str, **kwargs):
         """
@@ -77,6 +92,8 @@ class SampleSupervisor:
             samplertype (str):
                 The sampler to use
         """
+        self._verify_sampler_type(sampletype, sampler_type)
+
         if sampler_type == "SamplerDecimator":
             self._set_decimator_sampler(sampletype, **kwargs)
         elif sampler_type == "SamplerSpacing":

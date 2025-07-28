@@ -55,32 +55,65 @@ class SampleSupervisor:
         dtm_data = self.map_data.get_map_data(Datatype.DTM)
         fault_data = self.map_data.get_map_data(Datatype.FAULT)
 
-        self.samplers[SampleType.STRUCTURE] = SamplerDecimator(decimation=1, dtm_data=dtm_data, geology_data=geology_data)
-        self.samplers[SampleType.GEOLOGY] = SamplerSpacing(spacing=50.0)
-        self.samplers[SampleType.FAULT] = SamplerSpacing(spacing=50.0)
-        self.samplers[SampleType.FOLD] = SamplerSpacing(spacing=50.0)
-        self.samplers[SampleType.DTM] = SamplerSpacing(spacing=50.0)
-        self.samplers[SampleType.CONTACT] = ContactSampler(spacing=50.0,geology_data=geology_data,fault_data=fault_data, stratigraphic_column=self.stratigraphic_column.column)
-        self.samplers[SampleType.FAULT_ORIENTATION] = FaultOrientationSampler(dtm_data=dtm_data, geology_data=geology_data, 
-        fault_data=fault_data, map_data=self.map_data)
+        self._set_decimator_sampler(SampleType.STRUCTURE, decimation=1)
+        self._set_spacing_sampler(SampleType.GEOLOGY, spacing=50.0)
+        self._set_spacing_sampler(SampleType.FAULT, spacing=50.0)
+        self._set_spacing_sampler(SampleType.FOLD, spacing=50.0)
+        self._set_spacing_sampler(SampleType.DTM, spacing=50.0)
+        self._set_contact_sampler(SampleType.CONTACT, spacing=50.0)
+        self._set_fault_orientation_sampler(SampleType.FAULT_ORIENTATION)
+
         # dirty flags to false after initialisation
         self.sampler_dirtyflags = [False] * len(SampleType)
 
     @beartype.beartype
-    def set_sampler(self, sampletype: SampleType, sampler: Sampler):
+    def set_sampler(self, sampletype: SampleType, sampler_type: str, **kwargs):
         """
         Set the point sampler for a specific datatype
 
         Args:
             sampletype (SampleType):
                 The sample type (SampleType) to use this sampler on
-            sampler (Sampler):
+            samplertype (str):
                 The sampler to use
         """
-        self.samplers[sampletype] = sampler
+        if sampler_type == "SamplerDecimator":
+            self._set_decimator_sampler(sampletype, **kwargs)
+        elif sampler_type == "SamplerSpacing":
+            self._set_spacing_sampler(sampletype, **kwargs)
+        elif sampler_type == "ContactSampler":
+            self._set_contact_sampler(sampletype, **kwargs)
+        elif sampler_type == "FaultOrientationSampler":
+            self._set_fault_orientation_sampler(sampletype, **kwargs)
+        else:
+            raise ValueError('incorrect sampler type')
+
         # set the dirty flag to True to indicate that the sampler has changed
         self.sampler_dirtyflags[sampletype] = True
 
+    @beartype.beartype
+    def _set_decimator_sampler(self, sampletype, decimation=1):
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        self.samplers[sampletype] = SamplerDecimator(decimation=decimation, dtm_data=dtm_data, geology_data=geology_data)
+
+    @beartype.beartype
+    def _set_spacing_sampler(self, sampletype, spacing=50.0):
+        self.samplers[sampletype] = SamplerSpacing(spacing=spacing)
+    
+    @beartype.beartype
+    def _set_contact_sampler(self, sampletype, spacing=50.0):
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        fault_data = self.map_data.get_map_data(Datatype.FAULT)
+        self.samplers[sampletype] = ContactSampler(spacing=spacing,geology_data=geology_data,fault_data=fault_data, stratigraphic_column=self.stratigraphic_column.column)
+
+    @beartype.beartype
+    def _set_fault_orientation_sampler(self, sampletype):
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        fault_data = self.map_data.get_map_data(Datatype.FAULT)
+        self.samplers[sampletype] = FaultOrientationSampler(dtm_data=dtm_data, geology_data=geology_data, fault_data=fault_data, map_data=self.map_data)
+    
     @beartype.beartype
     def get_sampler(self, sampletype: SampleType):
         """

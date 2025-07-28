@@ -1675,7 +1675,8 @@ def test_calculate_thickness_structural_point():
         stratigraphic_order=st_column,
         basal_contacts=bc_gdf,
         structure_data=structures,
-        map_data=md,
+        geology_data=md.get_map_data(Datatype.GEOLOGY),
+        sampled_contacts=md.sampled_contacts,
     )
 
     # is thickness calc alpha the label?

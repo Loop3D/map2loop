@@ -366,19 +366,22 @@ class InterpolatedStructure(ThicknessCalculator):
                         # check if the short line is 
                         if self.max_line_length is not None and short_line.length > self.max_line_length:
                             continue
+                        
+                        inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
+                        data_array = numpy.array(self.dtm_data.GetRasterBand(1).ReadAsArray().T)
  
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
                         p1[1] = numpy.asarray(short_line[0].coords[0][1])
                         # get the elevation Z of the end point p1
-                        p1[2] = value_from_raster(Datatype.DTM, p1[0], p1[1])
+                        p1[2] = value_from_raster(inv_geotransform, data_array, p1[0], p1[1])
                         # create array to store xyz coordinates of the end point p2
                         p2 = numpy.zeros(3)
                         p2[0] = numpy.asarray(short_line[0].coords[-1][0])
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
                         # get the elevation Z of the end point p2
-                        p2[2] = value_from_raster(Datatype.DTM, p2[0], p2[1])
+                        p2[2] = value_from_raster(inv_geotransform, data_array, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line

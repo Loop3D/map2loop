@@ -1,6 +1,7 @@
 import pandas
 import geopandas
 import numpy
+import shapely.geometry
 
 from map2loop.mapdata import MapData
 from map2loop.thickness_calculator import InterpolatedStructure
@@ -1640,7 +1641,8 @@ featureid = [
     '3',
 ]
 
-s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
+geometry= [shapely.geometry.Point(x,y) for x,y in zip(X, Y)]
+s_c = geopandas.GeoDataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid}, geometry = geometry,  crs='EPSG:28350')
 
 
 ##################################

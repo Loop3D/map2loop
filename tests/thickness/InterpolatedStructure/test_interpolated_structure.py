@@ -1,6 +1,7 @@
 import pandas
 import geopandas
 import numpy
+import shapely.geometry
 
 from map2loop.mapdata import MapData
 from map2loop.thickness_calculator import InterpolatedStructure
@@ -1640,7 +1641,8 @@ featureid = [
     '3',
 ]
 
-s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
+geometry= [shapely.geometry.Point(x,y) for x,y in zip(X, Y)]
+s_c = geopandas.GeoDataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid}, geometry = geometry,  crs='EPSG:28350')
 
 
 ##################################
@@ -1663,7 +1665,6 @@ def check_thickness_values(result, column, description):
 
 def test_calculate_thickness_InterpolatedStructure():
     # Run the calculation
-    thickness_calculator = InterpolatedStructure()
 
     md = MapData()
     md.sampled_contacts = s_c
@@ -1683,13 +1684,16 @@ def test_calculate_thickness_InterpolatedStructure():
         "base": -3200,
         "top": 3000,
     }
+    thickness_calculator = InterpolatedStructure(dtm_data=md.get_map_data(Datatype.DTM),
+                                                 bounding_box=md.bounding_box)
 
     result = thickness_calculator.compute(
         units=st_units,
         stratigraphic_order=st_column,
         basal_contacts=bc_gdf,
         structure_data=structures,
-        map_data=md,
+        geology_data=md.get_map_data(Datatype.GEOLOGY),
+        sampled_contacts=md.sampled_contacts,
     )
 
     # is thickness calc alpha the label?

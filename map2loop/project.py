@@ -41,7 +41,7 @@ class Project(object):
     verbose_level: m2l_enums.VerboseLevel
         A selection that defines how much console logging is output
     samplers: Sampler
-        A list of samplers used to extract point samples from polyonal or line segments. Indexed by m2l_enum.Dataype
+        A list of samplers used to extract point samples from polygons or line segments. Indexed by m2l_enum
     sorter: Sorter
         The sorting algorithm to use for calculating the stratigraphic column
     loop_filename: str
@@ -141,7 +141,6 @@ class Project(object):
         self.bounding_box = bounding_box
         self.contact_extractor = None
         self.sorter = SorterUseHint()
-        self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
@@ -245,6 +244,10 @@ class Project(object):
             self.map_data.get_map_data(Datatype.GEOLOGY), 
             self.map_data.get_map_data(Datatype.FAULT)
             )
+        self.thickness_calculator = [InterpolatedStructure(
+            dtm_data=self.map_data.get_map_data(Datatype.DTM),
+            bounding_box=self.bounding_box,
+        )]
 
 
     @beartype.beartype
@@ -697,7 +700,8 @@ class Project(object):
                 self.stratigraphic_column.column,
                 basal_contacts,
                 self.structure_samples,
-                self.map_data,
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.sampled_contacts,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
 
             label = calculator.thickness_calculator_label

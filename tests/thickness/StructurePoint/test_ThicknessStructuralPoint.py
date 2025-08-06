@@ -1,6 +1,7 @@
 import pandas
 import geopandas
 import numpy
+import shapely.geometry
 
 from map2loop.mapdata import MapData
 from map2loop.thickness_calculator import StructuralPoint
@@ -1637,7 +1638,8 @@ featureid = [
     '3',
 ]
 
-s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
+geometry= [shapely.geometry.Point(x,y) for x,y in zip(X, Y)]
+s_c = geopandas.GeoDataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid}, geometry = geometry,  crs='EPSG:28350')
 
 
 ############################
@@ -1664,7 +1666,6 @@ def test_calculate_thickness_structural_point():
 
     md = MapData()
     md.sampled_contacts = s_c
-    md.sampled_contacts = s_c
     md.raw_data[Datatype.GEOLOGY] = geology
     md.load_map_data(Datatype.GEOLOGY)
     md.check_map(Datatype.GEOLOGY)
@@ -1675,7 +1676,8 @@ def test_calculate_thickness_structural_point():
         stratigraphic_order=st_column,
         basal_contacts=bc_gdf,
         structure_data=structures,
-        map_data=md,
+        geology_data=md.get_map_data(Datatype.GEOLOGY),
+        sampled_contacts=md.sampled_contacts,
     )
 
     # is thickness calc alpha the label?

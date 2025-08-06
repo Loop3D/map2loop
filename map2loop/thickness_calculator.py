@@ -8,9 +8,7 @@ from .utils import (
     set_z_values_from_raster_df,
     value_from_raster
 )
-from .m2l_enums import Datatype
 from .interpolators import DipDipDirectionInterpolator
-from .mapdata import MapData
 
 from .logging import getLogger
 logger = getLogger(__name__)  

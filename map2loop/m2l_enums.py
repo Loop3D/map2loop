@@ -30,3 +30,13 @@ class VerboseLevel(IntEnum):
     NONE = 0
     TEXTONLY = 1
     ALL = 2
+
+class SampleType(IntEnum):
+    GEOLOGY = 0
+    STRUCTURE = 1
+    FAULT = 2
+    FOLD = 3
+    DTM = 4
+    FAULT_ORIENTATION = 5
+    CONTACT = 6
+    BASAL_CONTACT = 7

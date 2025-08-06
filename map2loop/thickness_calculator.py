@@ -67,7 +67,7 @@ class ThicknessCalculator(ABC):
         basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         geology_data: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method (abstract method)
@@ -125,7 +125,7 @@ class ThicknessCalculatorAlpha(ThicknessCalculator):
         basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         geology_data: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts and stratigraphic order and attempts to estimate unit thickness.
@@ -239,7 +239,7 @@ class InterpolatedStructure(ThicknessCalculator):
         basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         geology_data: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
     ) -> pandas.DataFrame:
         """
         Execute thickness calculator method takes unit data, basal_contacts, stratigraphic order, orientation data and
@@ -479,7 +479,7 @@ class StructuralPoint(ThicknessCalculator):
         basal_contacts: geopandas.GeoDataFrame,
         structure_data: pandas.DataFrame,
         geology_data: geopandas.GeoDataFrame,
-        sampled_contacts: geopandas.GeoDataFrame,
+        sampled_contacts: pandas.DataFrame,
     ) -> pandas.DataFrame:
         """
         Method overview:

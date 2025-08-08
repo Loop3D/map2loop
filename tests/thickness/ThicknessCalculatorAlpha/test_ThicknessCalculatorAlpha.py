@@ -1640,8 +1640,7 @@ featureid = [
     '3',
 ]
 
-geometry= [shapely.geometry.Point(x,y) for x,y in zip(X, Y)]
-s_c = geopandas.GeoDataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid}, geometry = geometry,  crs='EPSG:28350')
+s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 
 #####################################
 ### TEST ThicknessCalculatorAlpha ###

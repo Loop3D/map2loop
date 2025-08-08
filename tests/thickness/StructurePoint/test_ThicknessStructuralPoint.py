@@ -1,7 +1,6 @@
 import pandas
 import geopandas
 import numpy
-import shapely.geometry
 
 from map2loop.mapdata import MapData
 from map2loop.thickness_calculator import StructuralPoint

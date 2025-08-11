@@ -471,11 +471,13 @@ def validate_config_dictionary(config_dict: dict) -> None:
         "fault": {
             "structtype_column",  "fault_text",  "dip_null_value",
             "dipdir_flag", "dipdir_column",  "dip_column",  "orientation_type",
-            "dipestimate_column",  "dipestimate_text",  "name_column",
-            "objectid_column", "minimum_fault_length", "ignore_fault_codes",
+            "dipestimate_column",  "dipestimate_text","displacement_column", 
+            "displacement_text",  "name_column","objectid_column", "minimum_fault_length",
+            "fault_length_column", "fault_length_text", "ignore_fault_codes",
         },
         "fold": {
-            "structtype_column", "fold_text", "description_column",
+            "structtype_column", "fold_text", "axial_plane_dipdir_column", 
+            "axial_plane_dip_column","tightness_column", "description_column",
             "synform_text", "foldname_column","objectid_column",
         },
     }

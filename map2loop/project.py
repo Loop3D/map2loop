@@ -694,7 +694,8 @@ class Project(object):
         labels = []
 
         for calculator in self.thickness_calculator:
-
+            calculator.dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            calculator.bounding_box = self.bounding_box
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,

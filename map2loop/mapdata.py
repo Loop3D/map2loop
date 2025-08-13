@@ -596,7 +596,11 @@ class MapData:
             )
 
             filename = f"https://pae-paha.pacioos.hawaii.edu/erddap/griddap/srtm30plus_v11_land.nc?elev{bbox_str}"
-            f = urllib.request.urlopen(filename)
+            try:
+                f = urllib.request.urlopen(filename)
+            except urllib.error.URLError:
+                logger.error(f"Failed to open remote file {filename}")
+                return None
             ds = netCDF4.Dataset("in-mem-file", mode="r", memory=f.read())
             spatial = [
                 ds.geospatial_lon_min,
@@ -621,7 +625,13 @@ class MapData:
             tif.GetRasterBand(1).WriteArray(numpy.flipud(ds.variables["elev"][:][:]))
         elif filename.startswith("http"):
             logger.info(f'Opening remote file {filename}')
-            image_data = self.open_http_query(filename)
+            try:
+                image_data = self.open_http_query(filename)
+            except urllib.error.URLError:
+                logger.error(f"Failed to open remote file {filename}")
+                return None
+            if image_data is None:
+                return None
             mmap_name = f"/vsimem/{str(uuid4())}"
             gdal.FileFromMemBuffer(mmap_name, image_data.read())
             tif = gdal.Open(mmap_name)
@@ -645,6 +655,9 @@ class MapData:
             if self.data_states[datatype] == Datastate.UNLOADED:
                 # Load data from file
                 self.data[datatype] = self.__retrieve_tif(self.filenames[datatype])
+                if self.data[datatype] is None:
+                    logger.error(f"Failed to load raster data for {datatype.name}")
+                    return
                 self.data_states[datatype] = Datastate.LOADED
             if self.data_states[datatype] == Datastate.LOADED:
                 # Reproject raster to required CRS
@@ -659,6 +672,7 @@ class MapData:
                     )
                 except Exception:
                     logger.error(f"Warp failed for {datatype.name}\n")
+                    return
                 self.data_states[datatype] = Datastate.REPROJECTED
             if self.data_states[datatype] == Datastate.REPROJECTED:
                 # Clip raster image to bounding polygon
@@ -668,6 +682,9 @@ class MapData:
                     self.bounding_box["maxx"],
                     self.bounding_box["miny"],
                 ]
+                if self.data[datatype] is None:
+                    logger.error(f"No raster data available for {datatype.name}")
+                    return
                 self.data[datatype] = gdal.Translate(
                     "",
                     self.data[datatype],
@@ -1448,170 +1465,7 @@ class MapData:
         val = data.ReadAsArray(px, py, 1, 1)[0][0]
         return val
 
-    @beartype.beartype
-    def __value_from_raster(self, inv_geotransform, data, x: float, y: float):
-        """
-        Get the value from a raster dataset at the specified point
 
-        Args:
-            inv_geotransform (gdal.GeoTransform):
-                The inverse of the data's geotransform
-            data (numpy.array):
-                The raster data
-            x (float):
-                The easting coordinate of the value
-            y (float):
-                The northing coordinate of the value
-
-        Returns:
-            float or int: The value at the point specified
-        """
-        px = int(inv_geotransform[0] + inv_geotransform[1] * x + inv_geotransform[2] * y)
-        py = int(inv_geotransform[3] + inv_geotransform[4] * x + inv_geotransform[5] * y)
-        # Clamp values to the edges of raster if past boundary, similiar to GL_CLIP
-        px = max(px, 0)
-        px = min(px, data.shape[0] - 1)
-        py = max(py, 0)
-        py = min(py, data.shape[1] - 1)
-        return data[px][py]
-
-    @beartype.beartype
-    def get_value_from_raster_df(self, datatype: Datatype, df: pandas.DataFrame):
-        """
-        Add a 'Z' column to a dataframe with the heights from the 'X' and 'Y' coordinates
-
-        Args:
-            datatype (Datatype):
-                The datatype of the raster map to retrieve from
-            df (pandas.DataFrame):
-                The original dataframe with 'X' and 'Y' columns
-
-        Returns:
-            pandas.DataFrame: The modified dataframe
-        """
-        if len(df) <= 0:
-            df["Z"] = []
-            return df
-        data = self.get_map_data(datatype)
-        if data is None:
-            logger.warning("Cannot get value from data as data is not loaded")
-            return None
-
-        inv_geotransform = gdal.InvGeoTransform(data.GetGeoTransform())
-        data_array = numpy.array(data.GetRasterBand(1).ReadAsArray().T)
-
-        df["Z"] = df.apply(
-            lambda row: self.__value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),
-            axis=1,
-        )
-        return df
-
-    @beartype.beartype
-    def extract_all_contacts(self, save_contacts=True):
-        """
-        Extract the contacts between units in the geology GeoDataFrame
-        """
-        logger.info("Extracting contacts")
-        geology = self.get_map_data(Datatype.GEOLOGY).copy()
-        geology = geology.dissolve(by="UNITNAME", as_index=False)
-        # Remove intrusions
-        geology = geology[~geology["INTRUSIVE"]]
-        geology = geology[~geology["SILL"]]
-        # Remove faults from contact geomety
-        if self.get_map_data(Datatype.FAULT) is not None:
-            faults = self.get_map_data(Datatype.FAULT).copy()
-            faults["geometry"] = faults.buffer(50)
-            geology = geopandas.overlay(geology, faults, how="difference", keep_geom_type=False)
-        units = geology["UNITNAME"].unique()
-        column_names = ["UNITNAME_1", "UNITNAME_2", "geometry"]
-        contacts = geopandas.GeoDataFrame(crs=geology.crs, columns=column_names, data=None)
-        while len(units) > 1:
-            unit1 = units[0]
-            units = units[1:]
-            for unit2 in units:
-                if unit1 != unit2:
-                    # print(f'contact: {unit1} and {unit2}')
-                    join = geopandas.overlay(
-                        geology[geology["UNITNAME"] == unit1],
-                        geology[geology["UNITNAME"] == unit2],
-                        keep_geom_type=False,
-                    )[column_names]
-                    join["geometry"] = join.buffer(1)
-                    buffered = geology[geology["UNITNAME"] == unit2][["geometry"]].copy()
-                    buffered["geometry"] = buffered.boundary
-                    end = geopandas.overlay(buffered, join, keep_geom_type=False)
-                    if len(end):
-                        contacts = pandas.concat([contacts, end], ignore_index=True)
-        # contacts["TYPE"] = "UNKNOWN"
-        contacts["length"] = [row.length for row in contacts["geometry"]]
-        # print('finished extracting contacts')
-        if save_contacts:
-            self.contacts = contacts
-        return contacts
-
-    @beartype.beartype
-    def extract_basal_contacts(self, stratigraphic_column: list, save_contacts=True):
-        """
-        Identify the basal unit of the contacts based on the stratigraphic column
-
-        Args:
-            stratigraphic_column (list):
-                The stratigraphic column to use
-        """
-        logger.info("Extracting basal contacts")
-        
-        units = stratigraphic_column
-        basal_contacts = self.contacts.copy()
-
-        # check if the units in the strati colum are in the geology dataset, so that basal contacts can be built
-        # if not, stop the project
-        if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
-            missing_units = (
-                basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
-                .unique()
-                .tolist()
-            )
-            logger.error(
-                "There are units in the Geology dataset, but not in the stratigraphic column: "
-                + ", ".join(missing_units)
-                + ". Please readjust the stratigraphic column if this is a user defined column."
-            )
-            raise ValueError(
-                "There are units in stratigraphic column, but not in the Geology dataset: "
-                + ", ".join(missing_units)
-                + ". Please readjust the stratigraphic column if this is a user defined column."
-            )
-
-        # apply minimum lithological id between the two units
-        basal_contacts["ID"] = basal_contacts.apply(
-            lambda row: min(units.index(row["UNITNAME_1"]), units.index(row["UNITNAME_2"])), axis=1
-        )
-        # match the name of the unit with the minimum id
-        basal_contacts["basal_unit"] = basal_contacts.apply(lambda row: units[row["ID"]], axis=1)
-        # how many units apart are the two units?
-        basal_contacts["stratigraphic_distance"] = basal_contacts.apply(
-            lambda row: abs(units.index(row["UNITNAME_1"]) - units.index(row["UNITNAME_2"])), axis=1
-        )
-        # if the units are more than 1 unit apart, the contact is abnormal (meaning that there is one (or more) unit(s) missing in between the two)
-        basal_contacts["type"] = basal_contacts.apply(
-            lambda row: "ABNORMAL" if abs(row["stratigraphic_distance"]) > 1 else "BASAL", axis=1
-        )
-
-        basal_contacts = basal_contacts[["ID", "basal_unit", "type", "geometry"]]
-
-        # added code to make sure that multi-line that touch each other are snapped and merged.
-        # necessary for the reconstruction based on featureId
-        basal_contacts["geometry"] = [
-            shapely.line_merge(shapely.snap(geo, geo, 1)) for geo in basal_contacts["geometry"]
-        ]
-
-        if save_contacts:
-            # keep abnormal contacts as all_basal_contacts
-            self.all_basal_contacts = basal_contacts
-            # remove the abnormal contacts from basal contacts
-            self.basal_contacts = basal_contacts[basal_contacts["type"] == "BASAL"]
-
-        return basal_contacts
 
     @beartype.beartype
     def colour_units(

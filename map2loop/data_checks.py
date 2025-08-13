@@ -471,11 +471,13 @@ def validate_config_dictionary(config_dict: dict) -> None:
         "fault": {
             "structtype_column",  "fault_text",  "dip_null_value",
             "dipdir_flag", "dipdir_column",  "dip_column",  "orientation_type",
-            "dipestimate_column",  "dipestimate_text",  "name_column",
-            "objectid_column", "minimum_fault_length", "ignore_fault_codes",
+            "dipestimate_column",  "dipestimate_text","displacement_column", 
+            "displacement_text",  "name_column","objectid_column", "featureid_column", "minimum_fault_length",
+            "fault_length_column", "fault_length_text", "ignore_fault_codes",
         },
         "fold": {
-            "structtype_column", "fold_text", "description_column",
+            "structtype_column", "fold_text", "axial_plane_dipdir_column", 
+            "axial_plane_dip_column","tightness_column", "description_column",
             "synform_text", "foldname_column","objectid_column",
         },
     }
@@ -853,6 +855,7 @@ def validate_structtype_column(
     if text_keys:
         for text_key, config_key in text_keys.items():
             text_value = config.get(config_key, None)
+            text_pattern = '|'.join(text_value) if text_value else None
             if text_value:
                 if not isinstance(text_value, str):
                     error_msg = (
@@ -862,7 +865,7 @@ def validate_structtype_column(
                     logger.error(error_msg)
                     return (True, error_msg)
                 
-                if not geodata[structtype_column].str.contains(text_value, na=False).any():
+                if not geodata[structtype_column].str.contains(text_pattern, case=False, regex=True, na=False).any():
                     if text_key == "synform_text":
                         warning_msg = (
                             f"Datatype {datatype_name.upper()}: The '{text_key}' value '{text_value}' is not found in column '{structtype_column}'. "

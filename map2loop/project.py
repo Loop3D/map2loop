@@ -1,8 +1,9 @@
 # internal imports
 from map2loop.fault_orientation import FaultOrientationNearest
-from .utils import hex_to_rgb
+from .utils import hex_to_rgb, set_z_values_from_raster_df
 from .m2l_enums import VerboseLevel, ErrorState, Datatype
 from .mapdata import MapData
+from .contact_extractor import ContactExtractor
 from .sampler import Sampler, SamplerDecimator, SamplerSpacing
 from .thickness_calculator import InterpolatedStructure, ThicknessCalculator
 from .throw_calculator import ThrowCalculator, ThrowCalculatorAlpha
@@ -10,7 +11,7 @@ from .fault_orientation import FaultOrientation
 from .sorter import Sorter, SorterAgeBased, SorterAlpha, SorterUseNetworkX, SorterUseHint
 from .stratigraphic_column import StratigraphicColumn
 from .deformation_history import DeformationHistory
-from .map2model_wrapper import Map2ModelWrapper
+from .topology import Topology
 from .data_checks import validate_config_dictionary
 
 # external imports
@@ -40,14 +41,14 @@ class Project(object):
     verbose_level: m2l_enums.VerboseLevel
         A selection that defines how much console logging is output
     samplers: Sampler
-        A list of samplers used to extract point samples from polyonal or line segments. Indexed by m2l_enum.Dataype
+        A list of samplers used to extract point samples from polygons or line segments. Indexed by m2l_enum
     sorter: Sorter
         The sorting algorithm to use for calculating the stratigraphic column
     loop_filename: str
         The name of the loop project file used in this project
     map_data: MapData
         The structure that holds all map and dtm data
-    map2model: Map2ModelWrapper
+    map2model: Topology
         A wrapper around the map2model module that extracts unit and fault adjacency
     stratigraphic_column: StratigraphicColumn
         The structure that holds the unit information and ordering
@@ -138,17 +139,17 @@ class Project(object):
         self.samplers = [SamplerDecimator()] * len(Datatype)
         self.set_default_samplers()
         self.bounding_box = bounding_box
+        self.contact_extractor = None
         self.sorter = SorterUseHint()
-        self.thickness_calculator = [InterpolatedStructure()]
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
-        self.map2model = Map2ModelWrapper(self.map_data)
         self.stratigraphic_column = StratigraphicColumn()
         self.deformation_history = DeformationHistory(project=self)
         self.loop_filename = loop_project_filename
         self.overwrite_lpf = overwrite_loopprojectfile
         self.active_thickness = None
+        
         
         # initialise the dataframes to store data in
         self.fault_orientations = pandas.DataFrame(
@@ -239,6 +240,14 @@ class Project(object):
         # Populate the stratigraphic column and deformation history from map data
         self.stratigraphic_column.populate(self.map_data.get_map_data(Datatype.GEOLOGY))
         self.deformation_history.populate(self.map_data.get_map_data(Datatype.FAULT))
+        self.topology = Topology(
+            self.map_data.get_map_data(Datatype.GEOLOGY), 
+            self.map_data.get_map_data(Datatype.FAULT)
+            )
+        self.thickness_calculator = [InterpolatedStructure(
+            dtm_data=self.map_data.get_map_data(Datatype.DTM),
+            bounding_box=self.bounding_box,
+        )]
 
 
     @beartype.beartype
@@ -503,45 +512,52 @@ class Project(object):
         """
         Use the samplers to extract points along polylines or unit boundaries
         """
-        logger.info(
-            f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}"
-        )
-        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.get_map_data(Datatype.GEOLOGY), self.map_data
-        )
-        logger.info(
-            f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}"
-        )
-        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(
-            self.map_data.get_map_data(Datatype.STRUCTURE), self.map_data
-        )
+        geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        
+        logger.info(f"Sampling geology map data using {self.samplers[Datatype.GEOLOGY].sampler_label}")
+        self.geology_samples = self.samplers[Datatype.GEOLOGY].sample(geology_data)
+
+        logger.info(f"Sampling structure map data using {self.samplers[Datatype.STRUCTURE].sampler_label}")
+        self.samplers[Datatype.STRUCTURE].dtm_data = dtm_data
+        self.samplers[Datatype.STRUCTURE].geology_data = geology_data
+        self.structure_samples = self.samplers[Datatype.STRUCTURE].sample(self.map_data.get_map_data(Datatype.STRUCTURE))
+
         logger.info(f"Sampling fault map data using {self.samplers[Datatype.FAULT].sampler_label}")
-        self.fault_samples = self.samplers[Datatype.FAULT].sample(
-            self.map_data.get_map_data(Datatype.FAULT), self.map_data
-        )
+        self.fault_samples = self.samplers[Datatype.FAULT].sample(self.map_data.get_map_data(Datatype.FAULT))
+
         logger.info(f"Sampling fold map data using {self.samplers[Datatype.FOLD].sampler_label}")
-        self.fold_samples = self.samplers[Datatype.FOLD].sample(
-            self.map_data.get_map_data(Datatype.FOLD), self.map_data
-        )
+        self.fold_samples = self.samplers[Datatype.FOLD].sample(self.map_data.get_map_data(Datatype.FOLD))
 
     def extract_geology_contacts(self):
         """
         Use the stratigraphic column, and fault and geology data to extract points along contacts
         """
         # Use stratigraphic column to determine basal contacts
-        self.map_data.extract_basal_contacts(self.stratigraphic_column.column)
+        if self.contact_extractor is None:
+            self.contact_extractor = ContactExtractor(
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.FAULT),
+            )
+            self.contact_extractor.extract_all_contacts()
+
+        basal_contacts = self.contact_extractor.extract_basal_contacts(self.stratigraphic_column.column)
 
         # sample the contacts
-        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(
-            self.map_data.basal_contacts
-        )
-
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.map_data.sampled_contacts)
+        self.map_data.sampled_contacts = self.samplers[Datatype.GEOLOGY].sample(basal_contacts)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        set_z_values_from_raster_df(dtm_data, self.map_data.sampled_contacts)
 
     def calculate_stratigraphic_order(self, take_best=False):
         """
         Use unit relationships, unit ages and the sorter to create a stratigraphic column
         """
+        if self.contact_extractor is None:
+            self.contact_extractor = ContactExtractor(
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.FAULT),
+            )
+            self.contact_extractor.extract_all_contacts()
         if take_best:
             sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
             logger.info(
@@ -551,14 +567,16 @@ class Project(object):
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
-                    self.map2model.get_unit_unit_relationships(),
-                    self.map_data.contacts,
+                    self.topology.get_unit_unit_relationships(),
+                    self.contact_extractor.contacts,
                     self.map_data,
                 )
                 for sorter in sorters
             ]
             basal_contacts = [
-                self.map_data.extract_basal_contacts(column, save_contacts=False)
+                self.contact_extractor.extract_basal_contacts(
+                    column, save_contacts=False
+                )
                 for column in columns
             ]
             basal_lengths = [
@@ -581,8 +599,8 @@ class Project(object):
             logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
-                self.map2model.get_unit_unit_relationships(),
-                self.map_data.contacts,
+                self.topology.get_unit_unit_relationships(),
+                self.contact_extractor.contacts,
                 self.map_data,
             )
 
@@ -649,7 +667,7 @@ class Project(object):
                 "self.thickness_calculator must be either a list of objects or a single object with a thickness_calculator_label attribute"
             )
 
-    def calculate_unit_thicknesses(self):
+    def calculate_unit_thicknesses(self, basal_contacts):
         """
         Calculates the unit thickness statistics (mean, median, standard deviation) for each stratigraphic unit
         in the stratigraphic column using the provided thickness calculators.
@@ -676,13 +694,15 @@ class Project(object):
         labels = []
 
         for calculator in self.thickness_calculator:
-
+            calculator.dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            calculator.bounding_box = self.bounding_box
             result = calculator.compute(
                 self.stratigraphic_column.stratigraphicUnits,
                 self.stratigraphic_column.column,
-                self.map_data.basal_contacts,
+                basal_contacts,
                 self.structure_samples,
-                self.map_data,
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.sampled_contacts,
             )[['ThicknessMean', 'ThicknessMedian', 'ThicknessStdDev']].to_numpy()
 
             label = calculator.thickness_calculator_label
@@ -714,7 +734,8 @@ class Project(object):
                 self.map_data.get_map_data(Datatype.FAULT_ORIENTATION),
                 self.map_data,
             )
-            self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_orientations)
+            dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            set_z_values_from_raster_df(dtm_data, self.fault_orientations)
         else:
             logger.warning(
                 "No fault orientation data found, skipping fault orientation calculation"
@@ -739,13 +760,14 @@ class Project(object):
         """
         Use the fault shapefile to make a summary of each fault by name
         """
-        self.map_data.get_value_from_raster_df(Datatype.DTM, self.fault_samples)
+        dtm_data = self.map_data.get_map_data(Datatype.DTM)
+        set_z_values_from_raster_df(dtm_data, self.fault_samples)
 
         self.deformation_history.summarise_data(self.fault_samples)
         self.deformation_history.faults = self.throw_calculator.compute(
             self.deformation_history.faults,
             self.stratigraphic_column.column,
-            self.map_data.basal_contacts,
+            self.contact_extractor.basal_contacts,
             self.map_data,
         )
         logger.info(f'There are {self.deformation_history.faults.shape[0]} faults in the dataset')
@@ -763,12 +785,16 @@ class Project(object):
             logger.info(f'User defined stratigraphic column: {user_defined_stratigraphic_column}')
 
         # Calculate contacts before stratigraphic column
-        self.map_data.extract_all_contacts()
+        self.contact_extractor = ContactExtractor(
+            self.map_data.get_map_data(Datatype.GEOLOGY),
+            self.map_data.get_map_data(Datatype.FAULT),
+        )
+        self.map_data.contacts = self.contact_extractor.extract_all_contacts()
 
         # Calculate the stratigraphic column
         if issubclass(type(user_defined_stratigraphic_column), list):
             self.stratigraphic_column.column = user_defined_stratigraphic_column
-            self.map2model.run()  # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
+            self.topology.run()  # if we use a user defined stratigraphic column, we still need to calculate the results of map2model
         else:
             if user_defined_stratigraphic_column is not None:
                 logger.warning(
@@ -780,7 +806,7 @@ class Project(object):
         # Calculate basal contacts based on stratigraphic column
         self.extract_geology_contacts()
         self.sample_map_data()
-        self.calculate_unit_thicknesses()
+        self.calculate_unit_thicknesses(self.contact_extractor.basal_contacts)
         self.calculate_fault_orientations()
         self.summarise_fault_data()
         self.apply_colour_to_units()
@@ -1012,9 +1038,9 @@ class Project(object):
         observations["dipPolarity"] = self.structure_samples["OVERTURNED"]
         LPF.Set(self.loop_filename, "stratigraphicObservations", data=observations)
 
-        if self.map2model.fault_fault_relationships is not None:
+        if self.topology.fault_fault_relationships is not None:
             ff_relationships = self.deformation_history.get_fault_relationships_with_ids(
-                self.map2model.fault_fault_relationships
+                self.topology.fault_fault_relationships
             )
             relationships = numpy.zeros(len(ff_relationships), LPF.eventRelationshipType)
 
@@ -1053,7 +1079,7 @@ class Project(object):
             base = geol.plot(color=geol["colour_rgba"])
         if overlay != "":
             if overlay == "basal_contacts":
-                self.map_data.basal_contacts[self.map_data.basal_contacts["type"] == "BASAL"].plot(
+                self.contact_extractor.basal_contacts[self.contact_extractor.basal_contacts["type"] == "BASAL"].plot(
                     ax=base
                 )
 

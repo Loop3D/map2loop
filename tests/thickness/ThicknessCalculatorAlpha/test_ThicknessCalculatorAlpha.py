@@ -1641,6 +1641,7 @@ featureid = [
 
 s_c = pandas.DataFrame({'X': X, 'Y': Y, 'Z': Z, 'featureId': featureid})
 
+
 #####################################
 ### TEST ThicknessCalculatorAlpha ###
 #####################################
@@ -1657,16 +1658,15 @@ def check_thickness_values(result, column, description):
 
 
 geology = load_hamersley_geology()
-geology.rename(columns={'unitname': 'UNITNAME', 'code': 'CODE'}, inplace=True)
+
 
 def test_calculate_thickness_thickness_calculator_alpha():
     # Run the calculation
     md = MapData()
     md.sampled_contacts = s_c
-    md.raw_data[Datatype.GEOLOGY] = geology
-    md.load_map_data(Datatype.GEOLOGY)
-    md.check_map(Datatype.GEOLOGY)
-    md.parse_geology_map()
+    md.data[Datatype.GEOLOGY] = geology
+
+    print('GERE', md.get_map_data(Datatype.GEOLOGY))
 
     thickness_calculator = ThicknessCalculatorAlpha()
     result = thickness_calculator.compute(
@@ -1674,8 +1674,7 @@ def test_calculate_thickness_thickness_calculator_alpha():
         stratigraphic_order=st_column,
         basal_contacts=bc_gdf,
         structure_data=structures,
-        geology_data=md.get_map_data(Datatype.GEOLOGY),
-        sampled_contacts=md.sampled_contacts,
+        map_data=md,
     )
 
     # is thickness calc alpha the label?

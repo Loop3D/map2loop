@@ -1663,6 +1663,7 @@ def check_thickness_values(result, column, description):
 
 def test_calculate_thickness_InterpolatedStructure():
     # Run the calculation
+    thickness_calculator = InterpolatedStructure()
 
     md = MapData()
     md.sampled_contacts = s_c
@@ -1682,16 +1683,13 @@ def test_calculate_thickness_InterpolatedStructure():
         "base": -3200,
         "top": 3000,
     }
-    thickness_calculator = InterpolatedStructure(dtm_data=md.get_map_data(Datatype.DTM),
-                                                 bounding_box=md.bounding_box)
 
     result = thickness_calculator.compute(
         units=st_units,
         stratigraphic_order=st_column,
         basal_contacts=bc_gdf,
         structure_data=structures,
-        geology_data=md.get_map_data(Datatype.GEOLOGY),
-        sampled_contacts=md.sampled_contacts,
+        map_data=md,
     )
 
     # is thickness calc alpha the label?

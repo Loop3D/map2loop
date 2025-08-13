@@ -1706,14 +1706,14 @@ def test_calculate_unit_thicknesses():
 
     # check set
 
-    project.set_thickness_calculator([StructuralPoint(dtm_data=dtm, bounding_box=bbox_3d), InterpolatedStructure(dtm_data=dtm, bounding_box=bbox_3d)])
+    project.set_thickness_calculator([StructuralPoint(), InterpolatedStructure()])
     assert project.get_thickness_calculator() == [
         'StructuralPoint',
         'InterpolatedStructure',
     ], "Setter method for thickness calculator not working"  ## default is InterpolatedStructure
 
     # Run the calculate_unit_thicknesses
-    project.calculate_unit_thicknesses(bc_gdf)
+    project.calculate_unit_thicknesses()
 
     # # Check if all thicknesses have been calculated
     columns_to_check = [

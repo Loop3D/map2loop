@@ -1,26 +1,24 @@
-from typing import Optional
 # internal imports
 from .m2l_enums import VerboseLevel
-from .contact_extractor import ContactExtractor
 
 # external imports
-import geopandas
-import pandas
-import numpy
+import geopandas as gpd
+import pandas as pd
+import numpy as np
 
 from .logging import getLogger
 
 logger = getLogger(__name__)
 
 
-class Topology:
+class Map2ModelWrapper:
     """
-    Topology calculator for units and faults relationships
+    A wrapper around map2model functionality
 
     Attributes
     ----------
     sorted_units: None or list
-        the stratigraphic column
+        map2model's estimate of the stratigraphic column
     fault_fault_relationships: None or pandas.DataFrame
         data frame of fault to fault relationships with columns ["Fault1", "Fault2", "Type", "Angle"]
     unit_fault_relationships: None or pandas.DataFrame
@@ -34,9 +32,7 @@ class Topology:
     """
 
     def __init__(
-        self, geology_data: geopandas.GeoDataFrame, 
-        fault_data: Optional[geopandas.GeoDataFrame] = None,  
-        verbose_level: VerboseLevel = VerboseLevel.NONE
+        self, map_data, *,  verbose_level: VerboseLevel = VerboseLevel.NONE
     ):
         """
         The initialiser for the map2model wrapper
@@ -51,8 +47,7 @@ class Topology:
         self._fault_fault_relationships = None
         self._unit_fault_relationships = None
         self._unit_unit_relationships = None
-        self.geology_data = geology_data
-        self.fault_data = fault_data
+        self.map_data = map_data
         self.verbose_level = verbose_level
         self.buffer_radius = 500
 
@@ -79,13 +74,13 @@ class Topology:
 
     def reset(self):
         """
-        Reset before the next run
+        Reset the wrapper to before the map2model process
         """
-        logger.info("Resetting topology calculator")
+        logger.info("Resetting map2model wrapper")
         self.sorted_units = None
-        self._fault_fault_relationships = None
-        self._unit_fault_relationships = None
-        self._unit_unit_relationships = None
+        self.fault_fault_relationships = None
+        self.unit_fault_relationships = None
+        self.unit_unit_relationships = None
 
     def get_sorted_units(self):
         """
@@ -129,23 +124,23 @@ class Topology:
 
     def _calculate_fault_fault_relationships(self):
 
-        faults = self.fault_data.copy()
+        faults = self.map_data.FAULT.copy()
         # reset index so that we can index the adjacency matrix with the index
         faults.reset_index(inplace=True)
         buffers = faults.buffer(self.buffer_radius)
         # create the adjacency matrix
-        intersection = geopandas.sjoin(
-            geopandas.GeoDataFrame(geometry=buffers), geopandas.GeoDataFrame(geometry=faults["geometry"])
+        intersection = gpd.sjoin(
+            gpd.GeoDataFrame(geometry=buffers), gpd.GeoDataFrame(geometry=faults["geometry"])
         )
         intersection["index_left"] = intersection.index
         intersection.reset_index(inplace=True)
 
-        adjacency_matrix = numpy.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
+        adjacency_matrix = np.zeros((faults.shape[0], faults.shape[0]), dtype=bool)
         adjacency_matrix[
             intersection.loc[:, "index_left"], intersection.loc[:, "index_right"]
         ] = True
-        f1, f2 = numpy.where(numpy.tril(adjacency_matrix, k=-1))
-        df = pandas.DataFrame(
+        f1, f2 = np.where(np.tril(adjacency_matrix, k=-1))
+        df = pd.DataFrame(
             {'Fault1': faults.loc[f1, 'ID'].to_list(), 'Fault2': faults.loc[f2, 'ID'].to_list()}
         )
         df['Angle'] = 60  # make it big to prevent LS from making splays
@@ -156,29 +151,26 @@ class Topology:
         """Calculate unit/fault relationships using geopandas sjoin.
         This will return
         """
-        units = self.geology_data["UNITNAME"].unique()
-        faults = self.fault_data.copy().reset_index().drop(columns=['index'])
-        adjacency_matrix = numpy.zeros((len(units), faults.shape[0]), dtype=bool)
+        units = self.map_data.GEOLOGY["UNITNAME"].unique()
+        faults = self.map_data.FAULT.copy().reset_index().drop(columns=['index'])
+        adjacency_matrix = np.zeros((len(units), faults.shape[0]), dtype=bool)
         for i, u in enumerate(units):
-            unit = self.geology_data[self.geology_data["UNITNAME"] == u]
-            intersection = geopandas.sjoin(
-                geopandas.GeoDataFrame(geometry=faults["geometry"]),
-                geopandas.GeoDataFrame(geometry=unit["geometry"]),
+            unit = self.map_data.GEOLOGY[self.map_data.GEOLOGY["UNITNAME"] == u]
+            intersection = gpd.sjoin(
+                gpd.GeoDataFrame(geometry=faults["geometry"]),
+                gpd.GeoDataFrame(geometry=unit["geometry"]),
             )
             intersection["index_left"] = intersection.index
             intersection.reset_index(inplace=True)
             adjacency_matrix[i, intersection.loc[:, "index_left"]] = True
-        u, f = numpy.where(adjacency_matrix)
-        df = pandas.DataFrame({"Unit": units[u].tolist(), "Fault": faults.loc[f, "ID"].to_list()})
+        u, f = np.where(adjacency_matrix)
+        df = pd.DataFrame({"Unit": units[u].tolist(), "Fault": faults.loc[f, "ID"].to_list()})
         self._unit_fault_relationships = df
 
     def _calculate_unit_unit_relationships(self):
-        extractor = ContactExtractor(
-            self.geology_data,
-            self.fault_data,
-        )
-        contacts = extractor.extract_all_contacts()
-        self._unit_unit_relationships = contacts.copy().drop(
+        if self.map_data.contacts is None:
+            self.map_data.extract_all_contacts()
+        self._unit_unit_relationships = self.map_data.contacts.copy().drop(
             columns=['length', 'geometry']
         )
         return self._unit_unit_relationships

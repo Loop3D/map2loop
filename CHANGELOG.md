@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.2.4](https://github.com/Loop3D/map2loop/compare/v3.2.3...v3.2.4) (2025-08-13)
+
+
+### Bug Fixes
+
+* trigger release for v3.3.0 ([54eab7c](https://github.com/Loop3D/map2loop/commit/54eab7ca462eb27cc1a6320ece8d1ecf2ebba2f5))
+* trigger release for v3.3.0 ([54eab7c](https://github.com/Loop3D/map2loop/commit/54eab7ca462eb27cc1a6320ece8d1ecf2ebba2f5))
+* trigger release for v3.3.0 ([8a4e093](https://github.com/Loop3D/map2loop/commit/8a4e093fedaefa4755db393e008bfc6484be0ba2))
+
 ## [3.2.3](https://github.com/Loop3D/map2loop/compare/v3.2.2...v3.2.3) (2025-06-20)
 
 

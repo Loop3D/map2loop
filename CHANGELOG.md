@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.5](https://github.com/Loop3D/map2loop/compare/v3.2.4...v3.2.5) (2025-08-15)
+
+
+### Bug Fixes
+
+* handle optional columns 'INTRUSIVE' and 'SILL' in geology data extraction ([#230](https://github.com/Loop3D/map2loop/issues/230)) ([3cbc9e3](https://github.com/Loop3D/map2loop/commit/3cbc9e384068b9afb1530dae686398d4575dd064))
+
 ## [3.2.4](https://github.com/Loop3D/map2loop/compare/v3.2.3...v3.2.4) (2025-08-13)
 
 

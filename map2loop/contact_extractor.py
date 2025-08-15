@@ -18,8 +18,10 @@ class ContactExtractor:
         logger.info("Extracting contacts")
         geology = self.geology.copy()
         geology = geology.dissolve(by="UNITNAME", as_index=False)
-        geology = geology[~geology["INTRUSIVE"]]
-        geology = geology[~geology["SILL"]]
+        if 'INTRUSIVE' in geology.columns:
+            geology = geology[~geology["INTRUSIVE"]]
+        if 'SILL' in geology.columns:
+            geology = geology[~geology["SILL"]]
         if self.faults is not None:
             faults = self.faults.copy()
             faults["geometry"] = faults.buffer(50)

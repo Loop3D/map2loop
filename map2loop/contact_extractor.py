@@ -62,19 +62,18 @@ class ContactExtractor:
             basal_contacts = self.contacts.copy()
         else:
             basal_contacts = self.contacts.copy()
-        if any(unit not in units for unit in basal_contacts["UNITNAME_1"].unique()):
-            missing_units = (
-                basal_contacts[~basal_contacts["UNITNAME_1"].isin(units)]["UNITNAME_1"]
-                .unique()
-                .tolist()
-            )
+        units_1 = set(basal_contacts["UNITNAME_1"])
+        units_2 = set(basal_contacts["UNITNAME_2"])
+        all_contact_units = units_1.union(units_2)
+        missing_units = [unit for unit in all_contact_units if unit not in units]
+        if missing_units:
             logger.error(
-                "There are units in the Geology dataset, but not in the stratigraphic column: "
+                "There are units in the stratigraphic column that don't appear in the contacts: "
                 + ", ".join(missing_units)
                 + ". Please readjust the stratigraphic column if this is a user defined column."
             )
             raise ValueError(
-                "There are units in stratigraphic column, but not in the Geology dataset: "
+               "There are units in the stratigraphic column that don't appear in the contacts: "
                 + ", ".join(missing_units)
                 + ". Please readjust the stratigraphic column if this is a user defined column."
             )

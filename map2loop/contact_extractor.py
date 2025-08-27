@@ -68,12 +68,12 @@ class ContactExtractor:
         missing_units = [unit for unit in all_contact_units if unit not in units]
         if missing_units:
             logger.error(
-                "There are units in the stratigraphic column that don't appear in the contacts: "
+                "There are units in the Geology dataset, but not in the stratigraphic column: "
                 + ", ".join(missing_units)
                 + ". Please readjust the stratigraphic column if this is a user defined column."
             )
             raise ValueError(
-               "There are units in the stratigraphic column that don't appear in the contacts: "
+               "There are units in the Geology dataset, but not in the stratigraphic column: "
                 + ", ".join(missing_units)
                 + ". Please readjust the stratigraphic column if this is a user defined column."
             )

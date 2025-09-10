@@ -3,9 +3,11 @@ import beartype
 import pandas
 import numpy as np
 import math
-from .mapdata import MapData
 from typing import Union
+from osgeo import gdal
+import geopandas
 
+from map2loop.utils import value_from_raster
 from .logging import getLogger
 
 logger = getLogger(__name__)
@@ -41,7 +43,6 @@ class Sorter(ABC):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
     ) -> list:
         """
         Execute sorter method (abstract method)
@@ -50,7 +51,6 @@ class Sorter(ABC):
             units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
             units_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: sorted list of unit names
@@ -75,7 +75,6 @@ class SorterUseNetworkX(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -84,7 +83,6 @@ class SorterUseNetworkX(Sorter):
             units (pandas.DataFrame): the data frame to sort
             units_relationships (pandas.DataFrame): the relationships between units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: the sorted unit names
@@ -140,7 +138,6 @@ class SorterAgeBased(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -150,7 +147,6 @@ class SorterAgeBased(Sorter):
             units_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: the sorted unit names
@@ -192,7 +188,6 @@ class SorterAlpha(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -202,7 +197,6 @@ class SorterAlpha(Sorter):
             units_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: the sorted unit names
@@ -280,7 +274,6 @@ class SorterMaximiseContacts(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -290,7 +283,6 @@ class SorterMaximiseContacts(Sorter):
             units_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
 
         Returns:
             list: the sorted unit names
@@ -362,7 +354,9 @@ class SorterObservationProjections(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
-        map_data: MapData,
+        geology_data: geopandas.GeoDataFrame,
+        structure_data: geopandas.GeoDataFrame,
+        dtm_data: gdal.Dataset
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -372,7 +366,9 @@ class SorterObservationProjections(Sorter):
             units_relationships (pandas.DataFrame): the relationships between units
             stratigraphic_order_hint (list): a list of unit names to use as a hint to sorting the units
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
-            map_data (map2loop.MapData): a catchall so that access to all map data is available
+            geology_data (geopandas.GeoDataFrame): the geology data
+            structure_data (geopandas.GeoDataFrame): the structure data
+            dtm_data (ggdal.Dataset): the dtm data
 
         Returns:
             list: the sorted unit names
@@ -382,9 +378,15 @@ class SorterObservationProjections(Sorter):
         from shapely.geometry import LineString, Point
         from map2loop.m2l_enums import Datatype
 
-        geol = map_data.get_map_data(Datatype.GEOLOGY).copy()
-        geol = geol.drop(geol.index[np.logical_or(geol["INTRUSIVE"], geol["SILL"])])
-        orientations = map_data.get_map_data(Datatype.STRUCTURE).copy()
+        geol = geology_data.copy()
+        if "INTRUSIVE" in geol.columns:
+            geol = geol.drop(geol.index[geol["INTRUSIVE"]])
+        if "SILL" in geol.columns:
+            geol = geol.drop(geol.index[geol["SILL"]])
+        orientations = structure_data.copy()
+        dtm = dtm_data.copy()
+        inv_geotransform = gdal.InvGeoTransform(dtm.GetGeoTransform())
+        dtm_array = np.array(dtm.GetRasterBand(1).ReadAsArray().T)
 
         # Create a map of maps to store younger/older observations
         ordered_unit_observations = []
@@ -434,11 +436,9 @@ class SorterObservationProjections(Sorter):
                         continue
 
                     # Get heights for intersection point and start of ray
-                    height = map_data.get_value_from_raster(Datatype.DTM, start.x, start.y)
+                    height = value_from_raster(inv_geotransform, dtm_array, start.x, start.y)
                     first_intersect_point = Point(start.x, start.y, height)
-                    height = map_data.get_value_from_raster(
-                        Datatype.DTM, second_intersect_point.x, second_intersect_point.y
-                    )
+                    height = value_from_raster(inv_geotransform, dtm_array, second_intersect_point.x, second_intersect_point.y)
                     second_intersect_point = Point(second_intersect_point.x, start.y, height)
 
                     # Check vertical difference between points and compare to projected dip angle

@@ -564,23 +564,17 @@ class Project(object):
                 f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}"
             )
 
-            columns = []
-            for sorter in sorters:
-                if sorter.sorter_label == "SorterObservationProjections":
-                    columns.append(sorter.sort(
-                        self.stratigraphic_column.stratigraphicUnits,
-                        self.topology.get_unit_unit_relationships(),
-                        self.contact_extractor.contacts,
-                        self.map_data.get_map_data(Datatype.GEOLOGY),
-                        self.map_data.get_map_data(Datatype.STRUCTURE),
-                        self.map_data.get_map_data(Datatype.DTM),
-                    ))
-                else:
-                    columns.append(sorter.sort(
-                        self.stratigraphic_column.stratigraphicUnits,
-                        self.topology.get_unit_unit_relationships(),
-                        self.contact_extractor.contacts,
-                    ))
+            columns = [
+                sorter.sort(
+                    self.stratigraphic_column.stratigraphicUnits,
+                    self.topology.get_unit_unit_relationships(),
+                    self.contact_extractor.contacts,
+                    self.map_data.get_map_data(Datatype.GEOLOGY),
+                    self.map_data.get_map_data(Datatype.STRUCTURE),
+                    self.map_data.get_map_data(Datatype.DTM),
+                )
+                for sorter in sorters
+            ]
             basal_contacts = [
                 self.contact_extractor.extract_basal_contacts(
                     column, save_contacts=False
@@ -605,21 +599,14 @@ class Project(object):
             self.stratigraphic_column.column = column
         else:
             logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
-            if self.sorter.sorter_label == "SorterObservationProjections":
-                self.stratigraphic_column.column = self.sorter.sort(
-                    self.stratigraphic_column.stratigraphicUnits,
-                    self.topology.get_unit_unit_relationships(),
-                    self.contact_extractor.contacts,
-                    self.map_data.get_map_data(Datatype.GEOLOGY),
-                    self.map_data.get_map_data(Datatype.STRUCTURE),
-                    self.map_data.get_map_data(Datatype.DTM),
-                )
-            else:
-                self.stratigraphic_column.column = self.sorter.sort(
-                    self.stratigraphic_column.stratigraphicUnits,
-                    self.topology.get_unit_unit_relationships(),
-                    self.contact_extractor.contacts,
-                )
+            self.stratigraphic_column.column = self.sorter.sort(
+                self.stratigraphic_column.stratigraphicUnits,
+                self.topology.get_unit_unit_relationships(),
+                self.contact_extractor.contacts,
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.STRUCTURE),
+                self.map_data.get_map_data(Datatype.DTM),
+            )
 
     @beartype.beartype
     def set_thickness_calculator(

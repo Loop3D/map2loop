@@ -43,6 +43,9 @@ class Sorter(ABC):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
+        geology_data: geopandas.GeoDataFrame = None,
+        structure_data: geopandas.GeoDataFrame = None,
+        dtm_data: gdal.Dataset = None,
     ) -> list:
         """
         Execute sorter method (abstract method)
@@ -51,6 +54,9 @@ class Sorter(ABC):
             units (pandas.DataFrame): the data frame to sort (columns must contain ["layerId", "name", "minAge", "maxAge", "group"])
             units_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
+            geology_data (geopandas.GeoDataFrame): the geology data
+            structure_data (geopandas.GeoDataFrame): the structure data
+            dtm_data (ggdal.Dataset): the dtm data
 
         Returns:
             list: sorted list of unit names
@@ -75,6 +81,9 @@ class SorterUseNetworkX(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
+        geology_data: geopandas.GeoDataFrame = None,
+        structure_data: geopandas.GeoDataFrame = None,
+        dtm_data: gdal.Dataset = None,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -138,6 +147,9 @@ class SorterAgeBased(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
+        geology_data: geopandas.GeoDataFrame = None,
+        structure_data: geopandas.GeoDataFrame = None,
+        dtm_data: gdal.Dataset = None,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -188,6 +200,9 @@ class SorterAlpha(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
+        geology_data: geopandas.GeoDataFrame = None,
+        structure_data: geopandas.GeoDataFrame = None,
+        dtm_data: gdal.Dataset = None,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.
@@ -274,6 +289,9 @@ class SorterMaximiseContacts(Sorter):
         units: pandas.DataFrame,
         unit_relationships: pandas.DataFrame,
         contacts: pandas.DataFrame,
+        geology_data: geopandas.GeoDataFrame = None,
+        structure_data: geopandas.GeoDataFrame = None,
+        dtm_data: gdal.Dataset = None,
     ) -> list:
         """
         Execute sorter method takes unit data, relationships and a hint and returns the sorted unit names based on this algorithm.

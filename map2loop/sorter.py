@@ -394,7 +394,6 @@ class SorterObservationProjections(Sorter):
         import networkx as nx
         import networkx.algorithms.approximation as nx_app
         from shapely.geometry import LineString, Point
-        from map2loop.m2l_enums import Datatype
 
         geol = geology_data.copy()
         if "INTRUSIVE" in geol.columns:

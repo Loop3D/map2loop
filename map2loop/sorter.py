@@ -401,9 +401,8 @@ class SorterObservationProjections(Sorter):
         if "SILL" in geol.columns:
             geol = geol.drop(geol.index[geol["SILL"]])
         orientations = structure_data.copy()
-        dtm = dtm_data.copy()
-        inv_geotransform = gdal.InvGeoTransform(dtm.GetGeoTransform())
-        dtm_array = np.array(dtm.GetRasterBand(1).ReadAsArray().T)
+        inv_geotransform = gdal.InvGeoTransform(dtm_data.GetGeoTransform())
+        dtm_array = np.array(dtm_data.GetRasterBand(1).ReadAsArray().T)
 
         # Create a map of maps to store younger/older observations
         ordered_unit_observations = []

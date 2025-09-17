@@ -322,12 +322,13 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations.set_geometry(create_points(xy), inplace=True)
         # set the crs of the interpolated orientations to the crs of the units
         interpolated_orientations = interpolated_orientations.set_crs(crs=basal_contacts.crs)
-        # get the elevation Z of the interpolated points
-        interpolated = set_z_values_from_raster_df(self.dtm_data, interpolated_orientations)
-        # update the geometry of the interpolated points to include the Z value
-        interpolated["geometry"] = interpolated.apply(
-            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
-        )
+        if self.dtm_data is not None:
+            # get the elevation Z of the interpolated points
+            interpolated_orientations = set_z_values_from_raster_df(self.dtm_data, interpolated_orientations)
+            # update the geometry of the interpolated points to include the Z value
+            interpolated_orientations["geometry"] = interpolated_orientations.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            )
         # for each interpolated point, assign name of unit using spatial join
         units = geology_data.copy()
         interpolated_orientations = interpolated_orientations.sjoin(

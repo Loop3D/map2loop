@@ -287,15 +287,24 @@ class InterpolatedStructure(ThicknessCalculator):
 
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)
+        if self.dtm_data is not None:
         # get the elevation Z of the contacts
-        contacts = set_z_values_from_raster_df(self.dtm_data, contacts)
-        # update the geometry of the contact points to include the Z value
-        contacts["geometry"] = contacts.apply(
-            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
-        )
+            contacts = set_z_values_from_raster_df(self.dtm_data, contacts)
+            # update the geometry of the contact points to include the Z value
+            contacts["geometry"] = contacts.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            )
+        else:
+            contacts["geometry"] = contacts.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y,), axis=1
+            )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
-        contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
+        # keep only necessary columns
+        if 'Z' not in contacts.columns:
+            contacts = contacts[["X", "Y", "geometry", "basal_unit"]].copy()
+        if 'Z' in contacts.columns:
+            contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
         # Interpolate the dip of the contacts

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.6](https://github.com/Loop3D/map2loop/compare/v3.2.5...v3.2.6) (2025-09-17)
+
+
+### Bug Fixes
+
+* refactor sorter ([#233](https://github.com/Loop3D/map2loop/issues/233)) ([3666bcb](https://github.com/Loop3D/map2loop/commit/3666bcb99e9a38c30ba87e94b3753f51a85b5c7a))
+
 ## [3.2.5](https://github.com/Loop3D/map2loop/compare/v3.2.4...v3.2.5) (2025-08-15)
 
 

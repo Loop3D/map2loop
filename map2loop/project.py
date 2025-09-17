@@ -569,7 +569,9 @@ class Project(object):
                     self.stratigraphic_column.stratigraphicUnits,
                     self.topology.get_unit_unit_relationships(),
                     self.contact_extractor.contacts,
-                    self.map_data,
+                    self.map_data.get_map_data(Datatype.GEOLOGY),
+                    self.map_data.get_map_data(Datatype.STRUCTURE),
+                    self.map_data.get_map_data(Datatype.DTM),
                 )
                 for sorter in sorters
             ]
@@ -601,7 +603,9 @@ class Project(object):
                 self.stratigraphic_column.stratigraphicUnits,
                 self.topology.get_unit_unit_relationships(),
                 self.contact_extractor.contacts,
-                self.map_data,
+                self.map_data.get_map_data(Datatype.GEOLOGY),
+                self.map_data.get_map_data(Datatype.STRUCTURE),
+                self.map_data.get_map_data(Datatype.DTM),
             )
 
     @beartype.beartype

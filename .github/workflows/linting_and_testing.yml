@@ -53,7 +53,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' && (matrix.python-version == '3.9' || matrix.python-version == '3.10') }}
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge "gdal=3.4.3" python=${{ matrix.python-version }} libjpeg-turbo -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
@@ -61,7 +61,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.11' }}
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c loop3d -c conda-forge gdal "netcdf4=*=nompi_py311*" python=${{ matrix.python-version }} -y
+            conda run -n test conda install -c loop3d -c conda-forge gdal "netcdf4=*=nompi_py311*" python=${{ matrix.python-version }} libjpeg-turbo -y
             conda run -n test conda install -c loop3d -c conda-forge --file dependencies.txt python=${{ matrix.python-version }} -y
             conda run -n test conda install pytest python=${{ matrix.python-version }} -y
 
@@ -69,7 +69,7 @@ jobs:
         if: ${{ !(matrix.os == 'windows-latest' && (matrix.python-version == '3.9' || matrix.python-version == '3.10' || matrix.python-version == '3.11')) }}
         run: |
             conda run -n test conda info
-            conda run -n test conda install -c loop3d -c conda-forge python=${{ matrix.python-version }} gdal pytest --file dependencies.txt -y
+            conda run -n test conda install -c loop3d -c conda-forge python=${{ matrix.python-version }} gdal pytest libjpeg-turbo --file dependencies.txt -y
             
       - name: Install map2loop
         run: |

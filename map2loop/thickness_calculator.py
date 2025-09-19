@@ -287,15 +287,24 @@ class InterpolatedStructure(ThicknessCalculator):
 
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)
+        if self.dtm_data is not None:
         # get the elevation Z of the contacts
-        contacts = set_z_values_from_raster_df(self.dtm_data, contacts)
-        # update the geometry of the contact points to include the Z value
-        contacts["geometry"] = contacts.apply(
-            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
-        )
+            contacts = set_z_values_from_raster_df(self.dtm_data, contacts)
+            # update the geometry of the contact points to include the Z value
+            contacts["geometry"] = contacts.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            )
+        else:
+            contacts["geometry"] = contacts.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y,), axis=1
+            )
         # spatial join the contact points with the basal contacts to get the unit for each contact point
         contacts = contacts.sjoin(basal_contacts, how="inner", predicate="intersects")
-        contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
+        # keep only necessary columns
+        if 'Z' not in contacts.columns:
+            contacts = contacts[["X", "Y", "geometry", "basal_unit"]].copy()
+        if 'Z' in contacts.columns:
+            contacts = contacts[["X", "Y", "Z", "geometry", "basal_unit"]].copy()
         # Interpolate the dip of the contacts
         interpolator = DipDipDirectionInterpolator(data_type="dip")
         # Interpolate the dip of the contacts
@@ -313,12 +322,13 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations.set_geometry(create_points(xy), inplace=True)
         # set the crs of the interpolated orientations to the crs of the units
         interpolated_orientations = interpolated_orientations.set_crs(crs=basal_contacts.crs)
-        # get the elevation Z of the interpolated points
-        interpolated = set_z_values_from_raster_df(self.dtm_data, interpolated_orientations)
-        # update the geometry of the interpolated points to include the Z value
-        interpolated["geometry"] = interpolated.apply(
-            lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
-        )
+        if self.dtm_data is not None:
+            # get the elevation Z of the interpolated points
+            interpolated_orientations = set_z_values_from_raster_df(self.dtm_data, interpolated_orientations)
+            # update the geometry of the interpolated points to include the Z value
+            interpolated_orientations["geometry"] = interpolated_orientations.apply(
+                lambda row: shapely.geometry.Point(row.geometry.x, row.geometry.y, row["Z"]), axis=1
+            )
         # for each interpolated point, assign name of unit using spatial join
         units = geology_data.copy()
         interpolated_orientations = interpolated_orientations.sjoin(
@@ -364,22 +374,24 @@ class InterpolatedStructure(ThicknessCalculator):
                         # check if the short line is 
                         if self.max_line_length is not None and short_line.length > self.max_line_length:
                             continue
-                        
-                        inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
-                        data_array = numpy.array(self.dtm_data.GetRasterBand(1).ReadAsArray().T)
+                        if self.dtm_data is not None:
+                            inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
+                            data_array = numpy.array(self.dtm_data.GetRasterBand(1).ReadAsArray().T)
  
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
                         p1[1] = numpy.asarray(short_line[0].coords[0][1])
-                        # get the elevation Z of the end point p1
-                        p1[2] = value_from_raster(inv_geotransform, data_array, p1[0], p1[1])
+                        if self.dtm_data is not None:
+                            # get the elevation Z of the end point p1
+                            p1[2] = value_from_raster(inv_geotransform, data_array, p1[0], p1[1])
                         # create array to store xyz coordinates of the end point p2
                         p2 = numpy.zeros(3)
                         p2[0] = numpy.asarray(short_line[0].coords[-1][0])
                         p2[1] = numpy.asarray(short_line[0].coords[-1][1])
-                        # get the elevation Z of the end point p2
-                        p2[2] = value_from_raster(inv_geotransform, data_array, p2[0], p2[1])
+                        if self.dtm_data is not None:
+                            # get the elevation Z of the end point p2
+                            p2[2] = value_from_raster(inv_geotransform, data_array, p2[0], p2[1])
                         # calculate the length of the shortest line
                         line_length = scipy.spatial.distance.euclidean(p1, p2)
                         # find the indices of the points that are within 5% of the length of the shortest line

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.7](https://github.com/Loop3D/map2loop/compare/v3.2.6...v3.2.7) (2025-09-19)
+
+
+### Bug Fixes
+
+* DTM is optional ([#234](https://github.com/Loop3D/map2loop/issues/234)) ([92e0d24](https://github.com/Loop3D/map2loop/commit/92e0d24e7c1fa39c75a5fa6baf31704f91096bf0))
+
 ## [3.2.6](https://github.com/Loop3D/map2loop/compare/v3.2.5...v3.2.6) (2025-09-17)
 
 

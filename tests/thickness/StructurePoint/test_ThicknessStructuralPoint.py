@@ -1660,7 +1660,7 @@ def check_thickness_values(result, column, description):
 
 def test_calculate_thickness_structural_point():
     # Run the calculation
-    thickness_calculator = StructuralPoint()
+    thickness_calculator = StructuralPoint(is_strike=False)
 
     md = MapData()
     md.sampled_contacts = s_c

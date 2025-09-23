@@ -39,7 +39,8 @@ class ThicknessCalculator(ABC):
         self, 
         dtm_data: Optional[gdal.Dataset] = None, 
         bounding_box: Optional[dict] = None, 
-        max_line_length: Optional[float] = None
+        max_line_length: Optional[float] = None,
+        is_strike: Optional[bool] = False,
         ):
         """
         Initialiser of for ThicknessCalculator
@@ -48,6 +49,7 @@ class ThicknessCalculator(ABC):
         self.max_line_length = max_line_length
         self.dtm_data = dtm_data
         self.bounding_box = bounding_box
+        self.is_strike = is_strike
 
     def type(self):
         """
@@ -221,12 +223,13 @@ class InterpolatedStructure(ThicknessCalculator):
         self, 
         dtm_data: Optional[gdal.Dataset] = None, 
         bounding_box: Optional[dict] = None, 
-        max_line_length: Optional[float] = None
+        max_line_length: Optional[float] = None,
+        is_strike: Optional[bool] = False
         ):
         """
         Initialiser for interpolated structure version of the thickness calculator
         """
-        super().__init__(dtm_data, bounding_box, max_line_length)
+        super().__init__(dtm_data, bounding_box, max_line_length, is_strike)
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = None
         
@@ -475,13 +478,14 @@ class StructuralPoint(ThicknessCalculator):
         self, 
         dtm_data: Optional[gdal.Dataset] = None, 
         bounding_box: Optional[dict] = None, 
-        max_line_length: Optional[float] = None
+        max_line_length: Optional[float] = None,
+        is_strike: Optional[bool] = False
         ):
-        super().__init__(dtm_data, bounding_box, max_line_length)
+        super().__init__(dtm_data, bounding_box, max_line_length, is_strike)
         self.thickness_calculator_label = "StructuralPoint"
         self.strike_allowance = 30
         self.lines = None
-        
+
 
     @beartype.beartype
     def compute(
@@ -575,7 +579,10 @@ class StructuralPoint(ThicknessCalculator):
 
             # find unit and strike
             litho_in = measurement['unit_name']
-            strike = (measurement['DIPDIR'] - 90) % 360
+            if self.is_strike:
+                strike = measurement['DIPDIR']
+            else:
+                strike = (measurement['DIPDIR'] - 90) % 360
 
             # find bounding box of the lithology
             bbox_poly = geology[geology['UNITNAME'] == litho_in][['minx', 'miny', 'maxx', 'maxy']]

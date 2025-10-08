@@ -90,6 +90,15 @@ class SamplerDecimator(Sampler):
         Returns:
             pandas.DataFrame: the sampled data points
         """
+        valid_geometry = (
+            shapely.geometry.point.Point,
+            shapely.geometry.multipoint.MultiPoint
+        )
+
+        all_valid_geometries = all(isinstance(geom, valid_geometry) for geom in spatial_data.geometry)
+        if not all_valid_geometries:
+            raise ValueError("Invalid geometry types found in spatial_data")
+        
         data = spatial_data.copy()
         data["X"] = data.geometry.x
         data["Y"] = data.geometry.y
@@ -149,6 +158,16 @@ class SamplerSpacing(Sampler):
         Returns:
             pandas.DataFrame: the sampled data points
         """
+        valid_geometry = (
+            shapely.geometry.multipolygon.MultiPolygon,
+            shapely.geometry.polygon.Polygon,
+            shapely.geometry.multilinestring.MultiLineString,
+            shapely.geometry.linestring.LineString
+        )
+        all_valid_geometries = all(isinstance(geom, valid_geometry) for geom in spatial_data.geometry)
+        if not all_valid_geometries:
+            raise ValueError("Invalid geometry types found in spatial_data")
+
         schema = {"ID": str, "X": float, "Y": float, "featureId": str}
         df = pandas.DataFrame(columns=schema.keys()).astype(schema)
         for _, row in spatial_data.iterrows():

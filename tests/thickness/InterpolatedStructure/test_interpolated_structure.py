@@ -1683,7 +1683,8 @@ def test_calculate_thickness_InterpolatedStructure():
         "top": 3000,
     }
     thickness_calculator = InterpolatedStructure(dtm_data=md.get_map_data(Datatype.DTM),
-                                                 bounding_box=md.bounding_box)
+                                                 bounding_box=md.bounding_box,
+                                                 is_strike=False)
 
     result = thickness_calculator.compute(
         units=st_units,

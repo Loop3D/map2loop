@@ -247,6 +247,7 @@ class Project(object):
         self.thickness_calculator = [InterpolatedStructure(
             dtm_data=self.map_data.get_map_data(Datatype.DTM),
             bounding_box=self.bounding_box,
+            is_strike=False
         )]
 
 
@@ -610,7 +611,7 @@ class Project(object):
 
     @beartype.beartype
     def set_thickness_calculator(
-        self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']]
+        self, thickness_calculator: Union['ThicknessCalculator', List['ThicknessCalculator']], is_strike: bool = False
     ) -> None:
         """
         Sets the thickness_calculator attribute for the object.
@@ -628,6 +629,7 @@ class Project(object):
                     ThicknessCalculator or a list of such instances.
         """
         if isinstance(thickness_calculator, ThicknessCalculator):
+            thickness_calculator.is_strike = is_strike
             thickness_calculator = [thickness_calculator]
 
         # Now check if thickness_calculator is a list of valid instances
@@ -639,6 +641,8 @@ class Project(object):
             )
 
         # Finally, set the calculators
+        for tc in thickness_calculator:
+            tc.is_strike = is_strike
         self.thickness_calculator = thickness_calculator
 
     def get_thickness_calculator(self) -> List[str]:

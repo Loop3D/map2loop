@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.8](https://github.com/Loop3D/map2loop/compare/v3.2.7...v3.2.8) (2025-10-29)
+
+
+### Bug Fixes
+
+* add is_strike parameter in thickness calculator ([#237](https://github.com/Loop3D/map2loop/issues/237)) ([1423a62](https://github.com/Loop3D/map2loop/commit/1423a62d4ccf54f7c860422b47223247af9b418c))
+
 ## [3.2.7](https://github.com/Loop3D/map2loop/compare/v3.2.6...v3.2.7) (2025-09-19)
 
 

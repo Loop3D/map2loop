@@ -743,7 +743,7 @@ def nearest_orientation_to_line(orientation_tree, orientation_dips, orientation_
     indices = numpy.atleast_1d(indices)
     best_idx = None
     best_dist = numpy.inf
-    for approx_dist, idx in zip(distances, indices):
+    for _approx_dist, idx in zip(distances, indices):
         if idx is None:
             continue
         candidate_point = shapely.geometry.Point(orientation_coords[int(idx)])

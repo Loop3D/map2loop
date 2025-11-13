@@ -782,7 +782,7 @@ class AlongSection(ThicknessCalculator):
             if sections is not None
             else geopandas.GeoDataFrame({"geometry": []}, geometry="geometry")  # ensure predictable structure when no sections supplied
         )
-        self.section_thickness_records: geopandas.GeoDataFrame | List[dict] = []  # populated as GeoDataFrame during compute
+        self.section_thickness_records: geopandas.GeoDataFrame = geopandas.GeoDataFrame()  # populated as GeoDataFrame during compute
         self.section_intersection_points: dict = {}
 
     def type(self):
@@ -894,7 +894,8 @@ class AlongSection(ThicknessCalculator):
 
         try:
             geology_sindex = geology.sindex
-        except Exception:
+        except Exception as e:
+            logger.error("Failed to create spatial index for geology data: %s", e, exc_info=True)
             geology_sindex = None
 
         dip_column = next((col for col in ("DIP", "dip", "Dip") if col in structure_data.columns), None)
@@ -910,14 +911,19 @@ class AlongSection(ThicknessCalculator):
                     try:
                         orientation_coords = orient_df[["X", "Y"]].astype(float).to_numpy()
                     except ValueError:
+                        logger.debug(
+                            "Failed to convert orientation coordinates to float for %d rows. Data quality issue likely. Example rows: %s",
+                            len(orient_df),
+                            orient_df[["X", "Y"]].head(3).to_dict(orient="records")
+                        )
                         orientation_coords = numpy.empty((0, 2))
                     if orientation_coords.size:
                         orientation_dips = orient_df["_dip_value"].astype(float).to_numpy()
                         try:
                             orientation_tree = cKDTree(orientation_coords)
-                        except Exception:
+                        except (ValueError, TypeError) as e:
+                            logger.error(f"Failed to construct cKDTree for orientation data: {e}")
                             orientation_tree = None
-
         default_dip_warning_emitted = False
 
         units_lookup = dict(zip(units["name"], units.index))
@@ -940,7 +946,8 @@ class AlongSection(ThicknessCalculator):
                 continue
 
             split_segments = []
-            for _, poly in geology.iloc[candidate_idx].iterrows():
+            for idx in candidate_idx:
+                poly = geology.iloc[idx]
                 polygon_geom = poly.geometry
                 if polygon_geom is None or polygon_geom.is_empty:
                     continue

@@ -629,7 +629,8 @@ def clean_line_geometry(geometry: shapely.geometry.base.BaseGeometry):
         return geometry
     try:
         merged = shapely.ops.linemerge(geometry)
-    except Exception:
+    except Exception as e:
+        logger.exception("Exception occurred in shapely.ops.linemerge during clean_line_geometry")
         return None
     if merged.geom_type == "LineString":
         return merged
@@ -737,7 +738,8 @@ def nearest_orientation_to_line(orientation_tree, orientation_dips, orientation_
     k = min(len(orientation_dips), 5)
     try:
         distances, indices = orientation_tree.query(query_xy, k=k)
-    except Exception:
+    except Exception as e:
+        logger.exception("Exception occurred during KDTree query in nearest_orientation_to_line; returning (nan, None, None)")
         return numpy.nan, None, None
     distances = numpy.atleast_1d(distances)
     indices = numpy.atleast_1d(indices)

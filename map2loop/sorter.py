@@ -31,7 +31,7 @@ class Sorter(ABC):
         dtm_data: Optional[gdal.Dataset] = None,
     ):
         """
-        Initialiser of for Sorter
+        Initialiser for Sorter
         
         Args:
             unit_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
@@ -138,6 +138,7 @@ class SorterUseHint(SorterUseNetworkX):
             "SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead"
         )
         super().__init__(unit_relationships=unit_relationships)
+    @beartype.beartype
     def sort(self, units: pandas.DataFrame) -> list:
         raise NotImplementedError("SorterUseHint is deprecated in v3.2. Use SorterUseNetworkX instead")
     
@@ -214,6 +215,8 @@ class SorterAlpha(Sorter):
         Returns:
             list: the sorted unit names
         """
+        if self.contacts is None:
+            raise ValueError("contacts must be set (not None) before calling sort() in SorterAlpha.")
         import networkx as nx
 
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)[
@@ -393,7 +396,11 @@ class SorterObservationProjections(Sorter):
             geol = geol.drop(geol.index[geol["INTRUSIVE"]])
         if "SILL" in geol.columns:
             geol = geol.drop(geol.index[geol["SILL"]])
+        if self.structure_data is None:
+            raise ValueError("structure_data is required for sorting but is None.")
         orientations = self.structure_data.copy()
+        if self.dtm_data is None:
+            raise ValueError("DTM data (self.dtm_data) is not set. Cannot proceed with sorting.")
         inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
         dtm_array = np.array(self.dtm_data.GetRasterBand(1).ReadAsArray().T)
 

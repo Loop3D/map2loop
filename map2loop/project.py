@@ -561,9 +561,6 @@ class Project(object):
             self.contact_extractor.extract_all_contacts()
         if take_best:
             sorters = [
-                SorterUseHint(
-                    unit_relationships=self.topology.get_unit_unit_relationships(),
-                ),
                 SorterAgeBased(),
                 SorterAlpha(
                     contacts=self.contact_extractor.contacts,

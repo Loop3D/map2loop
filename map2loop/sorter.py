@@ -3,7 +3,6 @@ import beartype
 import pandas
 import numpy as np
 import math
-import math
 from typing import Union, Optional, List
 from map2loop.topology import Topology
 import geopandas

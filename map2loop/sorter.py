@@ -75,7 +75,7 @@ class SorterUseNetworkX(Sorter):
     """
     Sorter class which returns a sorted list of units based on the unit relationships using a topological graph sorting algorithm
     """
-
+    required_arguments = 'unit_relationships'
     def __init__(
         self,
         *,
@@ -102,7 +102,8 @@ class SorterUseNetworkX(Sorter):
             list: the sorted unit names
         """
         import networkx as nx
-
+        if self.unit_relationships is None:
+            raise ValueError("SorterUseNetworkX requires 'unit_relationships' argument")
         graph = nx.DiGraph()
         name_to_index = {}
         for row in units.iterrows():
@@ -129,6 +130,7 @@ class SorterUseNetworkX(Sorter):
 
 
 class SorterUseHint(SorterUseNetworkX):
+    required_arguments = 'unit_relationships'
     def __init__(
         self,
         *,
@@ -146,7 +148,7 @@ class SorterAgeBased(Sorter):
     """
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
-
+    requried_arguments = None
     def __init__(self):
         """
         Initialiser for age based sorter
@@ -182,7 +184,7 @@ class SorterAgeBased(Sorter):
             logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']}")
 
         return list(sorted_units["name"])
-
+    
 
 class SorterAlpha(Sorter):
     """
@@ -215,7 +217,8 @@ class SorterAlpha(Sorter):
             list: the sorted unit names
         """
         import networkx as nx
-
+        if self.contacts is None:
+            raise ValueError("SorterAlpha requires 'contacts' argument")
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)[
             ["UNITNAME_1", "UNITNAME_2", "length"]
         ]
@@ -301,7 +304,8 @@ class SorterMaximiseContacts(Sorter):
         """
         import networkx as nx
         import networkx.algorithms.approximation as nx_app
-
+        if self.contacts is None:
+            raise ValueError("SorterMaximiseContacts requires 'contacts' argument")
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)
         self.graph = nx.Graph()
         unit_names = list(units["name"].unique())
@@ -310,7 +314,7 @@ class SorterMaximiseContacts(Sorter):
             ## sorter crashes
             if (
                 unit not in sorted_contacts['UNITNAME_1'].values
-                and unit not in sorted_contacts['UNITNAME_2'].values
+                or unit not in sorted_contacts['UNITNAME_2'].values
             ):
                 continue
             self.graph.add_node(unit, name=unit)
@@ -349,7 +353,7 @@ class SorterObservationProjections(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     using the direction of observations to predict which unit is adjacent to the current one
     """
-
+    required_arguments = ['contacts', 'geology_data', 'structure_data', 'dtm_data']
     def __init__(
         self,
         *,
@@ -387,7 +391,10 @@ class SorterObservationProjections(Sorter):
         import networkx as nx
         import networkx.algorithms.approximation as nx_app
         from shapely.geometry import LineString, Point
-
+        if self.contacts is None:
+            raise ValueError("SorterObservationProjections requires 'contacts' argument")
+        if self.geology_data is None:
+            raise ValueError("SorterObservationProjections requires 'geology_data' argument")
         geol = self.geology_data.copy()
         if "INTRUSIVE" in geol.columns:
             geol = geol.drop(geol.index[geol["INTRUSIVE"]])

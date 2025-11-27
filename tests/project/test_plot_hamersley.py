@@ -1,5 +1,6 @@
 import pytest
 from map2loop.project import Project
+from map2loop.sorter import SorterUseNetworkX
 from map2loop.m2l_enums import VerboseLevel
 from unittest.mock import patch
 from pyproj.exceptions import CRSError
@@ -36,6 +37,7 @@ def test_project_execution():
     except Exception:
         pytest.skip("Skipping the project test from server data due to loading failure")
     try:
+        proj.set_sorter(SorterUseNetworkX)
         proj.run_all(take_best=True)
     except requests.exceptions.ReadTimeout:
         pytest.skip(

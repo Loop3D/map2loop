@@ -140,7 +140,7 @@ class Project(object):
         self.set_default_samplers()
         self.bounding_box = bounding_box
         self.contact_extractor = None
-        self.sorter = SorterUseHint()
+        self.sorter = SorterUseHint
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)

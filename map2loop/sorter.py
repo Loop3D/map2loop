@@ -80,10 +80,16 @@ class SorterUseNetworkX(Sorter):
         """
         super().__init__()
         self.sorter_label = "SorterUseNetworkX"
+        
+        if isinstance(geology_data, geopandas.GeoDataFrame) is False:
+            raise TypeError("geology_data must be a geopandas.GeoDataFrame")
+        
         if 'UNITNAME' not in geology_data.columns:
             raise ValueError("geology_data must contain 'UNITNAME' column")
+        
         self.topology = Topology(geology_data=geology_data)
         self.unit_relationships = self.topology.get_unit_unit_relationships()
+        
     @beartype.beartype
     def sort(self, units: pandas.DataFrame) -> list:
         """

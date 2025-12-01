@@ -71,6 +71,7 @@ class SorterUseNetworkX(Sorter):
     def __init__(
         self,
         *,
+        unit_relationships: Optional[pandas.DataFrame] = None,
         geology_data: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
@@ -83,6 +84,8 @@ class SorterUseNetworkX(Sorter):
         self.sorter_label = "SorterUseNetworkX"
         if geology_data is not None:
             self.set_geology_data(geology_data)
+        elif unit_relationships is not None:
+            self.unit_relationships = unit_relationships
         else:
             self.unit_relationships = None
     def set_geology_data(self, geology_data: geopandas.GeoDataFrame):

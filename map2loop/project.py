@@ -140,7 +140,7 @@ class Project(object):
         self.set_default_samplers()
         self.bounding_box = bounding_box
         self.contact_extractor = None
-        self.sorter = SorterUseHint()
+        self.sorter = SorterUseHint
         self.throw_calculator = ThrowCalculatorAlpha()
         self.fault_orientation = FaultOrientationNearest()
         self.map_data = MapData(verbose_level=verbose_level)
@@ -560,7 +560,15 @@ class Project(object):
             )
             self.contact_extractor.extract_all_contacts()
         if take_best:
-            sorters = [SorterUseHint(), SorterAgeBased(), SorterAlpha(), SorterUseNetworkX()]
+            sorters = [
+                SorterAgeBased(),
+                SorterAlpha(
+                    contacts=self.contact_extractor.contacts,
+                ),
+                SorterUseNetworkX(
+                    unit_relationships=self.topology.get_unit_unit_relationships(),
+                ),
+            ]
             logger.info(
                 f"Calculating best stratigraphic column from {[sorter.sorter_label for sorter in sorters]}"
             )
@@ -568,11 +576,6 @@ class Project(object):
             columns = [
                 sorter.sort(
                     self.stratigraphic_column.stratigraphicUnits,
-                    self.topology.get_unit_unit_relationships(),
-                    self.contact_extractor.contacts,
-                    self.map_data.get_map_data(Datatype.GEOLOGY),
-                    self.map_data.get_map_data(Datatype.STRUCTURE),
-                    self.map_data.get_map_data(Datatype.DTM),
                 )
                 for sorter in sorters
             ]
@@ -600,13 +603,19 @@ class Project(object):
             self.stratigraphic_column.column = column
         else:
             logger.info(f'Calculating stratigraphic column using sorter {self.sorter.sorter_label}')
+            # Update sorter with current data based on what it needs
+            if hasattr(self.sorter, 'unit_relationships') and self.sorter.unit_relationships is None:
+                self.sorter.unit_relationships = self.topology.get_unit_unit_relationships()
+            if hasattr(self.sorter, 'contacts') and self.sorter.contacts is None:
+                self.sorter.contacts = self.contact_extractor.contacts
+            if hasattr(self.sorter, 'geology_data') and self.sorter.geology_data is None:
+                self.sorter.geology_data = self.map_data.get_map_data(Datatype.GEOLOGY)
+            if hasattr(self.sorter, 'structure_data') and self.sorter.structure_data is None:
+                self.sorter.structure_data = self.map_data.get_map_data(Datatype.STRUCTURE)
+            if hasattr(self.sorter, 'dtm_data') and self.sorter.dtm_data is None:
+                self.sorter.dtm_data = self.map_data.get_map_data(Datatype.DTM)
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
-                self.topology.get_unit_unit_relationships(),
-                self.contact_extractor.contacts,
-                self.map_data.get_map_data(Datatype.GEOLOGY),
-                self.map_data.get_map_data(Datatype.STRUCTURE),
-                self.map_data.get_map_data(Datatype.DTM),
             )
 
     @beartype.beartype

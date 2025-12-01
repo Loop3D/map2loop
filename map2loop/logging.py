@@ -1,7 +1,11 @@
 import logging
-import map2loop
 
+loggers = {}
 
+ch = ch = logging.StreamHandler()
+formatter = logging.Formatter("%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d -- %(message)s")
+ch.setFormatter(formatter)
+ch.setLevel(logging.WARNING)
 def get_levels():
     """dict for converting to logger levels from string
 
@@ -33,12 +37,12 @@ def getLogger(name: str):
     logging.Logger
         logger object
     """
-    if name in map2loop.loggers:
-        return map2loop.loggers[name]
+    if name in loggers:
+        return loggers[name]
     logger = logging.getLogger(name)
-    logger.addHandler(map2loop.ch)
+    logger.addHandler(ch)
     logger.propagate = False
-    map2loop.loggers[name] = logger
+    loggers[name] = logger
     return logger
 
 
@@ -56,9 +60,9 @@ def set_level(level: str):
     """
     levels = get_levels()
     level = levels.get(level, logging.WARNING)
-    map2loop.ch.setLevel(level)
+    ch.setLevel(level)
 
-    for name in map2loop.loggers:
+    for name in loggers:
         logger = logging.getLogger(name)
         logger.setLevel(level)
     logger.info(f"Logging level set to {level}")

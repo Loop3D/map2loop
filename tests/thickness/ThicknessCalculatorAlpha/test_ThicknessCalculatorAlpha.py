@@ -5,7 +5,7 @@ import numpy
 from map2loop.mapdata import MapData
 from map2loop.m2l_enums import Datatype
 from map2loop.thickness_calculator import ThicknessCalculatorAlpha
-from map2loop._datasets.geodata_files.load_map2loop_data import load_hamersley_geology
+from map2loop.utils.load_map2loop_data import load_hamersley_geology
 
 
 #########################################################

@@ -9,7 +9,7 @@ import re
 import json
 from osgeo import gdal
 
-from .logging import getLogger
+from ..logging import getLogger
 logger = getLogger(__name__)
 
 

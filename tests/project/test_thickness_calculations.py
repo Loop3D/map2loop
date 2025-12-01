@@ -3,10 +3,9 @@ import pandas
 import geopandas
 import numpy
 
-from map2loop._datasets.geodata_files import load_map2loop_data
+from map2loop.utils import load_map2loop_data
 from map2loop.thickness_calculator import InterpolatedStructure, StructuralPoint
 from map2loop import Project
-
 
 # 1. self.stratigraphic_column.stratigraphicUnits,
 st_units = pandas.DataFrame(
@@ -1705,6 +1704,7 @@ def test_calculate_unit_thicknesses():
     ], "Default for thickness calculator not set"  ## default is InterpolatedStructure
 
     # check set
+    print("****",StructuralPoint.__module__)
 
     project.set_thickness_calculator([StructuralPoint(dtm_data=dtm, bounding_box=bbox_3d), InterpolatedStructure(dtm_data=dtm, bounding_box=bbox_3d)])
     assert project.get_thickness_calculator() == [

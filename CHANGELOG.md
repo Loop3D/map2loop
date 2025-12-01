@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.9](https://github.com/Loop3D/map2loop/compare/v3.2.8...v3.2.9) (2025-12-01)
+
+
+### Bug Fixes
+
+* move extra sort arguments to sorter init ([#241](https://github.com/Loop3D/map2loop/issues/241)) ([3414fec](https://github.com/Loop3D/map2loop/commit/3414fec29969407f7b1b07ee59bfbedfe90a63b1))
+
 ## [3.2.8](https://github.com/Loop3D/map2loop/compare/v3.2.7...v3.2.8) (2025-10-29)
 
 

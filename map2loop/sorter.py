@@ -167,7 +167,7 @@ class SorterAgeBased(Sorter):
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
     required_arguments = ['min_age_column','max_age_column']
-    def __init__(self,*, min_age_column:Optional[str]='MIN_AGE', max_age_column:Optional[str]='MAX_AGE'):
+    def __init__(self,*, min_age_column:Optional[str]='minAge', max_age_column:Optional[str]='maxAge'):
         """
         Initialiser for age based sorter
         """
@@ -195,6 +195,8 @@ class SorterAgeBased(Sorter):
                 lambda row: (row[self.min_age_column] + row[self.max_age_column]) / 2.0, axis=1
             )
         else:
+            logger.error(f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame")
+            logger.error(f"Available columns are: {units.columns.tolist()}")
             raise ValueError(f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame")
         if "group" in units.columns:
             sorted_units = sorted_units.sort_values(by=["group", "meanAge"])

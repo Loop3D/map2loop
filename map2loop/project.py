@@ -614,6 +614,11 @@ class Project(object):
                 self.sorter.structure_data = self.map_data.get_map_data(Datatype.STRUCTURE)
             if hasattr(self.sorter, 'dtm_data') and self.sorter.dtm_data is None:
                 self.sorter.dtm_data = self.map_data.get_map_data(Datatype.DTM)
+            if hasattr(self.sorter, 'min_age_column') and self.sorter.min_age_column is None:
+                self.sorter.min_age_column = self.stratigraphic_column.get_min_age_column()
+            if hasattr(self.sorter, 'max_age_column') and self.sorter.max_age_column is None:
+                self.sorter.max_age_column = self.stratigraphic_column.get_max_age_column()
+            
             self.stratigraphic_column.column = self.sorter.sort(
                 self.stratigraphic_column.stratigraphicUnits,
             )

@@ -167,7 +167,7 @@ class SorterAgeBased(Sorter):
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
     required_arguments = ['min_age_column','max_age_column']
-    def __init__(self,*, min_age_column:Optional[str]=None, max_age_column:Optional[str]=None):
+    def __init__(self,*, min_age_column:Optional[str]='MIN_AGE', max_age_column:Optional[str]='MAX_AGE'):
         """
         Initialiser for age based sorter
         """

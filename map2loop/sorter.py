@@ -70,7 +70,8 @@ class SorterUseNetworkX(Sorter):
 
     def __init__(
         self,
-        geology_data: geopandas.GeoDataFrame
+        *,
+        geology_data: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
         Initialiser for networkx graph sorter
@@ -80,7 +81,22 @@ class SorterUseNetworkX(Sorter):
         """
         super().__init__()
         self.sorter_label = "SorterUseNetworkX"
-        
+        if geology_data is not None:
+            self.set_geology_data(geology_data)
+        else:
+            self.unit_relationships = None
+    def set_geology_data(self, geology_data: geopandas.GeoDataFrame):
+        """
+        Set geology data and calculate topology and unit relationships
+
+        Args:
+            geology_data (geopandas.GeoDataFrame): the geology data
+        """
+        self._calculate_topology(geology_data)
+    def _calculate_topology(self, geology_data: geopandas.GeoDataFrame):
+        if not geology_data:
+            raise ValueError("geology_data is required")
+
         if isinstance(geology_data, geopandas.GeoDataFrame) is False:
             raise TypeError("geology_data must be a geopandas.GeoDataFrame")
         
@@ -89,7 +105,7 @@ class SorterUseNetworkX(Sorter):
         
         self.topology = Topology(geology_data=geology_data)
         self.unit_relationships = self.topology.get_unit_unit_relationships()
-        
+    
     @beartype.beartype
     def sort(self, units: pandas.DataFrame) -> list:
         """
@@ -147,8 +163,8 @@ class SorterAgeBased(Sorter):
     """
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
-    requried_arguments = ['min_age_column','max_age_column']
-    def __init__(self, min_age_column:str, max_age_column:str):
+    required_arguments = ['min_age_column','max_age_column']
+    def __init__(self,*, min_age_column:Optional[str], max_age_column:Optional[str]):
         """
         Initialiser for age based sorter
         """
@@ -196,7 +212,8 @@ class SorterAlpha(Sorter):
     required_arguments = ['contacts']
     def __init__(
         self,
-        contacts: geopandas.GeoDataFrame,
+        *,
+        contacts: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
         Initialiser for adjacency based sorter
@@ -282,7 +299,8 @@ class SorterMaximiseContacts(Sorter):
     required_arguments = ['contacts']
     def __init__(
         self,
-        contacts: geopandas.GeoDataFrame,
+        *,
+        contacts: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
         Initialiser for adjacency based sorter
@@ -364,9 +382,10 @@ class SorterObservationProjections(Sorter):
     required_arguments = ['contacts', 'geology_data', 'structure_data', 'dtm_data']
     def __init__(
         self,
-        contacts: geopandas.GeoDataFrame,
-        geology_data: geopandas.GeoDataFrame,
-        structure_data: geopandas.GeoDataFrame,
+        *,
+        contacts: Optional[geopandas.GeoDataFrame] = None,
+        geology_data: Optional[geopandas.GeoDataFrame] = None,
+        structure_data: Optional[geopandas.GeoDataFrame] = None,
         dtm_data: Optional[gdal.Dataset] = None,
         length: Union[float, int] = 1000
     ):

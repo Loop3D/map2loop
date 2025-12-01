@@ -37,7 +37,7 @@ def test_project_execution():
     except Exception:
         pytest.skip("Skipping the project test from server data due to loading failure")
     try:
-        proj.set_sorter(SorterUseNetworkX)
+        proj.set_sorter(SorterUseNetworkX())
         proj.run_all(take_best=True)
     except requests.exceptions.ReadTimeout:
         pytest.skip(

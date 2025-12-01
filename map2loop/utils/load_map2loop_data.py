@@ -1,5 +1,4 @@
 import geopandas
-import map2loop
 import pathlib
 from osgeo import gdal
 gdal.UseExceptions()

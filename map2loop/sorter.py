@@ -9,6 +9,7 @@ import geopandas
 from osgeo import gdal
 from map2loop.utils import value_from_raster
 from .logging import getLogger
+import networkx as nx
 
 logger = getLogger(__name__)
 
@@ -218,12 +219,14 @@ class SorterAlpha(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     prioritising the units with lower number of contacting units
     """
-    required_arguments = ['contacts', 'unit_name_column']
+    required_arguments = ['contacts', 'unit_name_column', 'unitname1_column', 'unitname2_column']
     def __init__(
         self,
         *,
         contacts: Optional[geopandas.GeoDataFrame] = None,
         unit_name_column:Optional[str]='name',
+        unitname1_column:Optional[str]='UNITNAME_1',
+        unitname2_column:Optional[str]='UNITNAME_2',
     ):
         """
         Initialiser for adjacency based sorter
@@ -235,9 +238,11 @@ class SorterAlpha(Sorter):
         self.contacts = contacts
         self.unit_name_column = unit_name_column
         self.sorter_label = "SorterAlpha"
-        if 'UNITNAME_1' not in contacts.columns or 'UNITNAME_2' not in contacts.columns or 'length' not in contacts.columns:
-            raise ValueError("contacts GeoDataFrame must contain 'UNITNAME_1', 'UNITNAME_2' and 'length' columns")
-
+        self.unitname1_column = unitname1_column
+        self.unitname2_column = unitname2_column
+        if self.unitname1_column not in contacts.columns or self.unitname2_column not in contacts.columns or 'length' not in contacts.columns:
+            raise ValueError(f"contacts GeoDataFrame must contain '{self.unitname1_column}', '{self.unitname2_column}' and 'length' columns")
+        
     def sort(self, units: pandas.DataFrame) -> list:
         """
         Execute sorter method takes unit data and returns the sorted unit names based on this algorithm.
@@ -250,20 +255,22 @@ class SorterAlpha(Sorter):
         """
         if self.contacts is None:
             raise ValueError("contacts must be set (not None) before calling sort() in SorterAlpha.")
-        import networkx as nx
-        if self.contacts is None:
-            raise ValueError("SorterAlpha requires 'contacts' argument")
+        if len(self.contacts) == 0:
+            raise ValueError("contacts GeoDataFrame is empty in SorterAlpha.")
+        if 'length' not in self.contacts.columns:
+            self.contacts['length'] = self.contacts.geometry.length
+        self.contacts['length'] = self.contacts['length'].astype(float)
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)[
-            ["UNITNAME_1", "UNITNAME_2", "length"]
+            [self.unitname1_column, self.unitname2_column, "length"]
         ]
-        unit_names = list(units["name"].unique())
+        unit_names = list(units[self.unit_name_column].unique())
         graph = nx.Graph()
         for unit in unit_names:
             graph.add_node(unit, name=unit)
         max_weight = max(list(sorted_contacts["length"])) + 1
         for _, row in sorted_contacts.iterrows():
             graph.add_edge(
-                row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"])
+                row[self.unitname1_column], row[self.unitname2_column], weight=int(max_weight - row["length"])
             )
 
         cnode = None
@@ -534,6 +541,7 @@ class SorterObservationProjections(Sorter):
         df = pandas.DataFrame(0, index=unit_names, columns=unit_names)
         for younger, older in ordered_unit_observations:
             df.loc[younger, older] += 1
+        print(df, df.max())
         max_value = max(df.max())
 
         # Using the older/younger matrix create a directed graph

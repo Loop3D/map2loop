@@ -356,6 +356,11 @@ class SorterMaximiseContacts(Sorter):
         import networkx.algorithms.approximation as nx_app
         if self.contacts is None:
             raise ValueError("SorterMaximiseContacts requires 'contacts' argument")
+        if len(self.contacts) == 0:
+            raise ValueError("contacts GeoDataFrame is empty in SorterMaximiseContacts.")
+        if "length" not in self.contacts.columns:
+            self.contacts['length'] = self.contacts.geometry.length
+        self.contacts['length'] = self.contacts['length'].astype(float)
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)
         self.graph = nx.Graph()
         unit_names = list(units[self.unit_name_column].unique())

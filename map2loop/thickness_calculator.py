@@ -113,7 +113,7 @@ class ThicknessCalculator(ABC):
                 f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
                 f"is not suitable for this dataset."
             )
-            
+
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """
     ThicknessCalculator class which estimates unit thickness based on units, basal_contacts and stratigraphic order
@@ -452,8 +452,10 @@ class InterpolatedStructure(ThicknessCalculator):
                 )
         
         # Combine all location_tracking DataFrames into a single DataFrame
-        combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
-        
+        if _location_tracking and len(_location_tracking) > 0:
+            combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
+        else:
+            combined_location_tracking = pandas.DataFrame()
         # Save the combined DataFrame as an attribute of the class
         self.location_tracking = combined_location_tracking
         
@@ -491,7 +493,6 @@ class StructuralPoint(ThicknessCalculator):
         self.thickness_calculator_label = "StructuralPoint"
         self.strike_allowance = 30
         self.lines = None
-
 
     @beartype.beartype
     def compute(
@@ -552,7 +553,9 @@ class StructuralPoint(ThicknessCalculator):
             crs=basal_contacts.crs,
         )
         # add unitname to the sampled structures
-        sampled_structures['unit_name'] = geopandas.sjoin(sampled_structures, geology)['UNITNAME']
+        sampled_structures['unit_name'] = geopandas.sjoin(
+            sampled_structures.drop(columns=['UNITNAME']), geology, how='inner', predicate='within'
+        )['UNITNAME']
 
         # remove nans from sampled structures
         # this happens when there are strati measurements within intrusions. If intrusions are removed from the geology map, unit_name will then return a nan
@@ -683,7 +686,7 @@ class StructuralPoint(ThicknessCalculator):
             if not (b_s[0] < strike1 < b_s[1] and b_s[0] < strike2 < b_s[1]):
                 continue
 
-            #build the debug info
+            # build the debug info
             line = shapely.geometry.LineString([int_pt1, int_pt2])
             _lines.append(line)
             _dip.append(measurement['DIP'])  
@@ -694,17 +697,17 @@ class StructuralPoint(ThicknessCalculator):
             # if length is higher than max_line_length, skip
             if self.max_line_length is not None and L > self.max_line_length:
                 continue
-            
+
             # calculate thickness
             thickness = L * math.sin(math.radians(measurement['DIP']))
 
             thicknesses.append(thickness)
             lis.append(litho_in)
-        
+
         # create the debug gdf
         self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
         self.lines["DIP"] = _dip
-        
+
         # create a DataFrame of the thicknesses median and standard deviation by lithology
         result = pandas.DataFrame({'unit': lis, 'thickness': thicknesses})
         result = result.groupby('unit')['thickness'].agg(['median', 'mean', 'std']).reset_index()
@@ -715,7 +718,7 @@ class StructuralPoint(ThicknessCalculator):
         output_units['ThicknessMedian'] = numpy.full(len(output_units), numpy.nan)
         output_units['ThicknessMean'] = numpy.full(len(output_units), numpy.nan)
         output_units['ThicknessStdDev'] = numpy.full(len(output_units), numpy.nan)
-        
+
         # find which units have no thickness calculated
         names_not_in_result = units[~units['name'].isin(result['unit'])]['name'].to_list()
         # assign the thicknesses to the each unit
@@ -724,12 +727,11 @@ class StructuralPoint(ThicknessCalculator):
             output_units.loc[idx, 'ThicknessMedian'] = unit['median']
             output_units.loc[idx, 'ThicknessMean'] = unit['mean']
             output_units.loc[idx, 'ThicknessStdDev'] = unit['std']
-       
+
         output_units["ThicknessMean"] = output_units["ThicknessMean"].fillna(-1)
         output_units["ThicknessMedian"] = output_units["ThicknessMedian"].fillna(-1)
         output_units["ThicknessStdDev"] = output_units["ThicknessStdDev"].fillna(-1)
-        
-        
+
         # handle the units that have no thickness
         for unit in names_not_in_result:
             # if no thickness has been calculated for the unit
@@ -760,7 +762,7 @@ class StructuralPoint(ThicknessCalculator):
                 output_units.loc[output_units["name"] == unit, "ThicknessStdDev"] = -1
 
         self._check_thickness_percentage_calculations(output_units)
-        
+
         return output_units
 
 

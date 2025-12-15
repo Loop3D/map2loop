@@ -184,7 +184,7 @@ def find_segment_strike_from_pt(
 
 @beartype.beartype
 def calculate_endpoints(
-    start_point: shapely.geometry.Point, azimuth_deg: float, distance: int, bbox: pandas.DataFrame
+    start_point: shapely.geometry.Point, azimuth_deg: float, distance: Union[float,int], bbox: pandas.DataFrame
 ) -> shapely.geometry.LineString:
     """
     Calculate the endpoints of a line segment given a start point, azimuth angle, distance, and bounding box.

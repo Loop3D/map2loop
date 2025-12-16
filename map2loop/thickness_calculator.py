@@ -23,6 +23,7 @@ import scipy
 import pandas
 import geopandas
 import shapely
+from shapely.geometry import LineString
 import math
 from osgeo import gdal
 from shapely.errors import UnsupportedGEOSVersionError
@@ -451,8 +452,17 @@ class InterpolatedStructure(ThicknessCalculator):
         else:
             combined_location_tracking = pandas.DataFrame()
         # Save the combined DataFrame as an attribute of the class
-        self.location_tracking = combined_location_tracking
-        
+        # self.location_tracking = combined_location_tracking
+        combined_location_tracking['geometry'] = combined_location_tracking.apply(
+            lambda row: LineString([
+                (row['p1_x'], row['p1_y'], row['p1_z']),
+                (row['p2_x'], row['p2_y'], row['p2_z'])
+            ]),
+            axis=1
+        )
+
+        # Convert to GeoDataFrame and set CRS to match basal_contacts
+        self.location_tracking = geopandas.GeoDataFrame(combined_location_tracking, geometry='geometry', crs=basal_contacts.crs)
         # Create GeoDataFrame for lines
         self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
         self.lines['dip'] = _dips

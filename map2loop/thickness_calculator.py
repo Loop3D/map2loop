@@ -239,7 +239,6 @@ class InterpolatedStructure(ThicknessCalculator):
         super().__init__(dtm_data, bounding_box, max_line_length, is_strike)
         self.thickness_calculator_label = "InterpolatedStructure"
         self.lines = None
-        
 
     @beartype.beartype
     def compute(
@@ -298,7 +297,7 @@ class InterpolatedStructure(ThicknessCalculator):
         # set the crs of the contacts to the crs of the units
         contacts = contacts.set_crs(crs=basal_contacts.crs)
         if self.dtm_data is not None:
-        # get the elevation Z of the contacts
+            # get the elevation Z of the contacts
             contacts = set_z_values_from_raster_df(self.dtm_data, contacts)
             # update the geometry of the contact points to include the Z value
             contacts["geometry"] = contacts.apply(
@@ -347,11 +346,11 @@ class InterpolatedStructure(ThicknessCalculator):
         interpolated_orientations = interpolated_orientations[
             ["geometry", "dip", "UNITNAME"]
         ].copy()
-        
+
         _lines = []
         _dips = []
         _location_tracking = []
-        
+
         for i in range(0, len(stratigraphic_order) - 1):
             if (
                 stratigraphic_order[i] in basal_unit_list
@@ -373,21 +372,21 @@ class InterpolatedStructure(ThicknessCalculator):
                     dip = interpolated_orientations.loc[
                         interpolated_orientations["UNITNAME"] == stratigraphic_order[i], "dip"
                     ].to_numpy()
-                    
+
                     _thickness = []
-                
+
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
                         _lines.append(short_line[0])
-                        
-                        # check if the short line is 
+
+                        # check if the short line is
                         if self.max_line_length is not None and short_line.length > self.max_line_length:
                             continue
                         if self.dtm_data is not None:
                             inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
                             data_array = numpy.array(self.dtm_data.GetRasterBand(1).ReadAsArray().T)
- 
+
                         # extract the end points of the shortest line
                         p1 = numpy.zeros(3)
                         p1[0] = numpy.asarray(short_line[0].coords[0][0])
@@ -415,7 +414,7 @@ class InterpolatedStructure(ThicknessCalculator):
                         _dips.append(_dip)
                         # calculate the true thickness t = L * sin(dip)
                         thickness = line_length * numpy.sin(_dip)
-                        
+
                         # add location tracking
                         location_tracking = pandas.DataFrame(
                             {
@@ -426,7 +425,7 @@ class InterpolatedStructure(ThicknessCalculator):
                             }
                         )
                         _location_tracking.append(location_tracking)
-                        
+
                         # Average thickness along the shortest line
                         if all(numpy.isnan(thickness)):
                             pass
@@ -451,31 +450,36 @@ class InterpolatedStructure(ThicknessCalculator):
                 logger.warning(
                     f"Thickness Calculator InterpolatedStructure: Cannot calculate thickness between {stratigraphic_order[i]} and {stratigraphic_order[i + 1]}\n"
                 )
-        
+
         # Combine all location_tracking DataFrames into a single DataFrame
         if _location_tracking and len(_location_tracking) > 0:
             combined_location_tracking = pandas.concat(_location_tracking, ignore_index=True)
+            combined_location_tracking['geometry'] = combined_location_tracking.apply(
+                lambda row: LineString(
+                    [
+                        (row['p1_x'], row['p1_y'], row['p1_z']),
+                        (row['p2_x'], row['p2_y'], row['p2_z']),
+                    ]
+                ),
+                axis=1,
+            )
         else:
             combined_location_tracking = pandas.DataFrame()
         # Save the combined DataFrame as an attribute of the class
         # self.location_tracking = combined_location_tracking
-        combined_location_tracking['geometry'] = combined_location_tracking.apply(
-            lambda row: LineString([
-                (row['p1_x'], row['p1_y'], row['p1_z']),
-                (row['p2_x'], row['p2_y'], row['p2_z'])
-            ]),
-            axis=1
-        )
 
         # Convert to GeoDataFrame and set CRS to match basal_contacts
-        self.location_tracking = geopandas.GeoDataFrame(combined_location_tracking, geometry='geometry', crs=basal_contacts.crs)
+        if not combined_location_tracking.empty:
+            self.location_tracking = geopandas.GeoDataFrame(combined_location_tracking, geometry='geometry', crs=basal_contacts.crs)
+        else:
+            self.location_tracking = geopandas.GeoDataFrame(columns=['p1_x', 'p1_y', 'p1_z', 'p2_x', 'p2_y', 'p2_z', 'thickness', 'unit', 'geometry'], crs=basal_contacts.crs)
         # Create GeoDataFrame for lines
         self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
         self.lines['dip'] = _dips
-        
+
         # Check thickness calculation
         self._check_thickness_percentage_calculations(thicknesses)
-        
+
         return thicknesses
 
 class StructuralPoint(ThicknessCalculator):

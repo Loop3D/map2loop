@@ -560,9 +560,11 @@ class StructuralPoint(ThicknessCalculator):
             geometry=geopandas.points_from_xy(sampled_structures.X, sampled_structures.Y),
             crs=basal_contacts.crs,
         )
+        if 'UNITNAME' in sampled_structures.columns:
+            sampled_structures = sampled_structures.drop(columns=['UNITNAME'])
         # add unitname to the sampled structures
         sampled_structures['unit_name'] = geopandas.sjoin(
-            sampled_structures.drop(columns=['UNITNAME']), geology, how='inner', predicate='within'
+            sampled_structures, geology, how='inner', predicate='within'
         )['UNITNAME']
 
         # remove nans from sampled structures

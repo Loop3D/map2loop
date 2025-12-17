@@ -630,7 +630,7 @@ class StructuralPoint(ThicknessCalculator):
             # draw orthogonal line to the strike (default value 10Km), and clip it by the bounding box of the lithology
             if self.max_line_length is None:
                 self.max_line_length = 10000
-            B = calculate_endpoints(measurement_pt, strike, self.max_line_length, bbox_poly)
+            B = calculate_endpoints(measurement_pt, float(strike), float(self.max_line_length), bbox_poly)
             b = geopandas.GeoDataFrame({'geometry': [B]}).set_crs(basal_contacts.crs)
 
             # find all intersections

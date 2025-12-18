@@ -59,7 +59,9 @@ class Sorter(ABC):
             list: sorted list of unit names
         """
         pass
-
+    
+    def __call__(self, *args):
+        return self.sort(*args)
 
 class SorterUseNetworkX(Sorter):
     """

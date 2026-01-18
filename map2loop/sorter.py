@@ -60,8 +60,8 @@ class Sorter(ABC):
         """
         pass
     
-    def __call__(self, *args):
-        return self.sort(*args)
+    def __call__(self, **kwargs):
+        return self.sort(**kwargs)
 
 class SorterUseNetworkX(Sorter):
     """

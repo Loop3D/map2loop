@@ -114,8 +114,8 @@ class ThicknessCalculator(ABC):
                 f"have a calculated thickness of -1. This may indicate that {self.thickness_calculator_label} "
                 f"is not suitable for this dataset."
             )
-    def __call__(self, *args):
-        return self.compute(*args)
+    def __call__(self, **kwargs):
+        return self.compute(**kwargs)
 
 class ThicknessCalculatorAlpha(ThicknessCalculator):
     """

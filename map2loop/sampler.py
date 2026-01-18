@@ -52,8 +52,8 @@ class Sampler(ABC):
             pandas.DataFrame: data frame containing samples
         """
         pass
-    def __call__(self, *args):
-        return self.sample(*args)
+    def __call__(self, **kwargs):
+        return self.sample(**kwargs)
 
 class SamplerDecimator(Sampler):
     """

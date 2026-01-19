@@ -10,6 +10,7 @@ import json
 from osgeo import gdal
 
 from ..logging import getLogger
+
 logger = getLogger(__name__)
 
 
@@ -184,8 +185,11 @@ def find_segment_strike_from_pt(
 
 @beartype.beartype
 def calculate_endpoints(
-    start_point: shapely.geometry.Point, azimuth_deg: Union[float,int], distance: Union[float,int], bbox: pandas.DataFrame
-) -> Union[shapely.geometry.LineString,shapely.geometry.GeometryCollection]:
+    start_point: shapely.geometry.Point,
+    azimuth_deg: Union[float, int],
+    distance: Union[float, int],
+    bbox: pandas.DataFrame,
+) -> Union[shapely.geometry.LineString, shapely.geometry.GeometryCollection]:
     """
     Calculate the endpoints of a line segment given a start point, azimuth angle, distance, and bounding box.
 
@@ -225,7 +229,7 @@ def calculate_endpoints(
 
 @beartype.beartype
 def multiline_to_line(
-    geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString]
+    geometry: Union[shapely.geometry.LineString, shapely.geometry.MultiLineString],
 ) -> shapely.geometry.LineString:
     """
     Converts a multiline geometry to a single line geometry.
@@ -382,7 +386,6 @@ def hex_to_rgb(hex_color: str) -> tuple:
 def calculate_minimum_fault_length(
     bbox: dict[str, Union[int, float]], area_percentage: float
 ) -> float:
-
     """
     Calculate the minimum fault length based on the map bounding box and a given area percentage.
 
@@ -440,11 +443,10 @@ def read_hjson_with_json(file_path: str) -> dict:
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to decode preprocessed HJSON as JSON: {e}") from e
 
+
 @beartype.beartype
 def update_from_legacy_file(
-    filename: str,
-    json_save_path: Optional[str] = None,
-    lower: bool = False
+    filename: str, json_save_path: Optional[str] = None, lower: bool = False
 ) -> Optional[Dict[str, Dict]]:
     """
     Update the config dictionary from the provided old version dictionary
@@ -452,18 +454,19 @@ def update_from_legacy_file(
         filename (str): the path to the legacy file
         json_save_path (str, optional): the path to save the updated json file. Defaults to None.
         lower (bool, optional): whether to convert all strings to lowercase. Defaults to False.
-        
+
     Returns:
         Dict[Dict]: the updated config dictionary
-    
+
     Example:
         from map2loop.utils import update_from_legacy_file
         update_from_legacy_file(filename=r"./source_data/example.hjson")
     """
     # only import config if needed
     from .config import Config
+
     file_map = Config()
-    
+
     code_mapping = {
         "otype": (file_map.structure_config, "orientation_type"),
         "dd": (file_map.structure_config, "dipdir_column"),
@@ -505,7 +508,7 @@ def update_from_legacy_file(
     except Exception as e:
         logger.error(f"Error reading file {filename}: {e}")
         return
-    #map the keys 
+    # map the keys
     file_map = file_map.to_dict()
     for legacy_key, new_mapping in code_mapping.items():
         if legacy_key in parsed_data:
@@ -514,20 +517,21 @@ def update_from_legacy_file(
             if lower and isinstance(value, str):
                 value = value.lower()
             section[new_key] = value
-    
+
     if "o" in parsed_data:
         object_id_value = parsed_data["o"]
         if lower and isinstance(object_id_value, str):
             object_id_value = object_id_value.lower()
         file_map['structure']["objectid_column"] = object_id_value
         file_map['geology']["objectid_column"] = object_id_value
-        file_map['fold']["objectid_column"] = object_id_value 
-        
+        file_map['fold']["objectid_column"] = object_id_value
+
     if json_save_path is not None:
         with open(json_save_path, "w") as f:
             json.dump(parsed_data, f, indent=4)
-    
+
     return file_map
+
 
 @beartype.beartype
 def value_from_raster(inv_geotransform, data, x: float, y: float):
@@ -556,6 +560,7 @@ def value_from_raster(inv_geotransform, data, x: float, y: float):
     py = min(py, data.shape[1] - 1)
     return data[px][py]
 
+
 @beartype.beartype
 def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
     """
@@ -573,7 +578,7 @@ def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
     if len(df) <= 0:
         df["Z"] = []
         return df
-    
+
     if dtm_data is None:
         logger.warning("Cannot get value from data as data is not loaded")
         return None
@@ -582,8 +587,7 @@ def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
     data_array = numpy.array(dtm_data.GetRasterBand(1).ReadAsArray().T)
 
     df["Z"] = df.apply(
-        lambda row: value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]),
-        axis=1,
+        lambda row: value_from_raster(inv_geotransform, data_array, row["X"], row["Y"]), axis=1
     )
 
     return df

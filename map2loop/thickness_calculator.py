@@ -468,7 +468,6 @@ class InterpolatedStructure(ThicknessCalculator):
         else:
             combined_location_tracking = pandas.DataFrame()
         # Save the combined DataFrame as an attribute of the class
-        # self.location_tracking = combined_location_tracking
 
         # Convert to GeoDataFrame and set CRS to match basal_contacts
         if not combined_location_tracking.empty:

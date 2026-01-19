@@ -69,7 +69,7 @@ def set_level(level: str):
 
 
 logger = getLogger(__name__)
-logger.info("Imported LoopStructural")
+logger.info("Imported map2loop.logging module")
 
 
 def setLogging(level="info", handler=None):

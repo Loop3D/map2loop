@@ -220,7 +220,6 @@ def calculate_endpoints(
     line = shapely.geometry.LineString([left_endpoint, right_endpoint])
 
     new_line = shapely.ops.clip_by_rect(line, minx, miny, maxx, maxy)
-    print(type(new_line))
     return new_line
 
 

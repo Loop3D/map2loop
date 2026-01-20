@@ -9,6 +9,7 @@ import geopandas
 from osgeo import gdal
 from map2loop.utils import value_from_raster
 from .logging import getLogger
+import networkx as nx
 
 logger = getLogger(__name__)
 
@@ -21,11 +22,10 @@ class Sorter(ABC):
         ABC (ABC): Derived from Abstract Base Class
     """
 
-    def __init__(
-        self):
+    def __init__(self):
         """
         Initialiser for Sorter
-        
+
         Args:
             unit_relationships (pandas.DataFrame): the relationships between units (columns must contain ["Index1", "Unitname1", "Index2", "Unitname2"])
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
@@ -34,7 +34,6 @@ class Sorter(ABC):
             dtm_data (gdal.Dataset): the dtm data
         """
         self.sorter_label = "SorterBaseClass"
-        
 
     def type(self):
         """
@@ -59,35 +58,40 @@ class Sorter(ABC):
         """
         pass
 
+    def __call__(self, **kwargs):
+        return self.sort(**kwargs)
+
 
 class SorterUseNetworkX(Sorter):
     """
     Sorter class which returns a sorted list of units based on the unit relationships using a topological graph sorting algorithm
     """
-    required_arguments: List[str] = [
-        'geology_data'
-    ]
+
+    required_arguments: List[str] = ['geology_data', 'unit_name_column']
 
     def __init__(
         self,
         *,
+        unit_name_column: Optional[str] = 'name',
         unit_relationships: Optional[pandas.DataFrame] = None,
         geology_data: Optional[geopandas.GeoDataFrame] = None,
     ):
         """
         Initialiser for networkx graph sorter
-        
+
         Args:
             unit_relationships (pandas.DataFrame): the relationships between units
         """
         super().__init__()
         self.sorter_label = "SorterUseNetworkX"
+        self.unit_name_column = unit_name_column
         if geology_data is not None:
             self.set_geology_data(geology_data)
         elif unit_relationships is not None:
             self.unit_relationships = unit_relationships
         else:
             self.unit_relationships = None
+
     def set_geology_data(self, geology_data: geopandas.GeoDataFrame):
         """
         Set geology data and calculate topology and unit relationships
@@ -96,19 +100,20 @@ class SorterUseNetworkX(Sorter):
             geology_data (geopandas.GeoDataFrame): the geology data
         """
         self._calculate_topology(geology_data)
+
     def _calculate_topology(self, geology_data: geopandas.GeoDataFrame):
-        if not geology_data:
+        if geology_data is None:
             raise ValueError("geology_data is required")
 
         if isinstance(geology_data, geopandas.GeoDataFrame) is False:
             raise TypeError("geology_data must be a geopandas.GeoDataFrame")
-        
+
         if 'UNITNAME' not in geology_data.columns:
             raise ValueError("geology_data must contain 'UNITNAME' column")
-        
+
         self.topology = Topology(geology_data=geology_data)
         self.unit_relationships = self.topology.get_unit_unit_relationships()
-    
+
     @beartype.beartype
     def sort(self, units: pandas.DataFrame) -> list:
         """
@@ -121,6 +126,7 @@ class SorterUseNetworkX(Sorter):
             list: the sorted unit names
         """
         import networkx as nx
+
         if self.unit_relationships is None:
             raise ValueError("SorterUseNetworkX requires 'unit_relationships' argument")
         graph = nx.DiGraph()
@@ -150,28 +156,31 @@ class SorterUseNetworkX(Sorter):
 
 class SorterUseHint(SorterUseNetworkX):
     required_arguments: List[str] = ['unit_relationships']
-    def __init__(
-        self,
-        *,
-        geology_data: Optional[geopandas.GeoDataFrame] = None,
-    ):
-        logger.warning(
-            "SorterUseHint is deprecated in v3.2. Using SorterUseNetworkX instead"
-        )
+
+    def __init__(self, *, geology_data: Optional[geopandas.GeoDataFrame] = None):
+        logger.warning("SorterUseHint is deprecated in v3.2. Using SorterUseNetworkX instead")
         super().__init__(geology_data=geology_data)
-    
 
 
 class SorterAgeBased(Sorter):
     """
     Sorter class which returns a sorted list of units based on the min and max ages of the units
     """
-    required_arguments = ['min_age_column','max_age_column']
-    def __init__(self,*, min_age_column:Optional[str]='minAge', max_age_column:Optional[str]='maxAge'):
+
+    required_arguments = ['min_age_column', 'max_age_column', 'unit_name_column']
+
+    def __init__(
+        self,
+        *,
+        unit_name_column: Optional[str] = 'name',
+        min_age_column: Optional[str] = 'minAge',
+        max_age_column: Optional[str] = 'maxAge',
+    ):
         """
         Initialiser for age based sorter
         """
         super().__init__()
+        self.unit_name_column = unit_name_column
         self.min_age_column = min_age_column
         self.max_age_column = max_age_column
         self.sorter_label = "SorterAgeBased"
@@ -195,18 +204,24 @@ class SorterAgeBased(Sorter):
                 lambda row: (row[self.min_age_column] + row[self.max_age_column]) / 2.0, axis=1
             )
         else:
-            logger.error(f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame")
+            logger.error(
+                f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame"
+            )
             logger.error(f"Available columns are: {units.columns.tolist()}")
-            raise ValueError(f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame")
+            raise ValueError(
+                f"Columns {self.min_age_column} and {self.max_age_column} must be present in units DataFrame"
+            )
         if "group" in units.columns:
             sorted_units = sorted_units.sort_values(by=["group", "meanAge"])
         else:
             sorted_units = sorted_units.sort_values(by=["meanAge"])
         logger.info("Stratigraphic order calculated using age based sorting")
         for _i, row in sorted_units.iterrows():
-            logger.info(f"{row['name']} - {row['minAge']} - {row['maxAge']}")
+            logger.info(
+                f"{row[self.unit_name_column]} - {row[self.min_age_column]} - {row[self.max_age_column]}"
+            )
 
-        return list(sorted_units["name"])
+        return list(sorted_units[self.unit_name_column])
 
 
 class SorterAlpha(Sorter):
@@ -214,23 +229,37 @@ class SorterAlpha(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     prioritising the units with lower number of contacting units
     """
-    required_arguments = ['contacts']
+
+    required_arguments = ['contacts', 'unit_name_column', 'unitname1_column', 'unitname2_column']
+
     def __init__(
         self,
         *,
         contacts: Optional[geopandas.GeoDataFrame] = None,
+        unit_name_column: Optional[str] = 'name',
+        unitname1_column: Optional[str] = 'UNITNAME_1',
+        unitname2_column: Optional[str] = 'UNITNAME_2',
     ):
         """
         Initialiser for adjacency based sorter
-        
+
         Args:
             contacts (geopandas.GeoDataFrame): unit contacts with length of the contacts in metres
         """
         super().__init__()
         self.contacts = contacts
+        self.unit_name_column = unit_name_column
         self.sorter_label = "SorterAlpha"
-        if 'UNITNAME_1' not in contacts.columns or 'UNITNAME_2' not in contacts.columns or 'length' not in contacts.columns:
-            raise ValueError("contacts GeoDataFrame must contain 'UNITNAME_1', 'UNITNAME_2' and 'length' columns")
+        self.unitname1_column = unitname1_column
+        self.unitname2_column = unitname2_column
+        if (
+            self.unitname1_column not in contacts.columns
+            or self.unitname2_column not in contacts.columns
+            or 'length' not in contacts.columns
+        ):
+            raise ValueError(
+                f"contacts GeoDataFrame must contain '{self.unitname1_column}', '{self.unitname2_column}' and 'length' columns"
+            )
 
     def sort(self, units: pandas.DataFrame) -> list:
         """
@@ -243,21 +272,27 @@ class SorterAlpha(Sorter):
             list: the sorted unit names
         """
         if self.contacts is None:
-            raise ValueError("contacts must be set (not None) before calling sort() in SorterAlpha.")
-        import networkx as nx
-        if self.contacts is None:
-            raise ValueError("SorterAlpha requires 'contacts' argument")
+            raise ValueError(
+                "contacts must be set (not None) before calling sort() in SorterAlpha."
+            )
+        if len(self.contacts) == 0:
+            raise ValueError("contacts GeoDataFrame is empty in SorterAlpha.")
+        if 'length' not in self.contacts.columns:
+            self.contacts['length'] = self.contacts.geometry.length
+        self.contacts['length'] = self.contacts['length'].astype(float)
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)[
-            ["UNITNAME_1", "UNITNAME_2", "length"]
+            [self.unitname1_column, self.unitname2_column, "length"]
         ]
-        unit_names = list(units["name"].unique())
+        unit_names = list(units[self.unit_name_column].unique())
         graph = nx.Graph()
         for unit in unit_names:
             graph.add_node(unit, name=unit)
         max_weight = max(list(sorted_contacts["length"])) + 1
         for _, row in sorted_contacts.iterrows():
             graph.add_edge(
-                row["UNITNAME_1"], row["UNITNAME_2"], weight=int(max_weight - row["length"])
+                row[self.unitname1_column],
+                row[self.unitname2_column],
+                weight=int(max_weight - row["length"]),
             )
 
         cnode = None
@@ -301,15 +336,20 @@ class SorterMaximiseContacts(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     prioritising the maximum length of each contact
     """
-    required_arguments = ['contacts']
+
+    required_arguments = ['contacts', 'unit_name_column', 'unitname1_column', 'unitname2_column']
+
     def __init__(
         self,
         *,
         contacts: Optional[geopandas.GeoDataFrame] = None,
+        unit_name_column: str = 'name',
+        unitname1_column: str = 'UNITNAME_1',
+        unitname2_column: str = 'UNITNAME_2',
     ):
         """
         Initialiser for adjacency based sorter
-        
+
         Args:
             contacts (pandas.DataFrame): unit contacts with length of the contacts in metres
         """
@@ -320,8 +360,17 @@ class SorterMaximiseContacts(Sorter):
         self.route = None
         self.directed_graph = None
         self.contacts = contacts
-        if 'UNITNAME_1' not in contacts.columns or 'UNITNAME_2' not in contacts.columns or 'length' not in contacts.columns:
-            raise ValueError("contacts GeoDataFrame must contain 'UNITNAME_1', 'UNITNAME_2' and 'length' columns")
+        self.unit_name_column = unit_name_column
+        self.unitname1_column = unitname1_column
+        self.unitname2_column = unitname2_column
+        if (
+            self.unitname1_column not in contacts.columns
+            or self.unitname2_column not in contacts.columns
+            or 'length' not in contacts.columns
+        ):
+            raise ValueError(
+                f"contacts GeoDataFrame must contain '{self.unitname1_column}', '{self.unitname2_column}' and 'length' columns"
+            )
 
     def sort(self, units: pandas.DataFrame) -> list:
         """
@@ -335,17 +384,23 @@ class SorterMaximiseContacts(Sorter):
         """
         import networkx as nx
         import networkx.algorithms.approximation as nx_app
+
         if self.contacts is None:
             raise ValueError("SorterMaximiseContacts requires 'contacts' argument")
+        if len(self.contacts) == 0:
+            raise ValueError("contacts GeoDataFrame is empty in SorterMaximiseContacts.")
+        if "length" not in self.contacts.columns:
+            self.contacts['length'] = self.contacts.geometry.length
+        self.contacts['length'] = self.contacts['length'].astype(float)
         sorted_contacts = self.contacts.sort_values(by="length", ascending=False)
         self.graph = nx.Graph()
-        unit_names = list(units["name"].unique())
+        unit_names = list(units[self.unit_name_column].unique())
         for unit in unit_names:
             ## some units may not have any contacts e.g. if they are intrusives or sills. If we leave this then the
             ## sorter crashes
             if (
-                unit not in sorted_contacts['UNITNAME_1'].values
-                or unit not in sorted_contacts['UNITNAME_2'].values
+                unit not in sorted_contacts[self.unitname1_column].values
+                or unit not in sorted_contacts[self.unitname2_column].values
             ):
                 continue
             self.graph.add_node(unit, name=unit)
@@ -353,7 +408,9 @@ class SorterMaximiseContacts(Sorter):
         max_weight = max(list(sorted_contacts["length"])) + 1
         sorted_contacts['length'] /= max_weight
         for _, row in sorted_contacts.iterrows():
-            self.graph.add_edge(row["UNITNAME_1"], row["UNITNAME_2"], weight=(1 - row["length"]))
+            self.graph.add_edge(
+                row[self.unitname1_column], row[self.unitname2_column], weight=(1 - row["length"])
+            )
 
         self.route = nx_app.traveling_salesman_problem(self.graph)
         edge_list = list(nx.utils.pairwise(self.route))
@@ -384,15 +441,28 @@ class SorterObservationProjections(Sorter):
     Sorter class which returns a sorted list of units based on the adjacency of units
     using the direction of observations to predict which unit is adjacent to the current one
     """
-    required_arguments = ['contacts', 'geology_data', 'structure_data', 'dtm_data']
+
+    required_arguments = [
+        'contacts',
+        'geology_data',
+        'structure_data',
+        'dtm_data',
+        'unit_name_column',
+        'unitname1_column',
+        'unitname2_column',
+    ]
+
     def __init__(
         self,
         *,
+        unitname1_column: Optional[str] = 'UNITNAME_1',
+        unitname2_column: Optional[str] = 'UNITNAME_2',
+        unit_name_column: Optional[str] = 'name',
         contacts: Optional[geopandas.GeoDataFrame] = None,
         geology_data: Optional[geopandas.GeoDataFrame] = None,
         structure_data: Optional[geopandas.GeoDataFrame] = None,
         dtm_data: Optional[gdal.Dataset] = None,
-        length: Union[float, int] = 1000
+        length: Union[float, int] = 1000,
     ):
         """
         Initialiser for adjacency based sorter
@@ -409,9 +479,12 @@ class SorterObservationProjections(Sorter):
         self.geology_data = geology_data
         self.structure_data = structure_data
         self.dtm_data = dtm_data
+        self.unit_name_column = unit_name_column
         self.sorter_label = "SorterObservationProjections"
         self.length = length
         self.lines = []
+        self.unit1name_column = unitname1_column
+        self.unit2name_column = unitname2_column
 
     def sort(self, units: pandas.DataFrame) -> list:
         """
@@ -426,6 +499,7 @@ class SorterObservationProjections(Sorter):
         import networkx as nx
         import networkx.algorithms.approximation as nx_app
         from shapely.geometry import LineString, Point
+
         if self.contacts is None:
             raise ValueError("SorterObservationProjections requires 'contacts' argument")
         if self.geology_data is None:
@@ -493,7 +567,12 @@ class SorterObservationProjections(Sorter):
                     # Get heights for intersection point and start of ray
                     height = value_from_raster(inv_geotransform, dtm_array, start.x, start.y)
                     first_intersect_point = Point(start.x, start.y, height)
-                    height = value_from_raster(inv_geotransform, dtm_array, second_intersect_point.x, second_intersect_point.y)
+                    height = value_from_raster(
+                        inv_geotransform,
+                        dtm_array,
+                        second_intersect_point.x,
+                        second_intersect_point.y,
+                    )
                     second_intersect_point = Point(second_intersect_point.x, start.y, height)
 
                     # Check vertical difference between points and compare to projected dip angle
@@ -516,6 +595,7 @@ class SorterObservationProjections(Sorter):
         df = pandas.DataFrame(0, index=unit_names, columns=unit_names)
         for younger, older in ordered_unit_observations:
             df.loc[younger, older] += 1
+        print(df, df.max())
         max_value = max(df.max())
 
         # Using the older/younger matrix create a directed graph
@@ -543,13 +623,13 @@ class SorterObservationProjections(Sorter):
         g_undirected = g.to_undirected()
         for unit in unit_names:
             if len(list(g_undirected.neighbors(unit))) < 1:
-                mask1 = self.contacts["UNITNAME_1"] == unit
-                mask2 = self.contacts["UNITNAME_2"] == unit
+                mask1 = self.contacts[self.unit1name_column] == unit
+                mask2 = self.contacts[self.unit2name_column] == unit
                 for _, row in self.contacts[mask1 | mask2].iterrows():
-                    if unit == row["UNITNAME_1"]:
-                        g.add_edge(row["UNITNAME_2"], unit, weight=max_value * 10)
+                    if unit == row[self.unit1name_column]:
+                        g.add_edge(row[self.unit2name_column], unit, weight=max_value * 10)
                     else:
-                        g.add_edge(row["UNITNAME_1"], unit, weight=max_value * 10)
+                        g.add_edge(row[self.unit1name_column], unit, weight=max_value * 10)
 
         # Run travelling salesman using the observation evidence as weighting
         route = nx_app.traveling_salesman_problem(g.to_undirected())

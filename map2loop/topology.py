@@ -36,7 +36,8 @@ class Topology:
     def __init__(
         self, geology_data: geopandas.GeoDataFrame, 
         fault_data: Optional[geopandas.GeoDataFrame] = None,  
-        verbose_level: VerboseLevel = VerboseLevel.NONE
+        verbose_level: VerboseLevel = VerboseLevel.NONE,
+        id_field: str = 'ID',
     ):
         """
         The initialiser for the map2model wrapper
@@ -55,7 +56,7 @@ class Topology:
         self.fault_data = fault_data
         self.verbose_level = verbose_level
         self.buffer_radius = 500
-
+        self.fault_id_field = id_field
     @property
     def fault_fault_relationships(self):
         if self._fault_fault_relationships is None:

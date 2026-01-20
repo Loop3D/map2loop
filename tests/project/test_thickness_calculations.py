@@ -5,7 +5,7 @@ import numpy
 
 from map2loop.utils import load_map2loop_data
 from map2loop.thickness_calculator import InterpolatedStructure, StructuralPoint
-from map2loop import Project
+from map2loop.project import Project
 
 # 1. self.stratigraphic_column.stratigraphicUnits,
 st_units = pandas.DataFrame(

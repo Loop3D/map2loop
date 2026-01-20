@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.2.10](https://github.com/Loop3D/map2loop/compare/v3.2.9...v3.2.10) (2026-01-20)
+
+
+### Bug Fixes
+
+* add ability to specify fault field to topoloy ([92f754b](https://github.com/Loop3D/map2loop/commit/92f754b2511a18f41c0f990ca6f6391774858ad1))
+* add call methods to allow for generic debug exporting ([3c0e0e0](https://github.com/Loop3D/map2loop/commit/3c0e0e075b9d91bc32341cc8e2f249a828b00ee4))
+* add option to set logger level and handler. ([5fb0720](https://github.com/Loop3D/map2loop/commit/5fb0720d795a7123094c39f171c3f497f53eda07))
+* adding safeguarding and fixing merge ([a675be2](https://github.com/Loop3D/map2loop/commit/a675be2d6cef5646a682dbcd5c706681830d1ad9))
+* applying copilot suggestions ([4021640](https://github.com/Loop3D/map2loop/commit/40216402634b5b9349719b681fb48525080b48a8))
+* beartype issues ([6e2ee69](https://github.com/Loop3D/map2loop/commit/6e2ee69f08d913ce3a55df3f08144ded01922829))
+* change to no default arguments and add unit_name_column as a required ([65a7b86](https://github.com/Loop3D/map2loop/commit/65a7b86ae94c44c098aceb17b13bf3fa624716b9))
+* only store geodataframe if layer is not empty ([46fade8](https://github.com/Loop3D/map2loop/commit/46fade8bc8a673c0b8c067115970da70fed209bc))
+* project import for test ([6eb1518](https://github.com/Loop3D/map2loop/commit/6eb151882369e3e7a062f60722aac9b7e3436736))
+* replace args for kwargs ([e1cb1e6](https://github.com/Loop3D/map2loop/commit/e1cb1e642ffc9a3c206d51a8ccf78a064d645b5f))
+* save location tracking as a line geodataframe for qgis compatibility ([17e14ca](https://github.com/Loop3D/map2loop/commit/17e14cae5cd466e8e3185e2569c311a611e0bed4))
+* set age based sorter args ([5226b49](https://github.com/Loop3D/map2loop/commit/5226b49cfeda5592d878fc07e5ff960ba125f51e))
+* update maximise contacts to compute length and check for empty contacts ([f2cf211](https://github.com/Loop3D/map2loop/commit/f2cf211ce61e9547ac9a00e4d70f00cba24f3d4d))
+* updating incorrect type hints ([71f473c](https://github.com/Loop3D/map2loop/commit/71f473cd7e18d984b474de3a1b4bfd91bac98d81))
+* updating logic ([86b658c](https://github.com/Loop3D/map2loop/commit/86b658c582c8ca6102729e8f8fd7370f28a113f3))
+* updating requirements for alpha sorter plus add check for empty contacts ([b0f12b6](https://github.com/Loop3D/map2loop/commit/b0f12b68cfea2e0d16935720f01240230d912595))
+
 ## [3.2.9](https://github.com/Loop3D/map2loop/compare/v3.2.8...v3.2.9) (2025-12-01)
 
 

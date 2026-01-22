@@ -861,7 +861,7 @@ class AlongSection(ThicknessCalculator):
                 "AlongSection: Geology polygons are required to split sections; skipping thickness calculation."
             )
             return units
-
+        unit_column = "UNITNAME"
         sections = self.sections.copy()
         geology = geology_data.copy()
 

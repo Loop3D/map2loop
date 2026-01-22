@@ -862,25 +862,6 @@ class AlongSection(ThicknessCalculator):
             )
             return units
 
-        unit_column_candidates = [
-            "UNITNAME",
-            "unitname",
-            "UNIT_NAME",
-            "UnitName",
-            "unit",
-            "Unit",
-            "UNIT",
-            "name",
-            "Name",
-        ]
-        unit_column = next((col for col in unit_column_candidates if col in geology_data.columns), None)
-        if unit_column is None:
-            logger.warning(
-                "AlongSection: Unable to identify a unit-name column in geology data; expected one of %s.",
-                unit_column_candidates,
-            )
-            return units
-
         sections = self.sections.copy()
         geology = geology_data.copy()
 
@@ -897,6 +878,44 @@ class AlongSection(ThicknessCalculator):
         except Exception as e:
             logger.error("Failed to create spatial index for geology data: %s", e, exc_info=True)
             geology_sindex = None
+
+        #TODO: check if sections and geology have same crs and reproject if needed. then check if sections overlap geology
+        sections_bounds = sections.total_bounds
+        geology_bounds = geology.total_bounds
+        if (
+            sections_bounds[2] < geology_bounds[0]
+            or sections_bounds[0] > geology_bounds[2]
+            or sections_bounds[3] < geology_bounds[1]
+            or sections_bounds[1] > geology_bounds[3]
+        ):
+            logger.warning("AlongSection: Sections do not overlap geology extent; skipping thickness calculation.")
+            return units
+
+        if geology_sindex is None:
+            overlaps = False
+            for geom in sections.geometry:
+                if geom is None or geom.is_empty:
+                    continue
+                if geology.intersects(geom).any():
+                    overlaps = True
+                    break
+            if not overlaps:
+                logger.warning("AlongSection: Sections do not overlap geology; skipping thickness calculation.")
+                return units
+        else:
+            overlaps = False
+            for geom in sections.geometry:
+                if geom is None or geom.is_empty:
+                    continue
+                candidate_idx = list(geology_sindex.intersection(geom.bounds))
+                if not candidate_idx:
+                    continue
+                if geology.iloc[candidate_idx].intersects(geom).any():
+                    overlaps = True
+                    break
+            if not overlaps:
+                logger.warning("AlongSection: Sections do not overlap geology; skipping thickness calculation.")
+                return units
 
         dip_column = next((col for col in ("DIP", "dip", "Dip") if col in structure_data.columns), None)
         orientation_tree = None
@@ -1006,7 +1025,7 @@ class AlongSection(ThicknessCalculator):
                         )
                         default_dip_warning_emitted = True
 
-                thickness = segment["length"] * abs(math.sin(math.radians(dip_value)))
+                thickness = segment["length"] * math.sin(math.radians(dip_value))
                 if thickness <= 0:
                     continue
 

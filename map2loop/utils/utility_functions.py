@@ -591,3 +591,212 @@ def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
     )
 
     return df
+
+def clean_line_geometry(geometry: shapely.geometry.base.BaseGeometry):
+    """Clean and normalize a Shapely geometry to a single LineString or None.
+
+    Args:
+        geometry (shapely.geometry.base.BaseGeometry | None): Input geometry to be
+            cleaned. Accepted inputs include ``LineString``, ``MultiLineString``,
+            ``GeometryCollection``, and other Shapely geometries. If ``None`` or
+            an empty geometry is provided, the function returns ``None``.
+
+    Returns:
+        shapely.geometry.LineString or None: A single ``LineString`` if the
+        geometry is already a ``LineString`` or can be merged/converted into one.
+        If the input is ``None``, empty, or cannot be converted into a valid
+        ``LineString``, the function returns ``None``.
+
+    Raises:
+        None: Exceptions raised by ``shapely.ops.linemerge`` are caught and result
+        in a ``None`` return rather than being propagated.
+
+    Notes:
+        - The function uses ``shapely.ops.linemerge`` to attempt to merge multipart
+          geometries into a single ``LineString``.
+        - If ``linemerge`` returns a ``MultiLineString``, the longest constituent
+          ``LineString`` (by ``length``) is returned.
+        - Geometries that are already ``LineString`` are returned unchanged.
+
+    Examples:
+        >>> from shapely.geometry import LineString
+        >>> clean_line_geometry(None) is None
+        True
+        >>> ls = LineString([(0, 0), (1, 1)])
+        >>> clean_line_geometry(ls) is ls
+        True
+    """
+    if geometry is None or geometry.is_empty:
+        return None
+    if geometry.geom_type == "LineString":
+        return geometry
+    try:
+        merged = shapely.ops.linemerge(geometry)
+    except Exception:
+        logger.exception("Exception occurred in shapely.ops.linemerge during clean_line_geometry")
+        return None
+    if merged.geom_type == "LineString":
+        return merged
+    if merged.geom_type == "MultiLineString":
+        try:
+            return max(merged.geoms, key=lambda geom: geom.length)
+        except ValueError:
+            return None
+    return None
+
+def iter_line_segments(geometry):
+    """Produce all LineString segments contained in a Shapely geometry.
+
+    Args:
+        geometry (shapely.geometry.base.BaseGeometry | None): Input geometry. Accepted
+            types include ``LineString``, ``MultiLineString``, ``GeometryCollection``
+            and other Shapely geometries that may contain line parts. If ``None`` or
+            an empty geometry is provided, an empty list is returned.
+
+    Returns:
+        list[shapely.geometry.LineString]: A list of ``LineString`` objects extracted
+        from the input geometry. Behavior by input type:
+            - ``LineString``: returned as a single-element list.
+            - ``MultiLineString``: returns the non-zero-length constituent parts.
+            - ``GeometryCollection``: recursively extracts contained line segments.
+            - Other geometry types: returns an empty list if no line segments found.
+
+    Notes:
+        Zero-length segments are filtered out. The function is defensive and
+        will return an empty list for ``None`` or empty geometries rather than
+        raising an exception.
+
+    Examples:
+        >>> from shapely.geometry import LineString
+        >>> iter_line_segments(LineString([(0, 0), (1, 1)]))
+        [LineString([(0, 0), (1, 1)])]
+    """
+    if geometry is None or geometry.is_empty:
+        return []
+    if isinstance(geometry, shapely.geometry.LineString):
+        return [geometry]
+    if isinstance(geometry, shapely.geometry.MultiLineString):
+        return [geom for geom in geometry.geoms if geom.length > 0]
+    if isinstance(geometry, shapely.geometry.GeometryCollection):
+        segments = []
+        for geom in geometry.geoms:
+            segments.extend(iter_line_segments(geom))
+        return segments
+    return []
+
+def nearest_orientation_to_line(orientation_tree, orientation_dips, orientation_coords, line_geom: shapely.geometry.LineString):
+    """Find the nearest orientation measurement to the midpoint of a line.
+
+    This function queries the provided spatial index and orientation arrays and
+    returns the dip value, the index of the matched orientation, and the
+    distance from the line to that orientation point.
+
+    Args:
+        orientation_tree: Spatial index object (e.g., KDTree) with a ``query``
+            method accepting an (x, y) tuple and optional ``k``. Typically
+            provided by the caller so the utility remains stateless.
+        orientation_dips (Sequence[float]): Sequence of dip values aligned with
+            ``orientation_coords``.
+        orientation_coords (Sequence[tuple]): Sequence of (x, y) coordinate
+            tuples for each orientation measurement.
+        line_geom (shapely.geometry.LineString): Line geometry for which the
+            nearest orientation should be found. The midpoint (interpolated at
+            50% of the line length) is used as the query point; if the
+            midpoint is empty, the line centroid is used as a fallback.
+
+    Returns:
+        tuple: A tuple ``(dip, index, distance)`` where:
+            - ``dip`` (float or numpy.nan): the dip value from
+              ``orientation_dips`` at the nearest orientation. Returns
+              ``numpy.nan`` if no valid orientation can be found or on error.
+            - ``index`` (int or None): the integer index into the orientation
+              arrays for the best match, or ``None`` if not found.
+            - ``distance`` (float or None): the shortest geometric distance
+              between ``line_geom`` and the matched orientation point, or
+              ``None`` if not available.
+
+    Notes:
+        - The function queries up to 5 nearest neighbors (or fewer if fewer
+          orientations exist) and then computes the actual geometry distance
+          between the ``line_geom`` and each candidate point to select the
+          closest match. Any exceptions from the spatial query are caught and
+          result in ``(numpy.nan, None, None)`` being returned instead of
+          propagating the exception.
+        - The function is defensive: invalid or empty geometries return
+          ``(numpy.nan, None, None)`` rather than raising.
+
+    Examples:
+        >>> dip, idx, dist = nearest_orientation_to_line(tree, dips, coords, my_line)
+        >>> if idx is not None:
+        ...     print(f"Nearest dip={dip} at index={idx} (distance={dist})")
+    """
+    if orientation_tree is None or orientation_dips is None or orientation_coords is None:
+        return numpy.nan, None, None
+    midpoint = line_geom.interpolate(0.5, normalized=True)
+    if midpoint.is_empty:
+        midpoint = line_geom.centroid
+    if midpoint.is_empty:
+        return numpy.nan, None, None
+    query_xy = (float(midpoint.x), float(midpoint.y))
+    k = min(len(orientation_dips), 5)
+    try:
+        distances, indices = orientation_tree.query(query_xy, k=k)
+    except Exception:
+        logger.exception("Exception occurred during KDTree query in nearest_orientation_to_line; returning (nan, None, None)")
+        return numpy.nan, None, None
+    distances = numpy.atleast_1d(distances)
+    indices = numpy.atleast_1d(indices)
+    best_idx = None
+    best_dist = numpy.inf
+    for _approx_dist, idx in zip(distances, indices):
+        if idx is None:
+            continue
+        candidate_point = shapely.geometry.Point(orientation_coords[int(idx)])
+        actual_dist = line_geom.distance(candidate_point)
+        if actual_dist < best_dist:
+            best_dist = actual_dist
+            best_idx = int(idx)
+    if best_idx is None:
+        return numpy.nan, None, None
+    return float(orientation_dips[best_idx]), best_idx, best_dist
+
+def segment_measure_range(parent_line: shapely.geometry.LineString, segment: shapely.geometry.LineString):
+    """Compute projected measures of a segment's end points along a parent line.
+
+    This function projects the start and end points of ``segment`` onto
+    ``parent_line`` using Shapely's ``project`` method and returns the two
+    measures in ascending order (start <= end). Measures are distances along
+    the parent line's linear reference (units of the geometry's CRS).
+
+    Args:
+        parent_line (shapely.geometry.LineString): The reference line onto which
+            the segment end points will be projected.
+        segment (shapely.geometry.LineString): The segment whose first and last
+            vertices will be projected onto ``parent_line``. The function uses
+            ``segment.coords[0]`` and ``segment.coords[-1]`` as the start and
+            end points respectively.
+
+    Returns:
+        tuple(float, float): A tuple ``(start_measure, end_measure)`` containing
+        the projected distances along ``parent_line`` for the segment's start
+        and end points. The values are ordered so that ``start_measure <= end_measure``.
+
+    Notes:
+        - If ``segment`` is degenerate (e.g., a single point), both measures may
+          be equal.
+        - The returned measures are in the same linear units as the input
+          geometries (e.g., metres for projected CRS).
+        - No validation is performed on the inputs; callers should ensure both
+          geometries are valid and share a common CRS.
+
+    Examples:
+        >>> start_m, end_m = segment_measure_range(parent_line, segment)
+        >>> assert start_m <= end_m
+    """
+    start_point = shapely.geometry.Point(segment.coords[0])
+    end_point = shapely.geometry.Point(segment.coords[-1])
+    start_measure = parent_line.project(start_point)
+    end_measure = parent_line.project(end_point)
+    if end_measure < start_measure:
+        start_measure, end_measure = end_measure, start_measure
+    return start_measure, end_measure

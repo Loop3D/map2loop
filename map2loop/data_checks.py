@@ -460,7 +460,7 @@ def validate_config_dictionary(config_dict: dict) -> None:
         "structure": {
             "orientation_type", "dipdir_column", "dip_column",
             "description_column", "bedding_text", "overturned_column", "overturned_text",
-            "objectid_column", "desciption_column",
+            "objectid_column", "desciption_column", "interp_source_column"
         },
         "geology": {
             "unitname_column", "alt_unitname_column", "group_column",

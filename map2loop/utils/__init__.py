@@ -15,4 +15,8 @@ from .utility_functions import (
     normal_vector_to_dipdirection_dip,
     strike_dip_vector,
     generate_grid,
+    segment_measure_range,
+    clean_line_geometry,
+    nearest_orientation_to_line,
+    iter_line_segments
 )

@@ -591,7 +591,6 @@ def set_z_values_from_raster_df(dtm_data: gdal.Dataset, df: pandas.DataFrame):
     )
 
     return df
-<<<<<<< HEAD
 
 def clean_line_geometry(geometry: shapely.geometry.base.BaseGeometry):
     """Clean and normalize a Shapely geometry to a single LineString or None.
@@ -801,5 +800,3 @@ def segment_measure_range(parent_line: shapely.geometry.LineString, segment: sha
     if end_measure < start_measure:
         start_measure, end_measure = end_measure, start_measure
     return start_measure, end_measure
-=======
->>>>>>> 1febaa9 (style: formatting)

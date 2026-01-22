@@ -898,7 +898,6 @@ class AlongSection(ThicknessCalculator):
             logger.error("Failed to create spatial index for geology data: %s", e, exc_info=True)
             geology_sindex = None
 
-        #TODO: check if sections and geology have same crs and reproject if needed. then check if sections overlap geology
         sections_bounds = sections.total_bounds
         geology_bounds = geology.total_bounds
         if (

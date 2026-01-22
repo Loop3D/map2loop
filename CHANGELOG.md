@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/Loop3D/map2loop/compare/v3.2.10...v3.3.0) (2026-01-22)
+
+
+### Features
+
+* AlongSection Thickness Calculator ([#240](https://github.com/Loop3D/map2loop/issues/240)) ([ba8f82a](https://github.com/Loop3D/map2loop/commit/ba8f82af0b1663c032bfb80babf8f7785a1bf794))
+
 ## [3.2.10](https://github.com/Loop3D/map2loop/compare/v3.2.9...v3.2.10) (2026-01-20)
 
 

@@ -380,10 +380,8 @@ class InterpolatedStructure(ThicknessCalculator):
                     for _, row in basal_contact.iterrows():
                         # find the shortest line between the basal contact points and top contact points
                         short_line = shapely.shortest_line(row.geometry, top_contact_geometry)
-                        _lines.append(short_line[0])
-
                         # check if the short line is
-                        if self.max_line_length is not None and short_line.length > self.max_line_length:
+                        if self.max_line_length is not None and short_line[0].length > self.max_line_length:
                             continue
                         if self.dtm_data is not None:
                             inv_geotransform = gdal.InvGeoTransform(self.dtm_data.GetGeoTransform())
@@ -408,12 +406,14 @@ class InterpolatedStructure(ThicknessCalculator):
                         # find the indices of the points that are within 5% of the length of the shortest line
                         try:
                             # GEOS 3.10.0+
-                            indices = shapely.dwithin(short_line, interp_points, line_length * 0.25)
+                            indices = shapely.dwithin(short_line[0], interp_points, line_length * 0.25)
                         except UnsupportedGEOSVersionError:
                             indices= numpy.array([shapely.distance(short_line[0],point)<= (line_length * 0.25) for point in interp_points])
                         # get the dip of the points that are within
                         _dip = numpy.deg2rad(dip[indices])
-                        _dips.append(_dip)
+                        if len(_dip) > 0:
+                            _lines.extend([short_line[0]]*len(_dip))
+                            _dips.extend(_dip)
                         # calculate the true thickness t = L * sin(dip)
                         thickness = line_length * numpy.sin(_dip)
 
@@ -475,6 +475,7 @@ class InterpolatedStructure(ThicknessCalculator):
         else:
             self.location_tracking = geopandas.GeoDataFrame(columns=['p1_x', 'p1_y', 'p1_z', 'p2_x', 'p2_y', 'p2_z', 'thickness', 'unit', 'geometry'], crs=basal_contacts.crs)
         # Create GeoDataFrame for lines
+   
         self.lines = geopandas.GeoDataFrame(geometry=_lines, crs=basal_contacts.crs)
         self.lines['dip'] = _dips
 

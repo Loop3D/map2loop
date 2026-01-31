@@ -136,7 +136,8 @@ class SamplerSpacing(Sampler):
         spacing = max(spacing, 1.0)
         self.spacing = spacing
 
-
+    def __call__(self, **kwargs):
+        return self.sample(**kwargs)
     @beartype.beartype
     def sample(
         self, spatial_data: geopandas.GeoDataFrame

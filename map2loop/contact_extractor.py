@@ -2,7 +2,7 @@ import geopandas
 import pandas
 import shapely
 from .logging import getLogger
-from typing import Optional
+from typing import Any, Optional
 
 logger = getLogger(__name__)
 
@@ -13,7 +13,11 @@ class ContactExtractor:
         self.contacts = None
         self.basal_contacts = None
         self.all_basal_contacts = None
-
+    def __call__(self, **kwds: Any) -> Any:
+        if 'stratigraphic_column' in kwds:
+            return self.extract_basal_contacts(kwds['stratigraphic_column'], save_contacts=kwds.get('save_contacts', True))
+        else:
+            return self.extract_all_contacts(save_contacts=kwds.get('save_contacts', True))
     def extract_all_contacts(self, save_contacts: bool = True) -> geopandas.GeoDataFrame:
         logger.info("Extracting contacts")
         geology = self.geology.copy()

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/Loop3D/map2loop/compare/v3.3.0...v3.3.1) (2026-01-31)
+
+
+### Bug Fixes
+
+* use first line from shapely and add all dip/thickness estimates ([#246](https://github.com/Loop3D/map2loop/issues/246)) ([381d13f](https://github.com/Loop3D/map2loop/commit/381d13fb2b281568f81fd959139f6b3ac292df18))
+
 ## [3.3.0](https://github.com/Loop3D/map2loop/compare/v3.2.10...v3.3.0) (2026-01-22)
 
 
